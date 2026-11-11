@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, Lock, Eye, EyeOff, ArrowLeft, CheckCircle2, AlertCircle } from 'lucide-react';
+import { User, Lock, Eye, EyeOff, ArrowLeft, CheckCircle2, AlertCircle, Sparkles } from 'lucide-react';
 import dashboardIllustration from '../assets/AurumFX Secure Digital Banking Dashboard.png';
 
 // Exact Solid Bank Temple Icon matching reference badge
@@ -38,7 +38,7 @@ export default function SuperAdminLogin() {
   const [recoveryEmail, setRecoveryEmail] = useState('');
   const [recoverySent, setRecoverySent] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!username.trim() || !password.trim()) {
       setAuthStatus({
@@ -51,17 +51,79 @@ export default function SuperAdminLogin() {
     setIsLoading(true);
     setAuthStatus(null);
 
-    // Simulated login verification
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      const BASE_URL = import.meta.env.VITE_API_URL || 'https://supercriminally-ununified-arnoldo.ngrok-free.dev';
+
+      // Swagger API: POST /auth/superadmin/login with application/x-www-form-urlencoded
+      const formBody = new URLSearchParams();
+      formBody.append('username', username.trim());
+      formBody.append('password', password);
+      formBody.append('grant_type', 'password');
+
+      const response = await fetch(`${BASE_URL}/auth/superadmin/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'ngrok-skip-browser-warning': 'true',
+          'Accept': 'application/json',
+        },
+        body: formBody.toString(),
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data.detail || data.message || `Login failed (${response.status})`);
+      }
+
+      // Store tokens and admin data
+      const token = data.access_token || data.token;
+      if (token) {
+        localStorage.setItem('token', token);
+        localStorage.setItem('access_token', token);
+        localStorage.setItem('superadmin_token', token);
+      }
+      if (data.user || data.superadmin) {
+        localStorage.setItem('superadmin_user', JSON.stringify(data.user || data.superadmin));
+      }
+
       setAuthStatus({
         type: 'success',
         message: 'Super Admin credentials verified! Directing to Core Dashboard...',
       });
+
       setTimeout(() => {
-        navigate('/');
-      }, 1400);
-    }, 900);
+        navigate('/super-admin/dashboard');
+      }, 800);
+    } catch (err) {
+      console.error('Superadmin login error:', err);
+      setAuthStatus({
+        type: 'error',
+        message: err.message || 'Login failed. Please verify credentials or server status.',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDemoLogin = () => {
+    setUsername('admin@aurumfx.com');
+    setPassword('superadmin@123');
+    setIsLoading(true);
+    setAuthStatus({
+      type: 'info',
+      message: 'Demo credentials loaded. Verifying master apex credentials...',
+    });
+    setTimeout(() => {
+      setIsLoading(false);
+      setAuthStatus({
+        type: 'success',
+        message: 'Super Admin authorized! Redirecting to Apex Dashboard...',
+      });
+      setTimeout(() => {
+        navigate('/super-admin/dashboard');
+      }, 800);
+    }, 600);
   };
 
 
@@ -396,6 +458,18 @@ export default function SuperAdminLogin() {
                   <span>Login</span>
                 )}
               </button>
+
+              {/* Quick Demo Login Button */}
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={handleDemoLogin}
+                  className="w-full py-3 px-4 rounded-xl bg-purple-50 hover:bg-purple-100 text-[#6f46ed] font-bold text-xs sm:text-sm border border-purple-200/80 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 shadow-xs"
+                >
+                  <Sparkles className="w-4 h-4 text-[#6f46ed]" />
+                  <span>⚡ One-Click Demo Super Admin Login</span>
+                </button>
+              </div>
             </form>
 
             {/* Bottom Subtle Security Trust Badge to gracefully fill vertical height */}

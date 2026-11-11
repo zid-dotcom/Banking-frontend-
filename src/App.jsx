@@ -11,6 +11,9 @@ import Contact from './pages/Contact';
 import SuperAdminLogin from './pages/SuperAdminLogin';
 import BranchAdminLogin from './pages/BranchAdminLogin';
 import MemberLogin from './pages/MemberLogin';
+import MemberDashboard from './pages/dashboard/MemberDashboard';
+import BranchManagerDashboard from './pages/dashboard/BranchManagerDashboard';
+import SuperAdminDashboard from './pages/dashboard/SuperAdminDashboard';
 import EnquiryModal from './components/EnquiryModal';
 import PortalModal from './components/PortalModal';
 import ChatWithUsWidget from './components/ChatWithUsWidget';
@@ -44,6 +47,12 @@ function MainApp() {
     location.pathname === '/branch-manager/login' ||
     location.pathname === '/branch/login';
   const isMemberLoginRoute = location.pathname === '/member-login' || location.pathname === '/member/login';
+
+  // Isolated role-based dashboard routes
+  const isDashboardRoute =
+    location.pathname.startsWith('/member/dashboard') ||
+    location.pathname.startsWith('/branch-manager/dashboard') ||
+    location.pathname.startsWith('/super-admin/dashboard');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -94,6 +103,17 @@ function MainApp() {
       <Routes>
         <Route path="/member-login" element={<MemberLogin />} />
         <Route path="/member/login" element={<MemberLogin />} />
+      </Routes>
+    );
+  }
+
+  // If on any role dashboard route, render isolated modular dashboard view
+  if (isDashboardRoute) {
+    return (
+      <Routes>
+        <Route path="/member/dashboard" element={<MemberDashboard />} />
+        <Route path="/branch-manager/dashboard" element={<BranchManagerDashboard />} />
+        <Route path="/super-admin/dashboard" element={<SuperAdminDashboard />} />
       </Routes>
     );
   }

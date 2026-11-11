@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, Lock, Eye, EyeOff, ArrowLeft, CheckCircle2, AlertCircle, Users } from 'lucide-react';
+import { User, Lock, Eye, EyeOff, ArrowLeft, CheckCircle2, AlertCircle, Users, Sparkles } from 'lucide-react';
 import memberIllustration from '../assets/Modern Fintech Membership Illustration.png';
 
 // Exact Solid Bank Temple Icon matching reference logo & badge
@@ -54,12 +54,32 @@ export default function MemberLogin() {
       setIsLoading(false);
       setAuthStatus({
         type: 'success',
-        message: 'Member credentials verified! Accessing your account...',
+        message: 'Member credentials verified! Accessing Member Dashboard...',
       });
       setTimeout(() => {
-        navigate('/');
-      }, 1400);
-    }, 900);
+        navigate('/member/dashboard');
+      }, 1000);
+    }, 800);
+  };
+
+  const handleDemoLogin = () => {
+    setMemberId('AFX-MEM-8842');
+    setPassword('member@123');
+    setIsLoading(true);
+    setAuthStatus({
+      type: 'info',
+      message: 'Demo credentials loaded. Verifying member status...',
+    });
+    setTimeout(() => {
+      setIsLoading(false);
+      setAuthStatus({
+        type: 'success',
+        message: 'Member authorized! Redirecting to Member Dashboard...',
+      });
+      setTimeout(() => {
+        navigate('/member/dashboard');
+      }, 800);
+    }, 600);
   };
 
   const handleForgotPasswordSubmit = (e) => {
@@ -256,6 +276,18 @@ export default function MemberLogin() {
                 <span>Sign In</span>
               )}
             </button>
+
+            {/* Quick Demo Login Button */}
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={handleDemoLogin}
+                className="w-full h-12 px-4 rounded-2xl bg-teal-50 hover:bg-teal-100 text-[#008579] font-bold text-xs sm:text-sm border border-teal-200/80 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 shadow-xs"
+              >
+                <Sparkles className="w-4 h-4 text-[#008579]" />
+                <span>⚡ One-Click Demo Member Login</span>
+              </button>
+            </div>
           </form>
 
         </div>

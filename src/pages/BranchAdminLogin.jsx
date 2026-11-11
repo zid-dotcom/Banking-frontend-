@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, Lock, Eye, EyeOff, ArrowLeft, CheckCircle2, AlertCircle, Users } from 'lucide-react';
+import { User, Lock, Eye, EyeOff, ArrowLeft, CheckCircle2, AlertCircle, Users, Sparkles } from 'lucide-react';
 import branchDeskIllustration from '../assets/Branch Admin at a Modern Bank Desk.png';
 
 // Exact Solid Bank Temple Icon matching reference logo & badge
@@ -61,9 +61,29 @@ export default function BranchAdminLogin() {
         message: 'Branch Manager authorized! Accessing branch operations console...',
       });
       setTimeout(() => {
-        navigate('/');
-      }, 1400);
-    }, 900);
+        navigate('/branch-manager/dashboard');
+      }, 1000);
+    }, 800);
+  };
+
+  const handleDemoLogin = () => {
+    setManagerId('MGR-THRISSUR-01');
+    setPassword('manager@123');
+    setIsLoading(true);
+    setAuthStatus({
+      type: 'info',
+      message: 'Demo credentials loaded. Verifying branch manager access...',
+    });
+    setTimeout(() => {
+      setIsLoading(false);
+      setAuthStatus({
+        type: 'success',
+        message: 'Branch Manager authorized! Redirecting to Branch Dashboard...',
+      });
+      setTimeout(() => {
+        navigate('/branch-manager/dashboard');
+      }, 800);
+    }, 600);
   };
 
   const handleForgotPasswordSubmit = (e) => {
@@ -261,6 +281,18 @@ export default function BranchAdminLogin() {
                 <span>Sign In</span>
               )}
             </button>
+
+            {/* Quick Demo Login Button */}
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={handleDemoLogin}
+                className="w-full h-12 px-4 rounded-2xl bg-teal-50 hover:bg-teal-100 text-[#008579] font-bold text-xs sm:text-sm border border-teal-200/80 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 shadow-xs"
+              >
+                <Sparkles className="w-4 h-4 text-[#008579]" />
+                <span>⚡ One-Click Demo Manager Login</span>
+              </button>
+            </div>
           </form>
 
         </div>
