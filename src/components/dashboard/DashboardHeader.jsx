@@ -19,9 +19,24 @@ export default function DashboardHeader({
   const [notificationsOpen, setNotificationsOpen] = useState(false);
 
   const handleLogout = () => {
-    if (role === 'member') navigate('/member-login');
-    else if (role === 'branch_manager') navigate('/branch-manager-login');
-    else navigate('/super-admin/login');
+    localStorage.removeItem('token');
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('superadmin_token');
+    localStorage.removeItem('superadmin_user');
+    localStorage.removeItem('auth_token');
+    sessionStorage.removeItem('auth_expired_message');
+
+    if (role === 'member') {
+      localStorage.removeItem('member_token');
+      localStorage.removeItem('member_user');
+      navigate('/member-login');
+    } else if (role === 'branch_manager') {
+      localStorage.removeItem('branch_token');
+      localStorage.removeItem('branch_user');
+      navigate('/branch-manager-login');
+    } else {
+      navigate('/super-admin/login');
+    }
   };
 
   const notifications = [
@@ -47,7 +62,7 @@ export default function DashboardHeader({
             {SOCIETY_INFO.shortName} Multi-State Cooperative
           </p>
           <h2 className="text-base sm:text-lg lg:text-xl font-bold text-slate-900 leading-snug mt-0.5">
-            Welcome back, <span className="text-[#0d9488]">{user.name?.split(' ')[0] || 'User'}</span>
+            Welcome back, <span className="text-[#0d9488]">{role === 'super_admin' ? (user.name || 'Super Admin') : (user.name?.split(' ')[0] || 'User')}</span>
           </h2>
         </div>
       </div>
@@ -111,15 +126,15 @@ export default function DashboardHeader({
         {/* User Pill */}
         <div className="flex items-center gap-2.5 pl-2 sm:pl-3 border-l border-slate-200">
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#2dd4bf] to-[#14b8a6] text-white flex items-center justify-center font-bold text-sm shadow-sm shadow-teal-500/20 flex-shrink-0">
-            {user.avatarText || 'U'}
+            {user.avatarText || (role === 'super_admin' ? 'SA' : 'U')}
           </div>
           <div className="hidden lg:block text-left leading-none">
             <p className="text-xs font-bold text-slate-900 truncate max-w-[130px]">
-              {user.name || 'Demo User'}
+              {user.name || (role === 'super_admin' ? 'Super Admin' : 'User')}
             </p>
             <span className="text-[10px] text-emerald-600 font-semibold flex items-center gap-1 mt-1">
               <CheckCircle className="w-2.5 h-2.5" />
-              Verified
+              {user.role || (role === 'super_admin' ? 'Super Admin' : 'Verified')}
             </span>
           </div>
         </div>

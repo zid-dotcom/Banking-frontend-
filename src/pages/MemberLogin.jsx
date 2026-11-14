@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { User, Lock, Eye, EyeOff, ArrowLeft, CheckCircle2, AlertCircle, Users, Sparkles } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
+import { User, Lock, Eye, EyeOff, ArrowLeft, CheckCircle2, AlertCircle, Users, UserPlus } from 'lucide-react';
 import memberIllustration from '../assets/Modern Fintech Membership Illustration.png';
+import { memberLogin } from '../services/memberService';
+import MemberRegistrationModal from '../components/MemberRegistrationModal';
 
 // Exact Solid Bank Temple Icon matching reference logo & badge
 function BankTempleIcon({ className = 'w-6 h-6 text-slate-900' }) {
@@ -27,6 +29,8 @@ function BankTempleIcon({ className = 'w-6 h-6 text-slate-900' }) {
 
 export default function MemberLogin() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
   const [memberId, setMemberId] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -35,8 +39,24 @@ export default function MemberLogin() {
   const [forgotModalOpen, setForgotModalOpen] = useState(false);
   const [recoveryEmail, setRecoveryEmail] = useState('');
   const [recoverySent, setRecoverySent] = useState(false);
+  const [regModalOpen, setRegModalOpen] = useState(false);
+  const [regMode, setRegMode] = useState('register');
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    const expiredQuery = searchParams.get('expired') === 'true';
+    const expiredMsg = sessionStorage.getItem('auth_expired_message');
+    const stateMsg = location.state?.error || location.state?.message;
+
+    if (expiredQuery || expiredMsg || stateMsg) {
+      setAuthStatus({
+        type: 'error',
+        message: stateMsg || expiredMsg || 'Token is expired. Please login again.',
+      });
+      sessionStorage.removeItem('auth_expired_message');
+    }
+  }, [location, searchParams]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!memberId.trim() || !password.trim()) {
       setAuthStatus({
@@ -49,37 +69,57 @@ export default function MemberLogin() {
     setIsLoading(true);
     setAuthStatus(null);
 
-    // Simulated login verification
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      await memberLogin({
+        username: memberId.trim(),
+        password: password,
+      });
+
       setAuthStatus({
         type: 'success',
         message: 'Member credentials verified! Accessing Member Dashboard...',
       });
+
       setTimeout(() => {
         navigate('/member/dashboard');
-      }, 1000);
-    }, 800);
+      }, 700);
+    } catch (err) {
+      console.error('Member login error:', err);
+      setAuthStatus({
+        type: 'error',
+        message: err.message || 'Incorrect member code or password. Please verify your credentials.',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleDemoLogin = () => {
-    setMemberId('AFX-MEM-8842');
-    setPassword('member@123');
-    setIsLoading(true);
+  const handleOpenRegistration = (mode = 'register') => {
+    setRegMode(mode);
+    setRegModalOpen(true);
+  };
+
+  const isRejectedError = Boolean(
+    authStatus?.type === 'error' &&
+    authStatus?.message &&
+    (
+      authStatus.message.toLowerCase().includes('reject') ||
+      authStatus.message.toLowerCase().includes('re-apply') ||
+      authStatus.message.toLowerCase().includes('reapply')
+    )
+  );
+
+  const handleRegistrationSuccess = ({ memberCode, password: registeredPwd }) => {
+    if (memberCode) {
+      setMemberId(memberCode);
+    }
+    if (registeredPwd) {
+      setPassword(registeredPwd);
+    }
     setAuthStatus({
-      type: 'info',
-      message: 'Demo credentials loaded. Verifying member status...',
+      type: 'success',
+      message: `Application submitted! Your Member Code is #${memberCode}. You can log in once approved.`,
     });
-    setTimeout(() => {
-      setIsLoading(false);
-      setAuthStatus({
-        type: 'success',
-        message: 'Member authorized! Redirecting to Member Dashboard...',
-      });
-      setTimeout(() => {
-        navigate('/member/dashboard');
-      }, 800);
-    }, 600);
   };
 
   const handleForgotPasswordSubmit = (e) => {
@@ -188,7 +228,21 @@ export default function MemberLogin() {
               ) : (
                 <CheckCircle2 className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
               )}
-              <div className="leading-snug">{authStatus.message}</div>
+              <div className="leading-snug flex-1">
+                <div>{authStatus.message}</div>
+                {isRejectedError && (
+                  <div className="mt-2.5 pt-2 border-t border-rose-200/80 text-xs text-rose-600 font-medium">
+                    Need to update a rejected application?{' '}
+                    <button
+                      type="button"
+                      onClick={() => handleOpenRegistration('reapply')}
+                      className="font-bold text-rose-700 hover:text-rose-900 underline cursor-pointer transition-colors"
+                    >
+                      Reapply Member
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
@@ -277,16 +331,31 @@ export default function MemberLogin() {
               )}
             </button>
 
-            {/* Quick Demo Login Button */}
-            <div className="pt-2">
-              <button
-                type="button"
-                onClick={handleDemoLogin}
-                className="w-full h-12 px-4 rounded-2xl bg-teal-50 hover:bg-teal-100 text-[#008579] font-bold text-xs sm:text-sm border border-teal-200/80 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 shadow-xs"
-              >
-                <Sparkles className="w-4 h-4 text-[#008579]" />
-                <span>⚡ One-Click Demo Member Login</span>
-              </button>
+            {/* New User Registration & Reapply Options */}
+            <div className="pt-2 text-center space-y-1.5 border-t border-slate-100">
+              <p className="text-sm text-slate-600">
+                Are you a new user?{' '}
+                <button
+                  type="button"
+                  onClick={() => handleOpenRegistration('register')}
+                  className="font-bold text-[#008f85] hover:text-[#007068] hover:underline cursor-pointer transition-colors"
+                >
+                  Apply for Membership / Register Here
+                </button>
+              </p>
+
+              {isRejectedError && (
+                <p className="text-xs sm:text-sm text-rose-600 font-medium animate-fadeIn pt-0.5">
+                  Need to update a rejected application?{' '}
+                  <button
+                    type="button"
+                    onClick={() => handleOpenRegistration('reapply')}
+                    className="font-bold text-rose-600 hover:text-rose-800 underline cursor-pointer transition-colors"
+                  >
+                    Reapply Member
+                  </button>
+                </p>
+              )}
             </div>
           </form>
 
@@ -370,6 +439,19 @@ export default function MemberLogin() {
             )}
           </div>
         </div>
+      )}
+
+      {/* =====================================================================
+          Member Registration & Reapply Modal
+         ===================================================================== */}
+      {regModalOpen && (
+        <MemberRegistrationModal
+          isOpen={regModalOpen}
+          initialMode={regMode}
+          initialMemberCode={regMode === 'reapply' ? memberId : ''}
+          onClose={() => setRegModalOpen(false)}
+          onRegistrationSuccess={handleRegistrationSuccess}
+        />
       )}
 
     </div>

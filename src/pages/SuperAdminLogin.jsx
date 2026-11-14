@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { User, Lock, Eye, EyeOff, ArrowLeft, CheckCircle2, AlertCircle, Sparkles } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
+import { User, Lock, Eye, EyeOff, ArrowLeft, CheckCircle2, AlertCircle } from 'lucide-react';
 import dashboardIllustration from '../assets/AurumFX Secure Digital Banking Dashboard.png';
 
 // Exact Solid Bank Temple Icon matching reference badge
@@ -29,6 +29,8 @@ function BankTempleIcon({ className = 'w-6 h-6 text-slate-900' }) {
 
 export default function SuperAdminLogin() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -37,6 +39,20 @@ export default function SuperAdminLogin() {
   const [forgotModalOpen, setForgotModalOpen] = useState(false);
   const [recoveryEmail, setRecoveryEmail] = useState('');
   const [recoverySent, setRecoverySent] = useState(false);
+
+  useEffect(() => {
+    const expiredQuery = searchParams.get('expired') === 'true';
+    const expiredMsg = sessionStorage.getItem('auth_expired_message');
+    const stateMsg = location.state?.error || location.state?.message;
+
+    if (expiredQuery || expiredMsg || stateMsg) {
+      setAuthStatus({
+        type: 'error',
+        message: stateMsg || expiredMsg || 'Token is expired. Please login again.',
+      });
+      sessionStorage.removeItem('auth_expired_message');
+    }
+  }, [location, searchParams]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -106,28 +122,6 @@ export default function SuperAdminLogin() {
     }
   };
 
-  const handleDemoLogin = () => {
-    setUsername('admin@aurumfx.com');
-    setPassword('superadmin@123');
-    setIsLoading(true);
-    setAuthStatus({
-      type: 'info',
-      message: 'Demo credentials loaded. Verifying master apex credentials...',
-    });
-    setTimeout(() => {
-      setIsLoading(false);
-      setAuthStatus({
-        type: 'success',
-        message: 'Super Admin authorized! Redirecting to Apex Dashboard...',
-      });
-      setTimeout(() => {
-        navigate('/super-admin/dashboard');
-      }, 800);
-    }, 600);
-  };
-
-
-
   const handleForgotPasswordSubmit = (e) => {
     e.preventDefault();
     if (!recoveryEmail) return;
@@ -186,7 +180,7 @@ export default function SuperAdminLogin() {
             </defs>
           </svg>
         </div>
-
+ 
         {/* Bottom-Left Soft Purple Fluid Waves (Tucked strictly into bottom-left corner) */}
         <div className="absolute bottom-0 left-0 w-[24vw] min-w-[200px] max-w-[340px] h-[32vh] min-h-[180px] max-h-[300px] pointer-events-none overflow-hidden">
           <svg
@@ -244,7 +238,7 @@ export default function SuperAdminLogin() {
       >
         <ArrowLeft className="w-5 h-5 transition-transform group-hover:-translate-x-0.5" />
       </Link>
-
+    
       {/* =====================================================================
           MAIN CARD CONTAINER
           - Desktop: expanded width (max-w-[1480px] - 1640px) & tall height (min-h-[700px])
@@ -273,7 +267,7 @@ export default function SuperAdminLogin() {
             <circle cx="480" cy="190" r="300" stroke="white" strokeWidth="1.2" strokeDasharray="3 3" opacity="0.3" />
             <circle cx="480" cy="190" r="410" stroke="white" strokeWidth="1" opacity="0.2" />
           </svg>
-
+ 
           {/* Top Brand Content */}
           <div className="relative z-10">
             {/* Logo Row */}
@@ -458,18 +452,6 @@ export default function SuperAdminLogin() {
                   <span>Login</span>
                 )}
               </button>
-
-              {/* Quick Demo Login Button */}
-              <div className="pt-2">
-                <button
-                  type="button"
-                  onClick={handleDemoLogin}
-                  className="w-full py-3 px-4 rounded-xl bg-purple-50 hover:bg-purple-100 text-[#6f46ed] font-bold text-xs sm:text-sm border border-purple-200/80 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 shadow-xs"
-                >
-                  <Sparkles className="w-4 h-4 text-[#6f46ed]" />
-                  <span>⚡ One-Click Demo Super Admin Login</span>
-                </button>
-              </div>
             </form>
 
             {/* Bottom Subtle Security Trust Badge to gracefully fill vertical height */}

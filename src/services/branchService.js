@@ -23,6 +23,88 @@ function getHeaders() {
 }
 
 /**
+ * Handle expired token: cleans tokens, sets notification, and navigates to login
+ */
+export function handleAuthExpired(role = 'super_admin') {
+  localStorage.removeItem('token');
+  localStorage.removeItem('access_token');
+  localStorage.removeItem('superadmin_token');
+  localStorage.removeItem('superadmin_user');
+  sessionStorage.setItem('auth_expired_message', 'Token is expired. Please login again.');
+
+  const targetPath = role === 'member'
+    ? '/member-login?expired=true'
+    : role === 'branch_manager'
+    ? '/branch-manager-login?expired=true'
+    : '/super-admin/login?expired=true';
+
+  if (!window.location.pathname.includes('/login')) {
+    window.location.href = targetPath;
+  }
+}
+
+/**
+ * Extracts and formats user-friendly error messages from backend responses
+ * (specifically handles FastAPI/Pydantic 422 detail arrays, strings, etc.)
+ */
+export function parseApiError(errBody, status, fallbackMessage = 'Operation failed') {
+  if (!errBody) return `${fallbackMessage} (${status || 'Unknown'})`;
+  if (typeof errBody === 'string') return errBody;
+
+  // FastAPI detail format: can be string or array of error objects
+  if (typeof errBody.detail === 'string') {
+    return errBody.detail;
+  }
+
+  if (Array.isArray(errBody.detail)) {
+    const messages = errBody.detail.map((item) => {
+      if (typeof item === 'string') return item;
+      if (item && typeof item === 'object') {
+        const msg = item.msg || item.message || JSON.stringify(item);
+        // Clean up FastAPI "Value error, " prefix if present
+        const cleanMsg = msg.replace(/^Value error,\s*/i, '');
+        const loc = Array.isArray(item.loc)
+          ? item.loc.filter((l) => l !== 'body').join(' -> ')
+          : '';
+        return loc ? `${loc.replace(/_/g, ' ')}: ${cleanMsg}` : cleanMsg;
+      }
+      return String(item);
+    });
+    return messages.filter(Boolean).join(' | ');
+  }
+
+  if (typeof errBody.message === 'string') {
+    return errBody.message;
+  }
+
+  if (typeof errBody.error === 'string') {
+    return errBody.error;
+  }
+
+  return `${fallbackMessage} (${status || 'Error'})`;
+}
+
+/**
+ * Inspect response and throw error or redirect on expired token
+ */
+function checkResponseStatus(res, errBody, defaultMsg) {
+  const parsedMsg = parseApiError(errBody, res.status, defaultMsg);
+  const isExpired = 
+    res.status === 401 || 
+    res.status === 403 || 
+    parsedMsg.toLowerCase().includes('expired token') || 
+    parsedMsg.toLowerCase().includes('invalid or expired') ||
+    parsedMsg.toLowerCase().includes('token has expired');
+
+  if (isExpired) {
+    handleAuthExpired('super_admin');
+    throw new Error('Token is expired. Please login again.');
+  }
+
+  throw new Error(parsedMsg);
+}
+
+/**
  * 1. GET /superadmin/branches - List all branches
  */
 export async function getBranches() {
@@ -33,11 +115,11 @@ export async function getBranches() {
     });
 
     if (!res.ok) {
-      throw new Error(`Failed to fetch branches: ${res.status} ${res.statusText}`);
+      const errBody = await res.json().catch(() => ({}));
+      checkResponseStatus(res, errBody, 'Failed to fetch branches');
     }
 
     const data = await res.json();
-    // Return array safely if wrapped in an object like { branches: [...] } or { data: [...] }
     if (Array.isArray(data)) return data;
     if (Array.isArray(data.branches)) return data.branches;
     if (Array.isArray(data.data)) return data.data;
@@ -60,7 +142,8 @@ export async function getBranch(branchId) {
     });
 
     if (!res.ok) {
-      throw new Error(`Failed to fetch branch #${branchId}: ${res.status} ${res.statusText}`);
+      const errBody = await res.json().catch(() => ({}));
+      checkResponseStatus(res, errBody, `Failed to fetch branch #${branchId}`);
     }
 
     return await res.json();
@@ -83,7 +166,7 @@ export async function createBranch(branchData) {
 
     if (!res.ok) {
       const errBody = await res.json().catch(() => ({}));
-      throw new Error(errBody.detail || errBody.message || `Failed to create branch (${res.status})`);
+      checkResponseStatus(res, errBody, 'Failed to create branch');
     }
 
     return await res.json();
@@ -106,7 +189,7 @@ export async function updateBranch(branchId, branchData) {
 
     if (!res.ok) {
       const errBody = await res.json().catch(() => ({}));
-      throw new Error(errBody.detail || errBody.message || `Failed to update branch (${res.status})`);
+      checkResponseStatus(res, errBody, 'Failed to update branch');
     }
 
     return await res.json();
@@ -128,7 +211,7 @@ export async function deleteBranch(branchId) {
 
     if (!res.ok) {
       const errBody = await res.json().catch(() => ({}));
-      throw new Error(errBody.detail || errBody.message || `Failed to delete branch (${res.status})`);
+      checkResponseStatus(res, errBody, 'Failed to delete branch');
     }
 
     return await res.json().catch(() => ({ success: true }));
@@ -152,7 +235,7 @@ export async function changeBranchStatus(branchId, isActive) {
 
     if (!res.ok) {
       const errBody = await res.json().catch(() => ({}));
-      throw new Error(errBody.detail || errBody.message || `Failed to change status (${res.status})`);
+      checkResponseStatus(res, errBody, 'Failed to change branch status');
     }
 
     return await res.json();
@@ -161,4 +244,3 @@ export async function changeBranchStatus(branchId, isActive) {
     throw error;
   }
 }
-

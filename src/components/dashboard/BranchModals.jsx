@@ -46,6 +46,7 @@ export function BranchFormModal({
   });
 
   const [error, setError] = useState(null);
+  const [errorPopup, setErrorPopup] = useState(null);
 
   useEffect(() => {
     if (initialData && mode === 'edit') {
@@ -78,11 +79,17 @@ export function BranchFormModal({
     e.preventDefault();
     setError(null);
     if (!formData.name.trim()) {
-      setError('Branch name is required.');
+      setErrorPopup({
+        title: 'Validation Error',
+        message: 'Branch name is required.'
+      });
       return;
     }
     if (!formData.city.trim()) {
-      setError('City is required.');
+      setErrorPopup({
+        title: 'Validation Error',
+        message: 'City is required.'
+      });
       return;
     }
 
@@ -90,6 +97,10 @@ export function BranchFormModal({
       await onSubmit(formData);
     } catch (err) {
       setError(err.message || 'Operation failed. Please verify API connection.');
+      setErrorPopup({
+        title: mode === 'create' ? 'Branch Creation Failed' : 'Branch Update Failed',
+        message: err.message || 'Operation failed. Please verify API connection.'
+      });
     }
   };
 
@@ -108,12 +119,12 @@ export function BranchFormModal({
             </div>
             <div>
               <h3 className="text-lg font-bold text-slate-900">
-                {isEdit ? 'Update Society Branch' : 'Charter New Society Branch'}
+                {isEdit ? 'Update Branch' : 'Create Branch'}
               </h3>
               <p className="text-xs text-slate-500 mt-0.5">
                 {isEdit
                   ? `Editing ${initialData?.name || 'Branch'}`
-                  : 'Provision operational hub under Multi-State Cooperative Act'}
+                  : 'Register operational hub in the multi-state cooperative network'}
               </p>
             </div>
           </div>
@@ -127,9 +138,11 @@ export function BranchFormModal({
         </div>
 
         {error && (
-          <div className="mb-4 p-3 bg-rose-50 border border-rose-200 rounded-xl flex items-center gap-2.5 text-xs text-rose-700">
-            <AlertCircle className="w-4 h-4 flex-shrink-0" />
-            <span>{error}</span>
+          <div className="mb-4 p-3.5 bg-rose-50 border border-rose-200/80 rounded-2xl flex items-start gap-2.5 text-xs text-rose-700 shadow-xs animate-fadeIn">
+            <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0 mt-0.5" />
+            <div className="flex-1 font-semibold leading-relaxed whitespace-pre-wrap">
+              {error}
+            </div>
           </div>
         )}
 
@@ -210,9 +223,10 @@ export function BranchFormModal({
               required
               value={formData.contact_number}
               onChange={handleChange}
-              placeholder="e.g. +91 495 234 5000"
+              placeholder="e.g. +919495234500"
               className="w-full h-10 px-3.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#2dd4bf] focus:bg-white transition-all"
             />
+            <p className="text-[11px] text-slate-400 mt-1">10 to 14 digits, optional + at start (without spaces)</p>
           </div>
 
           {/* Actions */}
@@ -231,11 +245,41 @@ export function BranchFormModal({
               className="px-5 py-2 bg-gradient-to-r from-[#14b8a6] to-[#2dd4bf] hover:from-[#0d9488] hover:to-[#14b8a6] text-white font-bold text-xs sm:text-sm rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
             >
               {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
-              <span>{isEdit ? 'Save Changes' : 'Charter Branch'}</span>
+              <span>{isEdit ? 'Save Changes' : 'Create Branch'}</span>
             </button>
           </div>
         </form>
       </div>
+
+      {/* Centered Red Error Alert Popup */}
+      {errorPopup && (
+        <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fadeIn">
+          <div className="bg-white rounded-3xl p-6 sm:p-7 max-w-md w-full shadow-2xl border border-rose-100 text-center space-y-4 animate-scaleUp">
+            <div className="w-14 h-14 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mx-auto shadow-inner border border-rose-100">
+              <AlertCircle className="w-8 h-8 stroke-[2.2]" />
+            </div>
+
+            <div>
+              <h3 className="text-xl font-black text-slate-900 tracking-tight">
+                {typeof errorPopup === 'object' ? (errorPopup.title || 'Validation Error') : 'Submission Error'}
+              </h3>
+              <p className="text-xs sm:text-sm text-rose-900 mt-2.5 leading-relaxed bg-rose-50/70 p-4 rounded-2xl border border-rose-200/80 font-medium break-words text-left">
+                {typeof errorPopup === 'object' ? (errorPopup.message || JSON.stringify(errorPopup)) : String(errorPopup)}
+              </p>
+            </div>
+
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={() => setErrorPopup(null)}
+                className="w-full h-11 px-5 bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 text-white font-bold text-sm rounded-xl shadow-md transition-all cursor-pointer"
+              >
+                Okay, Got It
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -268,16 +312,16 @@ export function BranchDetailModal({
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-[11px] font-bold text-[#0f766e] bg-teal-50 px-2.5 py-0.5 rounded-full border border-teal-200/50">
-                  {branch.state} Jurisdiction
+                  {branch.state || 'kerala'}
                 </span>
                 <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 ${
-                  branch.isActive ? 'text-emerald-700 bg-emerald-50' : 'text-amber-700 bg-amber-50'
+                  branch.isActive ? 'text-emerald-700 bg-emerald-50' : 'text-slate-600 bg-slate-100'
                 }`}>
-                  <CheckCircle2 className="w-3 h-3" /> {branch.isActive ? 'Online & Active' : 'Offline'}
+                  <CheckCircle2 className="w-3 h-3" /> {branch.isActive ? 'Active' : 'Inactive'}
                 </span>
               </div>
               <h3 className="text-lg font-bold text-slate-900 mt-1">{branch.name}</h3>
-              <p className="text-xs text-slate-400 font-mono">Code: {branch.code || branch.id}</p>
+              <p className="text-xs text-slate-500 font-mono">Branch Code: #{branch.branch_code || branch.id}</p>
             </div>
           </div>
           <button
@@ -291,7 +335,7 @@ export function BranchDetailModal({
         {isLoading ? (
           <div className="py-12 text-center text-slate-400 flex flex-col items-center gap-2">
             <Loader2 className="w-6 h-6 animate-spin text-[#00b4a7]" />
-            <p className="text-xs font-medium">Fetching live branch audit metrics...</p>
+            <p className="text-xs font-medium">Fetching live branch details...</p>
           </div>
         ) : (
           <div className="py-4 space-y-4">
@@ -306,53 +350,42 @@ export function BranchDetailModal({
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-slate-200/60">
                 <div className="flex items-center gap-2 text-slate-700">
-                  <User className="w-4 h-4 text-slate-400 flex-shrink-0" />
-                  <span className="font-bold">{branch.manager}</span>
+                  <span className="text-slate-400 font-medium">State:</span>
+                  <span className="font-bold text-slate-900">{branch.state || 'N/A'}</span>
                 </div>
                 <div className="flex items-center gap-2 text-slate-700 font-mono">
                   <Phone className="w-4 h-4 text-slate-400 flex-shrink-0" />
-                  <span>{branch.phone}</span>
+                  <span>{branch.contact_number || branch.phone || 'N/A'}</span>
                 </div>
               </div>
-              {branch.email && (
-                <div className="flex items-center gap-2 text-slate-700 font-mono pt-1">
-                  <Mail className="w-4 h-4 text-slate-400 flex-shrink-0" />
-                  <span>{branch.email}</span>
-                </div>
-              )}
             </div>
 
-            {/* Financial Ledger Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {/* Real API Ledger Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="bg-white rounded-2xl p-3.5 border border-slate-200/80 shadow-2xs">
-                <span className="text-[10px] font-bold text-slate-400 uppercase">Deposits</span>
-                <p className="text-sm font-extrabold text-slate-900 mt-1">{branch.deposits}</p>
+                <span className="text-[10px] font-bold text-slate-400 uppercase">Branch Code</span>
+                <p className="text-sm font-mono font-extrabold text-slate-900 mt-1">#{branch.branch_code || branch.id}</p>
               </div>
 
               <div className="bg-white rounded-2xl p-3.5 border border-slate-200/80 shadow-2xs">
-                <span className="text-[10px] font-bold text-slate-400 uppercase">Credit Disbursed</span>
-                <p className="text-sm font-extrabold text-[#0d9488] mt-1">{branch.loans}</p>
+                <span className="text-[10px] font-bold text-slate-400 uppercase">Opening Date</span>
+                <p className="text-sm font-extrabold text-[#0d9488] mt-1">{branch.opening_date || 'N/A'}</p>
               </div>
 
               <div className="bg-white rounded-2xl p-3.5 border border-slate-200/80 shadow-2xs">
-                <span className="text-[10px] font-bold text-slate-400 uppercase">Recovery Rate</span>
-                <p className="text-sm font-extrabold text-emerald-700 mt-1">{branch.recoveryRate}</p>
-              </div>
-
-              <div className="bg-white rounded-2xl p-3.5 border border-slate-200/80 shadow-2xs">
-                <span className="text-[10px] font-bold text-slate-400 uppercase">Members</span>
-                <p className="text-sm font-extrabold text-slate-900 mt-1">{branch.members}</p>
+                <span className="text-[10px] font-bold text-slate-400 uppercase">Operational Status</span>
+                <p className={`text-sm font-extrabold mt-1 ${branch.isActive ? 'text-emerald-700' : 'text-amber-700'}`}>
+                  {branch.isActive ? 'Online' : 'Offline'}
+                </p>
               </div>
             </div>
 
-            {/* Regulatory Status */}
-            <div className="p-3 bg-teal-50/60 rounded-xl border border-teal-100 flex items-center justify-between text-xs text-[#0f766e]">
-              <span className="flex items-center gap-1.5 font-medium">
-                <ShieldCheck className="w-4 h-4 text-[#00b4a7]" />
-                Multi-State Cooperative Regulatory Compliance
-              </span>
-              <span className="font-bold">Verified</span>
-            </div>
+            {branch.created_at && (
+              <div className="p-3 bg-slate-50/70 rounded-xl border border-slate-100 flex items-center justify-between text-xs text-slate-600">
+                <span className="text-slate-400 font-medium">Database Registration:</span>
+                <span className="font-mono text-slate-700">{new Date(branch.created_at).toLocaleString()}</span>
+              </div>
+            )}
           </div>
         )}
 

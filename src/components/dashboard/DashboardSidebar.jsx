@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
   Wallet,
@@ -16,7 +16,11 @@ import {
   Award,
   HelpCircle,
   X,
-  UserCheck
+  UserCheck,
+  PiggyBank,
+  Coins,
+  HeartHandshake,
+  Megaphone
 } from 'lucide-react';
 
 export default function DashboardSidebar({
@@ -28,47 +32,74 @@ export default function DashboardSidebar({
   onClose
 }) {
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // Role based navigation menus
+  // Role based navigation menus with dedicated page routes
   const roleNavItems = {
     member: [
-      { id: 'overview', label: 'Overview', icon: LayoutDashboard },
-      { id: 'accounts', label: 'Savings & Deposits', icon: Wallet },
-      { id: 'loans', label: 'My Loans & EMIs', icon: CreditCard },
-      { id: 'transactions', label: 'Passbook & History', icon: History },
-      { id: 'shares', label: 'Society Shares', icon: Award },
-      { id: 'statements', label: 'Tax & Statements', icon: FileText },
+      { id: 'overview', label: 'Dashboard', icon: LayoutDashboard, path: '/member/dashboard' },
+      { id: 'savings_schemes', label: 'Savings Schemes', icon: PiggyBank, path: '/member/savings-schemes' },
+      { id: 'fd_mis_schemes', label: 'FD / MIS Schemes', icon: Coins, path: '/member/fd-mis-schemes' },
+      { id: 'loan_schemes', label: 'Loan Schemes', icon: Landmark, path: '/member/loan-schemes' },
+      { id: 'announcements', label: 'Announcements', icon: Megaphone, path: '/member/announcements' },
     ],
     branch_manager: [
-      { id: 'overview', label: 'Branch Dashboard', icon: LayoutDashboard },
-      { id: 'members', label: 'Member Registry', icon: Users },
-      { id: 'loan_appraisals', label: 'Loan Appraisals', icon: CreditCard },
-      { id: 'cash_counter', label: 'Cash & Daily Ledger', icon: Landmark },
-      { id: 'day_end', label: 'Day-End Reconciliation', icon: History },
-      { id: 'branch_reports', label: 'Branch Audit Reports', icon: FileText },
+      { id: 'overview', label: 'Branch Dashboard', icon: LayoutDashboard, path: '/branch-manager/dashboard' },
+      { id: 'members', label: 'Branch Members', icon: Users, path: '/branch-manager/members' },
+      { id: 'nominees', label: 'Branch Nominees', icon: HeartHandshake, path: '/branch-manager/nominees' },
+      { id: 'staff', label: 'Branch Staff', icon: ShieldCheck, path: '/branch-manager/staff' },
+      { id: 'savings_schemes', label: 'Savings Schemes', icon: PiggyBank, path: '/branch-manager/savings-schemes' },
+      { id: 'fd_mis_schemes', label: 'FD / MIS Schemes', icon: Coins, path: '/branch-manager/fd-mis-schemes' },
+      { id: 'loan_schemes', label: 'Loan Schemes', icon: Landmark, path: '/branch-manager/loan-schemes' },
+      { id: 'announcements', label: 'Announcements', icon: Megaphone, path: '/branch-manager/announcements' },
     ],
     super_admin: [
-      { id: 'overview', label: 'Dashboard', icon: LayoutDashboard },
-      { id: 'branches', label: 'Branches', icon: Building2 },
-      { id: 'branch_admins', label: 'Branch Admin', icon: UserCheck },
-      { id: 'member_base', label: 'View Members', icon: Users },
+      { id: 'overview', label: 'Dashboard', icon: LayoutDashboard, path: '/super-admin/dashboard' },
+      { id: 'branches', label: 'Branches', icon: Building2, path: '/super-admin/branches' },
+      { id: 'branch_admins', label: 'Branch Manager', icon: UserCheck, path: '/super-admin/branch-admins' },
+      { id: 'staff_roles', label: 'Staff Roles', icon: ShieldCheck, path: '/super-admin/staff-roles' },
+      { id: 'savings_schemes', label: 'Savings Schemes', icon: PiggyBank, path: '/super-admin/savings-schemes' },
+      { id: 'fd_mis_schemes', label: 'FD / MIS Schemes', icon: Coins, path: '/super-admin/fd-mis-schemes' },
+      { id: 'loan_schemes', label: 'Loan Schemes', icon: Landmark, path: '/super-admin/loan-schemes' },
+      { id: 'announcements', label: 'Announcements', icon: Megaphone, path: '/super-admin/announcements' },
+      { id: 'member_base', label: 'View Members', icon: Users, path: '/super-admin/members' },
     ]
   };
 
   const currentNavItems = roleNavItems[role] || roleNavItems.member;
 
+  const branchDisplayName =
+    typeof user?.branch === 'string'
+      ? user.branch
+      : (user?.branch_name || user?.branch?.name || user?.branch?.branch_name || 'Society Branch');
+
   const roleLabels = {
     member: { title: 'Member Portal', badge: 'Active Member', color: 'bg-teal-50 text-[#0f766e]' },
-    branch_manager: { title: 'Branch Manager', badge: 'Thrissur Central Branch', color: 'bg-teal-50 text-[#0f766e]' },
+    branch_manager: { title: 'Branch Manager', badge: branchDisplayName, color: 'bg-teal-50 text-[#0f766e]' },
     super_admin: { title: 'Super Admin', badge: 'Apex Society Authority', color: 'bg-teal-50 text-[#0f766e]' },
   };
 
   const currentRoleInfo = roleLabels[role] || roleLabels.member;
 
   const handleLogout = () => {
-    if (role === 'member') navigate('/member-login');
-    else if (role === 'branch_manager') navigate('/branch-manager-login');
-    else navigate('/super-admin/login');
+    localStorage.removeItem('token');
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('superadmin_token');
+    localStorage.removeItem('superadmin_user');
+    localStorage.removeItem('auth_token');
+    sessionStorage.removeItem('auth_expired_message');
+
+    if (role === 'member') {
+      localStorage.removeItem('member_token');
+      localStorage.removeItem('member_user');
+      navigate('/member-login');
+    } else if (role === 'branch_manager') {
+      localStorage.removeItem('branch_token');
+      localStorage.removeItem('branch_user');
+      navigate('/branch-manager-login');
+    } else {
+      navigate('/super-admin/login');
+    }
   };
 
   return (
@@ -130,11 +161,14 @@ export default function DashboardSidebar({
 
           {currentNavItems.map((item) => {
             const Icon = item.icon;
-            const isActive = activeTab === item.id;
+            const isActive = activeTab === item.id || (item.path && location.pathname === item.path);
             return (
               <button
                 key={item.id}
                 onClick={() => {
+                  if (item.path && location.pathname !== item.path) {
+                    navigate(item.path);
+                  }
                   if (onTabChange) onTabChange(item.id);
                   if (onClose) onClose();
                 }}
@@ -156,13 +190,35 @@ export default function DashboardSidebar({
                 Support & Help
               </div>
 
-              <Link
-                to="/contact"
-                className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
-              >
-                <HelpCircle className="w-4 h-4 text-slate-400" />
-                <span>Society Helpdesk</span>
-              </Link>
+              {role === 'member' ? (
+                <button
+                  onClick={() => {
+                    navigate('/member/helpdesk');
+                    if (onTabChange) onTabChange('helpdesk');
+                    if (onClose) onClose();
+                  }}
+                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer ${
+                    location.pathname === '/member/helpdesk' || location.pathname === '/member/service-requests' || activeTab === 'helpdesk'
+                      ? 'bg-gradient-to-r from-[#14b8a6] to-[#2dd4bf] text-white shadow-md shadow-teal-500/20'
+                      : 'text-slate-600 hover:bg-teal-50/70 hover:text-[#0f766e]'
+                  }`}
+                >
+                  <HelpCircle className={`w-4 h-4 ${
+                    location.pathname === '/member/helpdesk' || location.pathname === '/member/service-requests' || activeTab === 'helpdesk'
+                      ? 'text-white'
+                      : 'text-slate-400'
+                  }`} />
+                  <span>Society Helpdesk</span>
+                </button>
+              ) : (
+                <Link
+                  to="/contact"
+                  className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+                >
+                  <HelpCircle className="w-4 h-4 text-slate-400" />
+                  <span>Society Helpdesk</span>
+                </Link>
+              )}
             </>
           )}
         </div>
@@ -171,11 +227,11 @@ export default function DashboardSidebar({
         <div className="p-4 border-t border-slate-100 bg-slate-50/50">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-9 h-9 rounded-full bg-teal-50 text-[#0f766e] font-bold flex items-center justify-center text-sm border border-teal-200/60">
-              {user.avatarText || 'U'}
+              {user.avatarText || (role === 'super_admin' ? 'SA' : 'U')}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-bold text-slate-900 truncate">{user.name || 'Demo User'}</p>
-              <p className="text-[11px] text-slate-500 truncate">{user.id || 'ID: 0000'}</p>
+              <p className="text-xs font-bold text-slate-900 truncate">{user.name || (role === 'super_admin' ? 'Super Admin' : 'Demo User')}</p>
+              <p className="text-[11px] text-[#0d9488] font-bold truncate">{user.role || (role === 'super_admin' ? 'Super Admin' : user.id || 'Member')}</p>
             </div>
           </div>
 

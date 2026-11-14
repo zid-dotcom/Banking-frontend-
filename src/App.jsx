@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -12,8 +12,30 @@ import SuperAdminLogin from './pages/SuperAdminLogin';
 import BranchAdminLogin from './pages/BranchAdminLogin';
 import MemberLogin from './pages/MemberLogin';
 import MemberDashboard from './pages/dashboard/MemberDashboard';
+import MemberSavingsSchemes from './pages/dashboard/MemberSavingsSchemes';
+import MemberFdMisSchemes from './pages/dashboard/MemberFdMisSchemes';
+import MemberLoanSchemes from './pages/dashboard/MemberLoanSchemes';
+import MemberHelpdesk from './pages/dashboard/MemberHelpdesk';
+import MemberAnnouncements from './pages/dashboard/MemberAnnouncements';
+
 import BranchManagerDashboard from './pages/dashboard/BranchManagerDashboard';
+import BranchManagerMembers from './pages/dashboard/BranchManagerMembers';
+import BranchManagerStaff from './pages/dashboard/BranchManagerStaff';
+import BranchManagerLoanSchemes from './pages/dashboard/BranchManagerLoanSchemes';
+import BranchManagerSavingsSchemes from './pages/dashboard/BranchManagerSavingsSchemes';
+import BranchManagerFdMisSchemes from './pages/dashboard/BranchManagerFdMisSchemes';
+import BranchManagerNominees from './pages/dashboard/BranchManagerNominees';
+import BranchManagerAnnouncements from './pages/dashboard/BranchManagerAnnouncements';
+
 import SuperAdminDashboard from './pages/dashboard/SuperAdminDashboard';
+import SuperAdminBranches from './pages/dashboard/SuperAdminBranches';
+import SuperAdminBranchAdmin from './pages/dashboard/SuperAdminBranchAdmin';
+import SuperAdminMembers from './pages/dashboard/SuperAdminMembers';
+import SuperAdminLoanSchemes from './pages/dashboard/SuperAdminLoanSchemes';
+import SuperAdminStaffRoles from './pages/dashboard/SuperAdminStaffRoles';
+import SuperAdminSavingsSchemes from './pages/dashboard/SuperAdminSavingsSchemes';
+import SuperAdminFdMisSchemes from './pages/dashboard/SuperAdminFdMisSchemes';
+import SuperAdminAnnouncements from './pages/dashboard/SuperAdminAnnouncements';
 import EnquiryModal from './components/EnquiryModal';
 import PortalModal from './components/PortalModal';
 import ChatWithUsWidget from './components/ChatWithUsWidget';
@@ -50,9 +72,14 @@ function MainApp() {
 
   // Isolated role-based dashboard routes
   const isDashboardRoute =
-    location.pathname.startsWith('/member/dashboard') ||
-    location.pathname.startsWith('/branch-manager/dashboard') ||
-    location.pathname.startsWith('/super-admin/dashboard');
+    !isSuperAdminLoginRoute &&
+    !isBranchManagerLoginRoute &&
+    !isMemberLoginRoute && (
+      location.pathname.startsWith('/member/') ||
+      location.pathname.startsWith('/branch-manager/') ||
+      location.pathname.startsWith('/branch-admin/') ||
+      location.pathname.startsWith('/super-admin/')
+    );
 
   useEffect(() => {
     const handleScroll = () => {
@@ -111,9 +138,56 @@ function MainApp() {
   if (isDashboardRoute) {
     return (
       <Routes>
-        <Route path="/member/dashboard" element={<MemberDashboard />} />
-        <Route path="/branch-manager/dashboard" element={<BranchManagerDashboard />} />
+        {/* Super Admin Individual Page Routes */}
         <Route path="/super-admin/dashboard" element={<SuperAdminDashboard />} />
+        <Route path="/super-admin/branches" element={<SuperAdminBranches />} />
+        <Route path="/super-admin/branch-admins" element={<SuperAdminBranchAdmin />} />
+        <Route path="/super-admin/branch-admin" element={<SuperAdminBranchAdmin />} />
+        <Route path="/super-admin/staff-roles" element={<SuperAdminStaffRoles />} />
+        <Route path="/super-admin/staff-role" element={<SuperAdminStaffRoles />} />
+        <Route path="/super-admin/roles" element={<SuperAdminStaffRoles />} />
+        <Route path="/super-admin/savings-schemes" element={<SuperAdminSavingsSchemes />} />
+        <Route path="/super-admin/savings-scheme" element={<SuperAdminSavingsSchemes />} />
+        <Route path="/super-admin/savings" element={<SuperAdminSavingsSchemes />} />
+        <Route path="/super-admin/fd-mis-schemes" element={<SuperAdminFdMisSchemes />} />
+        <Route path="/super-admin/fd-mis-scheme" element={<SuperAdminFdMisSchemes />} />
+        <Route path="/super-admin/fd-mis" element={<SuperAdminFdMisSchemes />} />
+        <Route path="/super-admin/loan-schemes" element={<SuperAdminLoanSchemes />} />
+        <Route path="/super-admin/loan-scheme" element={<SuperAdminLoanSchemes />} />
+        <Route path="/super-admin/schemes" element={<SuperAdminLoanSchemes />} />
+        <Route path="/super-admin/announcements" element={<SuperAdminAnnouncements />} />
+        <Route path="/super-admin/announcement" element={<SuperAdminAnnouncements />} />
+        <Route path="/super-admin/members" element={<SuperAdminMembers />} />
+
+        {/* Branch Manager Routes */}
+        <Route path="/branch-manager/dashboard" element={<BranchManagerDashboard />} />
+        <Route path="/branch-manager/members" element={<BranchManagerMembers />} />
+        <Route path="/branch-admin/members" element={<BranchManagerMembers />} />
+        <Route path="/branch-manager/nominees" element={<BranchManagerNominees />} />
+        <Route path="/branch-admin/nominees" element={<BranchManagerNominees />} />
+        <Route path="/branch-manager/nominee" element={<BranchManagerNominees />} />
+        <Route path="/branch-admin/nominee" element={<BranchManagerNominees />} />
+        <Route path="/branch-manager/staff" element={<BranchManagerStaff />} />
+        <Route path="/branch-admin/staff" element={<BranchManagerStaff />} />
+        <Route path="/branch-manager/savings-schemes" element={<BranchManagerSavingsSchemes />} />
+        <Route path="/branch-admin/savings-schemes" element={<BranchManagerSavingsSchemes />} />
+        <Route path="/branch-manager/fd-mis-schemes" element={<BranchManagerFdMisSchemes />} />
+        <Route path="/branch-admin/fd-mis-schemes" element={<BranchManagerFdMisSchemes />} />
+        <Route path="/branch-manager/loan-schemes" element={<BranchManagerLoanSchemes />} />
+        <Route path="/branch-admin/loan-schemes" element={<BranchManagerLoanSchemes />} />
+        <Route path="/branch-manager/announcements" element={<BranchManagerAnnouncements />} />
+        <Route path="/branch-admin/announcements" element={<BranchManagerAnnouncements />} />
+        <Route path="/branch-manager/*" element={<Navigate to="/branch-manager/dashboard" replace />} />
+
+        {/* Member Page Routes */}
+        <Route path="/member/dashboard" element={<MemberDashboard />} />
+        <Route path="/member/savings-schemes" element={<MemberSavingsSchemes />} />
+        <Route path="/member/fd-mis-schemes" element={<MemberFdMisSchemes />} />
+        <Route path="/member/loan-schemes" element={<MemberLoanSchemes />} />
+        <Route path="/member/announcements" element={<MemberAnnouncements />} />
+        <Route path="/member/helpdesk" element={<MemberHelpdesk />} />
+        <Route path="/member/service-requests" element={<MemberHelpdesk />} />
+        <Route path="/member/*" element={<Navigate to="/member/dashboard" replace />} />
       </Routes>
     );
   }

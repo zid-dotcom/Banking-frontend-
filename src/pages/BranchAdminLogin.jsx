@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { User, Lock, Eye, EyeOff, ArrowLeft, CheckCircle2, AlertCircle, Users, Sparkles } from 'lucide-react';
+import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
+import { User, Lock, Eye, EyeOff, ArrowLeft, CheckCircle2, AlertCircle, Users } from 'lucide-react';
 import branchDeskIllustration from '../assets/Branch Admin at a Modern Bank Desk.png';
+import { branchAdminLogin } from '../services/branchAdminService';
 
 // Exact Solid Bank Temple Icon matching reference logo & badge
 function BankTempleIcon({ className = 'w-6 h-6 text-slate-900' }) {
@@ -27,6 +28,8 @@ function BankTempleIcon({ className = 'w-6 h-6 text-slate-900' }) {
 
 export default function BranchAdminLogin() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
   const [managerId, setManagerId] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -38,9 +41,20 @@ export default function BranchAdminLogin() {
 
   useEffect(() => {
     document.title = 'Branch Manager Login | Aurumfx Multi State Agro Co-operative Society Limited';
-  }, []);
+    const expiredQuery = searchParams.get('expired') === 'true';
+    const expiredMsg = sessionStorage.getItem('auth_expired_message');
+    const stateMsg = location.state?.error || location.state?.message;
 
-  const handleSubmit = (e) => {
+    if (expiredQuery || expiredMsg || stateMsg) {
+      setAuthStatus({
+        type: 'error',
+        message: stateMsg || expiredMsg || 'Token is expired. Please login again.',
+      });
+      sessionStorage.removeItem('auth_expired_message');
+    }
+  }, [location, searchParams]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!managerId.trim() || !password.trim()) {
       setAuthStatus({
@@ -53,37 +67,26 @@ export default function BranchAdminLogin() {
     setIsLoading(true);
     setAuthStatus(null);
 
-    // Simulated login verification
-    setTimeout(() => {
-      setIsLoading(false);
-      setAuthStatus({
-        type: 'success',
-        message: 'Branch Manager authorized! Accessing branch operations console...',
-      });
-      setTimeout(() => {
-        navigate('/branch-manager/dashboard');
-      }, 1000);
-    }, 800);
-  };
+    try {
+      await branchAdminLogin(managerId, password);
 
-  const handleDemoLogin = () => {
-    setManagerId('MGR-THRISSUR-01');
-    setPassword('manager@123');
-    setIsLoading(true);
-    setAuthStatus({
-      type: 'info',
-      message: 'Demo credentials loaded. Verifying branch manager access...',
-    });
-    setTimeout(() => {
-      setIsLoading(false);
       setAuthStatus({
         type: 'success',
-        message: 'Branch Manager authorized! Redirecting to Branch Dashboard...',
+        message: 'Branch Admin authorized! Accessing branch operations console...',
       });
+
       setTimeout(() => {
         navigate('/branch-manager/dashboard');
-      }, 800);
-    }, 600);
+      }, 700);
+    } catch (err) {
+      console.error('Branch admin login error:', err);
+      setAuthStatus({
+        type: 'error',
+        message: err.message || 'Login failed. Please verify your credentials or server connection.',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleForgotPasswordSubmit = (e) => {
@@ -281,18 +284,6 @@ export default function BranchAdminLogin() {
                 <span>Sign In</span>
               )}
             </button>
-
-            {/* Quick Demo Login Button */}
-            <div className="pt-2">
-              <button
-                type="button"
-                onClick={handleDemoLogin}
-                className="w-full h-12 px-4 rounded-2xl bg-teal-50 hover:bg-teal-100 text-[#008579] font-bold text-xs sm:text-sm border border-teal-200/80 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 shadow-xs"
-              >
-                <Sparkles className="w-4 h-4 text-[#008579]" />
-                <span>⚡ One-Click Demo Manager Login</span>
-              </button>
-            </div>
           </form>
 
         </div>
