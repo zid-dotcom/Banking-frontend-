@@ -75,6 +75,8 @@ export default function MemberLogin() {
         password: password,
       });
 
+      sessionStorage.removeItem('nominee_modal_dismissed');
+
       setAuthStatus({
         type: 'success',
         message: 'Member credentials verified! Accessing Member Dashboard...',

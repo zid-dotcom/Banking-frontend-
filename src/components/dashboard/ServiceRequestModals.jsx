@@ -11,8 +11,39 @@ import {
   User,
   Calendar,
   Send,
-  LifeBuoy
+  LifeBuoy,
+  Building2,
+  ShieldCheck,
+  UserCheck,
+  Headset
 } from 'lucide-react';
+
+function getRoleBadgeInfo(role) {
+  const r = String(role || '').toLowerCase().trim();
+  if (r === 'branch_admin' || r === 'branch_manager' || r === 'branch admin') {
+    return {
+      label: 'Branch Manager',
+      className: 'bg-teal-100 text-teal-800 border-teal-200'
+    };
+  }
+  if (r === 'super_admin' || r === 'superadmin' || r === 'super admin' || r === 'admin') {
+    return {
+      label: 'Main Administration',
+      className: 'bg-purple-100 text-purple-800 border-purple-200'
+    };
+  }
+  if (r === 'member') {
+    return {
+      label: 'Member',
+      className: 'bg-slate-100 text-slate-700 border-slate-200'
+    };
+  }
+  const formatted = r ? r.split('_').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : 'Branch Officer';
+  return {
+    label: formatted,
+    className: 'bg-emerald-100 text-emerald-800 border-emerald-200'
+  };
+}
 
 function formatDateTime(isoString) {
   if (!isoString) return 'N/A';
@@ -220,37 +251,87 @@ export function ServiceRequestDetailModal({
 
   const getStatusBadge = (st) => {
     switch (st) {
+      case 'solved':
       case 'resolved':
       case 'closed':
       case 'completed':
         return 'bg-emerald-50 text-emerald-700 border-emerald-200';
       case 'in_progress':
-      case 'pending':
         return 'bg-amber-50 text-amber-700 border-amber-200';
+      case 'pending':
+      case 'open':
       default:
-        return 'bg-teal-50 text-teal-700 border-teal-200';
+        return 'bg-rose-50 text-rose-700 border-rose-200';
     }
   };
 
+  const branchName =
+    request?.branch?.name ||
+    request?.branch?.branch_name ||
+    request?.branch_name ||
+    '';
+  const branchCode =
+    request?.branch?.branch_code ||
+    request?.branch_code ||
+    '';
+
+  // Parse replies from API response
+  const replies = Array.isArray(request?.replies)
+    ? request.replies
+    : Array.isArray(request?.responses)
+    ? request.responses
+    : request?.reply
+    ? [
+        {
+          id: 'single-reply',
+          message: request.reply,
+          created_at: request.updated_at || request.created_at,
+          sender: { full_name: 'Branch Manager', role: 'branch_admin' }
+        }
+      ]
+    : request?.resolution
+    ? [
+        {
+          id: 'single-resolution',
+          message: request.resolution,
+          created_at: request.updated_at || request.created_at,
+          sender: { full_name: 'Branch Manager', role: 'branch_admin' }
+        }
+      ]
+    : [];
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fadeIn">
-      <div className="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-slate-100 overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs animate-fadeIn">
+      <div className="bg-white rounded-3xl max-w-2xl w-full shadow-2xl border border-slate-100 overflow-hidden flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className="p-6 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+        <div className="p-5 sm:p-6 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-teal-50 text-teal-700 flex items-center justify-center border border-teal-100">
-              <MessageSquare className="w-5 h-5" />
+              <MessageSquare className="w-5 h-5 text-[#00b4a7]" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-base font-black text-slate-900">Service Request Details</h3>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h3 className="text-base sm:text-lg font-black text-slate-900">
+                  Service Request Details
+                </h3>
                 {reqId && (
                   <span className="font-mono text-xs font-bold text-teal-800 bg-teal-50 px-2 py-0.5 rounded border border-teal-200/60">
                     #{reqId}
                   </span>
                 )}
               </div>
-              <p className="text-xs text-slate-500 font-medium">Society Helpdesk Support Ticket</p>
+              <div className="flex items-center gap-2 text-xs text-slate-500 font-medium mt-0.5 flex-wrap">
+                <span>Society Helpdesk Support Ticket</span>
+                {branchName && (
+                  <>
+                    <span className="text-slate-300">•</span>
+                    <span className="inline-flex items-center gap-1 text-teal-700 font-semibold">
+                      <Building2 className="w-3 h-3 text-teal-600" />
+                      <span>{branchName} {branchCode ? `(#${branchCode})` : ''}</span>
+                    </span>
+                  </>
+                )}
+              </div>
             </div>
           </div>
           <button
@@ -263,7 +344,7 @@ export function ServiceRequestDetailModal({
         </div>
 
         {/* Content */}
-        <div className="p-6 space-y-5 overflow-y-auto flex-1">
+        <div className="p-5 sm:p-6 space-y-5 overflow-y-auto flex-1">
           {loading ? (
             <div className="py-12 text-center space-y-3">
               <Loader2 className="w-8 h-8 animate-spin text-teal-600 mx-auto" />
@@ -284,7 +365,7 @@ export function ServiceRequestDetailModal({
 
                 <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
                   <Clock className="w-3.5 h-3.5 text-slate-400" />
-                  <span>{formatDateTime(request.created_at || request.date)}</span>
+                  <span>Submitted on {formatDateTime(request.created_at || request.date)}</span>
                 </div>
               </div>
 
@@ -298,28 +379,111 @@ export function ServiceRequestDetailModal({
                 </h4>
               </div>
 
-              {/* Message */}
+              {/* Member Sent Message */}
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
-                  Message Description
+                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 flex items-center gap-1.5">
+                  <User className="w-3.5 h-3.5 text-slate-500" />
+                  <span>Your Sent Message</span>
                 </p>
-                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 text-xs sm:text-sm text-slate-700 font-medium whitespace-pre-wrap leading-relaxed">
-                  {request.message}
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 text-xs sm:text-sm text-slate-800 font-medium whitespace-pre-wrap leading-relaxed shadow-2xs">
+                  {request.message || request.description || 'No initial message text recorded.'}
                 </div>
               </div>
 
-              {/* Resolution / Admin Reply if available */}
-              {(request.resolution || request.reply || request.admin_notes) && (
-                <div>
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-emerald-600 mb-1.5 flex items-center gap-1">
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    <span>Society Desk Resolution</span>
-                  </p>
-                  <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 text-xs sm:text-sm text-emerald-950 font-medium whitespace-pre-wrap leading-relaxed">
-                    {request.resolution || request.reply || request.admin_notes}
+              {/* Official Responses & Desk Replies Thread */}
+              <div className="space-y-3 pt-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <MessageSquare className="w-4 h-4 text-teal-600" />
+                    <h5 className="font-bold text-slate-900 text-sm">
+                      Official Desk Responses ({replies.length})
+                    </h5>
                   </div>
+                  <span className="text-[11px] text-slate-400 font-medium">
+                    Branch &amp; Society Correspondence
+                  </span>
                 </div>
-              )}
+
+                {replies.length === 0 ? (
+                  <div className="p-5 text-center rounded-2xl bg-teal-50/40 border border-dashed border-teal-200/80 text-teal-800 space-y-1">
+                    <p className="text-xs font-bold text-teal-900">Awaiting Response</p>
+                    <p className="text-[11px] text-teal-700 leading-relaxed">
+                      Your service request has been logged. A Branch Manager or society officer will post responses here.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {replies.map((rep, idx) => {
+                      const repId = rep.id || `rep-${idx}`;
+                      const rawName =
+                        rep.sender?.full_name ||
+                        rep.sender?.name ||
+                        rep.author ||
+                        rep.sender_name ||
+                        '';
+                      const senderRole = String(rep.sender?.role || rep.role || 'branch_admin').toLowerCase();
+                      const roleBadge = getRoleBadgeInfo(senderRole);
+
+                      const isSuperAdmin =
+                        senderRole === 'super_admin' ||
+                        senderRole === 'superadmin' ||
+                        senderRole === 'admin' ||
+                        rawName.toLowerCase() === 'super admin' ||
+                        rawName.toLowerCase() === 'super_admin';
+
+                      let senderName = rawName;
+                      if (isSuperAdmin && (!rawName || rawName.toLowerCase() === 'super admin' || rawName.toLowerCase() === 'super_admin')) {
+                        senderName = 'Main Administration';
+                      } else if (!senderName) {
+                        senderName = roleBadge.label;
+                      }
+
+                      const avatarLetter = senderName === 'Main Administration' ? 'M' : senderName.slice(0, 1).toUpperCase();
+
+                      return (
+                        <div
+                          key={repId}
+                          className={`p-4 rounded-2xl border shadow-2xs space-y-2 ${
+                            isSuperAdmin
+                              ? 'bg-gradient-to-br from-purple-50/70 via-indigo-50/30 to-white border-purple-200/80'
+                              : 'bg-gradient-to-br from-teal-50/80 via-emerald-50/40 to-white border-teal-200/70'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between flex-wrap gap-2">
+                            <div className="flex items-center gap-2">
+                              <div
+                                className={`w-7 h-7 rounded-full text-white flex items-center justify-center text-xs font-bold shadow-2xs ${
+                                  isSuperAdmin ? 'bg-purple-600' : 'bg-teal-600'
+                                }`}
+                              >
+                                {avatarLetter}
+                              </div>
+                              <span className="font-bold text-xs text-slate-900">
+                                {senderName}
+                              </span>
+                              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border shadow-2xs ${roleBadge.className}`}>
+                                {roleBadge.label}
+                              </span>
+                            </div>
+
+                            <div className="flex items-center gap-1.5 text-[11px] text-slate-400 font-medium">
+                              <Clock className="w-3 h-3 text-slate-400" />
+                              <span>{formatDateTime(rep.created_at || rep.date)}</span>
+                              {rep.edited_at && (
+                                <span className="text-[10px] text-slate-400 italic">(edited)</span>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="text-xs sm:text-sm text-slate-800 font-medium whitespace-pre-wrap leading-relaxed pl-9">
+                            {rep.message || rep.reply}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             </>
           )}
         </div>

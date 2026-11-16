@@ -1,5 +1,5 @@
 // Super Admin Member API service connecting to backend superadmin branches members endpoints
-import { parseApiError, handleAuthExpired } from './branchService';
+import { parseApiError, handleAuthExpired, isTokenExpiredError } from './branchService';
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'https://supercriminally-ununified-arnoldo.ngrok-free.dev';
 
@@ -27,17 +27,10 @@ function getHeaders() {
 /**
  * Check response and handle expired token
  */
-function checkResponseStatus(res, errBody, defaultMsg) {
+function checkResponseStatus(res, errBody, defaultMsg, explicitRole = null) {
   const parsedMsg = parseApiError(errBody, res.status, defaultMsg);
-  const isExpired = 
-    res.status === 401 || 
-    res.status === 403 || 
-    parsedMsg.toLowerCase().includes('expired token') || 
-    parsedMsg.toLowerCase().includes('invalid or expired') ||
-    parsedMsg.toLowerCase().includes('token has expired');
-
-  if (isExpired) {
-    handleAuthExpired('super_admin');
+  if (isTokenExpiredError(res, parsedMsg)) {
+    handleAuthExpired(explicitRole);
     throw new Error('Token is expired. Please login again.');
   }
 
@@ -269,13 +262,57 @@ export async function getMemberMe(explicitToken = null) {
 
     if (!res.ok) {
       const errBody = await res.json().catch(() => ({}));
-      const msg = parseApiError(errBody, res.status, 'Failed to fetch member profile');
-      throw new Error(msg);
+      checkResponseStatus(res, errBody, 'Failed to fetch member profile', 'member');
     }
 
     return await res.json();
   } catch (error) {
     console.error('memberService.getMemberMe error:', error);
+    throw error;
+  }
+}
+
+/**
+ * 7b. GET /member/profile/full - Member Full Profile
+ * Returns MemberFullProfileOut:
+ * {
+ *   member_code, full_name, email, mobile, branch_id, branch,
+ *   date_of_birth, gender, country, state, district, city, street,
+ *   building_no, zip_code, aadhaar_masked, pan_masked, bank_holder_name,
+ *   bank_account_masked, ifsc_code, status, kyc_status, kyc_rejection_reason,
+ *   kyc_reviewed_at, member_created_at, nominee
+ * }
+ */
+export async function getMemberFullProfile(explicitToken = null) {
+  try {
+    const token =
+      explicitToken ||
+      localStorage.getItem('token') ||
+      localStorage.getItem('access_token') ||
+      localStorage.getItem('member_token');
+
+    const headers = {
+      'Content-Type': 'application/json',
+      'ngrok-skip-browser-warning': 'true',
+      'Accept': 'application/json',
+    };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const res = await fetch(`${BASE_URL}/member/profile/full`, {
+      method: 'GET',
+      headers,
+    });
+
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({}));
+      checkResponseStatus(res, errBody, 'Failed to fetch member full profile', 'member');
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error('memberService.getMemberFullProfile error:', error);
     throw error;
   }
 }
@@ -332,7 +369,9 @@ export async function reapplyMember(formData) {
     console.error('memberService.reapplyMember error:', error);
     throw error;
   }
-}
+}    
+ 
+  
 
 /**
  * 10. GET /member/savings-schemes - List Available Savings Schemes
@@ -365,5 +404,30 @@ export {
   getMemberServiceRequests,
   getMemberServiceRequest,
 } from './serviceRequestService';
+
+/**
+ * 15. Member Notifications APIs
+ * - GET /member/notifications
+ * - GET /member/notifications/unread-count
+ * - PATCH /member/notifications/read-all
+ * - PATCH /member/notifications/{notification_id}/read
+ */
+export {
+  getMemberNotifications,
+  getMemberUnreadCount,
+  markAllNotificationsRead,
+  markNotificationRead,
+} from './notificationService';
+
+/**
+ * 16. Member Nominee APIs
+ * - GET /member/nominee
+ * - POST /member/nominee
+ */
+export {
+  getMemberNominee,
+  submitMemberNominee,
+} from './nomineeService';
+
 
 

@@ -5,7 +5,13 @@ import StatCard from '../../components/dashboard/StatCard';
 import RecentTransactionsTable from '../../components/dashboard/RecentTransactionsTable';
 import QuickActionModal from '../../components/dashboard/QuickActionModal';
 import { SavingsSchemeDetailModal } from '../../components/dashboard/SavingsSchemeModals';
-import { getMemberMe, getMemberSavingsSchemes, getMemberAnnouncements } from '../../services/memberService';
+import {
+  getMemberMe,
+  getMemberSavingsSchemes,
+  getMemberAnnouncements,
+  getMemberNominee,
+  getMemberFullProfile
+} from '../../services/memberService';
 import {
   Wallet,
   CreditCard,
@@ -29,9 +35,14 @@ import {
   ArrowRight,
   Megaphone,
   LifeBuoy,
-  Bell
+  Bell,
+  HeartHandshake,
+  X,
+  Sparkles,
+  AlertTriangle
 } from 'lucide-react';
 import cooperativeSupportSticker from '../../assets/Cooperative Banking Support Sticker.png';
+import completeNomineeIllustration from '../../assets/Complete Your Nominee Details.png';
 
 export default function MemberDashboard() {
   const [searchParams] = useSearchParams();
@@ -94,11 +105,16 @@ export default function MemberDashboard() {
     };
   });
 
-  // Fetch fresh profile from GET /member/me
+  // Fetch fresh profile from GET /member/profile/full (with fallback to /member/me)
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const data = await getMemberMe();
+        let data = null;
+        try {
+          data = await getMemberFullProfile();
+        } catch {
+          data = await getMemberMe();
+        }
         if (data) {
           localStorage.setItem('member_user', JSON.stringify(data));
           const name = data.full_name || data.name || 'Member';
@@ -125,11 +141,11 @@ export default function MemberDashboard() {
               .slice(0, 2)
               .toUpperCase() || 'M',
             branch: branchName || 'Society Main Branch',
-            joined: '14 Jan 2024'
+            joined: data.member_created_at ? new Date(data.member_created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '14 Jan 2024'
           });
         }
       } catch (err) {
-        console.warn('Could not load fresh /member/me:', err);
+        console.warn('Could not load fresh profile:', err);
       }
     };
 
@@ -158,6 +174,34 @@ export default function MemberDashboard() {
       .finally(() => {
         if (isMounted) setLoadingAnnouncements(false);
       });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Check if member has submitted nominee details; if not, prompt with complete nominee modal
+  const [nomineeModalOpen, setNomineeModalOpen] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    getMemberNominee()
+      .then((data) => {
+        if (!isMounted) return;
+        const hasNominee = Boolean(
+          data &&
+          (data.id || data.nominee_name || data.name || data.full_name)
+        );
+        if (!hasNominee) {
+          setNomineeModalOpen(true);
+        } else {
+          setNomineeModalOpen(false);
+        }
+      })
+      .catch(() => {
+        if (!isMounted) return;
+        setNomineeModalOpen(true);
+      });
+
     return () => {
       isMounted = false;
     };
@@ -496,8 +540,19 @@ export default function MemberDashboard() {
                 </button>
 
                 <button
-                  onClick={() => navigate('/member/helpdesk')}
+                  onClick={() => navigate('/member/profile')}
                   className="w-full flex items-center justify-between p-3 rounded-xl bg-teal-50/60 hover:bg-teal-50 border border-teal-100/80 transition-colors text-xs font-bold text-teal-900 cursor-pointer group"
+                >
+                  <span className="flex items-center gap-2.5">
+                    <User className="w-4 h-4 text-[#0d9488]" />
+                    <span>My Full Profile &amp; KYC Records</span>
+                  </span>
+                  <ChevronRight className="w-4 h-4 text-teal-600 group-hover:translate-x-0.5 transition-transform" />
+                </button>
+
+                <button
+                  onClick={() => navigate('/member/helpdesk')}
+                  className="w-full flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-teal-50/70 border border-slate-100 transition-colors text-xs font-bold text-slate-800 cursor-pointer group"
                 >
                   <span className="flex items-center gap-2.5">
                     <LifeBuoy className="w-4 h-4 text-[#0d9488]" />
@@ -638,6 +693,65 @@ export default function MemberDashboard() {
           setSelectedScheme(null);
         }}
       />
+
+      {/* Complete Your Nominee Details Modal (Exact match to reference design) */}
+      {nomineeModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fadeIn">
+          <div className="bg-white rounded-[42px] max-w-[480px] w-full shadow-2xl border-[4px] border-[#c4f4ed] overflow-hidden relative p-7 sm:p-9 pt-6 pb-9 animate-scaleUp text-center">
+            {/* Top Close Button */}
+            <button
+              type="button"
+              onClick={() => setNomineeModalOpen(false)}
+              className="absolute top-6 right-6 z-20 w-10 h-10 rounded-full bg-[#f1f5f9] hover:bg-[#e2e8f0] text-slate-500 hover:text-slate-800 flex items-center justify-center transition-colors cursor-pointer shadow-xs"
+              title="Close"
+            >
+              <X className="w-5 h-5 text-slate-500" />
+            </button>
+
+            {/* Illustration */}
+            <div className="w-full flex items-center justify-center pt-1 pb-3 px-2">
+              <img
+                src={completeNomineeIllustration}
+                alt="Complete Your Nominee Details"
+                className="w-full max-w-[360px] h-auto object-contain select-none pointer-events-none drop-shadow-xs"
+              />
+            </div>
+
+            {/* Action Required Badge */}
+            <div className="flex justify-center mt-1">
+              <span className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#fef3c7] text-[#b45309] font-black text-xs sm:text-[13px] tracking-wide select-none">
+                <AlertTriangle className="w-4 h-4 fill-[#d97706] text-[#fef3c7] flex-shrink-0" />
+                <span>Action Required</span>
+              </span>
+            </div>
+
+            {/* Heading */}
+            <h3 className="text-2xl sm:text-[28px] font-black text-[#0f172a] tracking-tight mt-3.5 sm:mt-4 leading-tight">
+              Complete Your Nominee Details
+            </h3>
+
+            {/* Description */}
+            <p className="text-xs sm:text-sm text-[#475569] font-medium leading-relaxed max-w-[390px] mx-auto mt-2.5 sm:mt-3">
+              You haven’t registered a nominee yet. Please add your nominee details to help secure your savings, deposits, and other cooperative benefits.
+            </p>
+
+            {/* Pill Action Button */}
+            <div className="mt-7 flex justify-center">
+              <button
+                type="button"
+                onClick={() => {
+                  setNomineeModalOpen(false);
+                  navigate('/member/nominee');
+                }}
+                className="px-9 py-3.5 sm:py-4 rounded-full bg-[#009b8d] hover:bg-[#00867a] active:scale-95 text-white font-black text-sm sm:text-base shadow-md hover:shadow-lg transition-all inline-flex items-center justify-center gap-2.5 cursor-pointer"
+              >
+                <span>Register Nominee Now</span>
+                <ArrowRight className="w-4 h-4 text-white stroke-[2.5]" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </DashboardLayout>
   );
 }

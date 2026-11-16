@@ -1,4 +1,5 @@
 // Announcement API service connecting to backend superadmin announcements endpoints
+import { handleAuthExpired, isTokenExpiredError } from './branchService';
 const BASE_URL = import.meta.env.VITE_API_URL || 'https://supercriminally-ununified-arnoldo.ngrok-free.dev';
 
 /**
@@ -24,26 +25,7 @@ function getHeaders() {
   return headers;
 }
 
-/**
- * Handle expired token: cleans tokens, sets notification, and navigates to login
- */
-export function handleAuthExpired(role = 'super_admin') {
-  localStorage.removeItem('token');
-  localStorage.removeItem('access_token');
-  localStorage.removeItem('superadmin_token');
-  localStorage.removeItem('superadmin_user');
-  sessionStorage.setItem('auth_expired_message', 'Token is expired. Please login again.');
-
-  const targetPath = role === 'member'
-    ? '/member-login?expired=true'
-    : role === 'branch_manager'
-    ? '/branch-manager-login?expired=true'
-    : '/super-admin/login?expired=true';
-
-  if (!window.location.pathname.includes('/login')) {
-    window.location.href = targetPath;
-  }
-}
+export { handleAuthExpired };
 
 /**
  * Extracts and formats user-friendly error messages from backend responses
@@ -86,17 +68,10 @@ export function parseApiError(errBody, status, fallbackMessage = 'Operation fail
 /**
  * Inspect response and throw error or redirect on expired token
  */
-function checkResponseStatus(res, errBody, defaultMsg) {
+function checkResponseStatus(res, errBody, defaultMsg, role = null) {
   const parsedMsg = parseApiError(errBody, res.status, defaultMsg);
-  const isExpired = 
-    res.status === 401 || 
-    res.status === 403 || 
-    parsedMsg.toLowerCase().includes('expired token') || 
-    parsedMsg.toLowerCase().includes('invalid or expired') ||
-    parsedMsg.toLowerCase().includes('token has expired');
-
-  if (isExpired) {
-    handleAuthExpired('super_admin');
+  if (isTokenExpiredError(res, parsedMsg)) {
+    handleAuthExpired(role);
     throw new Error('Token is expired. Please login again.');
   }
 
@@ -300,8 +275,7 @@ export async function getMemberAnnouncements({ skip = 0, limit = 50 } = {}) {
 
     if (!res.ok) {
       const errBody = await res.json().catch(() => ({}));
-      const msg = parseApiError(errBody, res.status, 'Failed to fetch member announcements');
-      throw new Error(msg);
+      checkResponseStatus(res, errBody, 'Failed to fetch member announcements', 'member');
     }
 
     const data = await res.json();
@@ -349,8 +323,7 @@ export async function getBranchAdminAnnouncements({ skip = 0, limit = 50 } = {})
 
     if (!res.ok) {
       const errBody = await res.json().catch(() => ({}));
-      const msg = parseApiError(errBody, res.status, 'Failed to fetch branch admin announcements');
-      throw new Error(msg);
+      checkResponseStatus(res, errBody, 'Failed to fetch branch admin announcements', 'branch_manager');
     }
 
     const data = await res.json();

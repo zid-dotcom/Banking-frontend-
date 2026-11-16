@@ -777,4 +777,21 @@ export async function getBranchAdminFdMisSchemes({ skip = 0, limit = 50, search 
  */
 export { getBranchAdminAnnouncements } from './announcementService';
 
+/**
+ * 24. Branch Admin Service Requests endpoints
+ * GET   /branch-admin/service-requests
+ * GET   /branch-admin/service-requests/{request_id}
+ * POST  /branch-admin/service-requests/{request_id}/replies
+ * PATCH /branch-admin/service-requests/{request_id}/replies/{reply_id}
+ * PATCH /branch-admin/service-requests/{request_id}/status
+ */
+export {
+  getBranchAdminServiceRequests,
+  getBranchAdminServiceRequest,
+  replyToBranchServiceRequest,
+  editBranchServiceRequestReply,
+  updateBranchServiceRequestStatus,
+} from './serviceRequestService';
+
+
 

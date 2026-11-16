@@ -3,6 +3,7 @@ import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import StatCard from '../../components/dashboard/StatCard';
 import { AnnouncementDetailModal } from '../../components/dashboard/AnnouncementModals';
 import { getMemberAnnouncements, getMemberMe } from '../../services/memberService';
+import { handleAuthExpired, isTokenExpiredError } from '../../services/branchService';
 import {
   Megaphone,
   Bell,
@@ -117,7 +118,11 @@ export default function MemberAnnouncements() {
           });
         }
       })
-      .catch(() => {});
+      .catch((err) => {
+        if (isTokenExpiredError(null, err?.message)) {
+          handleAuthExpired('member');
+        }
+      });
   }, []);
 
   // Fetch Member Announcements (GET /member/announcements)
@@ -135,7 +140,8 @@ export default function MemberAnnouncements() {
       }
     } catch (err) {
       console.warn('Fetch member announcements error:', err.message);
-      if (err.message && err.message.toLowerCase().includes('token is expired')) {
+      if (isTokenExpiredError(null, err?.message)) {
+        handleAuthExpired('member');
         return;
       }
       setError(err.message || 'Failed to load society announcements.');

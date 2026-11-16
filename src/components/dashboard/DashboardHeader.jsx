@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Menu,
@@ -6,9 +6,34 @@ import {
   Search,
   Globe,
   CheckCircle,
-  LogOut
+  LogOut,
+  CheckCheck,
+  Check,
+  Loader2,
+  X
 } from 'lucide-react';
 import { SOCIETY_INFO } from '../../data/societyData';
+import {
+  getMemberNotifications,
+  getMemberUnreadCount,
+  markAllNotificationsRead,
+  markNotificationRead
+} from '../../services/memberService';
+
+function formatNotificationText(text) {
+  if (!text || typeof text !== 'string') return text || '';
+  if (/\b(?:A\s+)?branch\s+(?:administrator|admin)\b/i.test(text)) {
+    return text
+      .replace(/\b(?:A\s+)?branch\s+(?:administrator|admin)\s+replied\b/gi, 'Branch Administrator replied')
+      .replace(/\b(?:A\s+)?branch\s+(?:administrator|admin)\b/gi, 'Branch Administrator');
+  }
+  return text
+    .replace(/\b(?:An\s+)?super\s+(?:administrator|admin)\s+replied\b/gi, 'Main Administrator replied')
+    .replace(/\b(?:An\s+)?administrator\s+replied\b/gi, 'Main Administrator replied')
+    .replace(/\bAn\s+admin\s+replied\b/gi, 'Main Administrator replied')
+    .replace(/\b(?:An\s+)?super\s+(?:administrator|admin)\b/gi, 'Main Administrator')
+    .replace(/\bAn\s+administrator\b/gi, 'Main Administrator');
+}
 
 export default function DashboardHeader({
   role = 'member',
@@ -17,6 +42,59 @@ export default function DashboardHeader({
 }) {
   const navigate = useNavigate();
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [memberNotifications, setMemberNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [loadingNotes, setLoadingNotes] = useState(false);
+
+  useEffect(() => {
+    if (role === 'member') {
+      getMemberUnreadCount()
+        .then((c) => setUnreadCount(typeof c === 'number' ? c : 0))
+        .catch(() => {});
+    }
+  }, [role]);
+
+  const loadMemberNotes = async () => {
+    if (role !== 'member') return;
+    setLoadingNotes(true);
+    try {
+      const data = await getMemberNotifications({ limit: 10 });
+      setMemberNotifications(Array.isArray(data) ? data : []);
+      const c = await getMemberUnreadCount();
+      setUnreadCount(typeof c === 'number' ? c : 0);
+    } catch (err) {
+      console.warn('loadMemberNotes error:', err);
+    } finally {
+      setLoadingNotes(false);
+    }
+  };
+
+  const handleToggleNotes = () => {
+    const next = !notificationsOpen;
+    setNotificationsOpen(next);
+    if (next && role === 'member') {
+      loadMemberNotes();
+    }
+  };
+
+  const handleMarkOne = async (id) => {
+    if (!id) return;
+    try {
+      await markNotificationRead(id);
+      setMemberNotifications((prev) =>
+        prev.map((n) => ((n.id || n.notification_id) === id ? { ...n, is_read: true } : n))
+      );
+      setUnreadCount((c) => Math.max(0, c - 1));
+    } catch {}
+  };
+
+  const handleMarkAll = async () => {
+    try {
+      await markAllNotificationsRead();
+      setMemberNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
+      setUnreadCount(0);
+    } catch {}
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -94,42 +172,167 @@ export default function DashboardHeader({
         {/* Notifications Dropdown */}
         <div className="relative">
           <button
-            onClick={() => setNotificationsOpen(!notificationsOpen)}
-            className="p-2.5 rounded-xl text-slate-600 hover:bg-slate-100 relative cursor-pointer transition-colors"
+            onClick={handleToggleNotes}
+            className="p-2.5 rounded-xl text-slate-600 hover:bg-slate-100 relative cursor-pointer transition-colors flex items-center justify-center"
             aria-label="Notifications"
           >
-            <Bell className="w-5 h-5 text-slate-600" />
-            <span className="absolute top-2 right-2 w-2 h-2 bg-[#2dd4bf] rounded-full ring-2 ring-white" />
+            <div className="relative inline-flex items-center justify-center">
+              <Bell className="w-5 h-5 text-slate-600" />
+              {role === 'member' ? (
+                unreadCount > 0 && (
+                  <span className="absolute -top-1.5 -right-2.5 min-w-[18px] h-[18px] px-1 bg-rose-500 text-white text-[10px] font-bold rounded-full ring-2 ring-white flex items-center justify-center shadow-xs pointer-events-none">
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </span>
+                )
+              ) : (
+                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-[#2dd4bf] rounded-full ring-2 ring-white" />
+              )}
+            </div>
           </button>
 
           {notificationsOpen && (
-            <div className="absolute right-0 mt-2 w-72 sm:w-80 bg-white rounded-2xl shadow-2xl border border-slate-100 py-3 z-50 animate-fadeIn">
-              <div className="px-4 pb-2 border-b border-slate-100 flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-900">Notifications</span>
-                <span className="text-[10px] font-semibold text-[#0f766e] bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200/50">
-                  3 unread
-                </span>
+            <div className="absolute right-0 mt-2 w-[350px] sm:w-[430px] bg-white rounded-3xl shadow-2xl border border-slate-100 py-3.5 z-50 animate-fadeIn">
+              {/* Dropdown Header */}
+              <div className="px-4 sm:px-5 pb-3 border-b border-slate-100 flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-black text-slate-900">Notifications</span>
+                  {role === 'member' && (
+                    <span className="text-[11px] font-bold text-[#0f766e] bg-teal-50 px-2.5 py-0.5 rounded-full border border-teal-200/60 shadow-2xs">
+                      {unreadCount} unread
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2">
+                  {role === 'member' && unreadCount > 0 && (
+                    <button
+                      type="button"
+                      onClick={handleMarkAll}
+                      className="text-xs text-teal-700 hover:text-teal-900 hover:underline font-bold cursor-pointer"
+                    >
+                      Mark all read
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setNotificationsOpen(false)}
+                    className="p-1 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                    title="Close"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
-              <div className="divide-y divide-slate-50 max-h-72 overflow-y-auto">
-                {notifications.map((n) => (
-                  <div key={n.id} className="p-3 hover:bg-slate-50 transition-colors cursor-pointer">
-                    <p className="text-xs font-bold text-slate-800">{n.title}</p>
-                    <p className="text-[11px] text-slate-500 mt-0.5">{n.desc}</p>
-                    <span className="text-[10px] text-slate-400 mt-1 block">{n.time}</span>
-                  </div>
-                ))}
+
+              {/* Dropdown Notification Stream */}
+              <div className="divide-y divide-slate-100 max-h-80 sm:max-h-96 overflow-y-auto">
+                {role === 'member' ? (
+                  loadingNotes ? (
+                    <div className="py-8 text-center text-slate-400 space-y-1">
+                      <Loader2 className="w-5 h-5 animate-spin text-teal-600 mx-auto" />
+                      <span className="text-xs font-medium">Loading alerts...</span>
+                    </div>
+                  ) : memberNotifications.length === 0 ? (
+                    <div className="py-8 text-center text-slate-400 text-xs font-medium">
+                      No notifications logged.
+                    </div>
+                  ) : (
+                    memberNotifications.map((n) => {
+                      const id = n.id || n.notification_id;
+                      const isRead = n.is_read === true || n.read === true || n.status === 'read';
+                      return (
+                        <div
+                          key={id || Math.random()}
+                          className={`p-3.5 sm:p-4 transition-colors ${
+                            !isRead ? 'bg-teal-50/40' : 'hover:bg-slate-50'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between gap-2">
+                            <p className={`text-xs sm:text-sm leading-snug ${!isRead ? 'font-extrabold text-slate-900' : 'font-semibold text-slate-700'}`}>
+                              {formatNotificationText(n.title || n.subject || 'Member Alert')}
+                            </p>
+                            <div className="flex items-center gap-1.5 flex-shrink-0">
+                              {!isRead ? (
+                                <>
+                                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200/80">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
+                                    Unread
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleMarkOne(id);
+                                    }}
+                                    title="Mark as read"
+                                    className="inline-flex items-center gap-1 text-[10px] font-bold text-teal-800 hover:text-teal-950 bg-teal-50 hover:bg-teal-100 px-2 py-0.5 rounded-full border border-teal-200/80 shadow-2xs transition-all cursor-pointer"
+                                  >
+                                    <Check className="w-3 h-3 text-teal-600" />
+                                    <span>Mark read</span>
+                                  </button>
+                                </>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/80">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                  Read
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <p className="text-xs text-slate-600 mt-1 leading-relaxed line-clamp-2">
+                            {formatNotificationText(n.message || n.description || n.desc)}
+                          </p>
+                        </div>
+                      );
+                    })
+                  )
+                ) : (
+                  notifications.map((n) => (
+                    <div key={n.id} className="p-3.5 hover:bg-slate-50 transition-colors cursor-pointer">
+                      <p className="text-xs font-bold text-slate-800">{n.title}</p>
+                      <p className="text-[11px] text-slate-500 mt-0.5">{n.desc}</p>
+                      <span className="text-[10px] text-slate-400 mt-1 block">{n.time}</span>
+                    </div>
+                  ))
+                )}
               </div>
+
+              {role === 'member' && (
+                <div className="pt-2.5 px-4 border-t border-slate-100">
+                  <button
+                    onClick={() => {
+                      setNotificationsOpen(false);
+                      navigate('/member/notifications');
+                    }}
+                    className="w-full py-2.5 bg-teal-50 hover:bg-teal-100 text-teal-900 rounded-xl text-xs font-bold text-center block transition-colors cursor-pointer border border-teal-200/60"
+                  >
+                    View All Notifications →
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>
 
         {/* User Pill */}
-        <div className="flex items-center gap-2.5 pl-2 sm:pl-3 border-l border-slate-200">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#2dd4bf] to-[#14b8a6] text-white flex items-center justify-center font-bold text-sm shadow-sm shadow-teal-500/20 flex-shrink-0">
+        <div
+          onClick={() => {
+            if (role === 'member') {
+              navigate('/member/profile');
+            }
+          }}
+          className={`flex items-center gap-2.5 pl-2 sm:pl-3 border-l border-slate-200 ${
+            role === 'member'
+              ? 'cursor-pointer hover:opacity-90 group transition-all'
+              : ''
+          }`}
+          title={role === 'member' ? 'View My Full Profile' : ''}
+        >
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#2dd4bf] to-[#14b8a6] text-white flex items-center justify-center font-bold text-sm shadow-sm shadow-teal-500/20 flex-shrink-0 group-hover:scale-105 transition-transform">
             {user.avatarText || (role === 'super_admin' ? 'SA' : 'U')}
           </div>
           <div className="hidden lg:block text-left leading-none">
-            <p className="text-xs font-bold text-slate-900 truncate max-w-[130px]">
+            <p className="text-xs font-bold text-slate-900 truncate max-w-[130px] group-hover:text-teal-700 transition-colors">
               {user.name || (role === 'super_admin' ? 'Super Admin' : 'User')}
             </p>
             <span className="text-[10px] text-emerald-600 font-semibold flex items-center gap-1 mt-1">

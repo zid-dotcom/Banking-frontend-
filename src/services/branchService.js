@@ -23,22 +23,73 @@ function getHeaders() {
 }
 
 /**
+ * Detect role from current window location if not explicitly provided
+ */
+export function getRoleFromLocation() {
+  const p = window.location.pathname;
+  if (p.startsWith('/member/') || p === '/member-login' || p === '/member/login') {
+    return 'member';
+  }
+  if (p.startsWith('/branch-manager/') || p.startsWith('/branch-admin/') || p === '/branch-manager-login') {
+    return 'branch_manager';
+  }
+  return 'super_admin';
+}
+
+/**
+ * Checks if response or error message indicates an expired/invalid token
+ */
+export function isTokenExpiredError(res, parsedMsg = '') {
+  const msgLower = (parsedMsg || '').toLowerCase();
+  return (
+    res?.status === 401 ||
+    res?.status === 403 ||
+    msgLower.includes('expired token') ||
+    msgLower.includes('token is expired') ||
+    msgLower.includes('token has expired') ||
+    msgLower.includes('invalid or expired') ||
+    msgLower.includes('not authenticated') ||
+    msgLower.includes('invalid token') ||
+    msgLower.includes('could not validate credentials')
+  );
+}
+
+/**
  * Handle expired token: cleans tokens, sets notification, and navigates to login
  */
-export function handleAuthExpired(role = 'super_admin') {
+export function handleAuthExpired(role = null) {
+  const effectiveRole = role || getRoleFromLocation();
+
+  if (effectiveRole === 'member') {
+    localStorage.removeItem('member_token');
+    localStorage.removeItem('member_user');
+  } else if (effectiveRole === 'branch_manager' || effectiveRole === 'branch_admin') {
+    localStorage.removeItem('branch_token');
+    localStorage.removeItem('branch_user');
+    localStorage.removeItem('branch_manager_user');
+  } else {
+    localStorage.removeItem('superadmin_token');
+    localStorage.removeItem('superadmin_user');
+  }
   localStorage.removeItem('token');
   localStorage.removeItem('access_token');
-  localStorage.removeItem('superadmin_token');
-  localStorage.removeItem('superadmin_user');
+  localStorage.removeItem('auth_token');
+
   sessionStorage.setItem('auth_expired_message', 'Token is expired. Please login again.');
 
-  const targetPath = role === 'member'
+  const targetPath = effectiveRole === 'member'
     ? '/member-login?expired=true'
-    : role === 'branch_manager'
+    : (effectiveRole === 'branch_manager' || effectiveRole === 'branch_admin')
     ? '/branch-manager-login?expired=true'
     : '/super-admin/login?expired=true';
 
-  if (!window.location.pathname.includes('/login')) {
+  const isAlreadyOnLogin =
+    window.location.pathname === '/member-login' ||
+    window.location.pathname === '/member/login' ||
+    window.location.pathname === '/branch-manager-login' ||
+    window.location.pathname === '/super-admin/login';
+
+  if (!isAlreadyOnLogin) {
     window.location.href = targetPath;
   }
 }

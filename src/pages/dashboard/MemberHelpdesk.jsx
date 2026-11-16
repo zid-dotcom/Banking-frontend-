@@ -11,6 +11,7 @@ import {
   getMemberServiceRequest,
   getMemberMe
 } from '../../services/memberService';
+import { handleAuthExpired, isTokenExpiredError } from '../../services/branchService';
 import {
   LifeBuoy,
   MessageSquare,
@@ -140,7 +141,11 @@ export default function MemberHelpdesk() {
           });
         }
       })
-      .catch(() => {});
+      .catch((err) => {
+        if (isTokenExpiredError(null, err?.message)) {
+          handleAuthExpired('member');
+        }
+      });
   }, []);
 
   // Fetch Member Service Requests
@@ -158,7 +163,8 @@ export default function MemberHelpdesk() {
       }
     } catch (err) {
       console.warn('Fetch service requests error:', err.message);
-      if (err.message && err.message.toLowerCase().includes('token is expired')) {
+      if (isTokenExpiredError(null, err?.message)) {
+        handleAuthExpired('member');
         return;
       }
       setError(err.message || 'Failed to load your service requests.');
@@ -220,13 +226,13 @@ export default function MemberHelpdesk() {
     const messageMatch = !q || (r.message || '').toLowerCase().includes(q);
 
     let statusMatch = true;
-    const st = (r.status || 'open').toLowerCase();
-    if (statusFilter === 'open') {
-      statusMatch = st === 'open';
+    const st = (r.status || 'pending').toLowerCase();
+    if (statusFilter === 'open' || statusFilter === 'pending') {
+      statusMatch = st === 'open' || st === 'pending';
     } else if (statusFilter === 'in_progress') {
-      statusMatch = st === 'in_progress' || st === 'pending';
-    } else if (statusFilter === 'resolved') {
-      statusMatch = st === 'resolved' || st === 'closed' || st === 'completed';
+      statusMatch = st === 'in_progress';
+    } else if (statusFilter === 'solved' || statusFilter === 'resolved') {
+      statusMatch = st === 'solved' || st === 'resolved' || st === 'closed' || st === 'completed';
     }
 
     return (subjectMatch || messageMatch) && statusMatch;
@@ -234,13 +240,17 @@ export default function MemberHelpdesk() {
 
   // Computed Metrics
   const totalCount = requests.length;
+  const pendingCount = requests.filter((r) => {
+    const st = (r.status || '').toLowerCase();
+    return st === 'pending' || st === 'open';
+  }).length;
   const openCount = requests.filter((r) => {
-    const st = (r.status || 'open').toLowerCase();
+    const st = (r.status || '').toLowerCase();
     return st === 'open' || st === 'in_progress' || st === 'pending';
   }).length;
-  const resolvedCount = requests.filter((r) => {
+  const solvedCount = requests.filter((r) => {
     const st = (r.status || '').toLowerCase();
-    return st === 'resolved' || st === 'closed' || st === 'completed';
+    return st === 'solved' || st === 'resolved' || st === 'closed' || st === 'completed';
   }).length;
 
   const totalPages = Math.ceil(filteredRequests.length / itemsPerPage) || 1;
@@ -317,7 +327,7 @@ export default function MemberHelpdesk() {
             value={totalCount}
             subtitle="Logged Assistance Folios"
             icon={LifeBuoy}
-            trend={`${openCount} pending`}
+            trend={`${pendingCount} pending`}
             trendType="up"
           />
           <StatCard
@@ -328,11 +338,11 @@ export default function MemberHelpdesk() {
             badge="Assigned Desk"
           />
           <StatCard
-            title="Resolved Requests"
-            value={resolvedCount}
+            title="Solved Requests"
+            value={solvedCount}
             subtitle="Completed Solutions"
             icon={CheckCircle2}
-            trend={totalCount > 0 ? `${Math.round((resolvedCount / totalCount) * 100)}% solved` : '100%'}
+            trend={totalCount > 0 ? `${Math.round((solvedCount / totalCount) * 100)}% solved` : '100%'}
             trendType="up"
           />
           <StatCard
@@ -407,9 +417,9 @@ export default function MemberHelpdesk() {
                 className="py-2 px-3 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl font-medium focus:outline-none focus:border-teal-500 cursor-pointer"
               >
                 <option value="all">All Statuses</option>
-                <option value="open">Open Only</option>
+                <option value="pending">Pending</option>
                 <option value="in_progress">In Progress</option>
-                <option value="resolved">Resolved</option>
+                <option value="solved">Solved</option>
               </select>
 
               <button
@@ -501,13 +511,13 @@ export default function MemberHelpdesk() {
                     const st = (req.status || 'open').toLowerCase();
 
                     const getStatusBadge = (statusStr) => {
-                      if (statusStr === 'resolved' || statusStr === 'closed' || statusStr === 'completed') {
+                      if (statusStr === 'solved' || statusStr === 'resolved' || statusStr === 'closed' || statusStr === 'completed') {
                         return 'bg-emerald-50 text-emerald-700 border-emerald-200';
                       }
-                      if (statusStr === 'in_progress' || statusStr === 'pending') {
+                      if (statusStr === 'in_progress') {
                         return 'bg-amber-50 text-amber-700 border-amber-200';
                       }
-                      return 'bg-teal-50 text-teal-700 border-teal-200';
+                      return 'bg-rose-50 text-rose-700 border-rose-200';
                     };
 
                     return (
@@ -556,10 +566,10 @@ export default function MemberHelpdesk() {
                           <button
                             onClick={() => handleViewDetail(req)}
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-800 font-bold text-xs rounded-xl transition-colors cursor-pointer border border-teal-200/60 shadow-2xs"
-                            title="View request details"
+                            title="View request details and replies"
                           >
                             <Eye className="w-3.5 h-3.5 text-[#00b4a7]" />
-                            <span>View</span>
+                            <span>View Replies</span>
                           </button>
                         </td>
                       </tr>

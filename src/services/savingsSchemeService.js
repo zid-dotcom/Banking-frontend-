@@ -33,6 +33,9 @@ export function handleAuthExpired(role = 'super_admin') {
   localStorage.removeItem('branch_token');
   localStorage.removeItem('branch_user');
   localStorage.removeItem('branch_manager_user');
+  localStorage.removeItem('member_token');
+  localStorage.removeItem('member_user');
+  localStorage.removeItem('auth_token');
   sessionStorage.setItem('auth_expired_message', 'Token is expired. Please login again.');
 
   const targetPath = role === 'member'
@@ -41,7 +44,13 @@ export function handleAuthExpired(role = 'super_admin') {
     ? '/branch-manager-login?expired=true'
     : '/super-admin/login?expired=true';
 
-  if (!window.location.pathname.includes('/login')) {
+  const isAlreadyOnLogin =
+    window.location.pathname === '/member-login' ||
+    window.location.pathname === '/member/login' ||
+    window.location.pathname === '/branch-manager-login' ||
+    window.location.pathname === '/super-admin/login';
+
+  if (!isAlreadyOnLogin) {
     window.location.href = targetPath;
   }
 }
