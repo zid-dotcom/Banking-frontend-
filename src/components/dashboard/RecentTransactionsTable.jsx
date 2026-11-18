@@ -39,7 +39,20 @@ export default function RecentTransactionsTable({
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 text-slate-700">
-            {transactions.map((tx) => {
+            {transactions.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="py-12 px-5 text-center text-slate-400">
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <Clock className="w-8 h-8 text-slate-300 stroke-[1.5]" />
+                    <p className="text-sm font-semibold text-slate-700">No transactions recorded yet</p>
+                    <p className="text-xs text-slate-400 max-w-sm">
+                      Cash counter deposits and withdrawals will appear here in real time as soon as they are processed.
+                    </p>
+                  </div>
+                </td>
+              </tr>
+            ) : (
+              transactions.map((tx) => {
               const isCredit = tx.type === 'credit' || tx.type === 'deposit';
               return (
                 <tr key={tx.id} className="hover:bg-slate-50/80 transition-colors">
@@ -107,7 +120,8 @@ export default function RecentTransactionsTable({
                   </td>
                 </tr>
               );
-            })}
+            })
+            )}
           </tbody>
         </table>
       </div>

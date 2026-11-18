@@ -12,6 +12,8 @@ import {
   getMemberNominee,
   getMemberFullProfile
 } from '../../services/memberService';
+import { getMemberSavingsAccounts } from '../../services/savingsAccountService';
+import { getMemberSavingsAccountTransactions } from '../../services/cashTransactionService';
 import {
   Wallet,
   CreditCard,
@@ -225,38 +227,69 @@ export default function MemberDashboard() {
     };
   }, []);
 
-  const transactions = [
-    {
-      id: 'tx-1',
-      description: 'Dairy Loan EMI Installment #8',
-      refNo: 'AFX-EMI-992144',
-      category: 'Loan Repayment',
-      date: 'Today, 10:24 AM',
-      amount: '₹12,450',
-      type: 'debit',
-      status: 'Completed'
-    },
-    {
-      id: 'tx-2',
-      description: 'Monthly Thrift Deposit Credit',
-      refNo: 'AFX-THRF-331002',
-      category: 'Savings Thrift',
-      date: '02 Nov 2026',
-      amount: '₹5,000',
-      type: 'credit',
-      status: 'Completed'
-    },
-    {
-      id: 'tx-3',
-      description: 'Annual Society Share Dividend (FY 25-26)',
-      refNo: 'AFX-DIV-884201',
-      category: 'Share Capital',
-      date: '28 Oct 2026',
-      amount: '₹2,125',
-      type: 'credit',
-      status: 'Completed'
-    }
-  ];
+  const [savingsAccounts, setSavingsAccounts] = useState([]);
+  const [transactions, setTransactions] = useState([]);
+  const [loadingTransactions, setLoadingTransactions] = useState(true);
+
+  // Fetch Member Active Savings Accounts & Real Transactions (GET /member/savings-accounts & GET /member/savings-accounts/{account_id}/transactions)
+  useEffect(() => {
+    let isMounted = true;
+    getMemberSavingsAccounts()
+      .then(async (accs) => {
+        if (!isMounted) return;
+        const list = Array.isArray(accs) ? accs : [];
+        setSavingsAccounts(list);
+
+        if (list.length > 0) {
+          const primaryAcc = list[0];
+          try {
+            const txList = await getMemberSavingsAccountTransactions(primaryAcc.id, { limit: 10 });
+            if (isMounted && Array.isArray(txList)) {
+              const formatted = txList.map((tx) => {
+                const isDeposit =
+                  String(tx.transaction_type || '').toLowerCase().includes('deposit') ||
+                  String(tx.transaction_type || '').toLowerCase().includes('credit');
+                return {
+                  id: tx.id || tx.receipt_number,
+                  description: isDeposit
+                    ? (tx.notes ? `Deposit: ${tx.notes}` : 'Counter Cash Deposit')
+                    : (tx.notes ? `Withdrawal: ${tx.notes}` : 'Counter Cash Withdrawal'),
+                  refNo: tx.receipt_number ? `RCPT: ${tx.receipt_number}` : (tx.account_number ? `Acc: ${tx.account_number}` : `TXN-${tx.id}`),
+                  category: isDeposit ? 'Cash Inflow' : 'Cash Outflow',
+                  date: tx.created_at ? new Date(tx.created_at).toLocaleString('en-IN', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true
+                  }) : 'Recent',
+                  amount: `₹${Number(tx.amount || 0).toLocaleString('en-IN')}`,
+                  type: isDeposit ? 'credit' : 'debit',
+                  status: 'Completed'
+                };
+              });
+              setTransactions(formatted);
+            }
+          } catch (txErr) {
+            console.warn('Could not load savings account transactions:', txErr);
+          }
+        }
+      })
+      .catch((err) => console.warn('Could not load member savings accounts:', err))
+      .finally(() => {
+        if (isMounted) setLoadingTransactions(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const totalSavingsDeposit = savingsAccounts.length > 0
+    ? savingsAccounts.reduce((sum, a) => sum + (Number(a.balance) || 0), 0)
+    : null;
+  const primaryAccount = savingsAccounts[0];
 
   const handleOpenAction = (type) => {
     if (type === 'deposit') {
@@ -418,8 +451,8 @@ export default function MemberDashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <StatCard
             title="Total Savings Deposit"
-            value="₹1,48,250"
-            subtitle="Acc #4401-8842-10"
+            value={totalSavingsDeposit !== null ? `₹${totalSavingsDeposit.toLocaleString('en-IN')}` : '₹0'}
+            subtitle={primaryAccount ? `Acc #${primaryAccount.account_number}` : 'Savings Folio'}
             icon={Wallet}
             trend="+5.5% Annual Interest"
             trendType="up"
@@ -669,8 +702,9 @@ export default function MemberDashboard() {
 
         <RecentTransactionsTable
           title="Recent Member Transactions"
-          subtitle="Your verified deposit and loan ledger transactions"
+          subtitle="Your verified cash counter and deposit transactions"
           transactions={transactions}
+          onViewAll={() => navigate('/member/account-transactions')}
         />
       </div>
 

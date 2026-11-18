@@ -351,3 +351,118 @@ export async function changeBranchStaffStatus(staffId, isActive) {
   }
 }
 
+/**
+ * 7. POST /staff/login - Staff Member Authentication
+ * Schema: application/x-www-form-urlencoded { grant_type, username, password }
+ */
+export async function staffLogin(username, password) {
+  try {
+    const formBody = new URLSearchParams();
+    formBody.append('grant_type', 'password');
+    formBody.append('username', username.trim());
+    formBody.append('password', password);
+
+    const res = await fetch(`${BASE_URL}/staff/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'ngrok-skip-browser-warning': 'true',
+        'Accept': 'application/json',
+      },
+      body: formBody.toString(),
+    });
+
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      const parsed = parseApiError(data, res.status, 'Invalid Staff ID or password. Please verify your credentials.');
+      throw new Error(parsed);
+    }
+
+    const token = data.access_token || data.token;
+    if (token) {
+      localStorage.setItem('token', token);
+      localStorage.setItem('access_token', token);
+      localStorage.setItem('staff_token', token);
+    }
+    if (data.user || data.staff) {
+      localStorage.setItem('staff_user', JSON.stringify(data.user || data.staff));
+    }
+
+    // Attempt to auto-fetch staff profile
+    try {
+      if (token) {
+        const profileRes = await fetch(`${BASE_URL}/staff/me`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'ngrok-skip-browser-warning': 'true',
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        if (profileRes.ok) {
+          const profile = await profileRes.json();
+          localStorage.setItem('staff_user', JSON.stringify(profile));
+        }
+      }
+    } catch (profileErr) {
+      console.warn('Could not auto-fetch /staff/me after login:', profileErr);
+    }
+
+    return data;
+  } catch (error) {
+    console.error('branchStaffService.staffLogin error:', error);
+    throw error;
+  }
+}
+
+/**
+ * 8. GET /staff/me - Current Authenticated Staff Details
+ * Schema matching Swagger /staff/me:
+ * {
+ *   staff_id, user_id, staff_code, full_name, email, contact_number,
+ *   account_role, staff_role: { id, name, description },
+ *   branch_id, branch: { id, branch_code, ifsc_code, name, city, state, address, contact_number, opening_date, is_active, created_at },
+ *   is_active
+ * }
+ */
+export async function getStaffMe(explicitToken = null) {
+  try {
+    const token =
+      explicitToken ||
+      localStorage.getItem('staff_token') ||
+      localStorage.getItem('token') ||
+      localStorage.getItem('access_token');
+
+    const headers = {
+      'Content-Type': 'application/json',
+      'ngrok-skip-browser-warning': 'true',
+      'Accept': 'application/json',
+    };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const res = await fetch(`${BASE_URL}/staff/me`, {
+      method: 'GET',
+      headers,
+    });
+
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({}));
+      const msg = parseApiError(errBody, res.status, 'Failed to fetch staff profile');
+      throw new Error(msg);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error('branchStaffService.getStaffMe error:', error);
+    throw error;
+  }
+}
+
+
+
+

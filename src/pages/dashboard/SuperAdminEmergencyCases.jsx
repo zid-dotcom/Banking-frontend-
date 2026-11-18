@@ -5,6 +5,8 @@ import EmergencyCaseThreadModal from '../../components/dashboard/EmergencyCaseTh
 import {
   getSuperadminEmergencyCases,
   getSuperadminEmergencyUnreadCount,
+  notifyEmergencyUnreadUpdated,
+  EMERGENCY_UNREAD_UPDATED_EVENT,
 } from '../../services/emergencyService';
 import {
   getBranches as getSuperadminBranches,
@@ -114,7 +116,9 @@ export default function SuperAdminEmergencyCases() {
       ]);
 
       setCases(Array.isArray(casesData) ? casesData : []);
-      setUnreadInfo(unreadData || { total_unread_count: 0, branches: [] });
+      const unread = unreadData || { total_unread_count: 0, branches: [] };
+      setUnreadInfo(unread);
+      notifyEmergencyUnreadUpdated({ role: 'super_admin', count: unread.total_unread_count });
     } catch (err) {
       console.warn('Superadmin emergency fetch error:', err);
       if (isTokenExpiredError(null, err?.message)) {
@@ -131,6 +135,44 @@ export default function SuperAdminEmergencyCases() {
   useEffect(() => {
     fetchCasesAndUnread();
   }, [selectedBranchId, unreadOnly, searchQuery]);
+
+  useEffect(() => {
+    const handleEmergencyUpdated = (e) => {
+      const detail = e?.detail;
+      const targetRole = detail?.role;
+      if (!targetRole || targetRole === 'super_admin') {
+        if (typeof detail?.count === 'number') {
+          setUnreadInfo((prev) => ({ ...prev, total_unread_count: detail.count }));
+        }
+      }
+    };
+
+    window.addEventListener(EMERGENCY_UNREAD_UPDATED_EVENT || 'emergency-unread-updated', handleEmergencyUpdated);
+    return () => {
+      window.removeEventListener(EMERGENCY_UNREAD_UPDATED_EVENT || 'emergency-unread-updated', handleEmergencyUpdated);
+    };
+  }, []);
+
+  const handleOpenCase = (caseItem) => {
+    if (!caseItem) return;
+    setActiveCaseId(caseItem.id);
+
+    // If this case has unread messages, clear badge immediately in table & sidebar
+    const unreadOnCase = Number(caseItem.unread_count) || 0;
+    if (unreadOnCase > 0) {
+      setCases((prev) =>
+        prev.map((c) => (c.id === caseItem.id ? { ...c, unread_count: 0 } : c))
+      );
+      setUnreadInfo((prev) => {
+        const nextTotal = Math.max(0, (prev?.total_unread_count || 0) - unreadOnCase);
+        notifyEmergencyUnreadUpdated({ role: 'super_admin', count: nextTotal });
+        return {
+          ...prev,
+          total_unread_count: nextTotal,
+        };
+      });
+    }
+  };
 
   return (
     <DashboardLayout role="super_admin" user={superAdminUser} activeTab="emergency_cases">
@@ -347,7 +389,7 @@ export default function SuperAdminEmergencyCases() {
                         <td className="py-4 px-6 text-right whitespace-nowrap">
                           <button
                             type="button"
-                            onClick={() => setActiveCaseId(c.id)}
+                            onClick={() => handleOpenCase(c)}
                             className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-gradient-to-r from-[#14b8a6] to-[#0f766e] hover:from-[#0d9488] hover:to-[#0f766e] text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer active:scale-95"
                           >
                             <Eye className="w-3.5 h-3.5" />
@@ -369,8 +411,11 @@ export default function SuperAdminEmergencyCases() {
         isOpen={Boolean(activeCaseId)}
         caseId={activeCaseId}
         role="super_admin"
-        onClose={() => setActiveCaseId(null)}
-        onCaseUpdated={() => fetchCasesAndUnread(false)}
+        onClose={() => {
+          setActiveCaseId(null);
+          fetchCasesAndUnread(true);
+        }}
+        onCaseUpdated={() => fetchCasesAndUnread(true)}
       />
     </DashboardLayout>
   );

@@ -6,6 +6,8 @@ import {
   getBranchAdminEmergencyCases,
   createBranchAdminEmergencyCase,
   getBranchAdminEmergencyUnreadCount,
+  notifyEmergencyUnreadUpdated,
+  EMERGENCY_UNREAD_UPDATED_EVENT,
 } from '../../services/emergencyService';
 import { handleAuthExpired, isTokenExpiredError } from '../../services/branchService';
 import {
@@ -111,7 +113,9 @@ export default function BranchManagerEmergencyCases() {
       ]);
 
       setCases(Array.isArray(casesData) ? casesData : []);
-      setUnreadCount(Number(unreadData?.unread_count) || 0);
+      const count = Number(unreadData?.unread_count) || 0;
+      setUnreadCount(count);
+      notifyEmergencyUnreadUpdated({ role: 'branch_manager', count });
     } catch (err) {
       console.warn('Emergency cases fetch error:', err);
       if (isTokenExpiredError(null, err?.message)) {
@@ -128,6 +132,41 @@ export default function BranchManagerEmergencyCases() {
   useEffect(() => {
     fetchCasesAndUnread();
   }, [searchQuery]);
+
+  useEffect(() => {
+    const handleEmergencyUpdated = (e) => {
+      const detail = e?.detail;
+      const targetRole = detail?.role;
+      if (!targetRole || targetRole === 'branch_manager' || targetRole === 'branch_admin') {
+        if (typeof detail?.count === 'number') {
+          setUnreadCount(detail.count);
+        }
+      }
+    };
+
+    window.addEventListener(EMERGENCY_UNREAD_UPDATED_EVENT || 'emergency-unread-updated', handleEmergencyUpdated);
+    return () => {
+      window.removeEventListener(EMERGENCY_UNREAD_UPDATED_EVENT || 'emergency-unread-updated', handleEmergencyUpdated);
+    };
+  }, []);
+
+  const handleOpenCase = (caseItem) => {
+    if (!caseItem) return;
+    setActiveCaseId(caseItem.id);
+
+    // If this case has unread messages, clear badge immediately in table & sidebar
+    const unreadOnCase = Number(caseItem.unread_count) || 0;
+    if (unreadOnCase > 0) {
+      setCases((prev) =>
+        prev.map((c) => (c.id === caseItem.id ? { ...c, unread_count: 0 } : c))
+      );
+      setUnreadCount((prev) => {
+        const next = Math.max(0, prev - unreadOnCase);
+        notifyEmergencyUnreadUpdated({ role: 'branch_manager', count: next });
+        return next;
+      });
+    }
+  };
 
   const handleCreateSubmit = async (e) => {
     e.preventDefault();
@@ -382,7 +421,7 @@ export default function BranchManagerEmergencyCases() {
                         <td className="py-4 px-6 text-right whitespace-nowrap">
                           <button
                             type="button"
-                            onClick={() => setActiveCaseId(c.id)}
+                            onClick={() => handleOpenCase(c)}
                             className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-teal-50 hover:bg-teal-100 text-[#0f766e] font-bold text-xs rounded-xl border border-teal-200 transition-all cursor-pointer active:scale-95"
                           >
                             <Eye className="w-3.5 h-3.5" />
@@ -492,8 +531,11 @@ export default function BranchManagerEmergencyCases() {
         isOpen={Boolean(activeCaseId)}
         caseId={activeCaseId}
         role="branch_admin"
-        onClose={() => setActiveCaseId(null)}
-        onCaseUpdated={() => fetchCasesAndUnread(false)}
+        onClose={() => {
+          setActiveCaseId(null);
+          fetchCasesAndUnread(true);
+        }}
+        onCaseUpdated={() => fetchCasesAndUnread(true)}
       />
     </DashboardLayout>
   );

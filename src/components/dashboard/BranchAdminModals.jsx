@@ -226,9 +226,10 @@ export function BranchAdminFormModal({
               <option value="" disabled>Select branch unit</option>
               {branches.map((b) => {
                 const bId = b.rawId || b.id;
+                const ifsc = b.ifsc_code || b.ifsc;
                 return (
                   <option key={b.id || bId} value={bId}>
-                    {b.name} {b.city ? `(${b.city}, ${b.state})` : ''} - #{b.branch_code || bId}
+                    {b.name} {b.city ? `(${b.city}, ${b.state})` : ''} - #{b.branch_code || bId} {ifsc ? `[IFSC: ${ifsc}]` : ''}
                   </option>
                 );
               })}

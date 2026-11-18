@@ -23,6 +23,7 @@ import {
  * Aligned with backend API schema:
  * {
  *   "name": "string",
+ *   "ifsc_code": "string",
  *   "city": "string",
  *   "state": "string",
  *   "address": "string",
@@ -39,6 +40,7 @@ export function BranchFormModal({
 }) {
   const [formData, setFormData] = useState({
     name: '',
+    ifsc_code: '',
     city: '',
     state: '',
     address: '',
@@ -52,6 +54,7 @@ export function BranchFormModal({
     if (initialData && mode === 'edit') {
       setFormData({
         name: initialData.name || '',
+        ifsc_code: initialData.ifsc_code || initialData.ifsc || '',
         city: initialData.city || '',
         state: initialData.state || '',
         address: initialData.address || '',
@@ -60,6 +63,7 @@ export function BranchFormModal({
     } else {
       setFormData({
         name: '',
+        ifsc_code: '',
         city: '',
         state: '',
         address: '',
@@ -82,6 +86,13 @@ export function BranchFormModal({
       setErrorPopup({
         title: 'Validation Error',
         message: 'Branch name is required.'
+      });
+      return;
+    }
+    if (!formData.ifsc_code.trim()) {
+      setErrorPopup({
+        title: 'Validation Error',
+        message: 'Branch IFSC code is required.'
       });
       return;
     }
@@ -163,7 +174,25 @@ export function BranchFormModal({
             />
           </div>
 
-          {/* 2. City & State Jurisdiction */}
+          {/* 2. Branch IFSC Code */}
+          <div>
+            <label className="block text-xs font-bold text-slate-700 mb-1">
+              Branch IFSC Code <span className="text-rose-500">*</span>
+            </label>
+            <input
+              type="text"
+              name="ifsc_code"
+              required
+              value={formData.ifsc_code}
+              onChange={(e) => setFormData(prev => ({ ...prev, ifsc_code: e.target.value.toUpperCase() }))}
+              placeholder="e.g. AURM0001234"
+              maxLength={11}
+              className="w-full h-10 px-3.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-mono uppercase text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#2dd4bf] focus:bg-white transition-all"
+            />
+            <p className="text-[11px] text-slate-400 mt-1">11-character Indian Financial System Code (e.g. AURM0001234)</p>
+          </div>
+
+          {/* 3. City & State Jurisdiction */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">
@@ -321,7 +350,14 @@ export function BranchDetailModal({
                 </span>
               </div>
               <h3 className="text-lg font-bold text-slate-900 mt-1">{branch.name}</h3>
-              <p className="text-xs text-slate-500 font-mono">Branch Code: #{branch.branch_code || branch.id}</p>
+              <div className="flex items-center gap-2 mt-0.5">
+                <p className="text-xs text-slate-500 font-mono">Branch Code: #{branch.branch_code || branch.id}</p>
+                {branch.ifsc_code && (
+                  <span className="text-xs font-mono font-bold text-[#0f766e] bg-teal-50 px-2 py-0.5 rounded border border-teal-200/60">
+                    IFSC: {branch.ifsc_code}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
           <button
@@ -361,10 +397,15 @@ export function BranchDetailModal({
             </div>
 
             {/* Real API Ledger Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <div className="bg-white rounded-2xl p-3.5 border border-slate-200/80 shadow-2xs">
                 <span className="text-[10px] font-bold text-slate-400 uppercase">Branch Code</span>
                 <p className="text-sm font-mono font-extrabold text-slate-900 mt-1">#{branch.branch_code || branch.id}</p>
+              </div>
+
+              <div className="bg-white rounded-2xl p-3.5 border border-slate-200/80 shadow-2xs">
+                <span className="text-[10px] font-bold text-slate-400 uppercase">IFSC Code</span>
+                <p className="text-sm font-mono font-extrabold text-[#0f766e] mt-1">{branch.ifsc_code || 'N/A'}</p>
               </div>
 
               <div className="bg-white rounded-2xl p-3.5 border border-slate-200/80 shadow-2xs">

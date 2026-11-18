@@ -96,7 +96,7 @@ export default function PortalModal({ isOpen, onClose }) {
 
           <div className="mt-4 pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs">
             <span className="text-slate-500 font-medium">Administration:</span>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-wrap">
               <Link
                 to="/super-admin/login"
                 onClick={onClose}
@@ -111,6 +111,14 @@ export default function PortalModal({ isOpen, onClose }) {
                 className="font-semibold text-amber-600 hover:underline"
               >
                 Branch Admin &rarr;
+              </Link>
+              <span className="text-slate-300">&bull;</span>
+              <Link
+                to="/staff-login"
+                onClick={onClose}
+                className="font-semibold text-teal-700 hover:underline"
+              >
+                Staff &rarr;
               </Link>
             </div>
           </div>

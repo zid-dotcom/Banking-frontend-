@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Phone, User, Menu, X, ChevronRight, Building2, ArrowRight } from 'lucide-react';
+import { Phone, User, Menu, X, ChevronRight, Building2, ArrowRight, Briefcase } from 'lucide-react';
 import { SOCIETY_INFO } from '../data/societyData';
 import BrandLogo from './BrandLogo';
 
@@ -245,6 +245,32 @@ export default function Navbar({
               </div>
             </Link>
 
+            <div className="my-2.5 sm:my-3 border-t border-slate-100" />
+
+            {/* Staff Portal Option */}
+            <Link
+              to="/staff-login"
+              onClick={() => setPortalSelectionOpen(false)}
+              className="flex items-center gap-4 sm:gap-5 p-3.5 sm:p-4 rounded-2xl hover:bg-teal-50/80 active:bg-teal-100/70 group transition-all my-2"
+            >
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-[#008579] flex items-center justify-center text-white flex-shrink-0 shadow-sm shadow-teal-200/80 group-hover:scale-105 transition-transform">
+                <Briefcase className="w-6 h-6 sm:w-7 sm:h-7" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between">
+                  <span className="text-base sm:text-lg font-bold text-slate-900 group-hover:text-teal-900">
+                    Staff Portal
+                  </span>
+                  <span className="text-xs sm:text-sm font-bold text-teal-700 flex items-center gap-1">
+                    Login <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                  </span>
+                </div>
+                <p className="text-xs sm:text-sm text-slate-500 mt-0.5 truncate">
+                  Branch Staff Operations Portal
+                </p>
+              </div>
+            </Link>
+
           </div>
         </div>
       )}
@@ -319,6 +345,19 @@ export default function Navbar({
               <div className="flex items-center gap-2.5">
                 <Building2 className="w-5 h-5" />
                 <span>Branch Manager Login</span>
+              </div>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+
+            {/* Quick Access Staff Portal Link in Mobile Drawer */}
+            <Link
+              to="/staff-login"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center justify-between bg-[#008579] hover:bg-[#007469] text-white font-bold text-base py-3 px-4 rounded-xl shadow transition-colors"
+            >
+              <div className="flex items-center gap-2.5">
+                <Briefcase className="w-5 h-5" />
+                <span>Staff Portal Login</span>
               </div>
               <ArrowRight className="w-4 h-4" />
             </Link>

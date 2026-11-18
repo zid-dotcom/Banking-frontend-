@@ -11,8 +11,10 @@ import Contact from './pages/Contact';
 import SuperAdminLogin from './pages/SuperAdminLogin';
 import BranchAdminLogin from './pages/BranchAdminLogin';
 import MemberLogin from './pages/MemberLogin';
+import StaffLogin from './pages/StaffLogin';
 import MemberDashboard from './pages/dashboard/MemberDashboard';
 import MemberSavingsSchemes from './pages/dashboard/MemberSavingsSchemes';
+import MemberAccountTransactions from './pages/dashboard/MemberAccountTransactions';
 import MemberFdMisSchemes from './pages/dashboard/MemberFdMisSchemes';
 import MemberLoanSchemes from './pages/dashboard/MemberLoanSchemes';
 import MemberHelpdesk from './pages/dashboard/MemberHelpdesk';
@@ -20,17 +22,23 @@ import MemberAnnouncements from './pages/dashboard/MemberAnnouncements';
 import MemberNotifications from './pages/dashboard/MemberNotifications';
 import MemberNominee from './pages/dashboard/MemberNominee';
 import MemberProfile from './pages/dashboard/MemberProfile';
+import MemberSecurityEvents from './pages/dashboard/MemberSecurityEvents';
+import StaffDashboard from './pages/dashboard/StaffDashboard';
+import StaffCashReconciliation from './pages/dashboard/StaffCashReconciliation';
+import StaffCashOperations from './pages/dashboard/StaffCashOperations';
 
 import BranchManagerDashboard from './pages/dashboard/BranchManagerDashboard';
 import BranchManagerMembers from './pages/dashboard/BranchManagerMembers';
 import BranchManagerStaff from './pages/dashboard/BranchManagerStaff';
 import BranchManagerLoanSchemes from './pages/dashboard/BranchManagerLoanSchemes';
 import BranchManagerSavingsSchemes from './pages/dashboard/BranchManagerSavingsSchemes';
+import BranchManagerCashTransactions from './pages/dashboard/BranchManagerCashTransactions';
 import BranchManagerFdMisSchemes from './pages/dashboard/BranchManagerFdMisSchemes';
 import BranchManagerNominees from './pages/dashboard/BranchManagerNominees';
 import BranchManagerAnnouncements from './pages/dashboard/BranchManagerAnnouncements';
 import BranchManagerServiceRequests from './pages/dashboard/BranchManagerServiceRequests';
 import BranchManagerEmergencyCases from './pages/dashboard/BranchManagerEmergencyCases';
+import BranchManagerSecurityEvents from './pages/dashboard/BranchManagerSecurityEvents';
 
 import SuperAdminDashboard from './pages/dashboard/SuperAdminDashboard';
 import SuperAdminBranches from './pages/dashboard/SuperAdminBranches';
@@ -39,10 +47,12 @@ import SuperAdminMembers from './pages/dashboard/SuperAdminMembers';
 import SuperAdminLoanSchemes from './pages/dashboard/SuperAdminLoanSchemes';
 import SuperAdminStaffRoles from './pages/dashboard/SuperAdminStaffRoles';
 import SuperAdminSavingsSchemes from './pages/dashboard/SuperAdminSavingsSchemes';
+import SuperAdminCashTransactions from './pages/dashboard/SuperAdminCashTransactions';
 import SuperAdminFdMisSchemes from './pages/dashboard/SuperAdminFdMisSchemes';
 import SuperAdminAnnouncements from './pages/dashboard/SuperAdminAnnouncements';
 import SuperAdminServiceRequests from './pages/dashboard/SuperAdminServiceRequests';
 import SuperAdminEmergencyCases from './pages/dashboard/SuperAdminEmergencyCases';
+import SuperAdminSecurityEvents from './pages/dashboard/SuperAdminSecurityEvents';
 import EnquiryModal from './components/EnquiryModal';
 import PortalModal from './components/PortalModal';
 import ChatWithUsWidget from './components/ChatWithUsWidget';
@@ -76,16 +86,19 @@ function MainApp() {
     location.pathname === '/branch-manager/login' ||
     location.pathname === '/branch/login';
   const isMemberLoginRoute = location.pathname === '/member-login' || location.pathname === '/member/login';
+  const isStaffLoginRoute = location.pathname === '/staff-login' || location.pathname === '/staff/login';
 
   // Isolated role-based dashboard routes
   const isDashboardRoute =
     !isSuperAdminLoginRoute &&
     !isBranchManagerLoginRoute &&
-    !isMemberLoginRoute && (
+    !isMemberLoginRoute &&
+    !isStaffLoginRoute && (
       location.pathname.startsWith('/member/') ||
       location.pathname.startsWith('/branch-manager/') ||
       location.pathname.startsWith('/branch-admin/') ||
-      location.pathname.startsWith('/super-admin/')
+      location.pathname.startsWith('/super-admin/') ||
+      location.pathname.startsWith('/staff/')
     );
 
   useEffect(() => {
@@ -141,6 +154,16 @@ function MainApp() {
     );
   }
 
+  // If on /staff-login, render isolated full-screen Staff portal
+  if (isStaffLoginRoute) {
+    return (
+      <Routes>
+        <Route path="/staff-login" element={<StaffLogin />} />
+        <Route path="/staff/login" element={<StaffLogin />} />
+      </Routes>
+    );
+  }
+
   // If on any role dashboard route, render isolated modular dashboard view
   if (isDashboardRoute) {
     return (
@@ -156,6 +179,8 @@ function MainApp() {
         <Route path="/super-admin/savings-schemes" element={<SuperAdminSavingsSchemes />} />
         <Route path="/super-admin/savings-scheme" element={<SuperAdminSavingsSchemes />} />
         <Route path="/super-admin/savings" element={<SuperAdminSavingsSchemes />} />
+        <Route path="/super-admin/cash-transactions" element={<SuperAdminCashTransactions />} />
+        <Route path="/super-admin/cash-operations" element={<SuperAdminCashTransactions />} />
         <Route path="/super-admin/fd-mis-schemes" element={<SuperAdminFdMisSchemes />} />
         <Route path="/super-admin/fd-mis-scheme" element={<SuperAdminFdMisSchemes />} />
         <Route path="/super-admin/fd-mis" element={<SuperAdminFdMisSchemes />} />
@@ -168,6 +193,8 @@ function MainApp() {
         <Route path="/super-admin/service-request" element={<SuperAdminServiceRequests />} />
         <Route path="/super-admin/emergency-cases" element={<SuperAdminEmergencyCases />} />
         <Route path="/super-admin/emergency" element={<SuperAdminEmergencyCases />} />
+        <Route path="/super-admin/security-events" element={<SuperAdminSecurityEvents />} />
+        <Route path="/super-admin/security" element={<SuperAdminSecurityEvents />} />
         <Route path="/super-admin/members" element={<SuperAdminMembers />} />
 
         {/* Branch Manager Routes */}
@@ -182,6 +209,10 @@ function MainApp() {
         <Route path="/branch-admin/staff" element={<BranchManagerStaff />} />
         <Route path="/branch-manager/savings-schemes" element={<BranchManagerSavingsSchemes />} />
         <Route path="/branch-admin/savings-schemes" element={<BranchManagerSavingsSchemes />} />
+        <Route path="/branch-manager/cash-transactions" element={<BranchManagerCashTransactions />} />
+        <Route path="/branch-admin/cash-transactions" element={<BranchManagerCashTransactions />} />
+        <Route path="/branch-manager/cash-operations" element={<BranchManagerCashTransactions />} />
+        <Route path="/branch-admin/cash-operations" element={<BranchManagerCashTransactions />} />
         <Route path="/branch-manager/fd-mis-schemes" element={<BranchManagerFdMisSchemes />} />
         <Route path="/branch-admin/fd-mis-schemes" element={<BranchManagerFdMisSchemes />} />
         <Route path="/branch-manager/loan-schemes" element={<BranchManagerLoanSchemes />} />
@@ -194,6 +225,10 @@ function MainApp() {
         <Route path="/branch-admin/emergency-cases" element={<BranchManagerEmergencyCases />} />
         <Route path="/branch-manager/emergency" element={<BranchManagerEmergencyCases />} />
         <Route path="/branch-admin/emergency" element={<BranchManagerEmergencyCases />} />
+        <Route path="/branch-manager/security-events" element={<BranchManagerSecurityEvents />} />
+        <Route path="/branch-admin/security-events" element={<BranchManagerSecurityEvents />} />
+        <Route path="/branch-manager/security" element={<BranchManagerSecurityEvents />} />
+        <Route path="/branch-admin/security" element={<BranchManagerSecurityEvents />} />
         <Route path="/branch-manager/helpdesk" element={<BranchManagerServiceRequests />} />
         <Route path="/branch-admin/helpdesk" element={<BranchManagerServiceRequests />} />
         <Route path="/branch-manager/*" element={<Navigate to="/branch-manager/dashboard" replace />} />
@@ -205,13 +240,26 @@ function MainApp() {
         <Route path="/member/nominee" element={<MemberNominee />} />
         <Route path="/member/nominees" element={<MemberNominee />} />
         <Route path="/member/savings-schemes" element={<MemberSavingsSchemes />} />
+        <Route path="/member/account-transactions" element={<MemberAccountTransactions />} />
+        <Route path="/member/transactions" element={<MemberAccountTransactions />} />
+        <Route path="/member/cash-transactions" element={<MemberAccountTransactions />} />
         <Route path="/member/fd-mis-schemes" element={<MemberFdMisSchemes />} />
         <Route path="/member/loan-schemes" element={<MemberLoanSchemes />} />
         <Route path="/member/announcements" element={<MemberAnnouncements />} />
         <Route path="/member/notifications" element={<MemberNotifications />} />
+        <Route path="/member/security" element={<MemberSecurityEvents />} />
+        <Route path="/member/security-events" element={<MemberSecurityEvents />} />
         <Route path="/member/helpdesk" element={<MemberHelpdesk />} />
         <Route path="/member/service-requests" element={<MemberHelpdesk />} />
         <Route path="/member/*" element={<Navigate to="/member/dashboard" replace />} />
+
+        {/* Staff Dashboard Routes */}
+        <Route path="/staff/dashboard" element={<StaffDashboard />} />
+        <Route path="/staff/cash-reconciliation" element={<StaffCashReconciliation />} />
+        <Route path="/staff/cash-day" element={<StaffCashReconciliation />} />
+        <Route path="/staff/reconciliation" element={<StaffCashReconciliation />} />
+        <Route path="/staff/cash-operations" element={<StaffCashOperations />} />
+        <Route path="/staff/*" element={<Navigate to="/staff/dashboard" replace />} />
       </Routes>
     );
   }

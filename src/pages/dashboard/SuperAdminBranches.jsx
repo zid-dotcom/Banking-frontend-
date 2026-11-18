@@ -16,7 +16,8 @@ import {
   Trash2,
   RefreshCw,
   Loader2,
-  AlertCircle
+  AlertCircle,
+  Eye
 } from 'lucide-react';
 import branchMapScene from '../../assets/AurumFX Branch and Map Pin.png';
 
@@ -48,6 +49,7 @@ function normalizeBranch(b) {
     rawId,
     id: rawId,
     name: b.name || `Branch #${rawId}`,
+    ifsc_code: b.ifsc_code || b.ifsc || '',
     city: b.city || '',
     state: b.state || '',
     address: b.address || '',
@@ -137,6 +139,7 @@ export default function SuperAdminBranches() {
     try {
       const payload = {
         name: formData.name.trim(),
+        ifsc_code: formData.ifsc_code ? formData.ifsc_code.trim().toUpperCase() : '',
         city: formData.city.trim(),
         state: formData.state.trim(),
         address: formData.address.trim(),
@@ -232,6 +235,7 @@ export default function SuperAdminBranches() {
 
   const filteredBranches = branches.filter(b =>
     (b.name && b.name.toLowerCase().includes(branchSearch.toLowerCase())) ||
+    (b.ifsc_code && b.ifsc_code.toLowerCase().includes(branchSearch.toLowerCase())) ||
     (b.city && b.city.toLowerCase().includes(branchSearch.toLowerCase())) ||
     (b.state && b.state.toLowerCase().includes(branchSearch.toLowerCase())) ||
     (b.address && b.address.toLowerCase().includes(branchSearch.toLowerCase())) ||
@@ -407,13 +411,18 @@ export default function SuperAdminBranches() {
               <div key={br.id} className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs flex flex-col justify-between hover:border-[#2dd4bf] transition-all group">
                 <div>
                   <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5 flex-wrap">
                       <span className="text-[11px] font-bold text-[#0f766e] bg-teal-50 px-2.5 py-0.5 rounded-full border border-teal-200/50">
                         {br.state || 'kerala'}
                       </span>
                       {br.branch_code && (
                         <span className="text-[11px] font-mono font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200/60">
                           #{br.branch_code}
+                        </span>
+                      )}
+                      {br.ifsc_code && (
+                        <span className="text-[11px] font-mono font-extrabold text-[#0f766e] bg-teal-50/80 px-2 py-0.5 rounded-md border border-teal-200/60">
+                          {br.ifsc_code}
                         </span>
                       )}
                     </div>
@@ -452,15 +461,27 @@ export default function SuperAdminBranches() {
 
                   <div className="flex items-start justify-between mt-3 gap-2">
                     <div>
-                      <h3 className="text-base font-bold text-slate-900 group-hover:text-[#0f766e] transition-colors">{br.name}</h3>
+                      <h3
+                        onClick={() => setDetailModal({ isOpen: true, branch: br, isLoading: false })}
+                        className="text-base font-bold text-slate-900 group-hover:text-[#0f766e] transition-colors cursor-pointer"
+                      >
+                        {br.name}
+                      </h3>
                       <p className="text-xs text-slate-500 flex items-center gap-1.5 mt-1">
                         <MapPin className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
                         <span>{br.address}</span>
                       </p>
                     </div>
 
-                    {/* Edit (PUT) & Delete (DELETE) actions */}
+                    {/* View, Edit (PUT) & Delete (DELETE) actions */}
                     <div className="flex items-center gap-1 flex-shrink-0">
+                      <button
+                        onClick={() => setDetailModal({ isOpen: true, branch: br, isLoading: false })}
+                        title="View Branch Details"
+                        className="p-1.5 text-slate-400 hover:text-[#00b4a7] hover:bg-teal-50 rounded-lg transition-colors cursor-pointer"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                      </button>
                       <button
                         onClick={() => handleOpenEditBranch(br)}
                         title="Edit Branch (PUT)"
@@ -483,6 +504,12 @@ export default function SuperAdminBranches() {
                     <div className="flex items-center justify-between">
                       <span className="text-slate-400">Branch Code:</span>
                       <span className="font-mono font-bold text-slate-800">#{br.branch_code || 'N/A'}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-400">IFSC Code:</span>
+                      <span className="font-mono font-bold text-[#0f766e] bg-teal-50/80 px-2 py-0.5 rounded border border-teal-100">
+                        {br.ifsc_code || 'N/A'}
+                      </span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-slate-400">City:</span>
@@ -521,6 +548,17 @@ export default function SuperAdminBranches() {
         initialData={branchModal.data}
         onSubmit={handleSaveBranch}
         isSubmitting={branchModal.isSubmitting}
+      />
+
+      {/* Branch Detail Dossier Modal */}
+      <BranchDetailModal
+        isOpen={detailModal.isOpen}
+        onClose={() => setDetailModal({ isOpen: false, branch: null, isLoading: false })}
+        branch={detailModal.branch}
+        isLoading={detailModal.isLoading}
+        onEdit={(b) => handleOpenEditBranch(b)}
+        onDelete={(b) => handleDeleteBranch(b)}
+        onToggleStatus={(b) => handleToggleStatus(b)}
       />
 
       {/* Centered Backend Error Alert Popup */}

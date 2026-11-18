@@ -22,6 +22,7 @@ import {
   getBranchAdminAnnouncements
 } from '../../services/branchAdminService';
 import { getMemberBranches } from '../../services/memberService';
+import { getBranchAdminCashTransactions } from '../../services/cashTransactionService';
 
 function parseBranchInfo(obj = {}) {
   const b = obj.branch;
@@ -180,48 +181,45 @@ export default function BranchManagerDashboard() {
     };
   }, []);
 
-  const branchTransactions = [
-    {
-      id: 'tx-bm-1',
-      description: 'Gold Loan Disbursed - Sanction #GL-4491',
-      refNo: 'BR-DSB-1092',
-      category: 'Loan Outflow',
-      date: 'Today, 11:20 AM',
-      amount: '₹1,50,000',
-      type: 'debit',
-      status: 'Completed'
-    },
-    {
-      id: 'tx-bm-2',
-      description: 'Cash Deposit - Savings Folio AFX-MEM-8842',
-      refNo: 'BR-DEP-3391',
-      category: 'Member Deposit',
-      date: 'Today, 10:45 AM',
-      amount: '₹45,000',
-      type: 'credit',
-      status: 'Completed'
-    },
-    {
-      id: 'tx-bm-3',
-      description: 'Fertilizer Pre-Season EMI Repayment',
-      refNo: 'BR-REP-9021',
-      category: 'Recovery Inflow',
-      date: 'Today, 09:30 AM',
-      amount: '₹12,400',
-      type: 'credit',
-      status: 'Completed'
-    },
-    {
-      id: 'tx-bm-4',
-      description: 'Inter-Branch Clearing Transfer to Palakkad Hub',
-      refNo: 'BR-CLR-7714',
-      category: 'Treasury Clearing',
-      date: 'Yesterday, 04:15 PM',
-      amount: '₹5,00,000',
-      type: 'debit',
-      status: 'Approved'
-    }
-  ];
+  const [branchTransactions, setBranchTransactions] = useState([]);
+
+  useEffect(() => {
+    let isMounted = true;
+    getBranchAdminCashTransactions({ limit: 10 })
+      .then((txs) => {
+        if (!isMounted) return;
+        if (Array.isArray(txs) && txs.length > 0) {
+          const mapped = txs.map((t, idx) => {
+            const isDeposit =
+              String(t.transaction_type || t.type || '').toLowerCase().includes('deposit') ||
+              String(t.transaction_type || t.type || '').toLowerCase().includes('credit');
+            return {
+              id: t.id || `tx-${idx}`,
+              description: `${isDeposit ? 'Cash Deposit' : 'Cash Withdrawal'} - #${t.account_number || 'Account'}`,
+              refNo: t.reference_number || t.receipt_number || `#TX-${t.id || idx + 1}`,
+              category: isDeposit ? 'Counter Deposit' : 'Cash Withdrawal',
+              date: t.created_at
+                ? new Date(t.created_at).toLocaleString('en-IN', {
+                    day: '2-digit',
+                    month: 'short',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true
+                  })
+                : 'Today',
+              amount: `₹${(Number(t.amount) || 0).toLocaleString('en-IN')}`,
+              type: isDeposit ? 'credit' : 'debit',
+              status: t.status || 'Completed'
+            };
+          });
+          setBranchTransactions(mapped);
+        }
+      })
+      .catch((err) => console.warn('Could not load branch cash transactions for dashboard:', err));
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const handleApprove = (id) => {
     setPendingApplications(pendingApplications.filter(app => app.id !== id));

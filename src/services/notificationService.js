@@ -115,6 +115,18 @@ export async function getMemberUnreadCount() {
   }
 }
 
+export const NOTIFICATIONS_UPDATED_EVENT = 'member-notifications-updated';
+
+export function notifyNotificationsUpdated(count) {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(
+      new CustomEvent(NOTIFICATIONS_UPDATED_EVENT, {
+        detail: { unreadCount: typeof count === 'number' ? count : null }
+      })
+    );
+  }
+}
+
 /**
  * 3. PATCH /member/notifications/read-all - Mark All Notifications Read
  */
@@ -131,7 +143,9 @@ export async function markAllNotificationsRead() {
       checkNotificationResponseStatus(res, errBody, 'Failed to mark all notifications as read');
     }
 
-    return await res.json().catch(() => ({ success: true }));
+    const data = await res.json().catch(() => ({ success: true }));
+    notifyNotificationsUpdated(0);
+    return data;
   } catch (error) {
     console.error('notificationService.markAllNotificationsRead error:', error);
     throw error;
@@ -154,7 +168,9 @@ export async function markNotificationRead(notificationId) {
       checkNotificationResponseStatus(res, errBody, `Failed to mark notification #${notificationId} as read`);
     }
 
-    return await res.json().catch(() => ({ success: true }));
+    const data = await res.json().catch(() => ({ success: true }));
+    notifyNotificationsUpdated();
+    return data;
   } catch (error) {
     console.error(`notificationService.markNotificationRead(${notificationId}) error:`, error);
     throw error;
@@ -166,4 +182,6 @@ export default {
   getMemberUnreadCount,
   markAllNotificationsRead,
   markNotificationRead,
+  notifyNotificationsUpdated,
+  NOTIFICATIONS_UPDATED_EVENT,
 };

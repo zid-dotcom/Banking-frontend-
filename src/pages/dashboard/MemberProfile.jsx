@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import StatCard from '../../components/dashboard/StatCard';
 import { getMemberFullProfile, getMemberMe } from '../../services/memberService';
+import { getMemberSecurityEvents, formatSecurityEventType } from '../../services/securityService';
+import { getMemberSavingsAccounts } from '../../services/savingsSchemeService';
 import { handleAuthExpired, isTokenExpiredError } from '../../services/branchService';
 import {
   User,
@@ -27,8 +29,20 @@ import {
   Check,
   X,
   FileCheck2,
-  Compass
+  Compass,
+  Wallet,
+  PiggyBank,
+  Coins
 } from 'lucide-react';
+
+function formatCurrency(val) {
+  if (val === undefined || val === null || isNaN(val)) return '₹0';
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    maximumFractionDigits: 0
+  }).format(val);
+}
 
 function formatDate(isoString) {
   if (!isoString) return '—';
@@ -63,6 +77,45 @@ function formatDateTime(isoString) {
   }
 }
 
+function renderAccountStatusBadge(status) {
+  if (!status) return null;
+  const s = String(status).toLowerCase();
+  const label = String(status).replace(/_/g, ' ');
+
+  if (s === 'active' || s === 'approved' || s === 'awaiting_initial_deposit' || s === 'opened' || s === 'account_opened') {
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+        <span>Account Opened</span>
+      </span>
+    );
+  }
+
+  if (s.includes('pending')) {
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200 capitalize">
+        <Clock className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
+        <span>{label}</span>
+      </span>
+    );
+  }
+
+  if (s.includes('closed') || s.includes('rejected') || s.includes('inactive')) {
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200 capitalize">
+        <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+        <span>{label}</span>
+      </span>
+    );
+  }
+
+  return (
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200 capitalize">
+      <span>{label}</span>
+    </span>
+  );
+}
+
 function calculateAge(dobString) {
   if (!dobString) return null;
   try {
@@ -79,6 +132,8 @@ function calculateAge(dobString) {
 export default function MemberProfile() {
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
+  const [securityEvents, setSecurityEvents] = useState([]);
+  const [savingsAccounts, setSavingsAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
@@ -130,6 +185,21 @@ export default function MemberProfile() {
       if (data) {
         setProfile(data);
         localStorage.setItem('member_user', JSON.stringify(data));
+
+        getMemberSecurityEvents({ limit: 5 })
+          .then((evs) => {
+            if (Array.isArray(evs)) setSecurityEvents(evs);
+          })
+          .catch(() => {});
+
+        getMemberSavingsAccounts()
+          .then((accs) => {
+            if (Array.isArray(accs)) setSavingsAccounts(accs);
+            else if (accs && Array.isArray(accs.data)) setSavingsAccounts(accs.data);
+            else if (accs && Array.isArray(accs.items)) setSavingsAccounts(accs.items);
+            else setSavingsAccounts([]);
+          })
+          .catch((err) => console.warn('getMemberSavingsAccounts error in profile:', err));
 
         const name = data.full_name || 'Member';
         const branchObj = typeof data.branch === 'object' && data.branch !== null ? data.branch : null;
@@ -654,6 +724,125 @@ export default function MemberProfile() {
               </div>
             </div>
 
+            {/* Cooperative Savings Accounts Card */}
+            <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+              <div className="p-5 sm:p-6 bg-slate-50/80 border-b border-slate-100 flex items-center justify-between flex-wrap gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-teal-50 text-teal-700 flex items-center justify-center border border-teal-100 shadow-2xs">
+                    <Wallet className="w-5 h-5 text-[#00b4a7]" />
+                  </div>
+                  <div>
+                    <h3 className="text-base sm:text-lg font-black text-slate-900">
+                      Cooperative Savings Deposit Accounts
+                    </h3>
+                    <p className="text-xs text-slate-500 font-medium">
+                      Active member savings accounts registered with society branches
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-800 font-bold text-xs rounded-full border border-emerald-200">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>{savingsAccounts.length} Active {savingsAccounts.length === 1 ? 'Folio' : 'Folios'}</span>
+                  </span>
+                  <Link
+                    to="/member/savings-schemes"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors"
+                  >
+                    <span>Manage Savings</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
+              </div>
+
+              {savingsAccounts.length === 0 ? (
+                <div className="p-8 text-center space-y-2">
+                  <div className="w-12 h-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center mx-auto mb-2">
+                    <Wallet className="w-6 h-6" />
+                  </div>
+                  <p className="text-sm font-bold text-slate-700">
+                    No Cooperative Savings Accounts Opened
+                  </p>
+                  <p className="text-xs text-slate-500 max-w-md mx-auto">
+                    You currently have no active savings deposit folios in this branch. Apply for an approved savings scheme to start saving.
+                  </p>
+                  <div className="pt-2">
+                    <Link
+                      to="/member/savings-schemes"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-[#14b8a6] to-[#0f766e] text-white font-bold text-xs rounded-xl shadow-xs transition-all"
+                    >
+                      <PiggyBank className="w-3.5 h-3.5" />
+                      <span>Explore Savings Schemes</span>
+                    </Link>
+                  </div>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse min-w-[700px]">
+                    <thead>
+                      <tr className="border-b border-slate-100 bg-slate-50/75 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                        <th className="py-3.5 px-6">Account Number</th>
+                        <th className="py-3.5 px-6">Scheme</th>
+                        <th className="py-3.5 px-6">Branch</th>
+                        <th className="py-3.5 px-6">IFSC Code</th>
+                        <th className="py-3.5 px-6">Balance</th>
+                        <th className="py-3.5 px-6 text-center">Status</th>
+                        <th className="py-3.5 px-6">Opened On</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 text-sm">
+                      {savingsAccounts.map((acc) => (
+                        <tr key={acc.id} className="hover:bg-slate-50/50 transition-colors">
+                          <td className="py-4 px-6 font-mono font-extrabold text-teal-800 text-sm whitespace-nowrap">
+                            {acc.account_number || `#SB-${acc.id}`}
+                          </td>
+                          <td className="py-4 px-6">
+                            <div className="font-bold text-slate-900 capitalize">
+                              {acc.scheme_name || 'Savings Scheme'}
+                            </div>
+                            {acc.scheme_code && (
+                              <span className="font-mono text-[11px] text-slate-400 block font-normal mt-0.5">
+                                Code: {acc.scheme_code}
+                              </span>
+                            )}
+                          </td>
+                          <td className="py-4 px-6 whitespace-nowrap">
+                            <div className="font-semibold text-slate-800 text-xs">
+                              {acc.branch_name || 'Society Branch'}
+                            </div>
+                            {acc.branch_code && (
+                              <span className="text-[11px] text-slate-500 font-mono mt-0.5 block">
+                                Code: {acc.branch_code}
+                              </span>
+                            )}
+                          </td>
+                          <td className="py-4 px-6 whitespace-nowrap">
+                            {acc.ifsc_code ? (
+                              <span className="font-mono font-bold text-teal-800 bg-teal-50 px-2.5 py-1 rounded-lg border border-teal-200 text-xs">
+                                {acc.ifsc_code}
+                              </span>
+                            ) : (
+                              <span className="text-slate-400 font-mono text-xs">—</span>
+                            )}
+                          </td>
+                          <td className="py-4 px-6 font-black font-sans text-base text-slate-900 whitespace-nowrap">
+                            {formatCurrency(acc.balance ?? 0)}
+                          </td>
+                          <td className="py-4 px-6 text-center whitespace-nowrap">
+                            {renderAccountStatusBadge(acc.status)}
+                          </td>
+                          <td className="py-4 px-6 text-xs text-slate-600 font-medium whitespace-nowrap">
+                            {formatDateTime(acc.opened_at)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
             {/* 5. Linked Nominee Dossier Card */}
             <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
               <div className="p-5 sm:p-6 bg-slate-50/80 border-b border-slate-100 flex items-center justify-between flex-wrap gap-4">
@@ -741,6 +930,68 @@ export default function MemberProfile() {
                       <span>Register Nominee Now</span>
                     </Link>
                   </div>
+                </div>
+              )}
+            </div>
+
+            {/* 5. Security & Account Access Information */}
+            <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+              <div className="p-5 sm:p-6 bg-slate-50/80 border-b border-slate-100 flex items-center justify-between flex-wrap gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-teal-50 text-teal-700 flex items-center justify-center border border-teal-100 shadow-2xs">
+                    <ShieldCheck className="w-5 h-5 text-[#00b4a7]" />
+                  </div>
+                  <div>
+                    <h3 className="text-base sm:text-lg font-black text-slate-900">
+                      Security &amp; Recent Sign-in Activity
+                    </h3>
+                    <p className="text-xs text-slate-500 font-medium">
+                      Recent authentication events and access audits on your account
+                    </p>
+                  </div>
+                </div>
+
+                <Link
+                  to="/member/security"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-800 font-bold text-xs rounded-xl border border-teal-200/80 transition-colors shadow-2xs"
+                >
+                  <span>View Full Security Log</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+
+              {securityEvents.length > 0 ? (
+                <div className="p-5 sm:p-7 space-y-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    {securityEvents.slice(0, 3).map((ev) => (
+                      <div key={ev.id} className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-100 space-y-1">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-slate-800">
+                            {formatSecurityEventType(ev.event_type)}
+                          </span>
+                          {ev.succeeded ? (
+                            <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                              Success
+                            </span>
+                          ) : (
+                            <span className="text-[10px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200">
+                              Failed
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[11px] text-slate-500">
+                          {formatDateTime(ev.created_at)}
+                        </p>
+                        <p className="text-[10px] font-mono text-slate-400 truncate">
+                          IP: {ev.ip_address || '—'}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="p-6 text-center text-xs text-slate-400">
+                  <span>Sign-in activity log is recorded and protected by AurumFX Apex Security.</span>
                 </div>
               )}
             </div>

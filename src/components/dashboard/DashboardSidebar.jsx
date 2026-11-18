@@ -24,14 +24,18 @@ import {
   Bell,
   Headset,
   User,
-  AlertOctagon
+  AlertOctagon,
+  ShieldAlert,
+  Calculator,
 } from 'lucide-react';
 import {
-  getMemberUnreadCount
+  getMemberUnreadCount,
+  NOTIFICATIONS_UPDATED_EVENT,
 } from '../../services/memberService';
 import {
   getBranchAdminEmergencyUnreadCount,
   getSuperadminEmergencyUnreadCount,
+  EMERGENCY_UNREAD_UPDATED_EVENT,
 } from '../../services/emergencyService';
 
 export default function DashboardSidebar({
@@ -52,10 +56,12 @@ export default function DashboardSidebar({
       { id: 'profile', label: 'My Profile', icon: User, path: '/member/profile' },
       { id: 'nominee', label: 'Nominee Details', icon: HeartHandshake, path: '/member/nominee' },
       { id: 'savings_schemes', label: 'Savings Schemes', icon: PiggyBank, path: '/member/savings-schemes' },
+      { id: 'account_transactions', label: 'Account Transactions', icon: History, path: '/member/account-transactions' },
       { id: 'fd_mis_schemes', label: 'FD / MIS Schemes', icon: Coins, path: '/member/fd-mis-schemes' },
       { id: 'loan_schemes', label: 'Loan Schemes', icon: Landmark, path: '/member/loan-schemes' },
       { id: 'announcements', label: 'Announcements', icon: Megaphone, path: '/member/announcements' },
       { id: 'notifications', label: 'Notifications', icon: Bell, path: '/member/notifications' },
+      { id: 'security_events', label: 'Security & Access', icon: ShieldCheck, path: '/member/security' },
     ],
     branch_manager: [
       { id: 'overview', label: 'Branch Dashboard', icon: LayoutDashboard, path: '/branch-manager/dashboard' },
@@ -63,11 +69,13 @@ export default function DashboardSidebar({
       { id: 'nominees', label: 'Branch Nominees', icon: HeartHandshake, path: '/branch-manager/nominees' },
       { id: 'staff', label: 'Branch Staff', icon: ShieldCheck, path: '/branch-manager/staff' },
       { id: 'savings_schemes', label: 'Savings Schemes', icon: PiggyBank, path: '/branch-manager/savings-schemes' },
+      { id: 'cash_transactions', label: 'Cash Transactions', icon: Coins, path: '/branch-manager/cash-transactions' },
       { id: 'fd_mis_schemes', label: 'FD / MIS Schemes', icon: Coins, path: '/branch-manager/fd-mis-schemes' },
       { id: 'loan_schemes', label: 'Loan Schemes', icon: Landmark, path: '/branch-manager/loan-schemes' },
       { id: 'announcements', label: 'Announcements', icon: Megaphone, path: '/branch-manager/announcements' },
       { id: 'service_requests', label: 'Service Requests', icon: Headset, path: '/branch-manager/service-requests' },
       { id: 'emergency_cases', label: 'Emergency Cases', icon: AlertOctagon, path: '/branch-manager/emergency-cases' },
+      { id: 'security_events', label: 'Security Events', icon: ShieldCheck, path: '/branch-manager/security-events' },
     ],
     super_admin: [
       { id: 'overview', label: 'Dashboard', icon: LayoutDashboard, path: '/super-admin/dashboard' },
@@ -75,13 +83,30 @@ export default function DashboardSidebar({
       { id: 'branch_admins', label: 'Branch Manager', icon: UserCheck, path: '/super-admin/branch-admins' },
       { id: 'staff_roles', label: 'Staff Roles', icon: ShieldCheck, path: '/super-admin/staff-roles' },
       { id: 'savings_schemes', label: 'Savings Schemes', icon: PiggyBank, path: '/super-admin/savings-schemes' },
+      { id: 'cash_transactions', label: 'Cash Transactions', icon: Coins, path: '/super-admin/cash-transactions' },
       { id: 'fd_mis_schemes', label: 'FD / MIS Schemes', icon: Coins, path: '/super-admin/fd-mis-schemes' },
       { id: 'loan_schemes', label: 'Loan Schemes', icon: Landmark, path: '/super-admin/loan-schemes' },
       { id: 'announcements', label: 'Announcements', icon: Megaphone, path: '/super-admin/announcements' },
       { id: 'service_requests', label: 'Service Requests', icon: Headset, path: '/super-admin/service-requests' },
       { id: 'emergency_cases', label: 'Emergency Cases', icon: AlertOctagon, path: '/super-admin/emergency-cases' },
+      { id: 'security_events', label: 'Security Events', icon: ShieldAlert, path: '/super-admin/security-events' },
       { id: 'member_base', label: 'View Members', icon: Users, path: '/super-admin/members' },
-    ]
+    ],
+    staff: (() => {
+      const roleStr = String(user?.staff_role?.name || user?.account_role || user?.role || '').toLowerCase();
+      const isAccountant = roleStr.includes('accountant') || roleStr.includes('auditor');
+      if (isAccountant) {
+        return [
+          { id: 'overview', label: 'Staff Dashboard', icon: LayoutDashboard, path: '/staff/dashboard' },
+          { id: 'cash_reconciliation', label: 'Cash Reconciliation', icon: Calculator, path: '/staff/cash-reconciliation' },
+        ];
+      }
+      return [
+        { id: 'overview', label: 'Staff Dashboard', icon: LayoutDashboard, path: '/staff/dashboard' },
+        { id: 'cash_reconciliation', label: 'Cash Reconciliation', icon: Calculator, path: '/staff/cash-reconciliation' },
+        { id: 'cash_operations', label: 'Cash Operations', icon: Wallet, path: '/staff/cash-operations' },
+      ];
+    })()
   };
 
   const currentNavItems = roleNavItems[role] || roleNavItems.member;
@@ -95,6 +120,7 @@ export default function DashboardSidebar({
     member: { title: 'Member Portal', badge: 'Active Member', color: 'bg-teal-50 text-[#0f766e]' },
     branch_manager: { title: 'Branch Manager', badge: branchDisplayName, color: 'bg-teal-50 text-[#0f766e]' },
     super_admin: { title: 'Super Admin', badge: 'Apex Society Authority', color: 'bg-teal-50 text-[#0f766e]' },
+    staff: { title: user?.staff_role?.name || 'Branch Staff', badge: branchDisplayName, color: 'bg-teal-50 text-[#0f766e]' },
   };
 
   const currentRoleInfo = roleLabels[role] || roleLabels.member;
@@ -106,29 +132,74 @@ export default function DashboardSidebar({
   // Poll / refresh unread count for member & emergency cases
   useEffect(() => {
     let isMounted = true;
-    if (role === 'member') {
-      getMemberUnreadCount()
-        .then((count) => {
-          if (isMounted) setUnreadCount(typeof count === 'number' ? count : 0);
-        })
-        .catch(() => {});
-    } else if (role === 'branch_manager') {
-      getBranchAdminEmergencyUnreadCount()
-        .then((res) => {
-          const count = typeof res === 'number' ? res : (res?.unread_count || 0);
-          if (isMounted) setEmergencyUnreadCount(count);
-        })
-        .catch(() => {});
-    } else if (role === 'super_admin') {
-      getSuperadminEmergencyUnreadCount()
-        .then((res) => {
-          const count = typeof res === 'number' ? res : (res?.total_unread_count ?? res?.unread_count ?? 0);
-          if (isMounted) setEmergencyUnreadCount(count);
-        })
-        .catch(() => {});
-    }
+
+    const refreshMemberUnread = () => {
+      if (role === 'member') {
+        getMemberUnreadCount()
+          .then((count) => {
+            if (isMounted) setUnreadCount(typeof count === 'number' ? count : 0);
+          })
+          .catch(() => {});
+      }
+    };
+
+    const refreshEmergencyUnread = () => {
+      if (role === 'branch_manager' || role === 'branch_admin') {
+        getBranchAdminEmergencyUnreadCount()
+          .then((res) => {
+            const count = typeof res === 'number' ? res : (res?.unread_count || 0);
+            if (isMounted) setEmergencyUnreadCount(count);
+          })
+          .catch(() => {});
+      } else if (role === 'super_admin') {
+        getSuperadminEmergencyUnreadCount()
+          .then((res) => {
+            const count = typeof res === 'number' ? res : (res?.total_unread_count ?? res?.unread_count ?? 0);
+            if (isMounted) setEmergencyUnreadCount(count);
+          })
+          .catch(() => {});
+      }
+    };
+
+    refreshMemberUnread();
+    refreshEmergencyUnread();
+
+    const handleNotificationsUpdated = (e) => {
+      if (role === 'member') {
+        if (typeof e?.detail?.unreadCount === 'number') {
+          if (isMounted) setUnreadCount(e.detail.unreadCount);
+        } else {
+          refreshMemberUnread();
+        }
+      }
+    };
+
+    const handleEmergencyUpdated = (e) => {
+      const detail = e?.detail;
+      const targetRole = detail?.role;
+      const isBranchTarget = targetRole === 'branch_manager' || targetRole === 'branch_admin';
+      const isSuperTarget = targetRole === 'super_admin';
+      const isCurrentBranch = role === 'branch_manager' || role === 'branch_admin';
+      const isCurrentSuper = role === 'super_admin';
+
+      const roleMatches = !targetRole || (isBranchTarget && isCurrentBranch) || (isSuperTarget && isCurrentSuper);
+
+      if (roleMatches) {
+        if (typeof detail?.count === 'number') {
+          if (isMounted) setEmergencyUnreadCount(detail.count);
+        } else {
+          refreshEmergencyUnread();
+        }
+      }
+    };
+
+    window.addEventListener(NOTIFICATIONS_UPDATED_EVENT || 'member-notifications-updated', handleNotificationsUpdated);
+    window.addEventListener(EMERGENCY_UNREAD_UPDATED_EVENT || 'emergency-unread-updated', handleEmergencyUpdated);
+
     return () => {
       isMounted = false;
+      window.removeEventListener(NOTIFICATIONS_UPDATED_EVENT || 'member-notifications-updated', handleNotificationsUpdated);
+      window.removeEventListener(EMERGENCY_UNREAD_UPDATED_EVENT || 'emergency-unread-updated', handleEmergencyUpdated);
     };
   }, [role, location.pathname]);
 
@@ -148,6 +219,10 @@ export default function DashboardSidebar({
       localStorage.removeItem('branch_token');
       localStorage.removeItem('branch_user');
       navigate('/branch-manager-login');
+    } else if (role === 'staff') {
+      localStorage.removeItem('staff_token');
+      localStorage.removeItem('staff_user');
+      navigate('/staff-login');
     } else {
       navigate('/super-admin/login');
     }
@@ -229,8 +304,8 @@ export default function DashboardSidebar({
                     : 'text-slate-600 hover:bg-teal-50/70 hover:text-[#0f766e]'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-400'}`} />
-                <span>{item.label}</span>
+                <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+                <span className="truncate whitespace-nowrap text-left">{item.label}</span>
                 {item.id === 'notifications' && role === 'member' && unreadCount > 0 && (
                   <span
                     className={`ml-auto px-2 py-0.5 text-[10px] font-black rounded-full shadow-2xs ${
@@ -253,7 +328,7 @@ export default function DashboardSidebar({
             );
           })}
 
-          {role !== 'super_admin' && role !== 'branch_manager' && (
+          {role !== 'super_admin' && role !== 'branch_manager' && role !== 'staff' && (
             <>
               <div className="pt-4 px-3 pb-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                 Support & Help
@@ -293,40 +368,61 @@ export default function DashboardSidebar({
         </div>
 
         {/* User Profile & Bottom Logout Button */}
-        <div className="p-4 border-t border-slate-100 bg-slate-50/50">
-          <div
-            onClick={() => {
-              if (role === 'member') {
-                navigate('/member/profile');
-                if (onClose) onClose();
-              }
-            }}
-            className={`flex items-center gap-3 mb-3 p-1.5 -m-1.5 rounded-xl transition-colors ${
-              role === 'member' ? 'hover:bg-teal-50/70 cursor-pointer group' : ''
-            }`}
-            title={role === 'member' ? 'View My Full Profile' : ''}
-          >
-            <div className="w-9 h-9 rounded-full bg-teal-50 text-[#0f766e] font-bold flex items-center justify-center text-sm border border-teal-200/60 group-hover:scale-105 transition-transform">
-              {user.avatarText || (role === 'super_admin' ? 'SA' : 'U')}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-bold text-slate-900 truncate group-hover:text-teal-700 transition-colors">
-                {user.name || (role === 'super_admin' ? 'Super Admin' : 'Demo User')}
-              </p>
-              <p className="text-[11px] text-[#0d9488] font-bold truncate">
-                {user.role || (role === 'super_admin' ? 'Super Admin' : user.id || 'Member')}
-              </p>
-            </div>
-          </div>
+        {(() => {
+          const resolvedSidebarName =
+            user?.full_name ||
+            user?.name ||
+            user?.username ||
+            (role === 'super_admin' ? 'Super Admin' : role === 'staff' ? 'Staff Member' : role === 'branch_manager' ? 'Branch Manager' : 'Member');
 
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50 border border-rose-200/70 transition-colors cursor-pointer"
-          >
-            <LogOut className="w-3.5 h-3.5" />
-            <span>Sign Out</span>
-          </button>
-        </div>
+          const resolvedSidebarRole =
+            user?.staff_role?.name ||
+            user?.account_role ||
+            user?.role_name ||
+            user?.role ||
+            (role === 'super_admin' ? 'Super Admin' : role === 'staff' ? 'Staff' : role === 'branch_manager' ? 'Branch Manager' : (user?.id ? `Member #${user.id}` : 'Member'));
+
+          const resolvedSidebarAvatar =
+            user?.avatarText ||
+            (resolvedSidebarName ? resolvedSidebarName.trim().charAt(0).toUpperCase() : (role === 'super_admin' ? 'SA' : 'U'));
+
+          return (
+            <div className="p-4 border-t border-slate-100 bg-slate-50/50">
+              <div
+                onClick={() => {
+                  if (role === 'member') {
+                    navigate('/member/profile');
+                    if (onClose) onClose();
+                  }
+                }}
+                className={`flex items-center gap-3 mb-3 p-1.5 -m-1.5 rounded-xl transition-colors ${
+                  role === 'member' ? 'hover:bg-teal-50/70 cursor-pointer group' : ''
+                }`}
+                title={role === 'member' ? 'View My Full Profile' : ''}
+              >
+                <div className="w-9 h-9 rounded-full bg-teal-50 text-[#0f766e] font-bold flex items-center justify-center text-sm border border-teal-200/60 group-hover:scale-105 transition-transform">
+                  {resolvedSidebarAvatar}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-bold text-slate-900 truncate group-hover:text-teal-700 transition-colors">
+                    {resolvedSidebarName}
+                  </p>
+                  <p className="text-[11px] text-[#0d9488] font-bold truncate capitalize">
+                    {resolvedSidebarRole}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50 border border-rose-200/70 transition-colors cursor-pointer"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span>Sign Out</span>
+              </button>
+            </div>
+          );
+        })()}
       </aside>
     </>
   );

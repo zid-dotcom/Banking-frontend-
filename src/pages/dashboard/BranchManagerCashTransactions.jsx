@@ -1,0 +1,669 @@
+import React, { useState, useEffect } from 'react';
+import DashboardLayout from '../../components/dashboard/DashboardLayout';
+import StatCard from '../../components/dashboard/StatCard';
+import { getBranchAdminCashTransactions } from '../../services/cashTransactionService';
+import { getBranchAdminMe } from '../../services/branchAdminService';
+import { getMemberBranches } from '../../services/memberService';
+import {
+  Coins,
+  ArrowDownLeft,
+  ArrowUpRight,
+  ShieldCheck,
+  Building2,
+  Landmark,
+  Search,
+  RefreshCw,
+  AlertCircle,
+  Loader2,
+  Calendar,
+  User,
+  Clock,
+  CheckCircle2,
+  X
+} from 'lucide-react';
+import bankTechScene from '../../assets/AurumFX Cooperative Bank Technology Scene.png';
+
+function parseBranchInfo(obj = {}) {
+  const b = obj.branch;
+  const isObj = b && typeof b === 'object';
+
+  const name =
+    (isObj ? (b.name || b.branch_name) : null) ||
+    (typeof obj.branch_name === 'string' ? obj.branch_name : null) ||
+    (typeof b === 'string' ? b : null) ||
+    'Society Branch';
+
+  const code =
+    (isObj ? b.branch_code : null) ||
+    (typeof obj.branch_code === 'string' ? obj.branch_code : null) ||
+    (obj.branch_id ? `BRA-${obj.branch_id}` : 'BRA-01');
+
+  const loc =
+    (isObj ? (b.city ? `${b.city}, ${b.state || 'Kerala'}` : b.state) : null) ||
+    (typeof obj.location === 'string' ? obj.location : 'Kerala');
+
+  return { name, code, loc };
+}
+
+function formatCurrency(val) {
+  if (val === undefined || val === null || isNaN(val)) return '₹0';
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    maximumFractionDigits: 0
+  }).format(val);
+}
+
+function formatDateTime(isoString) {
+  if (!isoString) return 'N/A';
+  try {
+    const d = new Date(isoString);
+    if (isNaN(d.getTime())) return isoString;
+    return d.toLocaleString('en-IN', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    });
+  } catch {
+    return isoString;
+  }
+}
+
+export default function BranchManagerCashTransactions() {
+  const [managerUser, setManagerUser] = useState(() => {
+    try {
+      const cached = localStorage.getItem('branch_user') || localStorage.getItem('branch_manager_user');
+      if (cached) return JSON.parse(cached);
+    } catch {
+      // fallback
+    }
+    return {
+      name: 'Branch Manager',
+      full_name: 'Branch Manager',
+      id: 'MGR-001',
+      user_code: 'MGR-001',
+      avatarText: 'BM',
+      role: 'Branch Manager',
+      branch: 'Society Branch',
+      branch_name: 'Society Branch',
+      branch_code: 'BRA-01',
+      location: 'Kerala',
+      is_active: true
+    };
+  });
+
+  const [cashTransactions, setCashTransactions] = useState([]);
+  const [loadingCashTransactions, setLoadingCashTransactions] = useState(true);
+  const [errorCashTransactions, setErrorCashTransactions] = useState(null);
+  const [cashTxFilter, setCashTxFilter] = useState('all'); // 'all' | 'deposit' | 'withdrawal'
+  const [cashTxSearch, setCashTxSearch] = useState('');
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
+
+  // Fetch branch admin profile
+  useEffect(() => {
+    async function loadAdminProfile() {
+      try {
+        const profile = await getBranchAdminMe();
+        if (profile) {
+          let branchInfo = {};
+          try {
+            const branches = await getMemberBranches();
+            if (Array.isArray(branches) && profile.branch_id) {
+              const matched = branches.find((b) => String(b.id) === String(profile.branch_id));
+              if (matched) {
+                branchInfo = {
+                  branch_name: matched.branch_name,
+                  branch_code: matched.branch_code,
+                  location: matched.city ? `${matched.city}, ${matched.state || 'Kerala'}` : matched.state
+                };
+              }
+            }
+          } catch (e) {
+            console.warn('Could not resolve branch metadata for branch admin:', e);
+          }
+
+          const name = profile.full_name || profile.name || 'Branch Manager';
+          const { name: bName, code: bCode, loc: bLoc } = parseBranchInfo(profile);
+
+          const finalBranchName = branchInfo.branch_name || bName;
+          const finalBranchCode = branchInfo.branch_code || bCode;
+          const finalLocation = branchInfo.location || bLoc;
+
+          const updatedUser = {
+            ...profile,
+            name,
+            full_name: name,
+            id: profile.user_code || (profile.id ? `MGR-${profile.id}` : 'MGR-001'),
+            user_code: profile.user_code || (profile.id ? `MGR-${profile.id}` : 'MGR-001'),
+            avatarText: name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase() || 'BM',
+            role: 'Branch Manager',
+            branch: finalBranchName,
+            branch_name: finalBranchName,
+            branch_code: finalBranchCode,
+            location: finalLocation,
+            is_active: profile.is_active !== false
+          };
+
+          setManagerUser(updatedUser);
+          localStorage.setItem('branch_user', JSON.stringify(updatedUser));
+          localStorage.setItem('branch_manager_user', JSON.stringify(updatedUser));
+        }
+      } catch (err) {
+        console.warn('Failed to fetch /branch-admin/me:', err);
+      }
+    }
+
+    loadAdminProfile();
+  }, []);
+
+  // Fetch branch cash transactions
+  const fetchCashTransactions = async () => {
+    // Backend requires both from_date and to_date together for a date range query.
+    // If only one date is currently selected, wait for the other without throwing a premature backend error.
+    if ((fromDate && !toDate) || (!fromDate && toDate)) {
+      setErrorCashTransactions(null);
+      return;
+    }
+
+    if (fromDate && toDate && fromDate > toDate) {
+      setErrorCashTransactions('"From" date cannot be after "To" date.');
+      return;
+    }
+
+    setLoadingCashTransactions(true);
+    setErrorCashTransactions(null);
+    try {
+      const params = {};
+      if (fromDate && toDate) {
+        params.from_date = fromDate;
+        params.to_date = toDate;
+      }
+      const data = await getBranchAdminCashTransactions(params);
+      setCashTransactions(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.warn('Could not fetch branch cash transactions:', err);
+      setErrorCashTransactions(err.message || 'Unable to load branch cash transactions.');
+    } finally {
+      setLoadingCashTransactions(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCashTransactions();
+  }, [fromDate, toDate]);
+
+  // Filtered transactions
+  const filteredTransactions = cashTransactions.filter((tx) => {
+    const type = String(tx.transaction_type || tx.type || '').toLowerCase();
+    if (cashTxFilter === 'deposit' && !type.includes('deposit') && !type.includes('credit')) return false;
+    if (cashTxFilter === 'withdrawal' && !type.includes('withdrawal') && !type.includes('debit')) return false;
+
+    // Date range filtering
+    const rawDate = tx.created_at || tx.timestamp || tx.date;
+    if (rawDate) {
+      const d = new Date(rawDate);
+      let localDateStr = '';
+      if (!isNaN(d.getTime())) {
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        localDateStr = `${year}-${month}-${day}`;
+      } else {
+        localDateStr = String(rawDate).slice(0, 10);
+      }
+      if (fromDate && localDateStr < fromDate) return false;
+      if (toDate && localDateStr > toDate) return false;
+    }
+
+    if (cashTxSearch) {
+      const s = cashTxSearch.toLowerCase();
+      const acct = String(tx.account_number || '').toLowerCase();
+      const ref = String(tx.receipt_number || tx.reference_number || tx.id || '').toLowerCase();
+      const mem = String(tx.member_name || tx.member_code || '').toLowerCase();
+      const branch = String(tx.branch_name || tx.branch_code || '').toLowerCase();
+      const cashier = String(tx.cashier_name || tx.cashier_code || tx.staff_name || tx.created_by_name || '').toLowerCase();
+      const ifsc = String(tx.ifsc_code || '').toLowerCase();
+      const notes = String(tx.notes || tx.description || '').toLowerCase();
+      if (
+        !acct.includes(s) &&
+        !ref.includes(s) &&
+        !mem.includes(s) &&
+        !branch.includes(s) &&
+        !cashier.includes(s) &&
+        !ifsc.includes(s) &&
+        !notes.includes(s)
+      ) {
+        return false;
+      }
+    }
+    return true;
+  });
+
+  // Calculations for Stat Cards based on filteredTransactions
+  const totalDeposits = filteredTransactions
+    .filter((tx) => {
+      const type = String(tx.transaction_type || tx.type || '').toLowerCase();
+      return type.includes('deposit') || type.includes('credit');
+    })
+    .reduce((sum, tx) => sum + (Number(tx.amount) || 0), 0);
+
+  const totalWithdrawals = filteredTransactions
+    .filter((tx) => {
+      const type = String(tx.transaction_type || tx.type || '').toLowerCase();
+      return type.includes('withdrawal') || type.includes('debit');
+    })
+    .reduce((sum, tx) => sum + (Number(tx.amount) || 0), 0);
+
+  const branchDisplayName =
+    managerUser.branch_name ||
+    (managerUser.branch && typeof managerUser.branch === 'object'
+      ? managerUser.branch.name || managerUser.branch.branch_name
+      : null) ||
+    'Society Branch';
+
+  const rawBranchCode =
+    managerUser.branch_code ||
+    (managerUser.branch && typeof managerUser.branch === 'object' ? managerUser.branch.branch_code : null);
+  const branchCodeDisplay = rawBranchCode
+    ? String(rawBranchCode).startsWith('#')
+      ? rawBranchCode
+      : `#${rawBranchCode}`
+    : '#Central';
+
+  const branchLocation =
+    managerUser.location ||
+    (managerUser.branch && typeof managerUser.branch === 'object'
+      ? managerUser.branch.city
+        ? `${managerUser.branch.city}, ${managerUser.branch.state || 'Kerala'}`
+        : managerUser.branch.state
+      : '');
+
+  return (
+    <DashboardLayout role="branch_manager" user={managerUser} activeTab="cash_transactions">
+      <div className="space-y-6 sm:space-y-8 animate-fadeIn">
+        
+        {/* Banner matching AurumFX Branch Manager standards */}
+        <div className="bg-gradient-to-r from-[#d8f6f0] via-[#e5faf5] to-[#cbf3eb] rounded-3xl p-6 sm:p-7 lg:p-8 border border-teal-200/70 shadow-sm relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="relative z-10 flex-1 max-w-2xl">
+            {/* Top Separate Badges */}
+            <div className="flex flex-wrap items-center gap-2 mb-3.5">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur-xs text-xs font-semibold border border-teal-200/80 shadow-2xs text-[#0f766e]">
+                <Landmark className="w-3.5 h-3.5 text-[#00b4a7]" />
+                <span>Role: Branch Manager</span>
+              </div>
+
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur-xs text-xs font-semibold border border-teal-200/80 shadow-2xs text-slate-700">
+                <Building2 className="w-3.5 h-3.5 text-teal-600" />
+                <span>Branch Code: <span className="font-mono text-teal-800 font-bold">{branchCodeDisplay}</span></span>
+              </div>
+
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50/95 backdrop-blur-xs text-xs font-semibold border border-emerald-200 shadow-2xs text-emerald-700">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span>{managerUser.is_active !== false ? 'Active' : 'Inactive'}</span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <span className="w-1.5 h-8 sm:h-9 bg-[#00b4a7] rounded-full flex-shrink-0" />
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold text-slate-900 tracking-tight flex items-center gap-2.5">
+                <span>Branch Cash Transactions</span>
+              </h1>
+            </div>
+
+            {/* Manager identity chips */}
+            <div className="flex flex-wrap items-center gap-2 mt-3.5">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white/90 text-xs font-medium text-slate-700 border border-teal-100 shadow-2xs">
+                <User className="w-3.5 h-3.5 text-teal-600" />
+                <span>Logged in as: <strong className="font-bold text-slate-900">{managerUser.full_name || managerUser.name}</strong></span>
+              </div>
+
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white/90 text-xs font-medium text-slate-700 border border-teal-100 shadow-2xs">
+                <Building2 className="w-3.5 h-3.5 text-teal-600" />
+                <span>Branch: <strong className="font-bold text-slate-900">{branchDisplayName}</strong></span>
+              </div>
+
+              {branchLocation && (
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white/90 text-xs font-medium text-slate-700 border border-teal-100 shadow-2xs">
+                  <span>Location: <strong className="font-bold text-slate-900">{branchLocation}</strong></span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="relative z-10 flex justify-center md:justify-end pointer-events-none -my-2 sm:-my-5 lg:-my-6 flex-shrink-0 w-full md:w-auto">
+            <img
+              src={bankTechScene}
+              alt="Cash Operations Desk"
+              className="h-32 sm:h-44 lg:h-52 max-w-full w-auto object-contain drop-shadow-md select-none pointer-events-none mx-auto md:mx-0"
+            />
+          </div>
+
+          <div className="absolute -right-16 -top-16 w-80 h-80 rounded-full bg-teal-200/40 blur-3xl pointer-events-none" />
+          <div className="absolute left-1/3 -bottom-20 w-80 h-80 rounded-full bg-emerald-200/30 blur-3xl pointer-events-none" />
+          <div className="absolute -left-16 -bottom-16 w-64 h-64 rounded-full bg-teal-100/50 blur-2xl pointer-events-none" />
+        </div>
+
+        {/* 4 Summary Stat Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          <StatCard
+            title="Total Cash Deposits"
+            value={formatCurrency(totalDeposits)}
+            subtitle="Branch counter inflows"
+            icon={ArrowDownLeft}
+            trendType="up"
+          />
+          <StatCard
+            title="Total Cash Withdrawals"
+            value={formatCurrency(totalWithdrawals)}
+            subtitle="Counter cash releases"
+            icon={ArrowUpRight}
+            trendType="down"
+          />
+          <StatCard
+            title="Total Transactions"
+            value={filteredTransactions.length.toString()}
+            subtitle="All cashier transactions"
+            icon={Coins}
+            trend="Branch Operations"
+            trendType="up"
+          />
+          <StatCard
+            title="Cash Desk Status"
+            value="Active"
+            subtitle="Live branch counter"
+            icon={ShieldCheck}
+            trend="Operational"
+            trendType="up"
+          />
+        </div>
+
+        {/* Transactions Panel */}
+        <div className="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
+          {/* Panel Header: Title, Subtitle, and Clean Refresh Action */}
+          <div className="p-5 sm:p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-teal-50 text-teal-700 flex items-center justify-center flex-shrink-0">
+                  <Coins className="w-4 h-4 text-[#00b4a7]" />
+                </div>
+                <h3 className="font-serif font-bold text-slate-900 text-lg">
+                  Branch Cash Transactions Ledger
+                </h3>
+              </div>
+              <p className="text-xs text-slate-500 font-medium mt-1">
+                Verified deposits and cash withdrawals processed across all branch counters.
+              </p>
+            </div>
+
+            {/* Refresh Action: Always neatly aligned on top right */}
+            <div className="flex items-center gap-2 self-start sm:self-auto flex-shrink-0">
+              <button
+                type="button"
+                onClick={fetchCashTransactions}
+                disabled={loadingCashTransactions}
+                className="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 shadow-2xs text-xs font-bold text-slate-700 hover:text-slate-900 transition-all cursor-pointer disabled:opacity-50 flex items-center gap-2 active:scale-95"
+                title="Refresh Branch Transactions Ledger"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 text-[#00b4a7] ${loadingCashTransactions ? 'animate-spin' : ''}`} />
+                <span>{loadingCashTransactions ? 'Refreshing...' : 'Refresh'}</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Filter Toolbar: Full width, wrapping cleanly without crowding the title */}
+          <div className="px-5 py-3.5 sm:px-6 bg-slate-50/60 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3">
+            {/* Left Group: Type Filter */}
+            <div className="inline-flex rounded-xl p-1 bg-slate-100/90 border border-slate-200 shadow-2xs">
+              <button
+                type="button"
+                onClick={() => setCashTxFilter('all')}
+                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  cashTxFilter === 'all'
+                    ? 'bg-white text-slate-900 shadow-2xs'
+                    : 'text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                All
+              </button>
+              <button
+                type="button"
+                onClick={() => setCashTxFilter('deposit')}
+                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  cashTxFilter === 'deposit'
+                    ? 'bg-emerald-50 text-emerald-800 shadow-2xs font-extrabold'
+                    : 'text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                Deposits
+              </button>
+              <button
+                type="button"
+                onClick={() => setCashTxFilter('withdrawal')}
+                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  cashTxFilter === 'withdrawal'
+                    ? 'bg-rose-50 text-rose-800 shadow-2xs font-extrabold'
+                    : 'text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                Withdrawals
+              </button>
+            </div>
+
+            {/* Right Group: Date Range & Search */}
+            <div className="flex flex-wrap items-center gap-2.5 w-full lg:w-auto justify-start sm:justify-end">
+              {/* Prominent Date Range Pickers matching Member Portal */}
+              <div className="flex flex-wrap items-center gap-2">
+                {/* FROM Box */}
+                <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-slate-200 shadow-2xs hover:border-teal-400 focus-within:border-teal-500 focus-within:ring-2 focus-within:ring-teal-100 transition-all">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-teal-800 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-200 select-none">
+                    From
+                  </span>
+                  <input
+                    type="date"
+                    value={fromDate}
+                    onChange={(e) => setFromDate(e.target.value)}
+                    className="text-xs text-slate-800 font-bold focus:outline-none bg-transparent cursor-pointer"
+                    title="Filter transactions starting from this date"
+                  />
+                </div>
+
+                {/* TO Box */}
+                <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-slate-200 shadow-2xs hover:border-teal-400 focus-within:border-teal-500 focus-within:ring-2 focus-within:ring-teal-100 transition-all">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-teal-800 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-200 select-none">
+                    To
+                  </span>
+                  <input
+                    type="date"
+                    value={toDate}
+                    onChange={(e) => setToDate(e.target.value)}
+                    className="text-xs text-slate-800 font-bold focus:outline-none bg-transparent cursor-pointer"
+                    title="Filter transactions up to this date"
+                  />
+                </div>
+
+                {/* Clear Date Filter Button */}
+                {(fromDate || toDate) && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFromDate('');
+                      setToDate('');
+                    }}
+                    className="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 text-xs font-bold transition-all cursor-pointer flex items-center gap-1 shadow-2xs border border-slate-200"
+                    title="Clear Date Filter"
+                  >
+                    <X className="w-3.5 h-3.5 text-slate-500" />
+                    <span className="text-[11px]">Clear</span>
+                  </button>
+                )}
+              </div>
+
+              {/* Search */}
+              <div className="relative flex-1 sm:flex-initial">
+                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={cashTxSearch}
+                  onChange={(e) => setCashTxSearch(e.target.value)}
+                  placeholder="Search account, ref, cashier..."
+                  className="w-full sm:w-56 pl-8 pr-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#00b4a7] focus:ring-2 focus:ring-teal-100 shadow-2xs transition-all"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Error state */}
+          {errorCashTransactions && (
+            <div className="m-6 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0" />
+                <span>{errorCashTransactions}</span>
+              </div>
+              <button
+                onClick={fetchCashTransactions}
+                className="font-bold underline text-amber-900 hover:text-amber-700 cursor-pointer"
+              >
+                Retry
+              </button>
+            </div>
+          )}
+
+          {/* Transactions Table */}
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse text-xs whitespace-nowrap">
+              <thead>
+                <tr className="bg-slate-50 border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                  <th className="py-3.5 px-4 sm:px-6">Receipt Number</th>
+                  <th className="py-3.5 px-4">Account Number</th>
+                  <th className="py-3.5 px-4">Member Name</th>
+                  <th className="py-3.5 px-4">Transaction Type</th>
+                  <th className="py-3.5 px-4">Amount</th>
+                  <th className="py-3.5 px-4">Balance Before</th>
+                  <th className="py-3.5 px-4">Balance After</th>
+                  <th className="py-3.5 px-4">Branch Name</th>
+                  <th className="py-3.5 px-4">Branch Code</th>
+                  <th className="py-3.5 px-4">IFSC Code</th>
+                  <th className="py-3.5 px-4">Cashier Code</th>
+                  <th className="py-3.5 px-4">Cashier Name</th>
+                  <th className="py-3.5 px-4">Date &amp; Time</th>
+                  <th className="py-3.5 px-4 sm:px-6">Notes</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {loadingCashTransactions ? (
+                  <tr>
+                    <td colSpan={14} className="py-12 text-center text-slate-400">
+                      <Loader2 className="w-6 h-6 animate-spin text-[#00b4a7] mx-auto mb-2" />
+                      <span>Loading branch cash transactions...</span>
+                    </td>
+                  </tr>
+                ) : filteredTransactions.length === 0 ? (
+                  <tr>
+                    <td colSpan={14} className="py-12 text-center text-slate-400">
+                      <Coins className="w-8 h-8 mx-auto mb-2 text-slate-300" />
+                      <p className="font-semibold text-slate-600">No branch cash transactions found</p>
+                      <p className="text-[11px] mt-0.5">
+                        {cashTxSearch || cashTxFilter !== 'all'
+                          ? 'No transactions match your search or filter.'
+                          : 'Counter deposits and withdrawals from your staff cashiers will show here.'}
+                      </p>
+                    </td>
+                  </tr>
+                ) : (
+                  filteredTransactions.map((tx, idx) => {
+                    const isDeposit =
+                      String(tx.transaction_type || tx.type || '').toLowerCase().includes('deposit') ||
+                      String(tx.transaction_type || tx.type || '').toLowerCase().includes('credit');
+                    return (
+                      <tr key={tx.id || idx} className="hover:bg-slate-50/70 transition-colors">
+                        <td className="py-3.5 px-4 sm:px-6 font-mono font-bold text-slate-800">
+                          {tx.receipt_number || tx.reference_number || `#TX-${tx.id || idx + 1}`}
+                        </td>
+                        <td className="py-3.5 px-4 font-mono text-teal-800 font-semibold">
+                          {tx.account_number || '—'}
+                        </td>
+                        <td className="py-3.5 px-4 font-semibold text-slate-900">
+                          <div>{tx.member_name || '—'}</div>
+                          {tx.member_code && (
+                            <div className="text-[10px] font-mono text-slate-400 font-normal">Code: {tx.member_code}</div>
+                          )}
+                        </td>
+                        <td className="py-3.5 px-4">
+                          <span
+                            className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold border capitalize ${
+                              isDeposit
+                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                : 'bg-rose-50 text-rose-700 border-rose-200'
+                            }`}
+                          >
+                            {isDeposit ? (
+                              <ArrowDownLeft className="w-3 h-3 text-emerald-600" />
+                            ) : (
+                              <ArrowUpRight className="w-3 h-3 text-rose-600" />
+                            )}
+                            <span>{isDeposit ? 'Deposit' : 'Withdrawal'}</span>
+                          </span>
+                        </td>
+                        <td className="py-3.5 px-4 font-bold text-slate-900 text-sm">
+                          {formatCurrency(tx.amount || 0)}
+                        </td>
+                        <td className="py-3.5 px-4 font-mono text-slate-600 font-medium">
+                          {tx.balance_before !== undefined && tx.balance_before !== null
+                            ? formatCurrency(tx.balance_before)
+                            : '—'}
+                        </td>
+                        <td className="py-3.5 px-4 font-mono text-slate-700 font-medium">
+                          {tx.balance_after !== undefined && tx.balance_after !== null
+                            ? formatCurrency(tx.balance_after)
+                            : tx.balance
+                            ? formatCurrency(tx.balance)
+                            : '—'}
+                        </td>
+                        <td className="py-3.5 px-4 text-slate-700">
+                          {tx.branch_name || managerUser.branch_name || '—'}
+                        </td>
+                        <td className="py-3.5 px-4 font-mono text-slate-600">
+                          {tx.branch_code || managerUser.branch_code || '—'}
+                        </td>
+                        <td className="py-3.5 px-4 font-mono text-slate-600">
+                          {tx.ifsc_code || '—'}
+                        </td>
+                        <td className="py-3.5 px-4 font-mono text-teal-700 font-medium">
+                          {tx.cashier_code || '—'}
+                        </td>
+                        <td className="py-3.5 px-4 text-slate-700">
+                          {tx.cashier_name || tx.staff_name || tx.created_by_name || (tx.cashier_user_id ? `Cashier #${tx.cashier_user_id}` : '—')}
+                        </td>
+                        <td className="py-3.5 px-4 text-slate-500 text-[11px]">
+                          {formatDateTime(tx.created_at || tx.timestamp || tx.date)}
+                        </td>
+                        <td className="py-3.5 px-4 sm:px-6 text-slate-600 truncate max-w-[200px]" title={tx.notes || tx.description}>
+                          {tx.notes || tx.description || 'Counter transaction'}
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Footer Count */}
+          {!loadingCashTransactions && filteredTransactions.length > 0 && (
+            <div className="px-6 py-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-medium bg-slate-50/50">
+              <span>
+                Showing <strong className="text-slate-700">{filteredTransactions.length}</strong> of{' '}
+                <strong className="text-slate-700">{cashTransactions.length}</strong> transactions
+              </span>
+            </div>
+          )}
+        </div>
+
+      </div>
+    </DashboardLayout>
+  );
+}

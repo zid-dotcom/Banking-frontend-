@@ -6,6 +6,8 @@ import {
   getMemberUnreadCount,
   markAllNotificationsRead,
   markNotificationRead,
+  notifyNotificationsUpdated,
+  NOTIFICATIONS_UPDATED_EVENT,
   getMemberMe,
   getMemberServiceRequest,
   getMemberServiceRequests
@@ -176,7 +178,9 @@ export default function MemberNotifications() {
       } else {
         setNotifications([]);
       }
-      setUnreadCount(typeof countData === 'number' ? countData : 0);
+      const finalCount = typeof countData === 'number' ? countData : 0;
+      setUnreadCount(finalCount);
+      notifyNotificationsUpdated(finalCount);
     } catch (err) {
       console.warn('Fetch notifications error:', err);
       if (isTokenExpiredError(null, err?.message)) {
@@ -192,6 +196,16 @@ export default function MemberNotifications() {
 
   useEffect(() => {
     fetchAllNotifications();
+
+    const handleNotificationsUpdated = (e) => {
+      if (typeof e?.detail?.unreadCount === 'number') {
+        setUnreadCount(e.detail.unreadCount);
+      }
+    };
+    window.addEventListener(NOTIFICATIONS_UPDATED_EVENT || 'member-notifications-updated', handleNotificationsUpdated);
+    return () => {
+      window.removeEventListener(NOTIFICATIONS_UPDATED_EVENT || 'member-notifications-updated', handleNotificationsUpdated);
+    };
   }, []);
 
   // Mark single as read (PATCH /member/notifications/{id}/read)
@@ -200,10 +214,21 @@ export default function MemberNotifications() {
     setMarkingId(id);
     try {
       await markNotificationRead(id);
-      setNotifications((prev) =>
-        prev.map((n) => ((n.id || n.notification_id) === id ? { ...n, is_read: true } : n))
-      );
-      setUnreadCount((c) => Math.max(0, c - 1));
+      let nextUnread;
+      setNotifications((prev) => {
+        const updated = prev.map((n) =>
+          ((n.id || n.notification_id) === id ? { ...n, is_read: true } : n)
+        );
+        nextUnread = updated.filter(
+          (n) => !(n.is_read === true || n.read === true || n.status === 'read')
+        ).length;
+        return updated;
+      });
+      setUnreadCount((c) => {
+        const next = typeof nextUnread === 'number' ? nextUnread : Math.max(0, c - 1);
+        notifyNotificationsUpdated(next);
+        return next;
+      });
     } catch (err) {
       console.warn('Mark notification read error:', err);
     } finally {
@@ -219,6 +244,7 @@ export default function MemberNotifications() {
       await markAllNotificationsRead();
       setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
       setUnreadCount(0);
+      notifyNotificationsUpdated(0);
     } catch (err) {
       console.warn('Mark all read error:', err);
       alert(err.message || 'Failed to mark all notifications as read.');
@@ -229,6 +255,11 @@ export default function MemberNotifications() {
 
   // Handle View Replies for Service Request Notifications
   const handleViewReplies = async (item) => {
+    const isUnread = !(item.is_read === true || item.read === true || item.status === 'read');
+    if (isUnread) {
+      handleMarkAsRead(item.id || item.notification_id);
+    }
+
     let targetId =
       item.service_request_id ||
       item.request_id ||

@@ -17,7 +17,9 @@ import {
   getMemberNotifications,
   getMemberUnreadCount,
   markAllNotificationsRead,
-  markNotificationRead
+  markNotificationRead,
+  NOTIFICATIONS_UPDATED_EVENT,
+  notifyNotificationsUpdated
 } from '../../services/memberService';
 
 function formatNotificationText(text) {
@@ -46,12 +48,59 @@ export default function DashboardHeader({
   const [unreadCount, setUnreadCount] = useState(0);
   const [loadingNotes, setLoadingNotes] = useState(false);
 
+  // Resolved user display properties
+  const resolvedHeaderName =
+    user?.full_name ||
+    user?.name ||
+    user?.username ||
+    (role === 'super_admin' ? 'Super Admin' : role === 'staff' ? 'Staff Member' : role === 'branch_manager' ? 'Branch Manager' : 'User');
+
+  const resolvedFirstName = resolvedHeaderName.split(' ')[0] || resolvedHeaderName;
+
+  const resolvedHeaderRole =
+    user?.staff_role?.name ||
+    user?.account_role ||
+    user?.role_name ||
+    user?.role ||
+    (role === 'super_admin' ? 'Super Admin' : role === 'staff' ? 'Staff' : role === 'branch_manager' ? 'Branch Manager' : 'Verified');
+
+  const resolvedHeaderEmail = user?.email || '';
+
+  const resolvedHeaderAvatar =
+    user?.avatarText ||
+    (resolvedHeaderName ? resolvedHeaderName.trim().charAt(0).toUpperCase() : (role === 'super_admin' ? 'SA' : 'U'));
+
   useEffect(() => {
-    if (role === 'member') {
-      getMemberUnreadCount()
-        .then((c) => setUnreadCount(typeof c === 'number' ? c : 0))
-        .catch(() => {});
-    }
+    let isMounted = true;
+
+    const refreshMemberUnread = () => {
+      if (role === 'member') {
+        getMemberUnreadCount()
+          .then((c) => {
+            if (isMounted) setUnreadCount(typeof c === 'number' ? c : 0);
+          })
+          .catch(() => {});
+      }
+    };
+
+    refreshMemberUnread();
+
+    const handleNotificationsUpdated = (e) => {
+      if (role === 'member') {
+        if (typeof e?.detail?.unreadCount === 'number') {
+          if (isMounted) setUnreadCount(e.detail.unreadCount);
+        } else {
+          refreshMemberUnread();
+        }
+      }
+    };
+
+    window.addEventListener(NOTIFICATIONS_UPDATED_EVENT || 'member-notifications-updated', handleNotificationsUpdated);
+
+    return () => {
+      isMounted = false;
+      window.removeEventListener(NOTIFICATIONS_UPDATED_EVENT || 'member-notifications-updated', handleNotificationsUpdated);
+    };
   }, [role]);
 
   const loadMemberNotes = async () => {
@@ -84,7 +133,11 @@ export default function DashboardHeader({
       setMemberNotifications((prev) =>
         prev.map((n) => ((n.id || n.notification_id) === id ? { ...n, is_read: true } : n))
       );
-      setUnreadCount((c) => Math.max(0, c - 1));
+      setUnreadCount((c) => {
+        const next = Math.max(0, c - 1);
+        notifyNotificationsUpdated(next);
+        return next;
+      });
     } catch {}
   };
 
@@ -93,6 +146,7 @@ export default function DashboardHeader({
       await markAllNotificationsRead();
       setMemberNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
       setUnreadCount(0);
+      notifyNotificationsUpdated(0);
     } catch {}
   };
 
@@ -112,6 +166,10 @@ export default function DashboardHeader({
       localStorage.removeItem('branch_token');
       localStorage.removeItem('branch_user');
       navigate('/branch-manager-login');
+    } else if (role === 'staff') {
+      localStorage.removeItem('staff_token');
+      localStorage.removeItem('staff_user');
+      navigate('/staff-login');
     } else {
       navigate('/super-admin/login');
     }
@@ -140,7 +198,7 @@ export default function DashboardHeader({
             {SOCIETY_INFO.shortName} Multi-State Cooperative
           </p>
           <h2 className="text-base sm:text-lg lg:text-xl font-bold text-slate-900 leading-snug mt-0.5">
-            Welcome back, <span className="text-[#0d9488]">{role === 'super_admin' ? (user.name || 'Super Admin') : (user.name?.split(' ')[0] || 'User')}</span>
+            Welcome back, <span className="text-[#0d9488]">{role === 'super_admin' ? (user?.name || 'Super Admin') : resolvedFirstName}</span>
           </h2>
         </div>
       </div>
@@ -329,15 +387,20 @@ export default function DashboardHeader({
           title={role === 'member' ? 'View My Full Profile' : ''}
         >
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#2dd4bf] to-[#14b8a6] text-white flex items-center justify-center font-bold text-sm shadow-sm shadow-teal-500/20 flex-shrink-0 group-hover:scale-105 transition-transform">
-            {user.avatarText || (role === 'super_admin' ? 'SA' : 'U')}
+            {resolvedHeaderAvatar}
           </div>
           <div className="hidden lg:block text-left leading-none">
-            <p className="text-xs font-bold text-slate-900 truncate max-w-[130px] group-hover:text-teal-700 transition-colors">
-              {user.name || (role === 'super_admin' ? 'Super Admin' : 'User')}
+            <p className="text-xs font-bold text-slate-900 truncate max-w-[150px] group-hover:text-teal-700 transition-colors">
+              {resolvedHeaderName}
             </p>
-            <span className="text-[10px] text-emerald-600 font-semibold flex items-center gap-1 mt-1">
+            {resolvedHeaderEmail && (
+              <p className="text-[10px] text-slate-500 truncate max-w-[150px] mt-0.5">
+                {resolvedHeaderEmail}
+              </p>
+            )}
+            <span className="text-[10px] text-emerald-600 font-semibold flex items-center gap-1 mt-1 capitalize">
               <CheckCircle className="w-2.5 h-2.5" />
-              {user.role || (role === 'super_admin' ? 'Super Admin' : 'Verified')}
+              {resolvedHeaderRole}
             </span>
           </div>
         </div>

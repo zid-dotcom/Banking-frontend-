@@ -33,6 +33,9 @@ export function getRoleFromLocation() {
   if (p.startsWith('/branch-manager/') || p.startsWith('/branch-admin/') || p === '/branch-manager-login') {
     return 'branch_manager';
   }
+  if (p.startsWith('/staff/') || p === '/staff-login' || p === '/staff/login') {
+    return 'staff';
+  }
   return 'super_admin';
 }
 
@@ -43,7 +46,6 @@ export function isTokenExpiredError(res, parsedMsg = '') {
   const msgLower = (parsedMsg || '').toLowerCase();
   return (
     res?.status === 401 ||
-    res?.status === 403 ||
     msgLower.includes('expired token') ||
     msgLower.includes('token is expired') ||
     msgLower.includes('token has expired') ||
@@ -67,6 +69,9 @@ export function handleAuthExpired(role = null) {
     localStorage.removeItem('branch_token');
     localStorage.removeItem('branch_user');
     localStorage.removeItem('branch_manager_user');
+  } else if (effectiveRole === 'staff') {
+    localStorage.removeItem('staff_token');
+    localStorage.removeItem('staff_user');
   } else {
     localStorage.removeItem('superadmin_token');
     localStorage.removeItem('superadmin_user');
@@ -81,12 +86,15 @@ export function handleAuthExpired(role = null) {
     ? '/member-login?expired=true'
     : (effectiveRole === 'branch_manager' || effectiveRole === 'branch_admin')
     ? '/branch-manager-login?expired=true'
+    : effectiveRole === 'staff'
+    ? '/staff-login?expired=true'
     : '/super-admin/login?expired=true';
 
   const isAlreadyOnLogin =
     window.location.pathname === '/member-login' ||
     window.location.pathname === '/member/login' ||
     window.location.pathname === '/branch-manager-login' ||
+    window.location.pathname === '/staff-login' ||
     window.location.pathname === '/super-admin/login';
 
   if (!isAlreadyOnLogin) {
@@ -117,6 +125,14 @@ export function parseApiError(errBody, status, fallbackMessage = 'Operation fail
         const loc = Array.isArray(item.loc)
           ? item.loc.filter((l) => l !== 'body').join(' -> ')
           : '';
+
+        if (cleanMsg.includes('String should match pattern') || cleanMsg.includes('match pattern')) {
+          if (loc.includes('account_number') || loc.includes('account')) {
+            return 'Wrong account number. Account number must be exactly 16 digits.';
+          }
+          return 'Invalid input format. Please check the value entered.';
+        }
+
         return loc ? `${loc.replace(/_/g, ' ')}: ${cleanMsg}` : cleanMsg;
       }
       return String(item);

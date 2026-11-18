@@ -417,6 +417,8 @@ export {
   getMemberUnreadCount,
   markAllNotificationsRead,
   markNotificationRead,
+  notifyNotificationsUpdated,
+  NOTIFICATIONS_UPDATED_EVENT,
 } from './notificationService';
 
 /**

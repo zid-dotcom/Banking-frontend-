@@ -23,7 +23,7 @@ export default function StatCard({
     <div className={`bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/80 shadow-xs hover:shadow-md transition-all duration-200 group ${className}`}>
       <div className="flex items-start justify-between">
         <div className="flex-1 min-w-0 pr-2">
-          <p className="text-xs sm:text-sm font-semibold text-slate-500 uppercase tracking-wide truncate">
+          <p className="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider leading-snug whitespace-normal break-words">
             {title}
           </p>
           <div
@@ -42,9 +42,9 @@ export default function StatCard({
         </div>
       </div>
 
-      <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-        <div className="flex items-center gap-1.5 font-medium text-slate-500 truncate mr-2">
-          {(subtitle || subtext) && <span className="truncate">{subtitle || subtext}</span>}
+      <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs gap-2">
+        <div className="flex items-center gap-1.5 font-medium text-slate-500 min-w-0 flex-1">
+          {(subtitle || subtext) && <span className="text-[11px] leading-tight break-words">{subtitle || subtext}</span>}
         </div>
 
         {trendText && (

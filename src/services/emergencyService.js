@@ -2,6 +2,26 @@ import { handleAuthExpired, isTokenExpiredError } from './branchService';
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'https://supercriminally-ununified-arnoldo.ngrok-free.dev';
 
+export const EMERGENCY_UNREAD_UPDATED_EVENT = 'emergency-unread-updated';
+
+/**
+ * Dispatches an event to notify the sidebar and pages that an emergency case unread count has updated
+ * @param {Object} [payload] - { role: 'branch_manager' | 'super_admin', count?: number }
+ */
+export function notifyEmergencyUnreadUpdated(payload = {}) {
+  try {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(
+        new CustomEvent(EMERGENCY_UNREAD_UPDATED_EVENT, {
+          detail: typeof payload === 'object' && payload !== null ? payload : { count: payload },
+        })
+      );
+    }
+  } catch (e) {
+    console.warn('Failed to dispatch emergency unread updated event:', e);
+  }
+}
+
 /**
  * Standard request headers helper for Branch Admin / Branch Manager
  */
@@ -176,7 +196,9 @@ export async function getBranchAdminEmergencyUnreadCount() {
     }
 
     const data = await res.json();
-    return typeof data?.unread_count === 'number' ? data : { unread_count: 0 };
+    const result = typeof data?.unread_count === 'number' ? data : { unread_count: 0 };
+    notifyEmergencyUnreadUpdated({ role: 'branch_manager', count: result.unread_count });
+    return result;
   } catch (error) {
     console.warn('emergencyService.getBranchAdminEmergencyUnreadCount error:', error);
     return { unread_count: 0 };
@@ -199,7 +221,10 @@ export async function getBranchAdminEmergencyCase(caseId) {
       checkRequestStatus(res, errBody, `Failed to load emergency case #${caseId}`, 'branch_manager');
     }
 
-    return await res.json();
+    const data = await res.json();
+    // Superadmin messages for this case are marked as read on server; notify listeners
+    notifyEmergencyUnreadUpdated({ role: 'branch_manager' });
+    return data;
   } catch (error) {
     console.error(`emergencyService.getBranchAdminEmergencyCase(${caseId}) error:`, error);
     throw error;
@@ -227,7 +252,9 @@ export async function sendBranchAdminEmergencyMessage(caseId, { message }) {
       checkRequestStatus(res, errBody, 'Failed to send message to emergency case', 'branch_manager');
     }
 
-    return await res.json();
+    const data = await res.json();
+    notifyEmergencyUnreadUpdated({ role: 'branch_manager' });
+    return data;
   } catch (error) {
     console.error(`emergencyService.sendBranchAdminEmergencyMessage(${caseId}) error:`, error);
     throw error;
@@ -292,10 +319,12 @@ export async function getSuperadminEmergencyUnreadCount() {
     }
 
     const data = await res.json();
-    return {
+    const result = {
       total_unread_count: Number(data?.total_unread_count) || 0,
       branches: Array.isArray(data?.branches) ? data.branches : [],
     };
+    notifyEmergencyUnreadUpdated({ role: 'super_admin', count: result.total_unread_count });
+    return result;
   } catch (error) {
     console.warn('emergencyService.getSuperadminEmergencyUnreadCount error:', error);
     return { total_unread_count: 0, branches: [] };
@@ -318,7 +347,10 @@ export async function getSuperadminEmergencyCase(caseId) {
       checkRequestStatus(res, errBody, `Failed to load emergency case #${caseId}`, 'super_admin');
     }
 
-    return await res.json();
+    const data = await res.json();
+    // Branch Admin messages for this case are marked as read on server; notify listeners
+    notifyEmergencyUnreadUpdated({ role: 'super_admin' });
+    return data;
   } catch (error) {
     console.error(`emergencyService.getSuperadminEmergencyCase(${caseId}) error:`, error);
     throw error;
@@ -346,7 +378,9 @@ export async function sendSuperadminEmergencyMessage(caseId, { message }) {
       checkRequestStatus(res, errBody, 'Failed to send superadmin reply to emergency case', 'super_admin');
     }
 
-    return await res.json();
+    const data = await res.json();
+    notifyEmergencyUnreadUpdated({ role: 'super_admin' });
+    return data;
   } catch (error) {
     console.error(`emergencyService.sendSuperadminEmergencyMessage(${caseId}) error:`, error);
     throw error;
