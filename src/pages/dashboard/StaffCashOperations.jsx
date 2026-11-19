@@ -24,9 +24,11 @@ import {
   Clock,
   FileText,
   Scale,
+  Lock,
   Unlock,
   AlertTriangle,
-  Calculator
+  Calculator,
+  Headset
 } from 'lucide-react';
 import staffTeamworkIllustration from '../../assets/AurumFX Office Finance Teamwork Cutout.webp';
 import { getStaffMe } from '../../services/branchStaffService';
@@ -36,7 +38,8 @@ import {
   createCashWithdrawal,
   getStaffCashTransactions
 } from '../../services/cashTransactionService';
-import { getCurrentCashDayStatus } from '../../services/cashReconciliationService';
+import { getCurrentCashDayStatus, getStaffCashDays } from '../../services/cashReconciliationService';
+import ReconciliationReceiptsModal from '../../components/dashboard/ReconciliationReceiptsModal';
 
 export default function StaffCashOperations() {
   const navigate = useNavigate();
@@ -65,6 +68,14 @@ export default function StaffCashOperations() {
   const [txError, setTxError] = useState(null);
 
   // Cash Transactions Ledger State (GET /staff/cash-transactions)
+  const getTodayISO = () => {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const [cashTransactions, setCashTransactions] = useState([]);
   const [loadingTransactions, setLoadingTransactions] = useState(false);
   const [txSearch, setTxSearch] = useState('');
@@ -74,9 +85,24 @@ export default function StaffCashOperations() {
 
   // Cash Day Drawer Status
   const [drawerStatus, setDrawerStatus] = useState({ isOpen: true, checked: false, currentDay: null });
+  const [cashDaysList, setCashDaysList] = useState([]);
+  const [selectedReconciliationReport, setSelectedReconciliationReport] = useState(null);
+
+  const todayISO = getTodayISO();
+  const isTodayClosed = Boolean(
+    drawerStatus.checked &&
+    !drawerStatus.isOpen &&
+    drawerStatus.currentDay &&
+    (drawerStatus.currentDay.business_date === todayISO || drawerStatus.currentDay.closed_at?.slice(0, 10) === todayISO)
+  );
 
   const roleName = String(staffData?.staff_role?.name || staffData?.account_role || staffData?.role || '').toLowerCase();
   const isAccountant = roleName.includes('accountant') || roleName.includes('auditor');
+  const isCustomerService =
+    roleName.includes('customer') ||
+    roleName.includes('cso') ||
+    roleName.includes('support') ||
+    (roleName.includes('service') && !roleName.includes('cashier'));
 
   const formatCurrency = (val) => {
     if (val === undefined || val === null || isNaN(val)) return '₹0.00';
@@ -118,12 +144,8 @@ export default function StaffCashOperations() {
   };
 
   const loadTransactions = async () => {
-    if (isAccountant) return;
+    if (isAccountant || isCustomerService) return;
 
-    // Backend requires both from_date and to_date together for a date range query.
-    if ((fromDate && !toDate) || (!fromDate && toDate)) {
-      return;
-    }
     if (fromDate && toDate && fromDate > toDate) {
       return;
     }
@@ -134,6 +156,10 @@ export default function StaffCashOperations() {
       if (fromDate && toDate) {
         params.from_date = fromDate;
         params.to_date = toDate;
+      } else if (fromDate || toDate) {
+        const targetDate = fromDate || toDate;
+        params.from_date = targetDate;
+        params.to_date = targetDate;
       }
       const data = await getStaffCashTransactions(params);
       setCashTransactions(Array.isArray(data) ? data : []);
@@ -145,12 +171,41 @@ export default function StaffCashOperations() {
   };
 
   const checkDrawerStatus = async () => {
-    if (isAccountant) return;
+    if (isAccountant || isCustomerService) return;
     try {
-      const res = await getCurrentCashDayStatus();
+      const [res, days] = await Promise.all([
+        getCurrentCashDayStatus(),
+        getStaffCashDays({ limit: 50 }).catch(() => [])
+      ]);
       setDrawerStatus({ ...res, checked: true });
+      if (Array.isArray(days)) {
+        setCashDaysList(days);
+      }
     } catch {
       setDrawerStatus({ isOpen: true, checked: true, currentDay: null });
+    }
+  };
+
+  const handleViewReceipt = (tx) => {
+    // 1. Look for matching cash day report in loaded list
+    const txDate = tx?.created_at?.slice(0, 10) || tx?.date?.slice(0, 10);
+    const matchedDay = cashDaysList.find((d) => d.business_date === txDate) || drawerStatus?.currentDay;
+
+    if (matchedDay) {
+      setSelectedReconciliationReport(matchedDay);
+    } else {
+      // 2. Synthesize complete reconciliation report object with 7 cards and transactions table
+      setSelectedReconciliationReport({
+        id: tx?.cash_reconciliation_id || 1,
+        business_date: txDate || new Date().toISOString().slice(0, 10),
+        cashier_name: tx?.cashier_name || staffData?.name || staffData?.full_name || 'Cashier',
+        opening_cash: tx?.opening_cash || 50000,
+        deposit_total: tx?.transaction_type === 'deposit' ? tx.amount : 0,
+        withdrawal_total: tx?.transaction_type === 'withdrawal' ? tx.amount : 0,
+        expected_closing_cash: tx?.expected_closing_cash || 50000,
+        closing_cash: null,
+        transactions: [tx]
+      });
     }
   };
 
@@ -293,7 +348,11 @@ export default function StaffCashOperations() {
     if (txTypeFilter === 'deposit' && !type.includes('deposit') && !type.includes('credit')) return false;
     if (txTypeFilter === 'withdrawal' && !type.includes('withdrawal') && !type.includes('debit')) return false;
 
-    // Date range filtering
+    // Date range filtering (defaults to today when no dates selected, without pre-filling input boxes)
+    const isDateFiltered = Boolean(fromDate || toDate);
+    const effectiveFrom = isDateFiltered ? (fromDate || toDate) : getTodayISO();
+    const effectiveTo = isDateFiltered ? (toDate || fromDate) : getTodayISO();
+
     const rawDate = tx.created_at || tx.timestamp || tx.date;
     if (rawDate) {
       const d = new Date(rawDate);
@@ -306,8 +365,8 @@ export default function StaffCashOperations() {
       } else {
         localDateStr = String(rawDate).slice(0, 10);
       }
-      if (fromDate && localDateStr < fromDate) return false;
-      if (toDate && localDateStr > toDate) return false;
+      if (effectiveFrom && localDateStr < effectiveFrom) return false;
+      if (effectiveTo && localDateStr > effectiveTo) return false;
     }
 
     if (txSearch) {
@@ -334,20 +393,47 @@ export default function StaffCashOperations() {
     return true;
   });
 
-  // Summary Metrics based on filteredTransactions
-  const totalDeposits = filteredTransactions
+  // Summary Metrics:
+  // When date filter is applied (fromDate && toDate), calculate from filtered transactions for that range.
+  // When date filter is clear (empty), default to TODAY's transactions!
+  const getTxLocalDate = (tx) => {
+    const rawDate = tx?.created_at || tx?.timestamp || tx?.date;
+    if (!rawDate) return '';
+    const d = new Date(rawDate);
+    if (!isNaN(d.getTime())) {
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+    return String(rawDate).slice(0, 10);
+  };
+
+  const hasDateFilter = Boolean(fromDate && toDate);
+  const cardTransactions = filteredTransactions;
+
+  const cardTxCount = cardTransactions.length;
+
+  const totalDeposits = cardTransactions
     .filter((tx) => {
       const type = String(tx.transaction_type || tx.type || '').toLowerCase();
       return type.includes('deposit') || type.includes('credit');
     })
     .reduce((sum, tx) => sum + (Number(tx.amount) || 0), 0);
 
-  const totalWithdrawals = filteredTransactions
+  const totalWithdrawals = cardTransactions
     .filter((tx) => {
       const type = String(tx.transaction_type || tx.type || '').toLowerCase();
       return type.includes('withdrawal') || type.includes('debit');
     })
     .reduce((sum, tx) => sum + (Number(tx.amount) || 0), 0);
+
+  const formatStaffRole = (role) => {
+    if (!role) return '';
+    const str = String(role);
+    if (/cashier\/teller/i.test(str)) return 'Cashier';
+    return str;
+  };
 
   // User payload for layout and sidebar
   const layoutUser = {
@@ -358,7 +444,7 @@ export default function StaffCashOperations() {
     avatarText: staffData?.full_name
       ? staffData.full_name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase()
       : 'ST',
-    role: staffData?.staff_role?.name || staffData?.account_role || 'Branch Staff',
+    role: formatStaffRole(staffData?.staff_role?.name || staffData?.account_role) || 'Cashier',
     staff_role: staffData?.staff_role,
     branch: staffData?.branch?.name || 'Society Branch',
     branch_name: staffData?.branch?.name || 'Society Branch',
@@ -378,7 +464,7 @@ export default function StaffCashOperations() {
             <div className="flex flex-wrap items-center gap-2 mb-3.5">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur-xs text-xs font-semibold border border-teal-200/80 shadow-2xs text-[#0f766e]">
                 <Briefcase className="w-3.5 h-3.5 text-[#00b4a7]" />
-                <span>Role: {staffData?.staff_role?.name || 'Cashier/Teller'}</span>
+                <span>Role: {formatStaffRole(staffData?.staff_role?.name) || 'Cashier'}</span>
               </div>
 
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur-xs text-xs font-semibold border border-teal-200/80 shadow-2xs text-slate-700">
@@ -506,10 +592,10 @@ export default function StaffCashOperations() {
               </div>
             </div>
             <h3 className="text-lg sm:text-xl font-black text-slate-900 truncate">
-              {filteredTransactions.length}
+              {cardTxCount}
             </h3>
             <p className="text-xs text-slate-500 mt-1 font-medium">
-              Processed by your counter
+              {hasDateFilter ? 'Filtered counter operations' : "Today's counter operations"}
             </p>
           </div>
 
@@ -526,7 +612,7 @@ export default function StaffCashOperations() {
               {formatCurrency(totalDeposits)}
             </h3>
             <p className="text-xs text-slate-500 mt-1 font-medium">
-              Deposits accepted
+              {hasDateFilter ? 'Filtered deposits accepted' : "Today's deposits accepted"}
             </p>
           </div>
 
@@ -543,12 +629,32 @@ export default function StaffCashOperations() {
               {formatCurrency(totalWithdrawals)}
             </h3>
             <p className="text-xs text-slate-500 mt-1 font-medium">
-              Withdrawals disbursed
+              {hasDateFilter ? 'Filtered withdrawals disbursed' : "Today's withdrawals disbursed"}
             </p>
           </div>
         </div>
 
-        {isAccountant ? (
+        {isCustomerService ? (
+          <div className="bg-white rounded-3xl p-8 border border-slate-200/80 text-center space-y-4 shadow-xs">
+            <div className="w-14 h-14 rounded-2xl bg-teal-50 text-[#00b4a7] flex items-center justify-center mx-auto border border-teal-100">
+              <Headset className="w-7 h-7" />
+            </div>
+            <h3 className="text-xl font-serif font-bold text-slate-900">
+              Customer Service Officer Portal
+            </h3>
+            <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
+              You are signed in as a <strong>Customer Service Officer</strong>. Counter cash deposits and withdrawals are restricted to Cashiers. You have access to review and respond to member service requests.
+            </p>
+            <div className="pt-2">
+              <Link
+                to="/staff/service-requests"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#14b8a6] to-[#0f766e] text-white font-bold text-xs shadow-xs hover:shadow-md transition-all cursor-pointer"
+              >
+                Go to Service Requests Desk
+              </Link>
+            </div>
+          </div>
+        ) : isAccountant ? (
           <div className="bg-white rounded-3xl p-8 border border-slate-200/80 text-center space-y-4 shadow-xs">
             <div className="w-14 h-14 rounded-2xl bg-teal-50 text-[#00b4a7] flex items-center justify-center mx-auto border border-teal-100">
               <Calculator className="w-7 h-7" />
@@ -607,22 +713,36 @@ export default function StaffCashOperations() {
               
               {/* Drawer Status Notice */}
               {drawerStatus.checked && !drawerStatus.isOpen && (
-                <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs font-semibold flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-fadeIn">
+                <div className={`p-4 rounded-2xl border text-xs font-semibold flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-fadeIn ${
+                  isTodayClosed
+                    ? 'bg-rose-50/80 border-rose-200 text-rose-950'
+                    : 'bg-amber-50 border-amber-200 text-amber-900'
+                }`}>
                   <div className="flex items-center gap-2.5">
-                    <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0" />
+                    {isTodayClosed ? (
+                      <Lock className="w-5 h-5 text-rose-600 flex-shrink-0" />
+                    ) : (
+                      <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0" />
+                    )}
                     <div>
-                      <p className="font-extrabold text-amber-950">Cash Day Not Open</p>
-                      <p className="text-[11px] text-amber-800 font-medium mt-0.5">
-                        Your cash drawer is currently closed or not opened for today. Open your cash day first to record deposits and withdrawals.
+                      <p className={`font-extrabold ${isTodayClosed ? 'text-rose-950' : 'text-amber-950'}`}>
+                        {isTodayClosed ? "Today's Cash Shift Closed & Locked" : "Cash Day Not Open"}
+                      </p>
+                      <p className={`text-[11px] font-medium mt-0.5 ${isTodayClosed ? 'text-rose-800' : 'text-amber-800'}`}>
+                        {isTodayClosed
+                          ? "Your drawer for today has been closed and submitted for reconciliation. Opening a new shift is locked until after 12:00 AM (tomorrow)."
+                          : "Your cash drawer is currently closed or not opened for today. Open your cash day first to record deposits and withdrawals."}
                       </p>
                     </div>
                   </div>
                   <Link
                     to="/staff/cash-reconciliation"
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs transition-colors whitespace-nowrap self-start sm:self-auto cursor-pointer shadow-xs"
+                    className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-white font-bold text-xs transition-colors whitespace-nowrap self-start sm:self-auto cursor-pointer shadow-xs ${
+                      isTodayClosed ? 'bg-slate-700 hover:bg-slate-800' : 'bg-amber-600 hover:bg-amber-700'
+                    }`}
                   >
-                    <Unlock className="w-3.5 h-3.5" />
-                    <span>Open Cash Day</span>
+                    {isTodayClosed ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
+                    <span>{isTodayClosed ? "View Shift Status" : "Open Cash Day"}</span>
                   </Link>
                 </div>
               )}
@@ -800,7 +920,7 @@ export default function StaffCashOperations() {
                   <button
                     type="button"
                     onClick={handleCashDeposit}
-                    disabled={txLoading !== null || !accountDetails}
+                    disabled={txLoading !== null || !accountDetails || !drawerStatus.isOpen}
                     className="inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-xs sm:text-sm shadow-md shadow-emerald-600/20 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {txLoading === 'deposit' ? (
@@ -819,7 +939,7 @@ export default function StaffCashOperations() {
                   <button
                     type="button"
                     onClick={handleCashWithdrawal}
-                    disabled={txLoading !== null || !accountDetails}
+                    disabled={txLoading !== null || !accountDetails || !drawerStatus.isOpen}
                     className="inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 active:scale-95 text-white font-bold text-xs sm:text-sm shadow-md shadow-rose-600/20 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {txLoading === 'withdrawal' ? (
@@ -835,11 +955,15 @@ export default function StaffCashOperations() {
                     )}
                   </button>
                 </div>
-                {!accountDetails && (
+                {!accountDetails ? (
                   <p className="text-[11px] text-amber-700 text-center font-medium">
                     ⚠️ Please verify an account first to enable cash deposit / withdrawal buttons.
                   </p>
-                )}
+                ) : !drawerStatus.isOpen ? (
+                  <p className="text-[11px] text-rose-700 text-center font-bold">
+                    🔒 Cash counter is closed for today. Shift locked until tomorrow after 12:00 AM.
+                  </p>
+                ) : null}
               </div>
 
             </div>
@@ -971,6 +1095,17 @@ export default function StaffCashOperations() {
 
             {/* Refresh Action: Always neatly aligned on top right */}
             <div className="flex items-center gap-2 self-start sm:self-auto flex-shrink-0">
+              {drawerStatus?.currentDay && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedReconciliationReport(drawerStatus.currentDay)}
+                  className="px-3.5 py-2 rounded-xl bg-teal-50 hover:bg-teal-100 border border-teal-200 shadow-2xs text-xs font-bold text-teal-800 transition-all cursor-pointer flex items-center gap-1.5 active:scale-95"
+                  title="Inspect Today's Cash Reconciliation Receipts Audit"
+                >
+                  <Receipt className="w-3.5 h-3.5 text-teal-600" />
+                  <span>Day Receipts Audit</span>
+                </button>
+              )}
               <button
                 type="button"
                 onClick={loadTransactions}
@@ -1105,19 +1240,20 @@ export default function StaffCashOperations() {
                   <th className="py-3.5 px-4">Cashier Name</th>
                   <th className="py-3.5 px-4">Date &amp; Time</th>
                   <th className="py-3.5 px-4 sm:px-6">Notes</th>
+                  <th className="py-3.5 px-4 text-center">Receipt</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {loadingTransactions ? (
                   <tr>
-                    <td colSpan={14} className="py-12 text-center text-slate-400">
+                    <td colSpan={15} className="py-12 text-center text-slate-400">
                       <Loader2 className="w-6 h-6 animate-spin text-[#00b4a7] mx-auto mb-2" />
                       <span>Loading cashier transactions...</span>
                     </td>
                   </tr>
                 ) : cashTransactions.length === 0 ? (
                   <tr>
-                    <td colSpan={14} className="py-12 text-center text-slate-400">
+                    <td colSpan={15} className="py-12 text-center text-slate-400">
                       <Receipt className="w-8 h-8 mx-auto mb-2 text-slate-300" />
                       <p className="font-semibold text-slate-600">No cash transactions recorded yet</p>
                       <p className="text-[11px] mt-0.5">Use the Counter Desk above to execute your first cash deposit or withdrawal.</p>
@@ -1125,7 +1261,7 @@ export default function StaffCashOperations() {
                   </tr>
                 ) : filteredTransactions.length === 0 ? (
                   <tr>
-                    <td colSpan={14} className="py-12 text-center text-slate-400">
+                    <td colSpan={15} className="py-12 text-center text-slate-400">
                       <Receipt className="w-8 h-8 mx-auto mb-2 text-slate-300" />
                       <p className="font-semibold text-slate-600">No cash transactions match the selected filters</p>
                       <p className="text-[11px] mt-0.5">Try clearing date ranges or resetting search terms.</p>
@@ -1195,6 +1331,17 @@ export default function StaffCashOperations() {
                           <td className="py-3.5 px-4 sm:px-6 text-slate-600 truncate max-w-[180px]">
                             {tx.notes || tx.description || 'Processed by Cashier'}
                           </td>
+                          <td className="py-3.5 px-4 text-center whitespace-nowrap">
+                            <button
+                              type="button"
+                              onClick={() => handleViewReceipt(tx)}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200 font-bold text-xs transition-all cursor-pointer shadow-2xs"
+                              title="Inspect Counter Receipts & Reconciliation Audit"
+                            >
+                              <Receipt className="w-3.5 h-3.5 text-teal-600" />
+                              <span>Receipt</span>
+                            </button>
+                          </td>
                         </tr>
                       );
                     })
@@ -1207,6 +1354,14 @@ export default function StaffCashOperations() {
     )}
 
       </div>
+
+      {/* RECONCILIATION RECEIPTS MODAL */}
+      {selectedReconciliationReport && (
+        <ReconciliationReceiptsModal
+          report={selectedReconciliationReport}
+          onClose={() => setSelectedReconciliationReport(null)}
+        />
+      )}
     </DashboardLayout>
   );
 }

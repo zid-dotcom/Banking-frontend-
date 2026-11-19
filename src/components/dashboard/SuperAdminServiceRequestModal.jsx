@@ -52,6 +52,55 @@ function normalizeStatus(st) {
   return 'pending';
 }
 
+function getSenderRoleLabel(sender, rep) {
+  const staffRoleName =
+    sender?.staff_role?.name ||
+    (typeof sender?.staff_role === 'string' ? sender.staff_role : null) ||
+    rep?.staff_role?.name ||
+    (typeof rep?.staff_role === 'string' ? rep.staff_role : null);
+  if (staffRoleName) {
+    return staffRoleName;
+  }
+
+  const role = String(
+    sender?.role ||
+    rep?.replied_by_role ||
+    rep?.author_type ||
+    rep?.role ||
+    rep?.author ||
+    ''
+  ).toLowerCase().trim();
+
+  if (role === 'branch_admin' || role === 'branch_manager') {
+    return 'Branch Manager';
+  }
+  if (role === 'super_admin' || role === 'superadmin' || role === 'admin') {
+    return 'Super Admin';
+  }
+  if (role === 'customer_service' || role === 'cso' || role.includes('customer')) {
+    return 'Customer Service Officer';
+  }
+  if (role === 'accountant') {
+    return 'Accountant';
+  }
+  if (role === 'cashier') {
+    return 'Cashier';
+  }
+  if (role === 'member') {
+    return 'Member';
+  }
+
+  if (sender?.full_name?.toLowerCase() === 'super admin') {
+    return 'Super Admin';
+  }
+
+  if (role) {
+    return role.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+  }
+
+  return rep?.is_member ? 'Member' : 'Super Admin';
+}
+
 export function SuperAdminServiceRequestModal({
   isOpen,
   onClose,
@@ -413,30 +462,19 @@ export function SuperAdminServiceRequestModal({
                 {replies.map((rep, idx) => {
                   const repId = rep.id || `rep-${idx}`;
                   const isEditingThis = editingReplyId === rep.id;
-                  const senderRole = (rep.sender?.role || rep.role || '').toLowerCase();
-                  const isStaff = senderRole !== 'member';
-                  const isSuperAdminSender =
-                    senderRole === 'super_admin' ||
-                    senderRole === 'superadmin' ||
-                    senderRole === 'admin' ||
-                    rep.author_type === 'super_admin' ||
-                    rep.sender?.full_name?.toLowerCase() === 'super admin' ||
-                    rep.author?.toLowerCase() === 'super admin';
-
-                  const roleDisplayName =
-                    isSuperAdminSender
-                      ? 'Super Admin'
-                      : senderRole === 'branch_admin' || senderRole === 'branch_manager'
-                      ? 'Branch Manager'
-                      : isStaff
-                      ? 'Super Admin'
-                      : 'Member';
+                  const roleDisplayName = getSenderRoleLabel(rep.sender, rep);
+                  const isMember =
+                    roleDisplayName.toLowerCase() === 'member' ||
+                    rep.is_member ||
+                    rep.sender?.role === 'member';
+                  const isStaff = !isMember;
+                  const isSuperAdminSender = roleDisplayName === 'Super Admin' || roleDisplayName === 'Main Administration';
 
                   const senderName =
                     rep.sender?.full_name ||
                     rep.author ||
                     rep.sender_name ||
-                    (isSuperAdminSender ? 'Super Admin' : roleDisplayName);
+                    roleDisplayName;
 
                   return (
                     <div

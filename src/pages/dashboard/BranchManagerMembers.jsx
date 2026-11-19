@@ -18,8 +18,10 @@ import {
   XCircle,
   Check,
   Filter,
-  ShieldCheck
+  ShieldCheck,
+  Receipt
 } from 'lucide-react';
+import MemberCashTransactionsModal from '../../components/dashboard/MemberCashTransactionsModal';
 import branchMemberRegistryIllustration from '../../assets/Branch Member Registry Illustration.png';
 import {
   getBranchAdminMe,
@@ -73,6 +75,13 @@ export default function BranchManagerMembers() {
   const [selectedMember, setSelectedMember] = useState(null);
   const [rejectModal, setRejectModal] = useState({ isOpen: false, member: null, reason: '' });
   const [passwordModal, setPasswordModal] = useState({ isOpen: false, member: null, newPassword: '' });
+  const [transactionsModalOpen, setTransactionsModalOpen] = useState(false);
+  const [selectedMemberForTransactions, setSelectedMemberForTransactions] = useState(null);
+
+  const handleViewTransactions = (member) => {
+    setSelectedMemberForTransactions(member);
+    setTransactionsModalOpen(true);
+  };
 
   const [managerUser, setManagerUser] = useState(() => {
     try {
@@ -758,10 +767,20 @@ export default function BranchManagerMembers() {
                             {/* View Details Button */}
                             <button
                               onClick={() => handleViewDetails(member)}
-                              className="px-3 py-1 bg-teal-50 hover:bg-teal-100 text-[#0f766e] border border-teal-200 text-xs font-bold rounded-lg transition-colors cursor-pointer flex items-center gap-1 shadow-2xs"
+                              className="px-3 py-1 bg-teal-50 hover:bg-teal-100 text-[#0f766e] border border-teal-200 text-xs font-bold rounded-lg transition-colors cursor-pointer flex items-center gap-1 shadow-2xs whitespace-nowrap"
                             >
                               <Eye className="w-3.5 h-3.5" />
                               <span>View Details</span>
+                            </button>
+
+                            {/* View Transactions Button */}
+                            <button
+                              onClick={() => handleViewTransactions(member)}
+                              className="px-3 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold rounded-lg transition-colors cursor-pointer flex items-center gap-1 shadow-2xs whitespace-nowrap"
+                              title="View member counter cash transactions history"
+                            >
+                              <Receipt className="w-3.5 h-3.5 text-emerald-700" />
+                              <span>View Transactions</span>
                             </button>
                           </div>
                         </td>
@@ -938,6 +957,18 @@ export default function BranchManagerMembers() {
           </div>
         </div>
       )}
+
+      {/* Member Cash Transactions Modal */}
+      <MemberCashTransactionsModal
+        isOpen={transactionsModalOpen}
+        onClose={() => {
+          setTransactionsModalOpen(false);
+          setSelectedMemberForTransactions(null);
+        }}
+        member={selectedMemberForTransactions}
+        portal="branch_admin"
+        branchId={selectedMemberForTransactions?.branch_id || managerUser?.branch_id}
+      />
 
       {/* Centered Floating Toast Notification */}
       {toastMessage && (

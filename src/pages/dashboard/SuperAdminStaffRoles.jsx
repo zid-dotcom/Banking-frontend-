@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import StatCard from '../../components/dashboard/StatCard';
 import {
@@ -44,6 +45,7 @@ function formatDateTime(isoString) {
 }
 
 export default function SuperAdminStaffRoles() {
+  const navigate = useNavigate();
   const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -196,6 +198,23 @@ export default function SuperAdminStaffRoles() {
             <p className="text-slate-600 text-xs sm:text-sm mt-2.5 font-medium leading-relaxed max-w-xl">
               Manage and oversee staff roles, job titles, and organizational structure.
             </p>
+
+            {/* Navigation Tabs Pill (Staff Roles vs Staff Members) */}
+            <div className="mt-5 inline-flex items-center gap-1.5 bg-white/90 backdrop-blur-xs border border-teal-200/70 rounded-2xl p-1.5 shadow-2xs">
+              <button
+                type="button"
+                className="px-4 py-1.5 rounded-xl text-xs font-bold bg-[#00b4a7] text-white shadow-xs transition-all"
+              >
+                Staff Roles ({roles.length})
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate('/super-admin/staff')}
+                className="px-4 py-1.5 rounded-xl text-xs font-bold text-slate-600 hover:text-teal-800 hover:bg-teal-50/70 transition-all cursor-pointer"
+              >
+                Staff Members Registry
+              </button>
+            </div>
           </div>
 
           <div className="relative z-10 flex justify-end pointer-events-none -my-3 sm:-my-5 lg:-my-6 flex-shrink-0">

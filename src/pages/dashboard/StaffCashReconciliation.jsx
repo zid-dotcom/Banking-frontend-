@@ -26,7 +26,8 @@ import {
   X,
   AlertTriangle,
   Scale,
-  Receipt
+  Receipt,
+  Headset
 } from 'lucide-react';
 import staffTeamworkIllustration from '../../assets/AurumFX Office Finance Teamwork Cutout.webp';
 import { getStaffMe } from '../../services/branchStaffService';
@@ -36,6 +37,7 @@ import {
   closeStaffCashDay
 } from '../../services/cashReconciliationService';
 import AccountantCashReconciliationView from '../../components/dashboard/AccountantCashReconciliationView';
+import ReconciliationReceiptsModal from '../../components/dashboard/ReconciliationReceiptsModal';
 
 function formatCurrency(val) {
   if (val === undefined || val === null || val === '' || isNaN(val)) return '₹0.00';
@@ -96,6 +98,11 @@ export default function StaffCashReconciliation() {
 
   const roleName = String(staffData?.staff_role?.name || staffData?.account_role || staffData?.role || '').toLowerCase();
   const isAccountant = roleName.includes('accountant') || roleName.includes('auditor');
+  const isCustomerService =
+    roleName.includes('customer') ||
+    roleName.includes('cso') ||
+    roleName.includes('support') ||
+    (roleName.includes('service') && !roleName.includes('cashier'));
 
   // Cash Days Data
   const [cashDays, setCashDays] = useState([]);
@@ -103,7 +110,14 @@ export default function StaffCashReconciliation() {
   const [errorCashDays, setErrorCashDays] = useState(null);
 
   // Form states
-  const getTodayISO = () => new Date().toISOString().slice(0, 10);
+  const getTodayISO = () => {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const [openBusinessDate, setOpenBusinessDate] = useState(getTodayISO());
   const [openCashAmount, setOpenCashAmount] = useState('');
   const [openSubmitting, setOpenSubmitting] = useState(false);
@@ -119,6 +133,11 @@ export default function StaffCashReconciliation() {
   // History table filter
   const [historySearch, setHistorySearch] = useState('');
   const [historyStatusFilter, setHistoryStatusFilter] = useState('all');
+  const [historyFromDate, setHistoryFromDate] = useState('');
+  const [historyToDate, setHistoryToDate] = useState('');
+
+  // Selected Reconciliation Report for Receipts Modal
+  const [selectedReconciliationReport, setSelectedReconciliationReport] = useState(null);
 
   // Load Staff Profile
   const fetchStaffProfile = async (isManual = false) => {
@@ -138,7 +157,7 @@ export default function StaffCashReconciliation() {
 
   // Load Cash Days
   const loadCashDays = async () => {
-    if (isAccountant) {
+    if (isAccountant || isCustomerService) {
       setLoadingCashDays(false);
       return;
     }
@@ -160,8 +179,15 @@ export default function StaffCashReconciliation() {
     loadCashDays();
   }, []);
 
-  // Determine active open day (if any)
+  // Determine active open day (if any) and today's day record
+  const todayISO = getTodayISO();
   const activeOpenDay = cashDays.find((d) => String(d.status).toLowerCase() === 'open');
+  const todayDay = cashDays.find((d) => d.business_date === todayISO) || (activeOpenDay?.business_date === todayISO ? activeOpenDay : null);
+  const isTodayClosed = Boolean(
+    !activeOpenDay &&
+    todayDay &&
+    String(todayDay.status).toLowerCase() !== 'open'
+  );
   const latestDay = cashDays[0] || null;
 
   // Handle Opening Cash Day
@@ -169,6 +195,11 @@ export default function StaffCashReconciliation() {
     e.preventDefault();
     setOpenError(null);
     setOpenSuccess(null);
+
+    if (isTodayClosed && openBusinessDate <= todayISO) {
+      setOpenError("Today's cash shift has already been closed and locked. In accordance with banking security protocols, a new cash day can only be opened after 12:00 AM (tomorrow).");
+      return;
+    }
 
     const amount = Number(openCashAmount);
     if (!openBusinessDate) {
@@ -243,10 +274,18 @@ export default function StaffCashReconciliation() {
   const calculatedDiff = enteredClosingNumber !== null ? (enteredClosingNumber - activeExpectedCash) : null;
 
   // Filtered History
+  const isDateFiltered = Boolean(historyFromDate || historyToDate);
+  const effectiveFrom = isDateFiltered ? (historyFromDate || historyToDate) : todayISO;
+  const effectiveTo = isDateFiltered ? (historyToDate || historyFromDate) : todayISO;
+
   const filteredHistory = cashDays.filter((d) => {
     if (historyStatusFilter !== 'all') {
       if (String(d.status).toLowerCase() !== historyStatusFilter.toLowerCase()) return false;
     }
+    const bDate = d.business_date || String(d.opened_at || '').slice(0, 10);
+    if (effectiveFrom && bDate < effectiveFrom) return false;
+    if (effectiveTo && bDate > effectiveTo) return false;
+
     if (historySearch) {
       const s = historySearch.toLowerCase();
       const dateStr = String(d.business_date || '').toLowerCase();
@@ -259,6 +298,13 @@ export default function StaffCashReconciliation() {
     return true;
   });
 
+  const formatStaffRole = (role) => {
+    if (!role) return '';
+    const str = String(role);
+    if (/cashier\/teller/i.test(str)) return 'Cashier';
+    return str;
+  };
+
   return (
     <DashboardLayout role="staff" user={staffData} activeTab="cash_reconciliation">
       <div className="space-y-6 sm:space-y-8 animate-fadeIn">
@@ -270,7 +316,7 @@ export default function StaffCashReconciliation() {
             <div className="flex flex-wrap items-center gap-2 mb-3.5">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur-xs text-xs font-semibold border border-teal-200/80 shadow-2xs text-[#0f766e]">
                 <Briefcase className="w-3.5 h-3.5 text-[#00b4a7]" />
-                <span>Role: {staffData?.staff_role?.name || (isAccountant ? 'Branch Accountant' : 'Cashier/Teller')}</span>
+                <span>Role: {formatStaffRole(staffData?.staff_role?.name) || (isAccountant ? 'Branch Accountant' : 'Cashier')}</span>
               </div>
 
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur-xs text-xs font-semibold border border-teal-200/80 shadow-2xs text-slate-700">
@@ -372,37 +418,83 @@ export default function StaffCashReconciliation() {
           <div className="absolute -left-16 -bottom-16 w-64 h-64 rounded-full bg-teal-100/50 blur-2xl pointer-events-none" />
         </div>
 
-        {/* If Accountant, render Accountant Cash Reconciliation Review Portal */}
-        {isAccountant ? (
+        {isCustomerService ? (
+          <div className="bg-white rounded-3xl p-8 border border-slate-200/80 text-center space-y-4 shadow-xs">
+            <div className="w-14 h-14 rounded-2xl bg-teal-50 text-[#00b4a7] flex items-center justify-center mx-auto border border-teal-100">
+              <Headset className="w-7 h-7" />
+            </div>
+            <h3 className="text-xl font-serif font-bold text-slate-900">
+              Customer Service Officer Portal
+            </h3>
+            <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
+              You are signed in as a <strong>Customer Service Officer</strong>. Cash reconciliation is handled by Cashiers and Accountants. You have access to review and respond to member service requests.
+            </p>
+            <div className="pt-2">
+              <Link
+                to="/staff/service-requests"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#14b8a6] to-[#0f766e] text-white font-bold text-xs shadow-xs hover:shadow-md transition-all cursor-pointer"
+              >
+                Go to Service Requests Desk
+              </Link>
+            </div>
+          </div>
+        ) : isAccountant ? (
           <AccountantCashReconciliationView staffUser={staffData} isStandalone={true} />
         ) : (
           <>
-            {/* 4 Summary Stat Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            {/* 5 Summary Stat Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3.5 sm:gap-4">
           <StatCard
             title="Cash Day Status"
-            value={activeOpenDay ? 'Open & Active' : (latestDay?.status ? latestDay.status.toUpperCase() : 'Not Started')}
-            subtitle={activeOpenDay ? `Date: ${activeOpenDay.business_date}` : 'Drawer status'}
+            value={
+              activeOpenDay
+                ? 'Open & Active'
+                : isTodayClosed
+                ? 'Closed & Locked'
+                : todayDay
+                ? String(todayDay.status).toUpperCase()
+                : 'Not Started'
+            }
+            subtitle={
+              isTodayClosed
+                ? 'Locked until tomorrow (12:00 AM)'
+                : todayDay
+                ? `Date: ${todayDay.business_date}`
+                : `Date: ${todayISO}`
+            }
             icon={activeOpenDay ? Unlock : Lock}
-            trend={activeOpenDay ? 'Ready for operations' : 'Shift closed'}
+            trend={
+              activeOpenDay
+                ? 'Ready for operations'
+                : isTodayClosed
+                ? 'Unlocks next day 12:00 AM'
+                : 'Shift closed'
+            }
             trendType={activeOpenDay ? 'up' : 'down'}
           />
           <StatCard
-            title="Opening Drawer Float"
-            value={formatCurrency(activeOpenDay?.opening_cash ?? latestDay?.opening_cash ?? 0)}
-            subtitle="Starting physical cash"
+            title="Opening Drawer Cash"
+            value={formatCurrency(todayDay?.opening_cash ?? 0)}
+            subtitle={todayDay ? "Starting physical cash" : "No drawer opened today"}
             icon={Coins}
           />
           <StatCard
             title="Total Deposits Today"
-            value={formatCurrency(activeOpenDay?.deposit_total ?? 0)}
+            value={formatCurrency(todayDay?.deposit_total ?? 0)}
             subtitle="Member cash inflows"
             icon={ArrowDownLeft}
             trendType="up"
           />
           <StatCard
-            title="Expected Drawer Balance"
-            value={formatCurrency(activeExpectedCash)}
+            title="Withdrawal Total Today"
+            value={formatCurrency(todayDay?.withdrawal_total ?? 0)}
+            subtitle="Member cash outflows"
+            icon={ArrowUpRight}
+            trendType="down"
+          />
+          <StatCard
+            title="Expected Closing Cash"
+            value={formatCurrency(calcExpectedCash(todayDay))}
             subtitle="System cash ledger"
             icon={Scale}
             trendType="up"
@@ -425,6 +517,11 @@ export default function StaffCashReconciliation() {
                     <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
                       Day Open
+                    </span>
+                  ) : isTodayClosed ? (
+                    <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 border border-rose-200">
+                      <Lock className="w-3 h-3 text-rose-600" />
+                      Closed &amp; Locked Until 12:00 AM
                     </span>
                   ) : (
                     <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
@@ -693,8 +790,85 @@ export default function StaffCashReconciliation() {
                   </div>
                 </div>
               </div>
+            ) : isTodayClosed ? (
+              /* SCENARIO B: TODAY'S DAY IS CLOSED -> LOCKED UNTIL TOMORROW (12:00 AM) */
+              <div className="max-w-2xl mx-auto animate-fadeIn">
+                <div className="p-6 sm:p-8 rounded-3xl border border-rose-200/90 bg-gradient-to-b from-rose-50/40 via-white to-slate-50/60 shadow-xs">
+                  <div className="text-center max-w-lg mx-auto space-y-2.5 mb-6">
+                    <div className="w-16 h-16 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mx-auto border border-rose-200 shadow-2xs">
+                      <Lock className="w-8 h-8 stroke-[2.2]" />
+                    </div>
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-100 text-rose-800 font-bold text-xs border border-rose-200">
+                      <Clock className="w-3.5 h-3.5 text-rose-600" />
+                      <span>Locked Until Tomorrow (After 12:00 AM)</span>
+                    </div>
+                    <h3 className="font-serif font-black text-slate-900 text-xl sm:text-2xl pt-1">
+                      Today's Cash Shift Closed &amp; Locked
+                    </h3>
+                    <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                      Your cash drawer for today (<strong>{formatDate(todayDay?.business_date || todayISO)}</strong>) has already been closed and submitted for reconciliation.
+                      Per banking security controls, you cannot reopen or record starting cash again for today.
+                      A new cash day can only be opened <strong>after 12:00 AM</strong> on the next business date.
+                    </p>
+                  </div>
+
+                  {/* Shift Summary Breakdown */}
+                  <div className="p-4 sm:p-5 rounded-2xl bg-slate-50/90 border border-slate-200 text-xs space-y-2.5">
+                    <div className="flex items-center justify-between pb-2 border-b border-slate-200/80 font-bold">
+                      <span className="text-slate-600">Shift Business Date:</span>
+                      <span className="font-mono text-slate-900">{formatDate(todayDay?.business_date)}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-500">Starting Float Amount:</span>
+                      <span className="font-mono font-bold text-slate-800">{formatCurrency(todayDay?.opening_cash)}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-500">Total Inflows (Deposits):</span>
+                      <span className="font-mono font-bold text-emerald-700">+{formatCurrency(todayDay?.deposit_total || 0)}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-500">Total Outflows (Withdrawals):</span>
+                      <span className="font-mono font-bold text-rose-700">-{formatCurrency(todayDay?.withdrawal_total || 0)}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-500">Expected Closing Balance:</span>
+                      <span className="font-mono font-bold text-teal-900">{formatCurrency(calcExpectedCash(todayDay))}</span>
+                    </div>
+                    <div className="flex items-center justify-between pt-1 border-t border-slate-200 font-bold">
+                      <span className="text-slate-700">Counted Physical Closing:</span>
+                      <span className="font-mono text-slate-900">{formatCurrency(todayDay?.closing_cash)}</span>
+                    </div>
+                    {todayDay?.closed_at && (
+                      <div className="flex items-center justify-between pt-1 text-[11px] text-slate-500">
+                        <span>Shift Closed At:</span>
+                        <span>{formatDateTime(todayDay.closed_at)}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Lock Notice Info Banner */}
+                  <div className="mt-4 p-3.5 rounded-2xl bg-amber-50/80 border border-amber-200 text-amber-900 text-xs font-medium flex items-center gap-2.5">
+                    <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0" />
+                    <span>
+                      Next shift opens automatically tomorrow after 12:00 AM midnight. Please contact the branch manager or accountant if you need an emergency override.
+                    </span>
+                  </div>
+
+                  {/* Receipts Action Button */}
+                  <div className="pt-5 flex items-center justify-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedReconciliationReport(todayDay)}
+                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-md shadow-teal-600/20 transition-all cursor-pointer"
+                    >
+                      <Receipt className="w-4 h-4" />
+                      <span>View Today's Audit Receipts</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
             ) : (
-              /* SCENARIO B: NO ACTIVE OPEN DAY -> OPEN CASH DAY FORM */
+              /* SCENARIO C: NO ACTIVE OPEN DAY & NOT CLOSED TODAY -> OPEN CASH DAY FORM */
               <div className="max-w-2xl mx-auto">
                 <div className="p-6 sm:p-8 rounded-3xl border border-teal-200/80 bg-gradient-to-b from-teal-50/40 via-white to-slate-50/50">
                   <div className="text-center max-w-md mx-auto space-y-2 mb-6">
@@ -826,6 +1000,46 @@ export default function StaffCashReconciliation() {
                 ))}
               </div>
 
+              {/* Date Filter */}
+              <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1 bg-white px-2.5 py-1 rounded-xl border border-slate-200 shadow-2xs">
+                  <span className="text-[9px] font-black uppercase text-teal-800 bg-teal-50 px-1.5 py-0.5 rounded border border-teal-200 select-none">
+                    From
+                  </span>
+                  <input
+                    type="date"
+                    value={historyFromDate}
+                    onChange={(e) => setHistoryFromDate(e.target.value)}
+                    className="text-xs text-slate-800 font-bold focus:outline-none bg-transparent cursor-pointer"
+                  />
+                </div>
+                <div className="flex items-center gap-1 bg-white px-2.5 py-1 rounded-xl border border-slate-200 shadow-2xs">
+                  <span className="text-[9px] font-black uppercase text-teal-800 bg-teal-50 px-1.5 py-0.5 rounded border border-teal-200 select-none">
+                    To
+                  </span>
+                  <input
+                    type="date"
+                    value={historyToDate}
+                    onChange={(e) => setHistoryToDate(e.target.value)}
+                    className="text-xs text-slate-800 font-bold focus:outline-none bg-transparent cursor-pointer"
+                  />
+                </div>
+                {(historyFromDate || historyToDate) && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setHistoryFromDate('');
+                      setHistoryToDate('');
+                    }}
+                    className="px-2 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all cursor-pointer flex items-center gap-1 shadow-2xs border border-slate-200"
+                    title="Clear Date Filter"
+                  >
+                    <X className="w-3 h-3 text-slate-500" />
+                    <span className="text-[10px]">Clear</span>
+                  </button>
+                )}
+              </div>
+
               <button
                 type="button"
                 onClick={loadCashDays}
@@ -854,19 +1068,20 @@ export default function StaffCashReconciliation() {
                   <th className="py-3.5 px-4">Variance</th>
                   <th className="py-3.5 px-4">Status</th>
                   <th className="py-3.5 px-4 sm:px-6">Review / Notes</th>
+                  <th className="py-3.5 px-4 text-center">Receipts</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {loadingCashDays ? (
                   <tr>
-                    <td colSpan={11} className="py-12 text-center text-slate-400">
+                    <td colSpan={12} className="py-12 text-center text-slate-400">
                       <Loader2 className="w-6 h-6 animate-spin text-[#00b4a7] mx-auto mb-2" />
                       <span>Loading reconciliation history...</span>
                     </td>
                   </tr>
                 ) : filteredHistory.length === 0 ? (
                   <tr>
-                    <td colSpan={11} className="py-12 text-center text-slate-400">
+                    <td colSpan={12} className="py-12 text-center text-slate-400">
                       <Scale className="w-8 h-8 mx-auto mb-2 text-slate-300" />
                       <p className="font-semibold text-slate-600">No reconciliation records found</p>
                       <p className="text-[11px] mt-0.5">Your daily drawer shifts will be catalogued here.</p>
@@ -937,6 +1152,17 @@ export default function StaffCashReconciliation() {
                             'Active Shift'
                           )}
                         </td>
+                        <td className="py-3.5 px-4 text-center whitespace-nowrap">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedReconciliationReport(day)}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200 font-bold text-xs transition-all cursor-pointer shadow-2xs"
+                            title="Inspect Counter Receipts & Balance Logs"
+                          >
+                            <Receipt className="w-3.5 h-3.5 text-teal-600" />
+                            <span>Receipts</span>
+                          </button>
+                        </td>
                       </tr>
                     );
                   })
@@ -1003,6 +1229,13 @@ export default function StaffCashReconciliation() {
             </div>
           </div>
         </div>
+      )}
+      {/* RECONCILIATION RECEIPTS MODAL */}
+      {selectedReconciliationReport && (
+        <ReconciliationReceiptsModal
+          report={selectedReconciliationReport}
+          onClose={() => setSelectedReconciliationReport(null)}
+        />
       )}
     </DashboardLayout>
   );

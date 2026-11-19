@@ -104,10 +104,11 @@ export default function BranchManagerSecurityEvents() {
     setError(null);
 
     try {
+      const targetToDate = toDate || fromDate;
       const data = await getBranchAdminSecurityEvents({
         limit: 200,
-        from_date: fromDate ? new Date(fromDate).toISOString() : null,
-        to_date: toDate ? new Date(toDate).toISOString() : null,
+        from_date: fromDate ? new Date(`${fromDate}T00:00:00`).toISOString() : null,
+        to_date: targetToDate ? new Date(`${targetToDate}T23:59:59.999`).toISOString() : null,
       });
 
       setEvents(Array.isArray(data) ? data : []);

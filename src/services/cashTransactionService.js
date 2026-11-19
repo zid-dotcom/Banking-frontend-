@@ -374,3 +374,102 @@ export async function getMemberSavingsAccountTransactions(accountId, options = {
     throw error;
   }
 }
+
+/* =========================================================================
+   5. MEMBER CASH TRANSACTIONS (BRANCH ADMIN & SUPER ADMIN)
+   ========================================================================= */
+
+/**
+ * GET /branch-admin/members/{member_id}/cash-transactions
+ * Params: member_id (path), from_date, to_date, skip, limit
+ */
+export async function getBranchAdminMemberCashTransactions(memberId, options = {}) {
+  try {
+    if (!memberId) throw new Error('Member ID is required to fetch transactions.');
+    const opts = options || {};
+    const skip = opts.skip ?? 0;
+    const limit = opts.limit ?? 100;
+    const from_date = opts.from_date || opts.fromDate || '';
+    const to_date = opts.to_date || opts.toDate || '';
+
+    const params = new URLSearchParams();
+    if (skip !== undefined && skip !== null) params.append('skip', String(skip));
+    if (limit !== undefined && limit !== null) params.append('limit', String(limit));
+
+    if (from_date && to_date) {
+      params.append('from_date', String(from_date).trim());
+      params.append('to_date', String(to_date).trim());
+    } else if (from_date || to_date) {
+      const singleDate = String(from_date || to_date).trim();
+      params.append('from_date', singleDate);
+      params.append('to_date', singleDate);
+    }
+
+    const qs = params.toString() ? `?${params.toString()}` : '';
+    const res = await fetch(`${BASE_URL}/branch-admin/members/${encodeURIComponent(memberId)}/cash-transactions${qs}`, {
+      method: 'GET',
+      headers: getHeaders('branch_admin'),
+    });
+
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({}));
+      checkResponse(res, errBody, `Failed to fetch cash transactions for member #${memberId}`, 'branch_admin');
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error(`cashTransactionService.getBranchAdminMemberCashTransactions(${memberId}) error:`, error);
+    throw error;
+  }
+}
+
+/**
+ * GET /superadmin/branches/{branch_id}/members/{member_id}/cash-transactions
+ * Params: branch_id (path), member_id (path), from_date, to_date, skip, limit
+ */
+export async function getSuperAdminMemberCashTransactions(branchId, memberId, options = {}) {
+  try {
+    if (!branchId) throw new Error('Branch ID is required to fetch transactions.');
+    if (!memberId) throw new Error('Member ID is required to fetch transactions.');
+    const opts = options || {};
+    const skip = opts.skip ?? 0;
+    const limit = opts.limit ?? 100;
+    const from_date = opts.from_date || opts.fromDate || '';
+    const to_date = opts.to_date || opts.toDate || '';
+
+    const params = new URLSearchParams();
+    if (skip !== undefined && skip !== null) params.append('skip', String(skip));
+    if (limit !== undefined && limit !== null) params.append('limit', String(limit));
+
+    if (from_date && to_date) {
+      params.append('from_date', String(from_date).trim());
+      params.append('to_date', String(to_date).trim());
+    } else if (from_date || to_date) {
+      const singleDate = String(from_date || to_date).trim();
+      params.append('from_date', singleDate);
+      params.append('to_date', singleDate);
+    }
+
+    const qs = params.toString() ? `?${params.toString()}` : '';
+    const res = await fetch(`${BASE_URL}/superadmin/branches/${encodeURIComponent(branchId)}/members/${encodeURIComponent(memberId)}/cash-transactions${qs}`, {
+      method: 'GET',
+      headers: getHeaders('super_admin'),
+    });
+
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({}));
+      checkResponse(res, errBody, `Failed to fetch cash transactions for member #${memberId} at branch #${branchId}`, 'super_admin');
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error(`cashTransactionService.getSuperAdminMemberCashTransactions(branch=${branchId}, member=${memberId}) error:`, error);
+    throw error;
+  }
+}
+
+// Re-export Accountant member cash transactions
+export { getAccountantMemberCashTransactions } from './accountantMemberService';
+

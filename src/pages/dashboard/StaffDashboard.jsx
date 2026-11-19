@@ -34,6 +34,7 @@ import {
   getStaffCashTransactions
 } from '../../services/cashTransactionService';
 import AccountantCashReconciliationView from '../../components/dashboard/AccountantCashReconciliationView';
+import StaffCustomerServiceView from '../../components/dashboard/StaffCustomerServiceView';
 
 export default function StaffDashboard() {
   const navigate = useNavigate();
@@ -51,6 +52,12 @@ export default function StaffDashboard() {
 
   const roleStr = String(staffData?.staff_role?.name || staffData?.account_role || staffData?.role || '').toLowerCase();
   const isAccountant = roleStr.includes('accountant') || roleStr.includes('auditor');
+  const isCustomerService =
+    roleStr.includes('customer') ||
+    roleStr.includes('cso') ||
+    roleStr.includes('support') ||
+    (roleStr.includes('service') && !roleStr.includes('cashier'));
+  const isCashier = !isAccountant && !isCustomerService;
 
   // Cashier Operations Counter state
   const [accountLookupNumber, setAccountLookupNumber] = useState('');
@@ -93,13 +100,9 @@ export default function StaffDashboard() {
   };
 
   const loadTransactions = async () => {
-    // If accountant, skip loading cashier-only transactions
-    if (isAccountant) return;
+    // If accountant or customer service, skip loading cashier-only transactions
+    if (!isCashier) return;
 
-    // Backend requires both from_date and to_date together for a date range query.
-    if ((fromDate && !toDate) || (!fromDate && toDate)) {
-      return;
-    }
     if (fromDate && toDate && fromDate > toDate) {
       return;
     }
@@ -110,6 +113,10 @@ export default function StaffDashboard() {
       if (fromDate && toDate) {
         params.from_date = fromDate;
         params.to_date = toDate;
+      } else if (fromDate || toDate) {
+        const targetDate = fromDate || toDate;
+        params.from_date = targetDate;
+        params.to_date = targetDate;
       }
       const data = await getStaffCashTransactions(params);
       setCashTransactions(Array.isArray(data) ? data : []);
@@ -298,6 +305,10 @@ export default function StaffDashboard() {
     if (txTypeFilter === 'withdrawal' && !type.includes('withdrawal') && !type.includes('debit')) return false;
 
     // Date range filtering
+    const isDateFiltered = Boolean(fromDate || toDate);
+    const effectiveFrom = isDateFiltered ? (fromDate || toDate) : '';
+    const effectiveTo = isDateFiltered ? (toDate || fromDate) : '';
+
     const rawDate = tx.created_at || tx.timestamp || tx.date;
     if (rawDate) {
       const d = new Date(rawDate);
@@ -310,8 +321,8 @@ export default function StaffDashboard() {
       } else {
         localDateStr = String(rawDate).slice(0, 10);
       }
-      if (fromDate && localDateStr < fromDate) return false;
-      if (toDate && localDateStr > toDate) return false;
+      if (effectiveFrom && localDateStr < effectiveFrom) return false;
+      if (effectiveTo && localDateStr > effectiveTo) return false;
     }
 
     if (txSearch) {
@@ -338,6 +349,13 @@ export default function StaffDashboard() {
     return true;
   });
 
+  const formatStaffRole = (role) => {
+    if (!role) return '';
+    const str = String(role);
+    if (/cashier\/teller/i.test(str)) return 'Cashier';
+    return str;
+  };
+
   // User payload for layout and sidebar
   const layoutUser = {
     name: staffData?.full_name || 'Staff Member',
@@ -347,7 +365,7 @@ export default function StaffDashboard() {
     avatarText: staffData?.full_name
       ? staffData.full_name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase()
       : 'ST',
-    role: staffData?.staff_role?.name || staffData?.account_role || 'Branch Staff',
+    role: formatStaffRole(staffData?.staff_role?.name || staffData?.account_role) || 'Branch Staff',
     staff_role: staffData?.staff_role,
     branch: staffData?.branch?.name || 'Society Branch',
     branch_name: staffData?.branch?.name || 'Society Branch',
@@ -368,7 +386,7 @@ export default function StaffDashboard() {
             <div className="flex flex-wrap items-center gap-2 mb-3.5">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur-xs text-xs font-semibold border border-teal-200/80 shadow-2xs text-[#0f766e]">
                 <Briefcase className="w-3.5 h-3.5 text-[#00b4a7]" />
-                <span>Role: {staffData?.staff_role?.name || 'Staff Member'}</span>
+                <span>Role: {formatStaffRole(staffData?.staff_role?.name) || (isCustomerService ? 'Customer Service Officer' : isAccountant ? 'Accountant' : 'Cashier')}</span>
               </div>
 
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur-xs text-xs font-semibold border border-teal-200/80 shadow-2xs text-slate-700">
@@ -388,7 +406,7 @@ export default function StaffDashboard() {
             <div className="flex items-center gap-3">
               <span className="w-1.5 h-8 sm:h-9 bg-[#00b4a7] rounded-full flex-shrink-0" />
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
-                <span>Welcome, {staffData?.staff_role?.name || 'Staff Member'}</span>
+                <span>Welcome, {formatStaffRole(staffData?.staff_role?.name) || (isCustomerService ? 'Customer Service Officer' : isAccountant ? 'Accountant' : 'Cashier')}</span>
                 <span className="inline-block text-2xl sm:text-3xl">👋</span>
               </h1>
             </div>
@@ -510,7 +528,7 @@ export default function StaffDashboard() {
                 </div>
               </div>
               <h3 className="text-lg sm:text-xl font-black text-slate-900 truncate">
-                {staffData.staff_role?.name || 'Staff Officer'}
+                {formatStaffRole(staffData.staff_role?.name) || (isCustomerService ? 'Customer Service Officer' : isAccountant ? 'Accountant' : 'Cashier')}
               </h3>
               <p className="text-xs text-slate-500 mt-1 font-mono">
                 Staff ID: {staffData.staff_code || `STF-${staffData.staff_id}`}
@@ -582,9 +600,16 @@ export default function StaffDashboard() {
         )}
 
         {/* =========================================================================
-            CASHIER COUNTER & CASH OPERATIONS DESK (POST deposits/withdrawals & GET lookup)
+            CUSTOMER SERVICE OFFICER DESK (FOR CUSTOMER SERVICE OFFICER ONLY)
            ========================================================================= */}
-        {staffData && !isAccountant && (
+        {staffData && isCustomerService && (
+          <StaffCustomerServiceView staffUser={staffData} showBanner={false} />
+        )}
+
+        {/* =========================================================================
+            CASHIER COUNTER & CASH OPERATIONS DESK (FOR CASHIERS ONLY)
+           ========================================================================= */}
+        {staffData && isCashier && (
           <div className="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
             {/* Header */}
             <div className="p-5 sm:p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-teal-50/70 via-white to-emerald-50/40">
@@ -924,9 +949,9 @@ export default function StaffDashboard() {
         )}
 
         {/* =========================================================================
-            MY CASH TRANSACTIONS LEDGER (GET /staff/cash-transactions)
+            MY CASH TRANSACTIONS LEDGER (FOR CASHIERS ONLY)
            ========================================================================= */}
-        {staffData && !isAccountant && (
+        {staffData && isCashier && (
           <div className="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
             {/* Panel Header: Title, Count badge, and Clean Refresh Action */}
             <div className="p-5 sm:p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">

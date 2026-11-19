@@ -99,10 +99,6 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
 
   // Fetch all reports
   const fetchReports = async () => {
-    // If one date is set without the other, wait for both if user is picking a range
-    if ((fromDate && !toDate) || (!fromDate && toDate)) {
-      return;
-    }
     if (fromDate && toDate && fromDate > toDate) {
       setError('"From" date cannot be after "To" date.');
       return;
@@ -115,6 +111,10 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
       if (fromDate && toDate) {
         params.from_date = fromDate;
         params.to_date = toDate;
+      } else if (fromDate || toDate) {
+        const targetDate = fromDate || toDate;
+        params.from_date = targetDate;
+        params.to_date = targetDate;
       }
       const data = await listAccountantCashReconciliations(params);
       setReports(Array.isArray(data) ? data : []);
@@ -231,6 +231,18 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
     return !isReportReviewed(r);
   };
 
+  const getTodayISO = () => {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const isDateFiltered = Boolean(fromDate || toDate);
+  const effectiveFrom = isDateFiltered ? (fromDate || toDate) : getTodayISO();
+  const effectiveTo = isDateFiltered ? (toDate || fromDate) : getTodayISO();
+
   // Client-side filtering
   const filteredReports = reports.filter((r) => {
     if (statusFilter === 'pending') {
@@ -241,6 +253,13 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
     }
     if (statusFilter === 'reviewed') {
       if (!isReportReviewed(r)) return false;
+    }
+
+    // Date filtering (defaults to today's date if no date range is manually set)
+    const reportDate = r.business_date || String(r.opened_at || '').slice(0, 10);
+    if (reportDate) {
+      if (effectiveFrom && reportDate < effectiveFrom) return false;
+      if (effectiveTo && reportDate > effectiveTo) return false;
     }
 
     // Search filter
@@ -257,20 +276,23 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
     return true;
   });
 
-  // Overview metrics & Totals
-  const pendingReviewsCount = reports.filter(isReportPending).length;
-  const cashMismatchCount = reports.filter(isReportMismatch).length;
-  const reviewedCount = reports.filter(isReportReviewed).length;
+  const hasDateFilter = Boolean(fromDate || toDate);
+  const targetReportsForCards = filteredReports;
 
-  const totalOpeningCash = reports.reduce((acc, r) => acc + Number(r.opening_cash || 0), 0);
-  const totalClosingCash = reports.reduce((acc, r) => acc + Number(r.closing_cash || 0), 0);
-  const totalDeposit = reports.reduce((acc, r) => acc + Number(r.deposit_total || 0), 0);
-  const totalExpectedClosingCash = reports.reduce((acc, r) => acc + Number(r.expected_closing_cash || 0), 0);
+  const pendingReviewsCount = targetReportsForCards.filter(isReportPending).length;
+  const cashMismatchCount = targetReportsForCards.filter(isReportMismatch).length;
+  const reviewedCount = targetReportsForCards.filter(isReportReviewed).length;
+
+  const totalOpeningCash = targetReportsForCards.reduce((acc, r) => acc + Number(r.opening_cash || 0), 0);
+  const totalClosingCash = targetReportsForCards.reduce((acc, r) => acc + Number(r.closing_cash || 0), 0);
+  const totalDeposit = targetReportsForCards.reduce((acc, r) => acc + Number(r.deposit_total || 0), 0);
+  const totalWithdrawal = targetReportsForCards.reduce((acc, r) => acc + Number(r.withdrawal_total || 0), 0);
+  const totalExpectedClosingCash = targetReportsForCards.reduce((acc, r) => acc + Number(r.expected_closing_cash || 0), 0);
 
   return (
     <div className="space-y-6">
-      {/* 5 Overview Stat Cards: Pending + 4 Cash Metrics */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      {/* 6 Overview Stat Cards: Pending + 5 Cash Metrics */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
         {/* 1. Pending Reviews */}
         <StatCard
           title="Pending Reviews"
@@ -285,9 +307,9 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
         <StatCard
           title="Opening Cash"
           value={formatCurrency(totalOpeningCash)}
-          subtitle="Starting drawer float"
+          subtitle={hasDateFilter ? 'Filtered opening float' : "Today's opening float"}
           icon={Wallet}
-          trend="Opening Float"
+          trend={hasDateFilter ? 'Selected Float' : 'Opening Float'}
           trendType="neutral"
         />
 
@@ -295,29 +317,39 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
         <StatCard
           title="Closing Cash"
           value={formatCurrency(totalClosingCash)}
-          subtitle="Physical cash counted"
+          subtitle={hasDateFilter ? 'Filtered closing cash' : "Today's closing cash"}
           icon={Coins}
-          trend="Physical Cash"
+          trend={hasDateFilter ? 'Selected Cash' : 'Physical Cash'}
           trendType="neutral"
         />
 
-        {/* 4. Deposit Total */}
+        {/* 4. Total Deposits Today */}
         <StatCard
-          title="Deposit Total"
+          title={hasDateFilter ? "Total Deposits" : "Total Deposits Today"}
           value={formatCurrency(totalDeposit)}
-          subtitle="Counter cash inflows"
+          subtitle={hasDateFilter ? 'Filtered counter inflows' : "Today's counter inflows"}
           icon={ArrowDownLeft}
           trend="Cash Inflow"
           trendType="up"
         />
 
-        {/* 5. Expected Closing Cash */}
+        {/* 5. Withdrawal Total Today */}
+        <StatCard
+          title={hasDateFilter ? "Withdrawal Total" : "Withdrawal Total Today"}
+          value={formatCurrency(totalWithdrawal)}
+          subtitle={hasDateFilter ? 'Filtered counter outflows' : "Today's counter outflows"}
+          icon={ArrowUpRight}
+          trend="Cash Outflow"
+          trendType="down"
+        />
+
+        {/* 6. Expected Closing Cash */}
         <StatCard
           title="Expected Closing Cash"
           value={formatCurrency(totalExpectedClosingCash)}
-          subtitle="Calculated closing cash"
+          subtitle={hasDateFilter ? 'Filtered expected balance' : "Today's expected float"}
           icon={Calculator}
-          trend="Expected Float"
+          trend={hasDateFilter ? 'Selected Float' : 'Expected Float'}
           trendType="neutral"
         />
       </div>

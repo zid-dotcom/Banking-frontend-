@@ -57,12 +57,15 @@ export default function DashboardHeader({
 
   const resolvedFirstName = resolvedHeaderName.split(' ')[0] || resolvedHeaderName;
 
-  const resolvedHeaderRole =
+  const rawHeaderRole =
     user?.staff_role?.name ||
     user?.account_role ||
     user?.role_name ||
     user?.role ||
     (role === 'super_admin' ? 'Super Admin' : role === 'staff' ? 'Staff' : role === 'branch_manager' ? 'Branch Manager' : 'Verified');
+
+  const resolvedHeaderRole =
+    /cashier\/teller/i.test(String(rawHeaderRole)) ? 'Cashier' : rawHeaderRole;
 
   const resolvedHeaderEmail = user?.email || '';
 

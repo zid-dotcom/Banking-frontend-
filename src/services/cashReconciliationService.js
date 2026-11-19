@@ -263,12 +263,17 @@ export async function reviewAccountantCashReconciliation(reportId, { explanation
   }
 }
 
+/* =========================================================================
+   3. BRANCH ADMIN CASH RECONCILIATIONS
+   ========================================================================= */
+
 /**
  * GET /branch-admin/cash-reconciliations/daily-report?business_date=YYYY-MM-DD
  */
 export async function getBranchDailyCashReport(businessDate) {
   try {
-    const res = await fetch(`${BASE_URL}/branch-admin/cash-reconciliations/daily-report?business_date=${businessDate}`, {
+    const qs = businessDate ? `?business_date=${encodeURIComponent(businessDate)}` : '';
+    const res = await fetch(`${BASE_URL}/branch-admin/cash-reconciliations/daily-report${qs}`, {
       method: 'GET',
       headers: getHeaders('branch_admin'),
     });
@@ -281,6 +286,206 @@ export async function getBranchDailyCashReport(businessDate) {
     return await res.json();
   } catch (error) {
     console.error('cashReconciliationService.getBranchDailyCashReport error:', error);
+    throw error;
+  }
+}
+
+/**
+ * GET /branch-admin/cash-reconciliations/range-report?from_date=YYYY-MM-DD&to_date=YYYY-MM-DD&skip=0&limit=31
+ */
+export async function getBranchRangeCashReport({ from_date, to_date, skip = 0, limit = 31 }) {
+  try {
+    const params = new URLSearchParams();
+    if (from_date) params.append('from_date', String(from_date).trim());
+    if (to_date) params.append('to_date', String(to_date).trim());
+    if (skip !== undefined && skip !== null) params.append('skip', String(skip));
+    if (limit !== undefined && limit !== null) params.append('limit', String(limit));
+
+    const res = await fetch(`${BASE_URL}/branch-admin/cash-reconciliations/range-report?${params.toString()}`, {
+      method: 'GET',
+      headers: getHeaders('branch_admin'),
+    });
+
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({}));
+      checkResponse(res, errBody, 'Failed to fetch branch range cash report', 'branch_admin');
+    }
+
+    const data = await res.json();
+    return Array.isArray(data) ? data : [];
+  } catch (error) {
+    console.error('cashReconciliationService.getBranchRangeCashReport error:', error);
+    throw error;
+  }
+}
+
+/**
+ * GET /branch-admin/cash-reconciliations/{report_id}
+ * Full report with transaction details & decision history
+ */
+export async function getBranchAdminCashReconciliation(reportId) {
+  try {
+    if (!reportId) throw new Error('Report ID is required.');
+    const res = await fetch(`${BASE_URL}/branch-admin/cash-reconciliations/${encodeURIComponent(reportId)}`, {
+      method: 'GET',
+      headers: getHeaders('branch_admin'),
+    });
+
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({}));
+      checkResponse(res, errBody, 'Failed to fetch branch reconciliation report details', 'branch_admin');
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error('cashReconciliationService.getBranchAdminCashReconciliation error:', error);
+    throw error;
+  }
+}
+
+/**
+ * PATCH /branch-admin/cash-reconciliations/{report_id}/decision
+ * Body: { decision: 'resolved' | 'escalated', explanation: string }
+ */
+export async function decideBranchAdminCashReconciliation(reportId, { decision, explanation }) {
+  try {
+    if (!reportId) throw new Error('Report ID is required.');
+    const payload = {
+      decision, // 'resolved' | 'escalated'
+      explanation: String(explanation || '').trim()
+    };
+
+    const res = await fetch(`${BASE_URL}/branch-admin/cash-reconciliations/${encodeURIComponent(reportId)}/decision`, {
+      method: 'PATCH',
+      headers: getHeaders('branch_admin'),
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({}));
+      checkResponse(res, errBody, 'Failed to submit branch admin reconciliation decision', 'branch_admin');
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error('cashReconciliationService.decideBranchAdminCashReconciliation error:', error);
+    throw error;
+  }
+}
+
+/* =========================================================================
+   4. SUPER ADMIN CASH RECONCILIATIONS
+   ========================================================================= */
+
+/**
+ * GET /superadmin/cash-reconciliations/daily-report?business_date=YYYY-MM-DD&branch_id=...&skip=0&limit=100
+ */
+export async function getSuperAdminDailyCashReports({ business_date, branch_id, skip = 0, limit = 100 } = {}) {
+  try {
+    const params = new URLSearchParams();
+    if (business_date) params.append('business_date', String(business_date).trim());
+    if (branch_id && branch_id !== 'all') params.append('branch_id', String(branch_id));
+    if (skip !== undefined && skip !== null) params.append('skip', String(skip));
+    if (limit !== undefined && limit !== null) params.append('limit', String(limit));
+
+    const res = await fetch(`${BASE_URL}/superadmin/cash-reconciliations/daily-report?${params.toString()}`, {
+      method: 'GET',
+      headers: getHeaders('super_admin'),
+    });
+
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({}));
+      checkResponse(res, errBody, 'Failed to fetch superadmin daily cash reports', 'super_admin');
+    }
+
+    const data = await res.json();
+    return Array.isArray(data) ? data : [];
+  } catch (error) {
+    console.error('cashReconciliationService.getSuperAdminDailyCashReports error:', error);
+    throw error;
+  }
+}
+
+/**
+ * GET /superadmin/cash-reconciliations/range-report?from_date=YYYY-MM-DD&to_date=YYYY-MM-DD&branch_id=...&skip=0&limit=100
+ */
+export async function getSuperAdminRangeCashReports({ from_date, to_date, branch_id, skip = 0, limit = 100 } = {}) {
+  try {
+    const params = new URLSearchParams();
+    if (from_date) params.append('from_date', String(from_date).trim());
+    if (to_date) params.append('to_date', String(to_date).trim());
+    if (branch_id && branch_id !== 'all') params.append('branch_id', String(branch_id));
+    if (skip !== undefined && skip !== null) params.append('skip', String(skip));
+    if (limit !== undefined && limit !== null) params.append('limit', String(limit));
+
+    const res = await fetch(`${BASE_URL}/superadmin/cash-reconciliations/range-report?${params.toString()}`, {
+      method: 'GET',
+      headers: getHeaders('super_admin'),
+    });
+
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({}));
+      checkResponse(res, errBody, 'Failed to fetch superadmin range cash reports', 'super_admin');
+    }
+
+    const data = await res.json();
+    return Array.isArray(data) ? data : [];
+  } catch (error) {
+    console.error('cashReconciliationService.getSuperAdminRangeCashReports error:', error);
+    throw error;
+  }
+}
+
+/**
+ * GET /superadmin/cash-reconciliations/{report_id}
+ * Full report with transaction history & decision records
+ */
+export async function getSuperAdminCashReconciliation(reportId) {
+  try {
+    if (!reportId) throw new Error('Report ID is required.');
+    const res = await fetch(`${BASE_URL}/superadmin/cash-reconciliations/${encodeURIComponent(reportId)}`, {
+      method: 'GET',
+      headers: getHeaders('super_admin'),
+    });
+
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({}));
+      checkResponse(res, errBody, 'Failed to fetch superadmin reconciliation report details', 'super_admin');
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error('cashReconciliationService.getSuperAdminCashReconciliation error:', error);
+    throw error;
+  }
+}
+
+/**
+ * PATCH /superadmin/cash-reconciliations/{report_id}/decision
+ * Body: { decision: 'resolved' | 'returned_to_branch', explanation: string }
+ */
+export async function decideSuperAdminCashReconciliation(reportId, { decision, explanation }) {
+  try {
+    if (!reportId) throw new Error('Report ID is required.');
+    const payload = {
+      decision, // 'resolved' | 'returned_to_branch'
+      explanation: String(explanation || '').trim()
+    };
+
+    const res = await fetch(`${BASE_URL}/superadmin/cash-reconciliations/${encodeURIComponent(reportId)}/decision`, {
+      method: 'PATCH',
+      headers: getHeaders('super_admin'),
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({}));
+      checkResponse(res, errBody, 'Failed to submit superadmin reconciliation decision', 'super_admin');
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error('cashReconciliationService.decideSuperAdminCashReconciliation error:', error);
     throw error;
   }
 }

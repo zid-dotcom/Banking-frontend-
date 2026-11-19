@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import StatCard from '../../components/dashboard/StatCard';
 import { getBranchAdminCashTransactions } from '../../services/cashTransactionService';
@@ -19,7 +20,8 @@ import {
   User,
   Clock,
   CheckCircle2,
-  X
+  X,
+  Scale
 } from 'lucide-react';
 import bankTechScene from '../../assets/AurumFX Cooperative Bank Technology Scene.png';
 
@@ -162,13 +164,6 @@ export default function BranchManagerCashTransactions() {
 
   // Fetch branch cash transactions
   const fetchCashTransactions = async () => {
-    // Backend requires both from_date and to_date together for a date range query.
-    // If only one date is currently selected, wait for the other without throwing a premature backend error.
-    if ((fromDate && !toDate) || (!fromDate && toDate)) {
-      setErrorCashTransactions(null);
-      return;
-    }
-
     if (fromDate && toDate && fromDate > toDate) {
       setErrorCashTransactions('"From" date cannot be after "To" date.');
       return;
@@ -181,6 +176,10 @@ export default function BranchManagerCashTransactions() {
       if (fromDate && toDate) {
         params.from_date = fromDate;
         params.to_date = toDate;
+      } else if (fromDate || toDate) {
+        const targetDate = fromDate || toDate;
+        params.from_date = targetDate;
+        params.to_date = targetDate;
       }
       const data = await getBranchAdminCashTransactions(params);
       setCashTransactions(Array.isArray(data) ? data : []);
@@ -196,13 +195,25 @@ export default function BranchManagerCashTransactions() {
     fetchCashTransactions();
   }, [fromDate, toDate]);
 
+  const getTodayISO = () => {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const isDateFiltered = Boolean(fromDate || toDate);
+  const effectiveFrom = isDateFiltered ? (fromDate || toDate) : getTodayISO();
+  const effectiveTo = isDateFiltered ? (toDate || fromDate) : getTodayISO();
+
   // Filtered transactions
   const filteredTransactions = cashTransactions.filter((tx) => {
     const type = String(tx.transaction_type || tx.type || '').toLowerCase();
     if (cashTxFilter === 'deposit' && !type.includes('deposit') && !type.includes('credit')) return false;
     if (cashTxFilter === 'withdrawal' && !type.includes('withdrawal') && !type.includes('debit')) return false;
 
-    // Date range filtering
+    // Date range filtering (defaults to today's date if no date range is manually set)
     const rawDate = tx.created_at || tx.timestamp || tx.date;
     if (rawDate) {
       const d = new Date(rawDate);
@@ -215,8 +226,8 @@ export default function BranchManagerCashTransactions() {
       } else {
         localDateStr = String(rawDate).slice(0, 10);
       }
-      if (fromDate && localDateStr < fromDate) return false;
-      if (toDate && localDateStr > toDate) return false;
+      if (effectiveFrom && localDateStr < effectiveFrom) return false;
+      if (effectiveTo && localDateStr > effectiveTo) return false;
     }
 
     if (cashTxSearch) {
@@ -243,15 +254,19 @@ export default function BranchManagerCashTransactions() {
     return true;
   });
 
-  // Calculations for Stat Cards based on filteredTransactions
-  const totalDeposits = filteredTransactions
+  const hasDateFilter = Boolean(fromDate && toDate);
+  const cardTransactions = filteredTransactions;
+
+  const cardTxCount = cardTransactions.length;
+
+  const totalDeposits = cardTransactions
     .filter((tx) => {
       const type = String(tx.transaction_type || tx.type || '').toLowerCase();
       return type.includes('deposit') || type.includes('credit');
     })
     .reduce((sum, tx) => sum + (Number(tx.amount) || 0), 0);
 
-  const totalWithdrawals = filteredTransactions
+  const totalWithdrawals = cardTransactions
     .filter((tx) => {
       const type = String(tx.transaction_type || tx.type || '').toLowerCase();
       return type.includes('withdrawal') || type.includes('debit');
@@ -347,26 +362,44 @@ export default function BranchManagerCashTransactions() {
           <div className="absolute -left-16 -bottom-16 w-64 h-64 rounded-full bg-teal-100/50 blur-2xl pointer-events-none" />
         </div>
 
+        {/* Tab Navigation: Toggle between Cash Transactions and Cash Reconciliation */}
+        <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
+          <button
+            type="button"
+            className="px-4 py-2 rounded-xl text-xs font-bold bg-[#00b4a7] text-white shadow-sm flex items-center gap-2"
+          >
+            <Coins className="w-4 h-4" />
+            <span>Cash Transactions Ledger</span>
+          </button>
+          <Link
+            to="/branch-manager/cash-reconciliation"
+            className="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all flex items-center gap-2"
+          >
+            <Scale className="w-4 h-4 text-slate-400" />
+            <span>Cash Reconciliation Audit Desk</span>
+          </Link>
+        </div>
+
         {/* 4 Summary Stat Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <StatCard
             title="Total Cash Deposits"
             value={formatCurrency(totalDeposits)}
-            subtitle="Branch counter inflows"
+            subtitle={hasDateFilter ? 'Filtered counter inflows' : "Today's counter inflows"}
             icon={ArrowDownLeft}
             trendType="up"
           />
           <StatCard
             title="Total Cash Withdrawals"
             value={formatCurrency(totalWithdrawals)}
-            subtitle="Counter cash releases"
+            subtitle={hasDateFilter ? 'Filtered counter releases' : "Today's counter releases"}
             icon={ArrowUpRight}
             trendType="down"
           />
           <StatCard
             title="Total Transactions"
-            value={filteredTransactions.length.toString()}
-            subtitle="All cashier transactions"
+            value={cardTxCount.toString()}
+            subtitle={hasDateFilter ? 'Filtered cashier transactions' : "Today's cashier transactions"}
             icon={Coins}
             trend="Branch Operations"
             trendType="up"

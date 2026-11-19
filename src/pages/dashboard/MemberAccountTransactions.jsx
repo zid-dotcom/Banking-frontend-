@@ -175,10 +175,14 @@ export default function MemberAccountTransactions() {
     setErrorTx(null);
     try {
       const opts = { limit: 100 };
-      // Only send date range when both from_date and to_date are provided
+      // Send date range or single date query
       if (fromDate && toDate && fromDate.trim() && toDate.trim()) {
         opts.from_date = fromDate.trim();
         opts.to_date = toDate.trim();
+      } else if (fromDate || toDate) {
+        const targetDate = (fromDate || toDate).trim();
+        opts.from_date = targetDate;
+        opts.to_date = targetDate;
       }
       const data = await getMemberSavingsAccountTransactions(accId, opts);
       setTransactions(Array.isArray(data) ? data : []);
@@ -199,6 +203,18 @@ export default function MemberAccountTransactions() {
 
   const currentAccount = accounts.find((a) => a.id === selectedAccountId) || accounts[0] || null;
 
+  const getTodayISO = () => {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const isDateFiltered = Boolean(fromDate || toDate);
+  const effectiveFrom = isDateFiltered ? (fromDate || toDate) : getTodayISO();
+  const effectiveTo = isDateFiltered ? (toDate || fromDate) : getTodayISO();
+
   // Filter transactions with live date, type, and keyword matching
   const filteredTransactions = transactions.filter((tx) => {
     const isDeposit =
@@ -208,7 +224,7 @@ export default function MemberAccountTransactions() {
     if (typeFilter === 'deposits' && !isDeposit) return false;
     if (typeFilter === 'withdrawals' && isDeposit) return false;
 
-    // Date Range Filtering
+    // Date Range Filtering (defaults to today's date if no date range is manually set)
     const rawDate = tx.created_at || tx.timestamp || tx.date;
     if (rawDate) {
       const d = new Date(rawDate);
@@ -222,8 +238,8 @@ export default function MemberAccountTransactions() {
         localDateStr = String(rawDate).slice(0, 10);
       }
 
-      if (fromDate && localDateStr < fromDate) return false;
-      if (toDate && localDateStr > toDate) return false;
+      if (effectiveFrom && localDateStr < effectiveFrom) return false;
+      if (effectiveTo && localDateStr > effectiveTo) return false;
     }
 
     if (searchQuery && searchQuery.trim()) {
@@ -239,7 +255,10 @@ export default function MemberAccountTransactions() {
     return true;
   });
 
-  const totalDepositsAmount = filteredTransactions
+  const hasDateFilter = Boolean(fromDate && toDate);
+  const cardTransactions = filteredTransactions;
+
+  const totalDepositsAmount = cardTransactions
     .filter((tx) => {
       const isDeposit =
         String(tx.transaction_type || tx.type || '').toLowerCase().includes('deposit') ||
@@ -248,14 +267,14 @@ export default function MemberAccountTransactions() {
     })
     .reduce((sum, tx) => sum + (Number(tx.amount) || 0), 0);
 
-  const totalDepositsCount = filteredTransactions.filter((tx) => {
+  const totalDepositsCount = cardTransactions.filter((tx) => {
     const isDeposit =
       String(tx.transaction_type || tx.type || '').toLowerCase().includes('deposit') ||
       String(tx.transaction_type || tx.type || '').toLowerCase().includes('credit');
     return isDeposit;
   }).length;
 
-  const totalWithdrawalsAmount = filteredTransactions
+  const totalWithdrawalsAmount = cardTransactions
     .filter((tx) => {
       const isWithdrawal =
         String(tx.transaction_type || tx.type || '').toLowerCase().includes('withdrawal') ||
@@ -264,12 +283,14 @@ export default function MemberAccountTransactions() {
     })
     .reduce((sum, tx) => sum + (Number(tx.amount) || 0), 0);
 
-  const totalWithdrawalsCount = filteredTransactions.filter((tx) => {
+  const totalWithdrawalsCount = cardTransactions.filter((tx) => {
     const isWithdrawal =
       String(tx.transaction_type || tx.type || '').toLowerCase().includes('withdrawal') ||
       String(tx.transaction_type || tx.type || '').toLowerCase().includes('debit');
     return isWithdrawal;
   }).length;
+
+  const totalTxCount = cardTransactions.length;
 
   return (
     <DashboardLayout
@@ -404,7 +425,7 @@ export default function MemberAccountTransactions() {
           <StatCard
             title="Total Cash Deposits"
             value={formatCurrency(totalDepositsAmount)}
-            subtitle={`${totalDepositsCount} deposit transactions`}
+            subtitle={`${totalDepositsCount} deposits ${hasDateFilter ? '(filtered)' : '(today)'}`}
             icon={ArrowDownLeft}
             trend="Cash Desk Inflows"
             trendType="up"
@@ -412,15 +433,15 @@ export default function MemberAccountTransactions() {
           <StatCard
             title="Total Cash Withdrawals"
             value={formatCurrency(totalWithdrawalsAmount)}
-            subtitle={`${totalWithdrawalsCount} withdrawal transactions`}
+            subtitle={`${totalWithdrawalsCount} withdrawals ${hasDateFilter ? '(filtered)' : '(today)'}`}
             icon={ArrowUpRight}
             trend="Counter Cash Releases"
             trendType="down"
           />
           <StatCard
             title="Total Transactions"
-            value={String(filteredTransactions.length)}
-            subtitle="Passbook Entries"
+            value={totalTxCount.toString()}
+            subtitle={hasDateFilter ? 'Filtered ledger entries' : "Today's ledger entries"}
             icon={Coins}
             trend="Verified Ledger Count"
             trendType="neutral"

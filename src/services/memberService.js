@@ -431,5 +431,16 @@ export {
   submitMemberNominee,
 } from './nomineeService';
 
+/**
+ * 17. Accountant Branch Member APIs
+ * - GET /staff/accountant/members
+ * - GET /staff/accountant/members/{member_id}
+ */
+export {
+  listAccountantMembers,
+  getAccountantMember,
+} from './accountantMemberService';
+
+
 
 

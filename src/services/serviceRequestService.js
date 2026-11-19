@@ -498,6 +498,187 @@ export async function updateSuperAdminServiceRequestStatus(requestId, status) {
   }
 }
 
+/* =========================================================================
+   4. STAFF - CUSTOMER SERVICE OFFICER SERVICE REQUESTS
+   ========================================================================= */
+
+function getStaffHeaders() {
+  const headers = {
+    'Content-Type': 'application/json',
+    'ngrok-skip-browser-warning': 'true',
+    'Accept': 'application/json',
+  };
+
+  const token =
+    localStorage.getItem('staff_token') ||
+    localStorage.getItem('token') ||
+    localStorage.getItem('access_token') ||
+    localStorage.getItem('auth_token');
+
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  return headers;
+}
+
+/**
+ * 14. GET /staff/customer-service/service-requests
+ * Query params: skip, limit, status ('pending' | 'in_progress' | 'solved')
+ */
+export async function getStaffCustomerServiceRequests({ skip = 0, limit = 50, status } = {}) {
+  try {
+    const safeLimit = Math.min(Math.max(Number(limit) || 50, 1), 100);
+    const params = new URLSearchParams();
+    if (skip !== undefined && skip !== null) params.append('skip', String(skip));
+    params.append('limit', String(safeLimit));
+
+    if (status && status !== 'all') {
+      let st = String(status).toLowerCase().trim();
+      if (st === 'open') st = 'pending';
+      if (st === 'resolved' || st === 'closed' || st === 'completed') st = 'solved';
+      if (['pending', 'in_progress', 'solved'].includes(st)) {
+        params.append('status', st);
+      }
+    }
+
+    const qs = params.toString() ? `?${params.toString()}` : '';
+    const res = await fetch(`${BASE_URL}/staff/customer-service/service-requests${qs}`, {
+      method: 'GET',
+      headers: getStaffHeaders(),
+    });
+
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({}));
+      checkRequestStatus(res, errBody, 'Failed to fetch customer service requests', 'staff');
+    }
+
+    const data = await res.json();
+    if (Array.isArray(data)) return data;
+    if (Array.isArray(data.requests)) return data.requests;
+    if (Array.isArray(data.items)) return data.items;
+    if (Array.isArray(data.data)) return data.data;
+    return [];
+  } catch (error) {
+    console.error('serviceRequestService.getStaffCustomerServiceRequests error:', error);
+    throw error;
+  }
+}
+
+/**
+ * 15. GET /staff/customer-service/service-requests/pending-count
+ * Returns { pending_count: number }
+ */
+export async function getStaffCustomerServicePendingCount() {
+  try {
+    const res = await fetch(`${BASE_URL}/staff/customer-service/service-requests/pending-count`, {
+      method: 'GET',
+      headers: getStaffHeaders(),
+    });
+
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({}));
+      checkRequestStatus(res, errBody, 'Failed to fetch customer service pending count', 'staff');
+    }
+
+    const data = await res.json();
+    return Number(data?.pending_count || 0);
+  } catch (error) {
+    console.error('serviceRequestService.getStaffCustomerServicePendingCount error:', error);
+    return 0;
+  }
+}
+
+/**
+ * 16. GET /staff/customer-service/service-requests/{request_id}
+ */
+export async function getStaffCustomerServiceRequest(requestId) {
+  try {
+    if (!requestId) throw new Error('Request ID is required.');
+    const res = await fetch(`${BASE_URL}/staff/customer-service/service-requests/${encodeURIComponent(requestId)}`, {
+      method: 'GET',
+      headers: getStaffHeaders(),
+    });
+
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({}));
+      checkRequestStatus(res, errBody, `Failed to fetch customer service request #${requestId}`, 'staff');
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error(`serviceRequestService.getStaffCustomerServiceRequest(${requestId}) error:`, error);
+    throw error;
+  }
+}
+
+/**
+ * 17. POST /staff/customer-service/service-requests/{request_id}/replies
+ * Body: { message: string }
+ */
+export async function replyToStaffCustomerServiceRequest(requestId, { message, reply } = {}) {
+  try {
+    if (!requestId) throw new Error('Request ID is required.');
+    const text = (message || reply || '').trim();
+    if (!text) throw new Error('Reply message cannot be empty.');
+
+    const payload = {
+      message: text,
+    };
+
+    const res = await fetch(`${BASE_URL}/staff/customer-service/service-requests/${encodeURIComponent(requestId)}/replies`, {
+      method: 'POST',
+      headers: getStaffHeaders(),
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({}));
+      checkRequestStatus(res, errBody, `Failed to reply to customer service request #${requestId}`, 'staff');
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error(`serviceRequestService.replyToStaffCustomerServiceRequest(${requestId}) error:`, error);
+    throw error;
+  }
+}
+
+/**
+ * 18. PATCH /staff/customer-service/service-requests/{request_id}/status
+ * Body: { status: 'pending' | 'in_progress' | 'solved' }
+ */
+export async function updateStaffCustomerServiceRequestStatus(requestId, status) {
+  try {
+    if (!requestId) throw new Error('Request ID is required.');
+    let normalizedStatus = String(status || '').trim().toLowerCase();
+    if (normalizedStatus === 'open') normalizedStatus = 'pending';
+    if (normalizedStatus === 'resolved' || normalizedStatus === 'closed' || normalizedStatus === 'completed') {
+      normalizedStatus = 'solved';
+    }
+
+    const payload = {
+      status: normalizedStatus,
+    };
+
+    const res = await fetch(`${BASE_URL}/staff/customer-service/service-requests/${encodeURIComponent(requestId)}/status`, {
+      method: 'PATCH',
+      headers: getStaffHeaders(),
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({}));
+      checkRequestStatus(res, errBody, `Failed to update status for service request #${requestId}`, 'staff');
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error(`serviceRequestService.updateStaffCustomerServiceRequestStatus(${requestId}) error:`, error);
+    throw error;
+  }
+}
+
 export default {
   createMemberServiceRequest,
   getMemberServiceRequests,
@@ -512,4 +693,9 @@ export default {
   replyToSuperAdminServiceRequest,
   editSuperAdminServiceRequestReply,
   updateSuperAdminServiceRequestStatus,
+  getStaffCustomerServiceRequests,
+  getStaffCustomerServicePendingCount,
+  getStaffCustomerServiceRequest,
+  replyToStaffCustomerServiceRequest,
+  updateStaffCustomerServiceRequestStatus,
 };

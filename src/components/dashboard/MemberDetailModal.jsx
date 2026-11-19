@@ -16,7 +16,9 @@ import {
   ExternalLink,
   Download,
   Eye,
-  Loader2
+  Loader2,
+  Landmark,
+  Wallet
 } from 'lucide-react';
 import {
   getSuperadminBranchMember,
@@ -29,6 +31,37 @@ import {
   getBranchAdminNomineeDocument,
   reviewBranchAdminMember
 } from '../../services/branchAdminService';
+import {
+  getAccountantMember,
+  getAccountantMemberDocument
+} from '../../services/accountantMemberService';
+
+function formatCurrency(val) {
+  if (val === undefined || val === null || isNaN(Number(val))) return '₹0.00';
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    maximumFractionDigits: 2
+  }).format(Number(val));
+}
+
+function formatDateTime(isoString) {
+  if (!isoString) return '—';
+  try {
+    const d = new Date(isoString);
+    if (isNaN(d.getTime())) return isoString;
+    return d.toLocaleString('en-IN', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    });
+  } catch {
+    return isoString;
+  }
+}
 
 export default function MemberDetailModal({
   isOpen,
@@ -38,6 +71,7 @@ export default function MemberDetailModal({
   initialMember = null,
   branchName = '',
   isBranchAdmin = false,
+  portal = null, // 'accountant' | 'branch_admin' | 'super_admin'
   onStatusUpdated = null
 }) {
   const [activeTab, setActiveTab] = useState('profile');
@@ -64,7 +98,9 @@ export default function MemberDetailModal({
     setLoading(true);
     setError(null);
     try {
-      const data = isBranchAdmin
+      const data = portal === 'accountant'
+        ? await getAccountantMember(memberId)
+        : isBranchAdmin
         ? await getBranchAdminMember(memberId)
         : await getSuperadminBranchMember(branchId, memberId);
       setMember(data);
@@ -84,7 +120,13 @@ export default function MemberDetailModal({
 
     try {
       let docUrl = null;
-      if (isBranchAdmin) {
+      if (portal === 'accountant') {
+        const directPath = isNominee
+          ? member?.nominee?.[`${docType}_url`]
+          : member?.[`${docType}_url`];
+        const nomineeId = member?.nominee?.id || member?.nominee_id || memberId;
+        docUrl = await getAccountantMemberDocument(memberId, docType, isNominee, nomineeId, directPath);
+      } else if (isBranchAdmin) {
         if (isNominee) {
           const nomineeId = member?.nominee?.id || member?.nominee_id || memberId;
           docUrl = await getBranchAdminNomineeDocument(nomineeId, docType).catch(() =>
@@ -101,9 +143,7 @@ export default function MemberDetailModal({
         }
       }
 
-      if (typeof docUrl === 'string' && docUrl.startsWith('http')) {
-        window.open(docUrl, '_blank', 'noopener,noreferrer');
-      } else if (typeof docUrl === 'string') {
+      if (typeof docUrl === 'string') {
         setPreviewDoc({ url: docUrl, title: `${docType.replace(/_/g, ' ').toUpperCase()}` });
       }
     } catch (err) {
@@ -254,6 +294,7 @@ export default function MemberDetailModal({
           {[
             { id: 'profile', label: 'Personal & KYC', icon: User },
             { id: 'address', label: 'Address & Location', icon: MapPin },
+            { id: 'savings', label: 'Savings Account', icon: Landmark },
             { id: 'banking', label: 'Bank Account Details', icon: CreditCard },
             { id: 'nominee', label: 'Nominee Information', icon: ShieldCheck },
             { id: 'documents', label: 'Uploaded Documents', icon: FileText },
@@ -408,12 +449,143 @@ export default function MemberDetailModal({
                 </div>
               )}
 
-              {/* Tab 3: Bank Account Details */}
+              {/* Tab 3: Savings Account Details */}
+              {activeTab === 'savings' && (
+                <div className="space-y-4">
+                  {currentMember.accounts && currentMember.accounts.length > 0 ? (
+                    <div className="space-y-4">
+                      {currentMember.accounts.map((acc, idx) => {
+                        const accStatusUpper = (acc.status || 'ACTIVE').toUpperCase();
+                        const isAccActive = accStatusUpper === 'ACTIVE';
+
+                        return (
+                          <div
+                            key={acc.id || acc.account_number || idx}
+                            className="bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden"
+                          >
+                            {/* Card Visual Header Banner */}
+                            <div className="bg-gradient-to-br from-slate-900 via-teal-950 to-slate-900 text-white p-5 sm:p-6 relative overflow-hidden">
+                              <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                <div className="space-y-1">
+                                  <div className="flex items-center gap-2 flex-wrap">
+                                    <span className="text-[11px] font-bold uppercase tracking-wider text-teal-300 flex items-center gap-1.5">
+                                      <Landmark className="w-3.5 h-3.5" /> Society Savings Account
+                                    </span>
+                                    {acc.scheme_code && (
+                                      <span className="font-mono text-xs font-bold bg-teal-400/20 text-teal-200 px-2 py-0.5 rounded border border-teal-400/30">
+                                        {acc.scheme_code}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <h3 className="text-lg sm:text-xl font-black text-white capitalize tracking-tight">
+                                    {acc.scheme_name || 'Regular Member Savings Deposit'}
+                                  </h3>
+                                </div>
+
+                                <span
+                                  className={`self-start sm:self-auto inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${
+                                    isAccActive
+                                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/40'
+                                      : 'bg-slate-700 text-slate-300 border border-slate-600'
+                                  }`}
+                                >
+                                  <span className={`w-1.5 h-1.5 rounded-full ${isAccActive ? 'bg-emerald-400' : 'bg-slate-400'}`} />
+                                  {accStatusUpper}
+                                </span>
+                              </div>
+
+                              {/* Balance & Account Number Prominent Display */}
+                              <div className="mt-5 pt-4 border-t border-teal-800/60 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                                <div>
+                                  <p className="text-[11px] uppercase tracking-wider text-teal-200/80 font-bold">
+                                    Current Savings Balance
+                                  </p>
+                                  <p className="text-2xl sm:text-3xl font-black text-white mt-1 font-sans tracking-tight">
+                                    {formatCurrency(acc.balance)}
+                                  </p>
+                                </div>
+
+                                <div className="text-left sm:text-right">
+                                  <p className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">
+                                    Account Number
+                                  </p>
+                                  <p className="font-mono text-base sm:text-lg font-bold text-teal-200 tracking-wider mt-0.5">
+                                    {acc.account_number || '—'}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Detailed Metadata Grid */}
+                            <div className="p-4 sm:p-5 bg-slate-50/70 border-t border-slate-100">
+                              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 text-xs">
+                                <div className="bg-white p-3 rounded-xl border border-slate-200/70 shadow-2xs">
+                                  <span className="font-bold text-slate-400 uppercase text-[10px]">Scheme</span>
+                                  <p className="text-xs font-bold text-slate-900 mt-1 capitalize truncate" title={acc.scheme_name}>
+                                    {acc.scheme_name || '—'}
+                                  </p>
+                                  <p className="font-mono text-[10px] text-teal-700 font-semibold mt-0.5">
+                                    {acc.scheme_code || '—'}
+                                  </p>
+                                </div>
+
+                                <div className="bg-white p-3 rounded-xl border border-slate-200/70 shadow-2xs">
+                                  <span className="font-bold text-slate-400 uppercase text-[10px]">Branch Office</span>
+                                  <p className="text-xs font-bold text-slate-900 mt-1 truncate" title={acc.branch_name}>
+                                    {acc.branch_name || '—'}
+                                  </p>
+                                  {acc.branch_code && (
+                                    <p className="font-mono text-[10px] text-slate-500 mt-0.5">
+                                      Branch #{acc.branch_code}
+                                    </p>
+                                  )}
+                                </div>
+
+                                <div className="bg-white p-3 rounded-xl border border-slate-200/70 shadow-2xs">
+                                  <span className="font-bold text-slate-400 uppercase text-[10px]">IFSC Code</span>
+                                  <p className="font-mono text-xs font-bold text-slate-900 mt-1">
+                                    {acc.ifsc_code || '—'}
+                                  </p>
+                                  <p className="text-[10px] text-emerald-600 font-semibold mt-0.5">
+                                    Branch IFSC
+                                  </p>
+                                </div>
+
+                                <div className="bg-white p-3 rounded-xl border border-slate-200/70 shadow-2xs">
+                                  <span className="font-bold text-slate-400 uppercase text-[10px]">Opened Date</span>
+                                  <p className="text-xs font-bold text-slate-900 mt-1">
+                                    {formatDateTime(acc.opened_at)}
+                                  </p>
+                                  <p className="text-[10px] text-slate-400 mt-0.5">
+                                    Registration Date
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="bg-slate-50 rounded-2xl p-8 border border-slate-200/80 text-center">
+                      <div className="w-12 h-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center mx-auto mb-3">
+                        <Landmark className="w-6 h-6 stroke-[1.8]" />
+                      </div>
+                      <h4 className="font-bold text-slate-800 text-sm">No Savings Account Found</h4>
+                      <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+                        This member does not have any active cooperative society savings accounts registered under this folio.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Tab 4: Bank Account Details */}
               {activeTab === 'banking' && (
                 <div className="space-y-4">
                   <div className="bg-gradient-to-br from-slate-900 via-slate-850 to-slate-900 text-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-md relative overflow-hidden">
                     <div className="flex items-center justify-between">
-                      <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-teal-300">Society Linked Account</span>
+                      <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-teal-300">Commercial Bank Account (Payouts &amp; Transfers)</span>
                       <CreditCard className="w-5 h-5 sm:w-6 sm:h-6 text-teal-300 flex-shrink-0" />
                     </div>
                     <div className="mt-4 sm:mt-6">
@@ -629,12 +801,33 @@ export default function MemberDetailModal({
                 <X className="w-4 h-4" />
               </button>
             </div>
-            <div className="flex-1 overflow-auto py-4 flex items-center justify-center">
+            <div className="flex-1 overflow-auto py-4 flex items-center justify-center min-h-[300px]">
               <img
                 src={previewDoc.url}
                 alt={previewDoc.title}
-                className="max-h-[70vh] w-auto object-contain rounded-lg"
+                className="max-h-[70vh] w-auto object-contain rounded-lg shadow-2xs"
+                onError={(e) => {
+                  console.warn('Document preview image failed to render:', previewDoc.url);
+                  e.currentTarget.style.display = 'none';
+                  const fallback = document.getElementById('preview-doc-fallback');
+                  if (fallback) fallback.style.display = 'flex';
+                }}
               />
+              <div
+                id="preview-doc-fallback"
+                style={{ display: 'none' }}
+                className="flex-col items-center justify-center text-center p-6 space-y-3"
+              >
+                <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto">
+                  <FileText className="w-6 h-6 stroke-[1.8]" />
+                </div>
+                <div>
+                  <h5 className="font-bold text-slate-800 text-sm">Inline Preview Unavailable</h5>
+                  <p className="text-xs text-slate-500 mt-1 max-w-xs mx-auto">
+                    This file could not be displayed as an inline image. Please click Open in Fullscreen below.
+                  </p>
+                </div>
+              </div>
             </div>
             <div className="pt-2 flex justify-end">
               <a

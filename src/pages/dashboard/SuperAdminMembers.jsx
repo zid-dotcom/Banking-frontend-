@@ -15,11 +15,13 @@ import {
   ShieldCheck,
   Phone,
   Mail,
-  Calendar
+  Calendar,
+  Receipt
 } from 'lucide-react';
 import memberRegistryScene from '../../assets/Membership Registry Illustration.png';
 import { getBranches } from '../../services/branchService';
 import { getSuperadminBranchMembers } from '../../services/memberService';
+import MemberCashTransactionsModal from '../../components/dashboard/MemberCashTransactionsModal';
 
 export default function SuperAdminMembers() {
   const [branches, setBranches] = useState([]);
@@ -37,6 +39,13 @@ export default function SuperAdminMembers() {
   // Inspection modal
   const [inspectModalOpen, setInspectModalOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
+  const [transactionsModalOpen, setTransactionsModalOpen] = useState(false);
+  const [selectedMemberForTransactions, setSelectedMemberForTransactions] = useState(null);
+
+  const handleViewTransactions = (member) => {
+    setSelectedMemberForTransactions(member);
+    setTransactionsModalOpen(true);
+  };
 
   const storedUser = (() => {
     try {
@@ -553,16 +562,27 @@ export default function SuperAdminMembers() {
                           )}
                         </td>
 
-                        {/* Action: View Details */}
-                        <td className="py-4 px-5 text-right">
-                          <button
-                            onClick={() => handleInspect(m)}
-                            className="px-3.5 py-1.5 bg-gradient-to-r from-teal-50 to-emerald-50 hover:from-teal-100 hover:to-emerald-100 text-[#0f766e] font-bold text-xs rounded-xl border border-teal-200/80 shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer ml-auto whitespace-nowrap"
-                            title="View full certified member details & documents"
-                          >
-                            <Eye className="w-3.5 h-3.5" />
-                            <span>View Details</span>
-                          </button>
+                        {/* Action: View Details & View Transactions */}
+                        <td className="py-4 px-5 text-right whitespace-nowrap">
+                          <div className="flex items-center justify-end gap-1.5">
+                            <button
+                              onClick={() => handleInspect(m)}
+                              className="px-3.5 py-1.5 bg-gradient-to-r from-teal-50 to-emerald-50 hover:from-teal-100 hover:to-emerald-100 text-[#0f766e] font-bold text-xs rounded-xl border border-teal-200/80 shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
+                              title="View full certified member details & documents"
+                            >
+                              <Eye className="w-3.5 h-3.5" />
+                              <span>View Details</span>
+                            </button>
+
+                            <button
+                              onClick={() => handleViewTransactions(m)}
+                              className="px-3.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs rounded-xl border border-emerald-200/80 shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
+                              title="View member counter cash transactions history"
+                            >
+                              <Receipt className="w-3.5 h-3.5 text-emerald-700" />
+                              <span>View Transactions</span>
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     );
@@ -597,6 +617,18 @@ export default function SuperAdminMembers() {
           branchName={selectedMember.branch_name}
         />
       )}
+
+      {/* Member Cash Transactions Modal */}
+      <MemberCashTransactionsModal
+        isOpen={transactionsModalOpen}
+        onClose={() => {
+          setTransactionsModalOpen(false);
+          setSelectedMemberForTransactions(null);
+        }}
+        member={selectedMemberForTransactions}
+        portal="super_admin"
+        branchId={selectedMemberForTransactions?.branch_id || (selectedBranchId !== 'all' ? selectedBranchId : null)}
+      />
     </DashboardLayout>
   );
 }

@@ -27,6 +27,7 @@ import {
   AlertOctagon,
   ShieldAlert,
   Calculator,
+  Scale,
 } from 'lucide-react';
 import {
   getMemberUnreadCount,
@@ -37,6 +38,7 @@ import {
   getSuperadminEmergencyUnreadCount,
   EMERGENCY_UNREAD_UPDATED_EVENT,
 } from '../../services/emergencyService';
+import { getStaffCustomerServicePendingCount } from '../../services/serviceRequestService';
 
 export default function DashboardSidebar({
   role = 'member',
@@ -70,6 +72,7 @@ export default function DashboardSidebar({
       { id: 'staff', label: 'Branch Staff', icon: ShieldCheck, path: '/branch-manager/staff' },
       { id: 'savings_schemes', label: 'Savings Schemes', icon: PiggyBank, path: '/branch-manager/savings-schemes' },
       { id: 'cash_transactions', label: 'Cash Transactions', icon: Coins, path: '/branch-manager/cash-transactions' },
+      { id: 'cash_reconciliation', label: 'Cash Reconciliation', icon: Scale, path: '/branch-manager/cash-reconciliation' },
       { id: 'fd_mis_schemes', label: 'FD / MIS Schemes', icon: Coins, path: '/branch-manager/fd-mis-schemes' },
       { id: 'loan_schemes', label: 'Loan Schemes', icon: Landmark, path: '/branch-manager/loan-schemes' },
       { id: 'announcements', label: 'Announcements', icon: Megaphone, path: '/branch-manager/announcements' },
@@ -82,8 +85,10 @@ export default function DashboardSidebar({
       { id: 'branches', label: 'Branches', icon: Building2, path: '/super-admin/branches' },
       { id: 'branch_admins', label: 'Branch Manager', icon: UserCheck, path: '/super-admin/branch-admins' },
       { id: 'staff_roles', label: 'Staff Roles', icon: ShieldCheck, path: '/super-admin/staff-roles' },
+      { id: 'staff', label: 'Staff Registry', icon: Users, path: '/super-admin/staff' },
       { id: 'savings_schemes', label: 'Savings Schemes', icon: PiggyBank, path: '/super-admin/savings-schemes' },
       { id: 'cash_transactions', label: 'Cash Transactions', icon: Coins, path: '/super-admin/cash-transactions' },
+      { id: 'cash_reconciliation', label: 'Cash Reconciliation', icon: Scale, path: '/super-admin/cash-reconciliation' },
       { id: 'fd_mis_schemes', label: 'FD / MIS Schemes', icon: Coins, path: '/super-admin/fd-mis-schemes' },
       { id: 'loan_schemes', label: 'Loan Schemes', icon: Landmark, path: '/super-admin/loan-schemes' },
       { id: 'announcements', label: 'Announcements', icon: Megaphone, path: '/super-admin/announcements' },
@@ -95,16 +100,29 @@ export default function DashboardSidebar({
     staff: (() => {
       const roleStr = String(user?.staff_role?.name || user?.account_role || user?.role || '').toLowerCase();
       const isAccountant = roleStr.includes('accountant') || roleStr.includes('auditor');
+      const isCustomerService =
+        roleStr.includes('customer') ||
+        roleStr.includes('cso') ||
+        roleStr.includes('support') ||
+        (roleStr.includes('service') && !roleStr.includes('cashier'));
+
+      if (isCustomerService) {
+        return [
+          { id: 'overview', label: 'Staff Dashboard', icon: LayoutDashboard, path: '/staff/dashboard' },
+          { id: 'service_requests', label: 'Service Requests', icon: Headset, path: '/staff/service-requests' },
+        ];
+      }
       if (isAccountant) {
         return [
           { id: 'overview', label: 'Staff Dashboard', icon: LayoutDashboard, path: '/staff/dashboard' },
           { id: 'cash_reconciliation', label: 'Cash Reconciliation', icon: Calculator, path: '/staff/cash-reconciliation' },
+          { id: 'members', label: 'View Members', icon: Users, path: '/staff/members' },
         ];
       }
       return [
         { id: 'overview', label: 'Staff Dashboard', icon: LayoutDashboard, path: '/staff/dashboard' },
-        { id: 'cash_reconciliation', label: 'Cash Reconciliation', icon: Calculator, path: '/staff/cash-reconciliation' },
         { id: 'cash_operations', label: 'Cash Operations', icon: Wallet, path: '/staff/cash-operations' },
+        { id: 'cash_reconciliation', label: 'Cash Reconciliation', icon: Calculator, path: '/staff/cash-reconciliation' },
       ];
     })()
   };
@@ -116,11 +134,14 @@ export default function DashboardSidebar({
       ? user.branch
       : (user?.branch_name || user?.branch?.name || user?.branch?.branch_name || 'Society Branch');
 
+  const rawStaffTitle = user?.staff_role?.name || 'Branch Staff';
+  const staffTitle = /cashier\/teller/i.test(String(rawStaffTitle)) ? 'Cashier' : rawStaffTitle;
+
   const roleLabels = {
     member: { title: 'Member Portal', badge: 'Active Member', color: 'bg-teal-50 text-[#0f766e]' },
     branch_manager: { title: 'Branch Manager', badge: branchDisplayName, color: 'bg-teal-50 text-[#0f766e]' },
     super_admin: { title: 'Super Admin', badge: 'Apex Society Authority', color: 'bg-teal-50 text-[#0f766e]' },
-    staff: { title: user?.staff_role?.name || 'Branch Staff', badge: branchDisplayName, color: 'bg-teal-50 text-[#0f766e]' },
+    staff: { title: staffTitle, badge: branchDisplayName, color: 'bg-teal-50 text-[#0f766e]' },
   };
 
   const currentRoleInfo = roleLabels[role] || roleLabels.member;
@@ -128,8 +149,9 @@ export default function DashboardSidebar({
   // Member Notification Real-time Counter (for sidebar menu badge)
   const [unreadCount, setUnreadCount] = useState(0);
   const [emergencyUnreadCount, setEmergencyUnreadCount] = useState(0);
+  const [staffPendingCount, setStaffPendingCount] = useState(0);
 
-  // Poll / refresh unread count for member & emergency cases
+  // Poll / refresh unread count for member & emergency cases & staff service requests
   useEffect(() => {
     let isMounted = true;
 
@@ -138,6 +160,23 @@ export default function DashboardSidebar({
         getMemberUnreadCount()
           .then((count) => {
             if (isMounted) setUnreadCount(typeof count === 'number' ? count : 0);
+          })
+          .catch(() => {});
+      }
+    };
+
+    const refreshStaffPending = () => {
+      const roleStr = String(user?.staff_role?.name || user?.account_role || user?.role || '').toLowerCase();
+      const isCustomerService =
+        roleStr.includes('customer') ||
+        roleStr.includes('cso') ||
+        roleStr.includes('support') ||
+        (roleStr.includes('service') && !roleStr.includes('cashier'));
+
+      if (role === 'staff' && isCustomerService) {
+        getStaffCustomerServicePendingCount()
+          .then((count) => {
+            if (isMounted) setStaffPendingCount(typeof count === 'number' ? count : 0);
           })
           .catch(() => {});
       }
@@ -163,6 +202,7 @@ export default function DashboardSidebar({
 
     refreshMemberUnread();
     refreshEmergencyUnread();
+    refreshStaffPending();
 
     const handleNotificationsUpdated = (e) => {
       if (role === 'member') {
@@ -324,6 +364,15 @@ export default function DashboardSidebar({
                     {emergencyUnreadCount}
                   </span>
                 )}
+                {item.id === 'service_requests' && role === 'staff' && staffPendingCount > 0 && (
+                  <span
+                    className={`ml-auto px-2 py-0.5 text-[10px] font-black rounded-full shadow-2xs ${
+                      isActive ? 'bg-white text-amber-700' : 'bg-amber-500 text-white animate-pulse'
+                    }`}
+                  >
+                    {staffPendingCount}
+                  </span>
+                )}
               </button>
             );
           })}
@@ -375,12 +424,15 @@ export default function DashboardSidebar({
             user?.username ||
             (role === 'super_admin' ? 'Super Admin' : role === 'staff' ? 'Staff Member' : role === 'branch_manager' ? 'Branch Manager' : 'Member');
 
-          const resolvedSidebarRole =
+          const rawSidebarRole =
             user?.staff_role?.name ||
             user?.account_role ||
             user?.role_name ||
             user?.role ||
             (role === 'super_admin' ? 'Super Admin' : role === 'staff' ? 'Staff' : role === 'branch_manager' ? 'Branch Manager' : (user?.id ? `Member #${user.id}` : 'Member'));
+
+          const resolvedSidebarRole =
+            /cashier\/teller/i.test(String(rawSidebarRole)) ? 'Cashier' : rawSidebarRole;
 
           const resolvedSidebarAvatar =
             user?.avatarText ||

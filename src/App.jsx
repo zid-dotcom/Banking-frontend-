@@ -26,6 +26,8 @@ import MemberSecurityEvents from './pages/dashboard/MemberSecurityEvents';
 import StaffDashboard from './pages/dashboard/StaffDashboard';
 import StaffCashReconciliation from './pages/dashboard/StaffCashReconciliation';
 import StaffCashOperations from './pages/dashboard/StaffCashOperations';
+import StaffServiceRequests from './pages/dashboard/StaffServiceRequests';
+import StaffMembers from './pages/dashboard/StaffMembers';
 
 import BranchManagerDashboard from './pages/dashboard/BranchManagerDashboard';
 import BranchManagerMembers from './pages/dashboard/BranchManagerMembers';
@@ -33,6 +35,7 @@ import BranchManagerStaff from './pages/dashboard/BranchManagerStaff';
 import BranchManagerLoanSchemes from './pages/dashboard/BranchManagerLoanSchemes';
 import BranchManagerSavingsSchemes from './pages/dashboard/BranchManagerSavingsSchemes';
 import BranchManagerCashTransactions from './pages/dashboard/BranchManagerCashTransactions';
+import BranchManagerCashReconciliation from './pages/dashboard/BranchManagerCashReconciliation';
 import BranchManagerFdMisSchemes from './pages/dashboard/BranchManagerFdMisSchemes';
 import BranchManagerNominees from './pages/dashboard/BranchManagerNominees';
 import BranchManagerAnnouncements from './pages/dashboard/BranchManagerAnnouncements';
@@ -43,11 +46,13 @@ import BranchManagerSecurityEvents from './pages/dashboard/BranchManagerSecurity
 import SuperAdminDashboard from './pages/dashboard/SuperAdminDashboard';
 import SuperAdminBranches from './pages/dashboard/SuperAdminBranches';
 import SuperAdminBranchAdmin from './pages/dashboard/SuperAdminBranchAdmin';
+import SuperAdminStaff from './pages/dashboard/SuperAdminStaff';
 import SuperAdminMembers from './pages/dashboard/SuperAdminMembers';
 import SuperAdminLoanSchemes from './pages/dashboard/SuperAdminLoanSchemes';
 import SuperAdminStaffRoles from './pages/dashboard/SuperAdminStaffRoles';
 import SuperAdminSavingsSchemes from './pages/dashboard/SuperAdminSavingsSchemes';
 import SuperAdminCashTransactions from './pages/dashboard/SuperAdminCashTransactions';
+import SuperAdminCashReconciliation from './pages/dashboard/SuperAdminCashReconciliation';
 import SuperAdminFdMisSchemes from './pages/dashboard/SuperAdminFdMisSchemes';
 import SuperAdminAnnouncements from './pages/dashboard/SuperAdminAnnouncements';
 import SuperAdminServiceRequests from './pages/dashboard/SuperAdminServiceRequests';
@@ -176,11 +181,16 @@ function MainApp() {
         <Route path="/super-admin/staff-roles" element={<SuperAdminStaffRoles />} />
         <Route path="/super-admin/staff-role" element={<SuperAdminStaffRoles />} />
         <Route path="/super-admin/roles" element={<SuperAdminStaffRoles />} />
+        <Route path="/super-admin/staff" element={<SuperAdminStaff />} />
+        <Route path="/super-admin/branch-staff" element={<SuperAdminStaff />} />
+        <Route path="/super-admin/staff-members" element={<SuperAdminStaff />} />
         <Route path="/super-admin/savings-schemes" element={<SuperAdminSavingsSchemes />} />
         <Route path="/super-admin/savings-scheme" element={<SuperAdminSavingsSchemes />} />
         <Route path="/super-admin/savings" element={<SuperAdminSavingsSchemes />} />
         <Route path="/super-admin/cash-transactions" element={<SuperAdminCashTransactions />} />
         <Route path="/super-admin/cash-operations" element={<SuperAdminCashTransactions />} />
+        <Route path="/super-admin/cash-reconciliation" element={<SuperAdminCashReconciliation />} />
+        <Route path="/super-admin/cash-reconciliations" element={<SuperAdminCashReconciliation />} />
         <Route path="/super-admin/fd-mis-schemes" element={<SuperAdminFdMisSchemes />} />
         <Route path="/super-admin/fd-mis-scheme" element={<SuperAdminFdMisSchemes />} />
         <Route path="/super-admin/fd-mis" element={<SuperAdminFdMisSchemes />} />
@@ -213,6 +223,10 @@ function MainApp() {
         <Route path="/branch-admin/cash-transactions" element={<BranchManagerCashTransactions />} />
         <Route path="/branch-manager/cash-operations" element={<BranchManagerCashTransactions />} />
         <Route path="/branch-admin/cash-operations" element={<BranchManagerCashTransactions />} />
+        <Route path="/branch-manager/cash-reconciliation" element={<BranchManagerCashReconciliation />} />
+        <Route path="/branch-admin/cash-reconciliation" element={<BranchManagerCashReconciliation />} />
+        <Route path="/branch-manager/cash-reconciliations" element={<BranchManagerCashReconciliation />} />
+        <Route path="/branch-admin/cash-reconciliations" element={<BranchManagerCashReconciliation />} />
         <Route path="/branch-manager/fd-mis-schemes" element={<BranchManagerFdMisSchemes />} />
         <Route path="/branch-admin/fd-mis-schemes" element={<BranchManagerFdMisSchemes />} />
         <Route path="/branch-manager/loan-schemes" element={<BranchManagerLoanSchemes />} />
@@ -259,6 +273,12 @@ function MainApp() {
         <Route path="/staff/cash-day" element={<StaffCashReconciliation />} />
         <Route path="/staff/reconciliation" element={<StaffCashReconciliation />} />
         <Route path="/staff/cash-operations" element={<StaffCashOperations />} />
+        <Route path="/staff/service-requests" element={<StaffServiceRequests />} />
+        <Route path="/staff/helpdesk" element={<StaffServiceRequests />} />
+        <Route path="/staff/customer-service" element={<StaffServiceRequests />} />
+        <Route path="/staff/members" element={<StaffMembers />} />
+        <Route path="/staff/view-members" element={<StaffMembers />} />
+        <Route path="/staff/branch-members" element={<StaffMembers />} />
         <Route path="/staff/*" element={<Navigate to="/staff/dashboard" replace />} />
       </Routes>
     );

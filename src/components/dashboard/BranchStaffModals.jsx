@@ -16,7 +16,8 @@ import {
   Pencil,
   Clock,
   Eye,
-  EyeOff
+  EyeOff,
+  Building2
 } from 'lucide-react';
 import { getBranchAdminStaffRoles, getAvailableStaffRoles } from '../../services/branchStaffService';
 
@@ -48,6 +49,8 @@ export function BranchStaffFormModal({
   mode = 'create', // 'create' | 'edit'
   initialData = null,
   availableRoles = null,
+  branches = null,
+  isSuperAdmin = false,
   isSubmitting = false
 }) {
   const [formData, setFormData] = useState({
@@ -57,6 +60,7 @@ export function BranchStaffFormModal({
     contact_number: '',
     address: '',
     staff_role_id: '',
+    branch_id: '',
   });
 
   const [formErrors, setFormErrors] = useState({});
@@ -104,6 +108,13 @@ export function BranchStaffFormModal({
             ? String(initialData.role_id)
             : '';
 
+        const branchIdVal =
+          initialData.branch_id !== undefined && initialData.branch_id !== null
+            ? String(initialData.branch_id)
+            : initialData.branch?.id !== undefined
+            ? String(initialData.branch.id)
+            : '';
+
         setFormData({
           full_name: initialData.full_name || '',
           email: initialData.email || '',
@@ -111,6 +122,7 @@ export function BranchStaffFormModal({
           contact_number: initialData.contact_number || '',
           address: initialData.address || '',
           staff_role_id: roleIdVal,
+          branch_id: branchIdVal,
         });
       } else {
         setFormData({
@@ -120,6 +132,7 @@ export function BranchStaffFormModal({
           contact_number: '',
           address: '',
           staff_role_id: '',
+          branch_id: initialData?.branch_id ? String(initialData.branch_id) : '',
         });
       }
       setFormErrors({});
@@ -209,6 +222,10 @@ export function BranchStaffFormModal({
 
     if (!formData.staff_role_id) {
       errors.staff_role_id = 'Please select an assigned staff role.';
+    }
+
+    if (isSuperAdmin && !formData.branch_id) {
+      errors.branch_id = 'Please select an assigned branch.';
     }
 
     setFormErrors(errors);
@@ -341,6 +358,41 @@ export function BranchStaffFormModal({
               )}
             </div>
           </div>
+
+          {/* Branch Selection for Superadmin */}
+          {isSuperAdmin && Array.isArray(branches) && (
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                Assigned Branch <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <Building2 className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <select
+                  name="branch_id"
+                  value={formData.branch_id}
+                  onChange={handleChange}
+                  className={`w-full pl-10 pr-8 py-2.5 rounded-xl border text-sm transition-all focus:outline-none focus:ring-2 font-medium appearance-none bg-white cursor-pointer ${
+                    formErrors.branch_id
+                      ? 'border-red-300 focus:border-red-500 focus:ring-red-100 bg-red-50/30'
+                      : 'border-slate-200 focus:border-teal-500 focus:ring-teal-100'
+                  }`}
+                >
+                  <option value="">Select Branch</option>
+                  {branches.map((b) => (
+                    <option key={b.id} value={b.id}>
+                      {b.name || `Branch #${b.branch_code || b.id}`} ({b.city || 'Kerala'})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {formErrors.branch_id && (
+                <p className="text-xs text-red-500 mt-1 flex items-center gap-1 font-medium">
+                  <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
+                  {formErrors.branch_id}
+                </p>
+              )}
+            </div>
+          )}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Staff Role */}
@@ -562,6 +614,25 @@ export function BranchStaffDetailModal({
               <p className="text-sm font-semibold text-slate-800">{staff.contact_number || 'N/A'}</p>
             </div>
           </div>
+
+          {/* Branch Information */}
+          {(staff.branch_name || staff.branch?.name || staff.branch_code || staff.branch_id) && (
+            <div className="p-3.5 bg-slate-50/80 rounded-2xl border border-slate-100 flex items-center justify-between">
+              <div>
+                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">
+                  Assigned Branch
+                </span>
+                <p className="text-sm font-bold text-slate-800">
+                  {staff.branch_name || staff.branch?.name || `Branch #${staff.branch_id}`}
+                </p>
+              </div>
+              {staff.branch_code && (
+                <span className="font-mono text-xs font-bold text-teal-800 bg-teal-50 border border-teal-200 px-2.5 py-0.5 rounded-lg">
+                  #{staff.branch_code}
+                </span>
+              )}
+            </div>
+          )}
 
           {/* Address */}
           <div className="p-3.5 bg-slate-50/80 rounded-2xl border border-slate-100">
