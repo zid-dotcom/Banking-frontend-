@@ -28,8 +28,10 @@ import StaffCashReconciliation from './pages/dashboard/StaffCashReconciliation';
 import StaffCashOperations from './pages/dashboard/StaffCashOperations';
 import StaffServiceRequests from './pages/dashboard/StaffServiceRequests';
 import StaffMembers from './pages/dashboard/StaffMembers';
+import StaffAnnouncements from './pages/dashboard/StaffAnnouncements';
 
 import BranchManagerDashboard from './pages/dashboard/BranchManagerDashboard';
+import BranchManagerOverview from './pages/dashboard/BranchManagerOverview';
 import BranchManagerMembers from './pages/dashboard/BranchManagerMembers';
 import BranchManagerStaff from './pages/dashboard/BranchManagerStaff';
 import BranchManagerLoanSchemes from './pages/dashboard/BranchManagerLoanSchemes';
@@ -44,6 +46,7 @@ import BranchManagerEmergencyCases from './pages/dashboard/BranchManagerEmergenc
 import BranchManagerSecurityEvents from './pages/dashboard/BranchManagerSecurityEvents';
 
 import SuperAdminDashboard from './pages/dashboard/SuperAdminDashboard';
+import SuperAdminBranchOverview from './pages/dashboard/SuperAdminBranchOverview';
 import SuperAdminBranches from './pages/dashboard/SuperAdminBranches';
 import SuperAdminBranchAdmin from './pages/dashboard/SuperAdminBranchAdmin';
 import SuperAdminStaff from './pages/dashboard/SuperAdminStaff';
@@ -175,6 +178,8 @@ function MainApp() {
       <Routes>
         {/* Super Admin Individual Page Routes */}
         <Route path="/super-admin/dashboard" element={<SuperAdminDashboard />} />
+        <Route path="/super-admin/branch-overview" element={<SuperAdminBranchOverview />} />
+        <Route path="/super-admin/overview" element={<SuperAdminBranchOverview />} />
         <Route path="/super-admin/branches" element={<SuperAdminBranches />} />
         <Route path="/super-admin/branch-admins" element={<SuperAdminBranchAdmin />} />
         <Route path="/super-admin/branch-admin" element={<SuperAdminBranchAdmin />} />
@@ -209,6 +214,10 @@ function MainApp() {
 
         {/* Branch Manager Routes */}
         <Route path="/branch-manager/dashboard" element={<BranchManagerDashboard />} />
+        <Route path="/branch-manager/branch-overview" element={<BranchManagerOverview />} />
+        <Route path="/branch-admin/branch-overview" element={<BranchManagerOverview />} />
+        <Route path="/branch-manager/overview" element={<BranchManagerOverview />} />
+        <Route path="/branch-admin/overview" element={<BranchManagerOverview />} />
         <Route path="/branch-manager/members" element={<BranchManagerMembers />} />
         <Route path="/branch-admin/members" element={<BranchManagerMembers />} />
         <Route path="/branch-manager/nominees" element={<BranchManagerNominees />} />
@@ -279,6 +288,8 @@ function MainApp() {
         <Route path="/staff/members" element={<StaffMembers />} />
         <Route path="/staff/view-members" element={<StaffMembers />} />
         <Route path="/staff/branch-members" element={<StaffMembers />} />
+        <Route path="/staff/announcements" element={<StaffAnnouncements />} />
+        <Route path="/staff/notices" element={<StaffAnnouncements />} />
         <Route path="/staff/*" element={<Navigate to="/staff/dashboard" replace />} />
       </Routes>
     );

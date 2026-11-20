@@ -139,7 +139,7 @@ export async function getAnnouncement(announcementId) {
 
 /**
  * 3. POST /superadmin/announcements - Create Announcement
- * Body: { title, message, is_active }
+ * Body: { title, message, is_active, target_account_roles, target_staff_role_ids }
  */
 export async function createAnnouncement(announcementData) {
   try {
@@ -148,6 +148,18 @@ export async function createAnnouncement(announcementData) {
       message: announcementData.message?.trim() || '',
       is_active: announcementData.is_active !== undefined ? Boolean(announcementData.is_active) : true,
     };
+
+    if (announcementData.target_account_roles !== undefined) {
+      payload.target_account_roles = Array.isArray(announcementData.target_account_roles)
+        ? announcementData.target_account_roles
+        : [];
+    }
+
+    if (announcementData.target_staff_role_ids !== undefined) {
+      payload.target_staff_role_ids = Array.isArray(announcementData.target_staff_role_ids)
+        ? announcementData.target_staff_role_ids.map(Number).filter((n) => !isNaN(n))
+        : [];
+    }
 
     const res = await fetch(`${BASE_URL}/superadmin/announcements`, {
       method: 'POST',
@@ -169,7 +181,7 @@ export async function createAnnouncement(announcementData) {
 
 /**
  * 4. PUT /superadmin/announcements/{announcement_id} - Update Announcement
- * Body: { title, message, is_active }
+ * Body: { title, message, is_active, target_account_roles?, target_staff_role_ids? }
  */
 export async function updateAnnouncement(announcementId, announcementData) {
   try {
@@ -178,6 +190,18 @@ export async function updateAnnouncement(announcementId, announcementData) {
       message: announcementData.message?.trim() || '',
       is_active: announcementData.is_active !== undefined ? Boolean(announcementData.is_active) : true,
     };
+
+    if (announcementData.target_account_roles !== undefined) {
+      payload.target_account_roles = Array.isArray(announcementData.target_account_roles)
+        ? announcementData.target_account_roles
+        : [];
+    }
+
+    if (announcementData.target_staff_role_ids !== undefined) {
+      payload.target_staff_role_ids = Array.isArray(announcementData.target_staff_role_ids)
+        ? announcementData.target_staff_role_ids.map(Number).filter((n) => !isNaN(n))
+        : [];
+    }
 
     const res = await fetch(`${BASE_URL}/superadmin/announcements/${announcementId}`, {
       method: 'PUT',
@@ -334,6 +358,56 @@ export async function getBranchAdminAnnouncements({ skip = 0, limit = 50 } = {})
     return [];
   } catch (error) {
     console.error('announcementService.getBranchAdminAnnouncements error:', error);
+    throw error;
+  }
+}
+
+/**
+ * 9. GET /staff/announcements - List Announcements For Staff
+ * Cashiers, Accountants, and Customer Service Officers can fetch active announcements targeted to their assigned staff role.
+ * Supports skip, limit, and search.
+ */
+export async function getStaffAnnouncements({ skip = 0, limit = 50, search = '' } = {}) {
+  try {
+    const token =
+      localStorage.getItem('staff_token') ||
+      localStorage.getItem('token') ||
+      localStorage.getItem('access_token') ||
+      localStorage.getItem('auth_token');
+
+    const headers = {
+      'Content-Type': 'application/json',
+      'ngrok-skip-browser-warning': 'true',
+      'Accept': 'application/json',
+    };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const params = new URLSearchParams();
+    if (skip !== undefined && skip !== null) params.append('skip', String(skip));
+    if (limit !== undefined && limit !== null) params.append('limit', String(limit));
+    if (search && search.trim()) params.append('search', search.trim());
+
+    const qs = params.toString() ? `?${params.toString()}` : '';
+    const res = await fetch(`${BASE_URL}/staff/announcements${qs}`, {
+      method: 'GET',
+      headers,
+    });
+
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({}));
+      checkResponseStatus(res, errBody, 'Failed to fetch staff announcements', 'staff');
+    }
+
+    const data = await res.json();
+    if (Array.isArray(data)) return data;
+    if (Array.isArray(data.announcements)) return data.announcements;
+    if (Array.isArray(data.items)) return data.items;
+    if (Array.isArray(data.data)) return data.data;
+    return [];
+  } catch (error) {
+    console.error('announcementService.getStaffAnnouncements error:', error);
     throw error;
   }
 }

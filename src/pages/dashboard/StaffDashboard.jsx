@@ -23,7 +23,8 @@ import {
   Wallet,
   Receipt,
   Check,
-  X
+  X,
+  Megaphone
 } from 'lucide-react';
 import staffTeamworkIllustration from '../../assets/AurumFX Office Finance Teamwork Cutout.webp';
 import { getStaffMe } from '../../services/branchStaffService';
@@ -466,6 +467,16 @@ export default function StaffDashboard() {
                   <span className="font-mono font-bold text-teal-800">{staffData.branch.ifsc_code}</span>
                 </div>
               )}
+
+              {/* Role Announcements Action */}
+              <button
+                onClick={() => navigate('/staff/announcements')}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-teal-50 hover:bg-teal-100 border border-teal-200/80 shadow-2xs text-xs font-semibold text-teal-800 transition-colors cursor-pointer active:scale-95"
+                title="View announcements targeted to your role"
+              >
+                <Megaphone className="w-3.5 h-3.5 text-teal-600" />
+                <span>Role Announcements</span>
+              </button>
 
               {/* Refresh Action */}
               <button

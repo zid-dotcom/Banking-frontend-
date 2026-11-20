@@ -28,6 +28,7 @@ import {
   ShieldAlert,
   Calculator,
   Scale,
+  FileBarChart,
 } from 'lucide-react';
 import {
   getMemberUnreadCount,
@@ -67,6 +68,7 @@ export default function DashboardSidebar({
     ],
     branch_manager: [
       { id: 'overview', label: 'Branch Dashboard', icon: LayoutDashboard, path: '/branch-manager/dashboard' },
+      { id: 'branch_overview', label: 'Branch Overview', icon: FileBarChart, path: '/branch-manager/branch-overview' },
       { id: 'members', label: 'Branch Members', icon: Users, path: '/branch-manager/members' },
       { id: 'nominees', label: 'Branch Nominees', icon: HeartHandshake, path: '/branch-manager/nominees' },
       { id: 'staff', label: 'Branch Staff', icon: ShieldCheck, path: '/branch-manager/staff' },
@@ -82,6 +84,7 @@ export default function DashboardSidebar({
     ],
     super_admin: [
       { id: 'overview', label: 'Dashboard', icon: LayoutDashboard, path: '/super-admin/dashboard' },
+      { id: 'branch_overview', label: 'Branch Overview', icon: FileBarChart, path: '/super-admin/branch-overview' },
       { id: 'branches', label: 'Branches', icon: Building2, path: '/super-admin/branches' },
       { id: 'branch_admins', label: 'Branch Manager', icon: UserCheck, path: '/super-admin/branch-admins' },
       { id: 'staff_roles', label: 'Staff Roles', icon: ShieldCheck, path: '/super-admin/staff-roles' },
@@ -110,6 +113,7 @@ export default function DashboardSidebar({
         return [
           { id: 'overview', label: 'Staff Dashboard', icon: LayoutDashboard, path: '/staff/dashboard' },
           { id: 'service_requests', label: 'Service Requests', icon: Headset, path: '/staff/service-requests' },
+          { id: 'announcements', label: 'Announcements', icon: Megaphone, path: '/staff/announcements' },
         ];
       }
       if (isAccountant) {
@@ -117,12 +121,14 @@ export default function DashboardSidebar({
           { id: 'overview', label: 'Staff Dashboard', icon: LayoutDashboard, path: '/staff/dashboard' },
           { id: 'cash_reconciliation', label: 'Cash Reconciliation', icon: Calculator, path: '/staff/cash-reconciliation' },
           { id: 'members', label: 'View Members', icon: Users, path: '/staff/members' },
+          { id: 'announcements', label: 'Announcements', icon: Megaphone, path: '/staff/announcements' },
         ];
       }
       return [
         { id: 'overview', label: 'Staff Dashboard', icon: LayoutDashboard, path: '/staff/dashboard' },
         { id: 'cash_operations', label: 'Cash Operations', icon: Wallet, path: '/staff/cash-operations' },
         { id: 'cash_reconciliation', label: 'Cash Reconciliation', icon: Calculator, path: '/staff/cash-reconciliation' },
+        { id: 'announcements', label: 'Announcements', icon: Megaphone, path: '/staff/announcements' },
       ];
     })()
   };

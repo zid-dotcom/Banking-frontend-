@@ -74,7 +74,11 @@ function formatDateTime(isoString) {
   }
 }
 
-export default function BranchManagerCashTransactions() {
+export default function BranchManagerCashTransactions({
+  embedded = false,
+  fromDate: propFromDate = '',
+  toDate: propToDate = ''
+}) {
   const [managerUser, setManagerUser] = useState(() => {
     try {
       const cached = localStorage.getItem('branch_user') || localStorage.getItem('branch_manager_user');
@@ -102,8 +106,20 @@ export default function BranchManagerCashTransactions() {
   const [errorCashTransactions, setErrorCashTransactions] = useState(null);
   const [cashTxFilter, setCashTxFilter] = useState('all'); // 'all' | 'deposit' | 'withdrawal'
   const [cashTxSearch, setCashTxSearch] = useState('');
-  const [fromDate, setFromDate] = useState('');
-  const [toDate, setToDate] = useState('');
+  const [fromDate, setFromDate] = useState(propFromDate || '');
+  const [toDate, setToDate] = useState(propToDate || '');
+
+  useEffect(() => {
+    if (propFromDate !== undefined) {
+      setFromDate(propFromDate || '');
+    }
+  }, [propFromDate]);
+
+  useEffect(() => {
+    if (propToDate !== undefined) {
+      setToDate(propToDate || '');
+    }
+  }, [propToDate]);
 
   // Fetch branch admin profile
   useEffect(() => {
@@ -297,9 +313,8 @@ export default function BranchManagerCashTransactions() {
         : managerUser.branch.state
       : '');
 
-  return (
-    <DashboardLayout role="branch_manager" user={managerUser} activeTab="cash_transactions">
-      <div className="space-y-6 sm:space-y-8 animate-fadeIn">
+  const content = (
+    <div className="space-y-6 sm:space-y-8 animate-fadeIn">
         
         {/* Banner matching AurumFX Branch Manager standards */}
         <div className="bg-gradient-to-r from-[#d8f6f0] via-[#e5faf5] to-[#cbf3eb] rounded-3xl p-6 sm:p-7 lg:p-8 border border-teal-200/70 shadow-sm relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
@@ -697,6 +712,15 @@ export default function BranchManagerCashTransactions() {
         </div>
 
       </div>
+  );
+
+  if (embedded) {
+    return content;
+  }
+
+  return (
+    <DashboardLayout role="branch_manager" user={managerUser} activeTab="cash_transactions">
+      {content}
     </DashboardLayout>
   );
 }

@@ -87,7 +87,12 @@ function formatDateTime(isoString) {
   }
 }
 
-export default function SuperAdminCashReconciliation() {
+export default function SuperAdminCashReconciliation({
+  embedded = false,
+  branchId = null,
+  fromDate: propFromDate = '',
+  toDate: propToDate = ''
+}) {
   const navigate = useNavigate();
 
   const [currentUser, setCurrentUser] = useState(() => {
@@ -113,15 +118,33 @@ export default function SuperAdminCashReconciliation() {
 
   // State
   const [branches, setBranches] = useState([]);
-  const [selectedBranchId, setSelectedBranchId] = useState('all');
+  const [selectedBranchId, setSelectedBranchId] = useState(branchId || 'all');
+
+  useEffect(() => {
+    if (branchId !== null && branchId !== undefined) {
+      setSelectedBranchId(branchId);
+    }
+  }, [branchId]);
   const [dailyReports, setDailyReports] = useState([]);
   const [reports, setReports] = useState([]); // Flattened cashier reports
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   // Filters
-  const [fromDate, setFromDate] = useState('');
-  const [toDate, setToDate] = useState('');
+  const [fromDate, setFromDate] = useState(propFromDate || '');
+  const [toDate, setToDate] = useState(propToDate || '');
+
+  useEffect(() => {
+    if (propFromDate !== undefined) {
+      setFromDate(propFromDate || '');
+    }
+  }, [propFromDate]);
+
+  useEffect(() => {
+    if (propToDate !== undefined) {
+      setToDate(propToDate || '');
+    }
+  }, [propToDate]);
   const [statusFilter, setStatusFilter] = useState('all'); // 'all' | 'pending' | 'resolved' | 'returned' | 'mismatch'
   const [search, setSearch] = useState('');
 
@@ -315,21 +338,23 @@ export default function SuperAdminCashReconciliation() {
   };
 
   // Helpers
-  const isReportPendingSuperAdmin = (r) => {
-    return !r.superadmin_decision || r.superadmin_decision === 'pending';
-  };
-
   const isReportMismatch = (r) => {
     const diff = r.difference;
-    if (diff !== null && diff !== undefined && Number(diff) !== 0) return true;
+    if (diff !== null && diff !== undefined && Math.abs(Number(diff)) > 0.001) return true;
     if (
       r.closing_cash !== null &&
+      r.closing_cash !== undefined &&
       r.expected_closing_cash !== null &&
-      Number(r.closing_cash) !== Number(r.expected_closing_cash)
+      r.expected_closing_cash !== undefined &&
+      Math.abs(Number(r.closing_cash) - Number(r.expected_closing_cash)) > 0.001
     ) {
       return true;
     }
     return false;
+  };
+
+  const isReportPendingSuperAdmin = (r) => {
+    return (!r.superadmin_decision || r.superadmin_decision === 'pending') && isReportMismatch(r);
   };
 
   // Filtered reports
@@ -377,8 +402,14 @@ export default function SuperAdminCashReconciliation() {
   );
   const totalDifference = filteredReports.reduce((acc, r) => acc + Number(r.difference || 0), 0);
 
-  return (
-    <DashboardLayout role="super_admin" user={currentUser} activeTab="cash_reconciliation">
+  // Show Decision columns only if there is any cash variance / difference
+  const hasAnyVariance =
+    Math.abs(totalDifference) > 0.001 ||
+    filteredReports.some((r) => isReportMismatch(r) || Math.abs(Number(r.difference || 0)) > 0.001);
+  const showDecisionColumns = hasAnyVariance;
+
+  const content = (
+    <>
       <div className="space-y-6 sm:space-y-8 animate-fadeIn">
         {/* Top Header Banner */}
         <div className="bg-gradient-to-r from-[#d8f6f0] via-[#e5faf5] to-[#cbf3eb] rounded-3xl p-6 sm:p-7 lg:p-8 border border-teal-200/70 shadow-sm relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
@@ -696,15 +727,19 @@ export default function SuperAdminCashReconciliation() {
                   <th className="py-3.5 px-4 text-right whitespace-nowrap">Expected Cash</th>
                   <th className="py-3.5 px-4 text-right whitespace-nowrap">Counted Cash</th>
                   <th className="py-3.5 px-4 text-right whitespace-nowrap">Difference</th>
-                  <th className="py-3.5 px-4 text-center whitespace-nowrap">Branch Decision</th>
-                  <th className="py-3.5 px-4 text-center whitespace-nowrap">Super Admin Decisions</th>
+                  {showDecisionColumns && (
+                    <>
+                      <th className="py-3.5 px-4 text-center whitespace-nowrap">Branch Decision</th>
+                      <th className="py-3.5 px-4 text-center whitespace-nowrap">Super Admin Decisions</th>
+                    </>
+                  )}
                   <th className="py-3.5 px-4 text-center whitespace-nowrap">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-xs font-medium text-slate-700">
                 {loading ? (
                   <tr>
-                    <td colSpan="13" className="py-12 text-center text-slate-400">
+                    <td colSpan={showDecisionColumns ? 13 : 11} className="py-12 text-center text-slate-400">
                       <div className="flex flex-col items-center justify-center gap-2">
                         <Loader2 className="w-6 h-6 animate-spin text-[#00b4a7]" />
                         <span>Loading central cash reconciliations...</span>
@@ -713,7 +748,7 @@ export default function SuperAdminCashReconciliation() {
                   </tr>
                 ) : filteredReports.length === 0 ? (
                   <tr>
-                    <td colSpan="13" className="py-12 text-center text-slate-400">
+                    <td colSpan={showDecisionColumns ? 13 : 11} className="py-12 text-center text-slate-400">
                       <div className="max-w-xs mx-auto space-y-2">
                         <Scale className="w-8 h-8 text-slate-300 mx-auto" />
                         <p className="font-bold text-slate-700 text-sm">No cash reconciliations found</p>
@@ -728,6 +763,7 @@ export default function SuperAdminCashReconciliation() {
                 ) : (
                   filteredReports.map((report) => {
                     const diffNum = Number(report.difference || 0);
+                    const hasMismatch = isReportMismatch(report) || Math.abs(diffNum) > 0.001;
                     const bDecision = report.branch_admin_decision;
                     const sDecision = report.superadmin_decision;
 
@@ -766,7 +802,7 @@ export default function SuperAdminCashReconciliation() {
                         <td className="py-3.5 px-4 text-right font-mono font-black whitespace-nowrap">
                           {report.difference === null || report.difference === undefined ? (
                             <span className="text-slate-400">—</span>
-                          ) : diffNum === 0 ? (
+                          ) : Math.abs(diffNum) <= 0.001 ? (
                             <span className="text-emerald-700">₹0.00</span>
                           ) : diffNum > 0 ? (
                             <span className="text-emerald-600">+{formatCurrency(diffNum)} (Surplus)</span>
@@ -774,40 +810,52 @@ export default function SuperAdminCashReconciliation() {
                             <span className="text-rose-600">{formatCurrency(diffNum)} (Shortage)</span>
                           )}
                         </td>
-                        <td className="py-3.5 px-4 text-center whitespace-nowrap">
-                          {bDecision === 'resolved' ? (
-                            <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 whitespace-nowrap">
-                              <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                              <span>Resolved</span>
-                            </span>
-                          ) : bDecision === 'escalated' ? (
-                            <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-800 border border-rose-200 whitespace-nowrap">
-                              <AlertTriangle className="w-3 h-3 text-rose-600" />
-                              <span>Escalated</span>
-                            </span>
-                          ) : (
-                            <span className="inline-block text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-500 whitespace-nowrap">
-                              Pending
-                            </span>
-                          )}
-                        </td>
-                        <td className="py-3.5 px-4 text-center whitespace-nowrap">
-                          {sDecision === 'resolved' ? (
-                            <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 whitespace-nowrap">
-                              <CheckCircle2 className="w-3 h-3 text-emerald-700" />
-                              <span>Approved</span>
-                            </span>
-                          ) : sDecision === 'returned_to_branch' ? (
-                            <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 whitespace-nowrap">
-                              <RotateCcw className="w-3 h-3 text-amber-600" />
-                              <span>Returned</span>
-                            </span>
-                          ) : (
-                            <span className="inline-block text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 whitespace-nowrap">
-                              Decision Pending
-                            </span>
-                          )}
-                        </td>
+                        {showDecisionColumns && (
+                          <>
+                            <td className="py-3.5 px-4 text-center whitespace-nowrap">
+                              {hasMismatch ? (
+                                bDecision === 'resolved' ? (
+                                  <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 whitespace-nowrap">
+                                    <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                                    <span>Resolved</span>
+                                  </span>
+                                ) : bDecision === 'escalated' ? (
+                                  <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-800 border border-rose-200 whitespace-nowrap">
+                                    <AlertTriangle className="w-3 h-3 text-rose-600" />
+                                    <span>Escalated</span>
+                                  </span>
+                                ) : (
+                                  <span className="inline-block text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-500 whitespace-nowrap">
+                                    Pending
+                                  </span>
+                                )
+                              ) : (
+                                <span className="text-slate-400 text-xs">—</span>
+                              )}
+                            </td>
+                            <td className="py-3.5 px-4 text-center whitespace-nowrap">
+                              {hasMismatch ? (
+                                sDecision === 'resolved' ? (
+                                  <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 whitespace-nowrap">
+                                    <CheckCircle2 className="w-3 h-3 text-emerald-700" />
+                                    <span>Approved</span>
+                                  </span>
+                                ) : sDecision === 'returned_to_branch' ? (
+                                  <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 whitespace-nowrap">
+                                    <RotateCcw className="w-3 h-3 text-amber-600" />
+                                    <span>Returned</span>
+                                  </span>
+                                ) : (
+                                  <span className="inline-block text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 whitespace-nowrap">
+                                    Decision Pending
+                                  </span>
+                                )
+                              ) : (
+                                <span className="text-slate-400 text-xs">—</span>
+                              )}
+                            </td>
+                          </>
+                        )}
                         <td className="py-3.5 px-4 text-center whitespace-nowrap">
                           <div className="flex items-center justify-center gap-1.5">
                             <button
@@ -819,15 +867,17 @@ export default function SuperAdminCashReconciliation() {
                               <Receipt className="w-3 h-3 text-teal-600" />
                               <span>Details</span>
                             </button>
-                            <button
-                              type="button"
-                              onClick={() => handleOpenDecision(report)}
-                              className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1 shadow-2xs"
-                              title="Record superadmin decision"
-                            >
-                              <ShieldCheck className="w-3 h-3" />
-                              <span>Decide</span>
-                            </button>
+                            {hasMismatch && (
+                              <button
+                                type="button"
+                                onClick={() => handleOpenDecision(report)}
+                                className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1 shadow-2xs"
+                                title="Record superadmin decision"
+                              >
+                                <ShieldCheck className="w-3 h-3" />
+                                <span>Decide</span>
+                              </button>
+                            )}
                           </div>
                         </td>
                       </tr>
@@ -1210,6 +1260,16 @@ export default function SuperAdminCashReconciliation() {
           </div>
         </div>
       )}
+    </>
+  );
+
+  if (embedded) {
+    return content;
+  }
+
+  return (
+    <DashboardLayout role="super_admin" user={currentUser} activeTab="cash_reconciliation">
+      {content}
     </DashboardLayout>
   );
 }

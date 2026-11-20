@@ -14,13 +14,36 @@ import {
 } from 'lucide-react';
 import { SOCIETY_INFO } from '../../data/societyData';
 import {
-  getMemberNotifications,
-  getMemberUnreadCount,
-  markAllNotificationsRead,
-  markNotificationRead,
+  fetchNotificationsForRole,
+  fetchUnreadCountForRole,
+  markNotificationReadForRole,
+  markAllNotificationsReadForRole,
   NOTIFICATIONS_UPDATED_EVENT,
   notifyNotificationsUpdated
-} from '../../services/memberService';
+} from '../../services/notificationService';
+
+function formatNotificationTime(dateStr) {
+  if (!dateStr) return '';
+  if (typeof dateStr === 'string' && (dateStr.includes('ago') || dateStr.includes('Yesterday'))) {
+    return dateStr;
+  }
+  try {
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return String(dateStr);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `${diffHours}h ago`;
+    const diffDays = Math.floor(diffHours / 24);
+    if (diffDays < 7) return `${diffDays}d ago`;
+    return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  } catch {
+    return String(dateStr);
+  }
+}
 
 function formatNotificationText(text) {
   if (!text || typeof text !== 'string') return text || '';
@@ -44,7 +67,7 @@ export default function DashboardHeader({
 }) {
   const navigate = useNavigate();
   const [notificationsOpen, setNotificationsOpen] = useState(false);
-  const [memberNotifications, setMemberNotifications] = useState([]);
+  const [notificationsList, setNotificationsList] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loadingNotes, setLoadingNotes] = useState(false);
 
@@ -76,46 +99,46 @@ export default function DashboardHeader({
   useEffect(() => {
     let isMounted = true;
 
-    const refreshMemberUnread = () => {
-      if (role === 'member') {
-        getMemberUnreadCount()
-          .then((c) => {
-            if (isMounted) setUnreadCount(typeof c === 'number' ? c : 0);
-          })
-          .catch(() => {});
-      }
+    const refreshUnread = () => {
+      fetchUnreadCountForRole(role)
+        .then((c) => {
+          if (isMounted) setUnreadCount(typeof c === 'number' ? c : 0);
+        })
+        .catch(() => {});
     };
 
-    refreshMemberUnread();
+    refreshUnread();
 
     const handleNotificationsUpdated = (e) => {
-      if (role === 'member') {
+      const targetRole = e?.detail?.role;
+      if (!targetRole || targetRole === role || (targetRole === 'branch_admin' && role === 'branch_manager')) {
         if (typeof e?.detail?.unreadCount === 'number') {
           if (isMounted) setUnreadCount(e.detail.unreadCount);
         } else {
-          refreshMemberUnread();
+          refreshUnread();
         }
       }
     };
 
-    window.addEventListener(NOTIFICATIONS_UPDATED_EVENT || 'member-notifications-updated', handleNotificationsUpdated);
+    window.addEventListener(NOTIFICATIONS_UPDATED_EVENT, handleNotificationsUpdated);
+    window.addEventListener('member-notifications-updated', handleNotificationsUpdated);
 
     return () => {
       isMounted = false;
-      window.removeEventListener(NOTIFICATIONS_UPDATED_EVENT || 'member-notifications-updated', handleNotificationsUpdated);
+      window.removeEventListener(NOTIFICATIONS_UPDATED_EVENT, handleNotificationsUpdated);
+      window.removeEventListener('member-notifications-updated', handleNotificationsUpdated);
     };
   }, [role]);
 
-  const loadMemberNotes = async () => {
-    if (role !== 'member') return;
+  const loadNotifications = async () => {
     setLoadingNotes(true);
     try {
-      const data = await getMemberNotifications({ limit: 10 });
-      setMemberNotifications(Array.isArray(data) ? data : []);
-      const c = await getMemberUnreadCount();
+      const data = await fetchNotificationsForRole(role, { limit: 20 });
+      setNotificationsList(Array.isArray(data) ? data : []);
+      const c = await fetchUnreadCountForRole(role);
       setUnreadCount(typeof c === 'number' ? c : 0);
     } catch (err) {
-      console.warn('loadMemberNotes error:', err);
+      console.warn('loadNotifications error:', err);
     } finally {
       setLoadingNotes(false);
     }
@@ -124,33 +147,37 @@ export default function DashboardHeader({
   const handleToggleNotes = () => {
     const next = !notificationsOpen;
     setNotificationsOpen(next);
-    if (next && role === 'member') {
-      loadMemberNotes();
+    if (next) {
+      loadNotifications();
     }
   };
 
   const handleMarkOne = async (id) => {
     if (!id) return;
     try {
-      await markNotificationRead(id);
-      setMemberNotifications((prev) =>
-        prev.map((n) => ((n.id || n.notification_id) === id ? { ...n, is_read: true } : n))
+      await markNotificationReadForRole(role, id);
+      setNotificationsList((prev) =>
+        prev.map((n) => ((n.id || n.notification_id || n._id) === id ? { ...n, is_read: true, read: true, status: 'read' } : n))
       );
       setUnreadCount((c) => {
         const next = Math.max(0, c - 1);
-        notifyNotificationsUpdated(next);
+        notifyNotificationsUpdated(role, next);
         return next;
       });
-    } catch {}
+    } catch (err) {
+      console.warn('handleMarkOne error:', err);
+    }
   };
 
   const handleMarkAll = async () => {
     try {
-      await markAllNotificationsRead();
-      setMemberNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
+      await markAllNotificationsReadForRole(role);
+      setNotificationsList((prev) => prev.map((n) => ({ ...n, is_read: true, read: true, status: 'read' })));
       setUnreadCount(0);
-      notifyNotificationsUpdated(0);
-    } catch {}
+      notifyNotificationsUpdated(role, 0);
+    } catch (err) {
+      console.warn('handleMarkAll error:', err);
+    }
   };
 
   const handleLogout = () => {
@@ -177,12 +204,6 @@ export default function DashboardHeader({
       navigate('/super-admin/login');
     }
   };
-
-  const notifications = [
-    { id: 1, title: 'Dividend Credited', desc: 'Annual society share dividend of ₹1,850 credited.', time: '2h ago' },
-    { id: 2, title: 'KYC Verified', desc: 'Your agrarian membership ledger is completely updated.', time: '1d ago' },
-    { id: 3, title: 'Quarterly Audit Note', desc: 'Statutory inspection report uploaded for members.', time: '3d ago' },
-  ];
 
   return (
     <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-6 lg:px-8 py-4 sm:py-5 min-h-[78px] sm:min-h-[86px] lg:min-h-[92px] flex items-center justify-between gap-3 sm:gap-4">
@@ -239,14 +260,10 @@ export default function DashboardHeader({
           >
             <div className="relative inline-flex items-center justify-center">
               <Bell className="w-5 h-5 text-slate-600" />
-              {role === 'member' ? (
-                unreadCount > 0 && (
-                  <span className="absolute -top-1.5 -right-2.5 min-w-[18px] h-[18px] px-1 bg-rose-500 text-white text-[10px] font-bold rounded-full ring-2 ring-white flex items-center justify-center shadow-xs pointer-events-none">
-                    {unreadCount > 99 ? '99+' : unreadCount}
-                  </span>
-                )
-              ) : (
-                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-[#2dd4bf] rounded-full ring-2 ring-white" />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1.5 -right-2.5 min-w-[18px] h-[18px] px-1 bg-rose-500 text-white text-[10px] font-bold rounded-full ring-2 ring-white flex items-center justify-center shadow-xs pointer-events-none">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
               )}
             </div>
           </button>
@@ -257,7 +274,7 @@ export default function DashboardHeader({
               <div className="px-4 sm:px-5 pb-3 border-b border-slate-100 flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-black text-slate-900">Notifications</span>
-                  {role === 'member' && (
+                  {unreadCount > 0 && (
                     <span className="text-[11px] font-bold text-[#0f766e] bg-teal-50 px-2.5 py-0.5 rounded-full border border-teal-200/60 shadow-2xs">
                       {unreadCount} unread
                     </span>
@@ -265,7 +282,7 @@ export default function DashboardHeader({
                 </div>
 
                 <div className="flex items-center gap-2">
-                  {role === 'member' && unreadCount > 0 && (
+                  {unreadCount > 0 && (
                     <button
                       type="button"
                       onClick={handleMarkAll}
@@ -287,74 +304,75 @@ export default function DashboardHeader({
 
               {/* Dropdown Notification Stream */}
               <div className="divide-y divide-slate-100 max-h-80 sm:max-h-96 overflow-y-auto">
-                {role === 'member' ? (
-                  loadingNotes ? (
-                    <div className="py-8 text-center text-slate-400 space-y-1">
-                      <Loader2 className="w-5 h-5 animate-spin text-teal-600 mx-auto" />
-                      <span className="text-xs font-medium">Loading alerts...</span>
-                    </div>
-                  ) : memberNotifications.length === 0 ? (
-                    <div className="py-8 text-center text-slate-400 text-xs font-medium">
-                      No notifications logged.
-                    </div>
-                  ) : (
-                    memberNotifications.map((n) => {
-                      const id = n.id || n.notification_id;
-                      const isRead = n.is_read === true || n.read === true || n.status === 'read';
-                      return (
-                        <div
-                          key={id || Math.random()}
-                          className={`p-3.5 sm:p-4 transition-colors ${
-                            !isRead ? 'bg-teal-50/40' : 'hover:bg-slate-50'
-                          }`}
-                        >
-                          <div className="flex items-center justify-between gap-2">
-                            <p className={`text-xs sm:text-sm leading-snug ${!isRead ? 'font-extrabold text-slate-900' : 'font-semibold text-slate-700'}`}>
-                              {formatNotificationText(n.title || n.subject || 'Member Alert')}
-                            </p>
-                            <div className="flex items-center gap-1.5 flex-shrink-0">
-                              {!isRead ? (
-                                <>
-                                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200/80">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
-                                    Unread
-                                  </span>
-                                  <button
-                                    type="button"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleMarkOne(id);
-                                    }}
-                                    title="Mark as read"
-                                    className="inline-flex items-center gap-1 text-[10px] font-bold text-teal-800 hover:text-teal-950 bg-teal-50 hover:bg-teal-100 px-2 py-0.5 rounded-full border border-teal-200/80 shadow-2xs transition-all cursor-pointer"
-                                  >
-                                    <Check className="w-3 h-3 text-teal-600" />
-                                    <span>Mark read</span>
-                                  </button>
-                                </>
-                              ) : (
-                                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/80">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                                  Read
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                          <p className="text-xs text-slate-600 mt-1 leading-relaxed line-clamp-2">
-                            {formatNotificationText(n.message || n.description || n.desc)}
-                          </p>
-                        </div>
-                      );
-                    })
-                  )
+                {loadingNotes ? (
+                  <div className="py-8 text-center text-slate-400 space-y-1">
+                    <Loader2 className="w-5 h-5 animate-spin text-teal-600 mx-auto" />
+                    <span className="text-xs font-medium">Loading alerts...</span>
+                  </div>
+                ) : notificationsList.length === 0 ? (
+                  <div className="py-8 text-center text-slate-400 text-xs font-medium">
+                    No notifications logged.
+                  </div>
                 ) : (
-                  notifications.map((n) => (
-                    <div key={n.id} className="p-3.5 hover:bg-slate-50 transition-colors cursor-pointer">
-                      <p className="text-xs font-bold text-slate-800">{n.title}</p>
-                      <p className="text-[11px] text-slate-500 mt-0.5">{n.desc}</p>
-                      <span className="text-[10px] text-slate-400 mt-1 block">{n.time}</span>
-                    </div>
-                  ))
+                  notificationsList.map((n) => {
+                    const id = n.id || n.notification_id || n._id;
+                    const isRead = n.is_read === true || n.read === true || n.status === 'read';
+                    const timeStr = formatNotificationTime(n.created_at || n.timestamp || n.date || n.time);
+                    const title = n.title || n.subject || n.alert_type || (role === 'super_admin' ? 'Superadmin Alert' : role === 'staff' ? 'Staff Alert' : role === 'branch_manager' ? 'Branch Alert' : 'Member Alert');
+                    const message = n.message || n.description || n.desc || n.body || '';
+
+                    return (
+                      <div
+                        key={id || Math.random()}
+                        className={`p-3.5 sm:p-4 transition-colors ${
+                          !isRead ? 'bg-teal-50/40' : 'hover:bg-slate-50'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <p className={`text-xs sm:text-sm leading-snug ${!isRead ? 'font-extrabold text-slate-900' : 'font-semibold text-slate-700'}`}>
+                            {formatNotificationText(title)}
+                          </p>
+                          <div className="flex items-center gap-1.5 flex-shrink-0">
+                            {!isRead ? (
+                              <>
+                                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200/80">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
+                                  Unread
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleMarkOne(id);
+                                  }}
+                                  title="Mark as read"
+                                  className="inline-flex items-center gap-1 text-[10px] font-bold text-teal-800 hover:text-teal-950 bg-teal-50 hover:bg-teal-100 px-2 py-0.5 rounded-full border border-teal-200/80 shadow-2xs transition-all cursor-pointer"
+                                >
+                                  <Check className="w-3 h-3 text-teal-600" />
+                                  <span>Mark read</span>
+                                </button>
+                              </>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/80">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                Read
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        {message && (
+                          <p className="text-xs text-slate-600 mt-1 leading-relaxed line-clamp-2">
+                            {formatNotificationText(message)}
+                          </p>
+                        )}
+                        {timeStr && (
+                          <span className="text-[10px] text-slate-400 mt-1.5 block font-medium">
+                            {timeStr}
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })
                 )}
               </div>
 

@@ -51,16 +51,40 @@ function formatDateTime(isoString) {
   }
 }
 
-export default function SuperAdminCashTransactions() {
+export default function SuperAdminCashTransactions({
+  embedded = false,
+  branchId = null,
+  fromDate: propFromDate = '',
+  toDate: propToDate = ''
+}) {
   const [branches, setBranches] = useState([]);
-  const [selectedBranchId, setSelectedBranchId] = useState('all');
+  const [selectedBranchId, setSelectedBranchId] = useState(branchId || 'all');
+
+  useEffect(() => {
+    if (branchId !== null && branchId !== undefined) {
+      setSelectedBranchId(branchId);
+    }
+  }, [branchId]);
+
   const [cashTransactions, setCashTransactions] = useState([]);
   const [loadingCashTransactions, setLoadingCashTransactions] = useState(true);
   const [errorCashTransactions, setErrorCashTransactions] = useState(null);
   const [cashTxFilter, setCashTxFilter] = useState('all'); // 'all' | 'deposit' | 'withdrawal'
   const [cashTxSearch, setCashTxSearch] = useState('');
-  const [fromDate, setFromDate] = useState('');
-  const [toDate, setToDate] = useState('');
+  const [fromDate, setFromDate] = useState(propFromDate || '');
+  const [toDate, setToDate] = useState(propToDate || '');
+
+  useEffect(() => {
+    if (propFromDate !== undefined) {
+      setFromDate(propFromDate || '');
+    }
+  }, [propFromDate]);
+
+  useEffect(() => {
+    if (propToDate !== undefined) {
+      setToDate(propToDate || '');
+    }
+  }, [propToDate]);
 
   const storedUser = (() => {
     try {
@@ -206,9 +230,8 @@ export default function SuperAdminCashTransactions() {
     })
     .reduce((sum, tx) => sum + (Number(tx.amount) || 0), 0);
 
-  return (
-    <DashboardLayout role="super_admin" user={currentUser} activeTab="cash_transactions">
-      <div className="space-y-6 sm:space-y-8 animate-fadeIn">
+  const content = (
+    <div className="space-y-6 sm:space-y-8 animate-fadeIn">
         
         {/* Top Header Banner */}
         <div className="bg-gradient-to-r from-[#d8f6f0] via-[#e5faf5] to-[#cbf3eb] rounded-3xl p-6 sm:p-7 lg:p-8 border border-teal-200/70 shadow-sm relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
@@ -611,6 +634,15 @@ export default function SuperAdminCashTransactions() {
         </div>
 
       </div>
+  );
+
+  if (embedded) {
+    return content;
+  }
+
+  return (
+    <DashboardLayout role="super_admin" user={currentUser} activeTab="cash_transactions">
+      {content}
     </DashboardLayout>
   );
 }

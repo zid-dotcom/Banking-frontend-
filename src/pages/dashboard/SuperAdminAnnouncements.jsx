@@ -7,6 +7,7 @@ import {
   AnnouncementDeleteModal
 } from '../../components/dashboard/AnnouncementModals';
 import * as announcementService from '../../services/announcementService';
+import { getStaffRoles } from '../../services/staffRoleService';
 import {
   Megaphone,
   Bell,
@@ -80,6 +81,21 @@ export default function SuperAdminAnnouncements() {
   // Centered Feedback Popups
   const [errorPopup, setErrorPopup] = useState(null);
   const [successPopup, setSuccessPopup] = useState(null);
+  const [staffRolesMap, setStaffRolesMap] = useState({});
+
+  useEffect(() => {
+    getStaffRoles({ limit: 100 })
+      .then((roles) => {
+        if (Array.isArray(roles)) {
+          const map = {};
+          roles.forEach((r) => {
+            if (r.id) map[r.id] = r.name;
+          });
+          setStaffRolesMap(map);
+        }
+      })
+      .catch((err) => console.warn('Could not load staff roles mapping:', err));
+  }, []);
 
   const fetchAnnouncementsList = async (silent = false) => {
     if (!silent) setLoading(true);
@@ -465,6 +481,7 @@ export default function SuperAdminAnnouncements() {
                   <tr className="border-b border-slate-100 bg-slate-50/75 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                     <th className="py-3.5 px-6">Notice Title</th>
                     <th className="py-3.5 px-6">Message Preview</th>
+                    <th className="py-3.5 px-6">Target Audience</th>
                     <th className="py-3.5 px-6">Published At</th>
                     <th className="py-3.5 px-6 text-center">Status</th>
                     <th className="py-3.5 px-6 text-right">Actions</th>
@@ -502,6 +519,40 @@ export default function SuperAdminAnnouncements() {
                           <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
                             {item.message}
                           </p>
+                        </td>
+
+                        {/* Target Audience */}
+                        <td className="py-4 px-6 max-w-xs">
+                          <div className="flex flex-wrap gap-1">
+                            {Array.isArray(item.target_account_roles) && item.target_account_roles.length > 0 ? (
+                              item.target_account_roles.map((r) => (
+                                <span
+                                  key={r}
+                                  className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200/80"
+                                >
+                                  {r === 'branch_admin' ? 'Branch Admin' : r === 'member' ? 'Members' : r}
+                                </span>
+                              ))
+                            ) : null}
+
+                            {Array.isArray(item.target_staff_role_ids) && item.target_staff_role_ids.length > 0 ? (
+                              item.target_staff_role_ids.map((id) => (
+                                <span
+                                  key={id}
+                                  className="text-[10px] font-bold px-2 py-0.5 rounded bg-teal-50 text-teal-800 border border-teal-200/80"
+                                >
+                                  {staffRolesMap[id] || `Role #${id}`}
+                                </span>
+                              ))
+                            ) : null}
+
+                            {(!item.target_account_roles || item.target_account_roles.length === 0) &&
+                              (!item.target_staff_role_ids || item.target_staff_role_ids.length === 0) && (
+                                <span className="text-[10px] font-medium text-slate-400 italic">
+                                  All Audiences
+                                </span>
+                              )}
+                          </div>
                         </td>
 
                         {/* Published Date */}
@@ -640,6 +691,7 @@ export default function SuperAdminAnnouncements() {
       <AnnouncementDetailModal
         isOpen={detailModal.isOpen}
         announcement={detailModal.announcement}
+        showAudience={true}
         onClose={() => setDetailModal({ isOpen: false, announcement: null })}
         onEditClick={(item) =>
           setFormModal({

@@ -47,7 +47,7 @@ function formatDateTime(isoString) {
   }
 }
 
-export default function BranchManagerSecurityEvents() {
+export default function BranchManagerSecurityEvents({ embedded = false }) {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -174,8 +174,8 @@ export default function BranchManagerSecurityEvents() {
     return true;
   });
 
-  return (
-    <DashboardLayout role="branch_manager" user={branchUser} activeTab="security_events">
+  const content = (
+    <>
       <div className="space-y-6 sm:space-y-8 animate-fadeIn pb-12">
         {/* Top Header Banner */}
         <div className="bg-gradient-to-r from-[#d8f6ef] via-[#eafaf6] to-[#c7f3e8] rounded-3xl p-6 sm:p-7 lg:p-8 border border-teal-200/80 shadow-xs relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
@@ -467,6 +467,16 @@ export default function BranchManagerSecurityEvents() {
         event={selectedEvent}
         onClose={() => setSelectedEvent(null)}
       />
+    </>
+  );
+
+  if (embedded) {
+    return content;
+  }
+
+  return (
+    <DashboardLayout role="branch_manager" user={branchUser} activeTab="security_events">
+      {content}
     </DashboardLayout>
   );
 }

@@ -54,7 +54,7 @@ function formatDateTime(isoString) {
   }
 }
 
-export default function SuperAdminSecurityEvents() {
+export default function SuperAdminSecurityEvents({ embedded = false, branchId = null }) {
   const [events, setEvents] = useState([]);
   const [summary, setSummary] = useState({ total_events: 0, suspicious_events: 0, branches: [] });
   const [branchesList, setBranchesList] = useState([]);
@@ -63,7 +63,13 @@ export default function SuperAdminSecurityEvents() {
   const [error, setError] = useState(null);
 
   // Filters
-  const [selectedBranchId, setSelectedBranchId] = useState('all');
+  const [selectedBranchId, setSelectedBranchId] = useState(branchId || 'all');
+
+  useEffect(() => {
+    if (branchId !== null && branchId !== undefined) {
+      setSelectedBranchId(branchId);
+    }
+  }, [branchId]);
   const [selectedRole, setSelectedRole] = useState('all');
   const [selectedSucceeded, setSelectedSucceeded] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -202,8 +208,8 @@ export default function SuperAdminSecurityEvents() {
     return true;
   });
 
-  return (
-    <DashboardLayout role="super_admin" user={superAdminUser} activeTab="security_events">
+  const content = (
+    <>
       <div className="space-y-6 sm:space-y-8 animate-fadeIn pb-12">
         {/* Top Header Banner */}
         <div className="bg-gradient-to-r from-[#d8f6ef] via-[#eafaf6] to-[#c7f3e8] rounded-3xl p-6 sm:p-7 lg:p-8 border border-teal-200/80 shadow-xs relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
@@ -509,6 +515,16 @@ export default function SuperAdminSecurityEvents() {
         event={selectedEvent}
         onClose={() => setSelectedEvent(null)}
       />
+    </>
+  );
+
+  if (embedded) {
+    return content;
+  }
+
+  return (
+    <DashboardLayout role="super_admin" user={superAdminUser} activeTab="security_events">
+      {content}
     </DashboardLayout>
   );
 }

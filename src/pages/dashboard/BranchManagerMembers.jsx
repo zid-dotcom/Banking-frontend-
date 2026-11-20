@@ -55,7 +55,7 @@ function parseBranchInfo(obj = {}) {
   return { name, code, loc };
 }
 
-export default function BranchManagerMembers() {
+export default function BranchManagerMembers({ embedded = false }) {
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -356,12 +356,8 @@ export default function BranchManagerMembers() {
     ? (String(rawBranchCode).startsWith('#') ? rawBranchCode : `#${rawBranchCode}`)
     : '#Central';
 
-  return (
-    <DashboardLayout
-      role="branch_manager"
-      user={managerUser}
-      activeTab="members"
-    >
+  const content = (
+    <>
       <div className="space-y-6 sm:space-y-8 animate-fadeIn">
         {/* Top Header Banner */}
         <div className="bg-gradient-to-r from-[#d8f6f0] via-[#e6faf5] to-[#cbf2ea] rounded-3xl p-6 sm:p-7 lg:p-8 border border-teal-200/70 shadow-sm relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
@@ -977,6 +973,20 @@ export default function BranchManagerMembers() {
           <span className="font-medium">{toastMessage}</span>
         </div>
       )}
+    </>
+  );
+
+  if (embedded) {
+    return content;
+  }
+
+  return (
+    <DashboardLayout
+      role="branch_manager"
+      user={managerUser}
+      activeTab="members"
+    >
+      {content}
     </DashboardLayout>
   );
 }

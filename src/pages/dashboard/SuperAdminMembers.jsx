@@ -23,9 +23,17 @@ import { getBranches } from '../../services/branchService';
 import { getSuperadminBranchMembers } from '../../services/memberService';
 import MemberCashTransactionsModal from '../../components/dashboard/MemberCashTransactionsModal';
 
-export default function SuperAdminMembers() {
+export default function SuperAdminMembers({ embedded = false, branchId = null }) {
   const [branches, setBranches] = useState([]);
-  const [selectedBranchId, setSelectedBranchId] = useState('all');
+  const [selectedBranchId, setSelectedBranchId] = useState(branchId || 'all');
+
+  // Sync prop branchId to selectedBranchId
+  useEffect(() => {
+    if (branchId !== null && branchId !== undefined) {
+      setSelectedBranchId(branchId);
+    }
+  }, [branchId]);
+
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -65,31 +73,45 @@ export default function SuperAdminMembers() {
     office: storedUser?.office || 'Head Office - Apex Central Administration',
   };
 
-  // Initial load
+  // Fetch branches and members whenever selectedBranchId changes
   useEffect(() => {
-    fetchBranchesAndMembers();
-  }, []);
+    let isMounted = true;
+
+    async function loadData() {
+      setLoading(true);
+      setError(null);
+      try {
+        let branchList = branches;
+        if (!branchList || branchList.length === 0) {
+          branchList = await getBranches().catch(() => []);
+          if (isMounted) setBranches(branchList);
+        }
+        if (isMounted) {
+          await loadMembersForSelection(selectedBranchId, branchList);
+        }
+      } catch (err) {
+        if (isMounted) {
+          console.error('SuperAdminMembers fetch error:', err);
+          setError(err.message || 'Failed to connect to members API.');
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+          setRefreshing(false);
+        }
+      }
+    }
+
+    loadData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedBranchId]);
 
   // When branch filter selection changes
-  const handleBranchChange = (branchId) => {
-    setSelectedBranchId(branchId);
-    loadMembersForSelection(branchId, branches);
-  };
-
-  const fetchBranchesAndMembers = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const branchList = await getBranches();
-      setBranches(branchList);
-      await loadMembersForSelection(selectedBranchId, branchList);
-    } catch (err) {
-      console.error('SuperAdminMembers fetch error:', err);
-      setError(err.message || 'Failed to connect to members API.');
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
+  const handleBranchChange = (newBranchId) => {
+    setSelectedBranchId(newBranchId);
   };
 
   const loadMembersForSelection = async (branchSelection, branchList) => {
@@ -192,12 +214,8 @@ export default function SuperAdminMembers() {
     return matchSearch && matchStatus && matchActive;
   });
 
-  return (
-    <DashboardLayout
-      role="super_admin"
-      user={currentUser}
-      activeTab="member_base"
-    >
+  const content = (
+    <>
       <div className="space-y-6 sm:space-y-8 animate-fadeIn">
         
         {/* View Members Banner: Custom Matching Banner with 3D Membership Scene */}
@@ -629,6 +647,20 @@ export default function SuperAdminMembers() {
         portal="super_admin"
         branchId={selectedMemberForTransactions?.branch_id || (selectedBranchId !== 'all' ? selectedBranchId : null)}
       />
+    </>
+  );
+
+  if (embedded) {
+    return content;
+  }
+
+  return (
+    <DashboardLayout
+      role="super_admin"
+      user={currentUser}
+      activeTab="member_base"
+    >
+      {content}
     </DashboardLayout>
   );
 }

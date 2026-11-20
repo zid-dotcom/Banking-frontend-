@@ -50,7 +50,7 @@ function formatDateTime(isoString) {
   }
 }
 
-export default function SuperAdminStaff() {
+export default function SuperAdminStaff({ embedded = false, branchId = null }) {
   const navigate = useNavigate();
 
   const [staffList, setStaffList] = useState([]);
@@ -63,7 +63,20 @@ export default function SuperAdminStaff() {
 
   // Filters & Pagination
   const [searchQuery, setSearchQuery] = useState('');
-  const [branchFilter, setBranchFilter] = useState('all');
+  const [branchFilter, setBranchFilter] = useState(branchId ? String(branchId) : 'all');
+
+  useEffect(() => {
+    if (branchId !== null && branchId !== undefined) {
+      const bStr = String(branchId);
+      setBranchFilter(bStr);
+      fetchStaffList({
+        branch_id: bStr !== 'all' ? bStr : null,
+        staff_role_id: roleFilter !== 'all' ? roleFilter : null,
+        is_active: statusFilter === 'all' ? null : statusFilter === 'active',
+        search: searchQuery
+      });
+    }
+  }, [branchId]);
   const [roleFilter, setRoleFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all'); // 'all' | 'active' | 'inactive'
   const [currentPage, setCurrentPage] = useState(1);
@@ -337,8 +350,8 @@ export default function SuperAdminStaff() {
     currentPage * itemsPerPage
   );
 
-  return (
-    <DashboardLayout role="super_admin" user={currentUser} activeTab="staff">
+  const content = (
+    <>
       <div className="space-y-6 sm:space-y-8 animate-fadeIn">
 
         {/* Hero Banner with Modern HR Team Registry Illustration */}
@@ -884,6 +897,16 @@ export default function SuperAdminStaff() {
           </div>
         </div>
       )}
+    </>
+  );
+
+  if (embedded) {
+    return content;
+  }
+
+  return (
+    <DashboardLayout role="super_admin" user={currentUser} activeTab="staff">
+      {content}
     </DashboardLayout>
   );
 }

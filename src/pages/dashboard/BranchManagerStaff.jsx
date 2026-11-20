@@ -72,7 +72,7 @@ function formatDateTime(isoString) {
   }
 }
 
-export default function BranchManagerStaff() {
+export default function BranchManagerStaff({ embedded = false }) {
   const [staffList, setStaffList] = useState([]);
   const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -306,8 +306,8 @@ export default function BranchManagerStaff() {
     currentPage * itemsPerPage
   );
 
-  return (
-    <DashboardLayout role="branch_manager" user={managerUser} activeTab="staff">
+  const content = (
+    <>
       <div className="space-y-6">
         
         {/* Banner Section */}
@@ -764,6 +764,16 @@ export default function BranchManagerStaff() {
           </div>
         </div>
       )}
+    </>
+  );
+
+  if (embedded) {
+    return content;
+  }
+
+  return (
+    <DashboardLayout role="branch_manager" user={managerUser} activeTab="staff">
+      {content}
     </DashboardLayout>
   );
 }

@@ -86,7 +86,11 @@ function formatDateTime(isoString) {
   }
 }
 
-export default function BranchManagerCashReconciliation() {
+export default function BranchManagerCashReconciliation({
+  embedded = false,
+  fromDate: propFromDate = '',
+  toDate: propToDate = ''
+}) {
   const navigate = useNavigate();
 
   const [managerUser, setManagerUser] = useState(() => {
@@ -119,8 +123,20 @@ export default function BranchManagerCashReconciliation() {
   const [error, setError] = useState(null);
 
   // Filters
-  const [fromDate, setFromDate] = useState('');
-  const [toDate, setToDate] = useState('');
+  const [fromDate, setFromDate] = useState(propFromDate || '');
+  const [toDate, setToDate] = useState(propToDate || '');
+
+  useEffect(() => {
+    if (propFromDate !== undefined) {
+      setFromDate(propFromDate || '');
+    }
+  }, [propFromDate]);
+
+  useEffect(() => {
+    if (propToDate !== undefined) {
+      setToDate(propToDate || '');
+    }
+  }, [propToDate]);
   const [statusFilter, setStatusFilter] = useState('all'); // 'all' | 'pending' | 'resolved' | 'escalated' | 'mismatch'
   const [search, setSearch] = useState('');
 
@@ -334,21 +350,23 @@ export default function BranchManagerCashReconciliation() {
   };
 
   // Helpers
-  const isReportPendingAdmin = (r) => {
-    return !r.branch_admin_decision || r.branch_admin_decision === 'pending';
-  };
-
   const isReportMismatch = (r) => {
     const diff = r.difference;
-    if (diff !== null && diff !== undefined && Number(diff) !== 0) return true;
+    if (diff !== null && diff !== undefined && Math.abs(Number(diff)) > 0.001) return true;
     if (
       r.closing_cash !== null &&
+      r.closing_cash !== undefined &&
       r.expected_closing_cash !== null &&
-      Number(r.closing_cash) !== Number(r.expected_closing_cash)
+      r.expected_closing_cash !== undefined &&
+      Math.abs(Number(r.closing_cash) - Number(r.expected_closing_cash)) > 0.001
     ) {
       return true;
     }
     return false;
+  };
+
+  const isReportPendingAdmin = (r) => {
+    return (!r.branch_admin_decision || r.branch_admin_decision === 'pending') && isReportMismatch(r);
   };
 
   // Filtered reports
@@ -395,8 +413,14 @@ export default function BranchManagerCashReconciliation() {
   );
   const totalDifference = filteredReports.reduce((acc, r) => acc + Number(r.difference || 0), 0);
 
-  return (
-    <DashboardLayout role="branch_manager" user={managerUser} activeTab="cash_reconciliation">
+  // Show Branch Decision column only if there is any cash variance / difference
+  const hasAnyVariance =
+    Math.abs(totalDifference) > 0.001 ||
+    filteredReports.some((r) => isReportMismatch(r) || Math.abs(Number(r.difference || 0)) > 0.001);
+  const showBranchDecisionColumn = hasAnyVariance;
+
+  const content = (
+    <>
       <div className="space-y-6 sm:space-y-8 animate-fadeIn">
         {/* Top Header Banner */}
         <div className="bg-gradient-to-r from-[#d8f6f0] via-[#e5faf5] to-[#cbf3eb] rounded-3xl p-6 sm:p-7 lg:p-8 border border-teal-200/70 shadow-sm relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
@@ -690,14 +714,16 @@ export default function BranchManagerCashReconciliation() {
                   <th className="py-3.5 px-4 text-right">Counted Cash</th>
                   <th className="py-3.5 px-4 text-right">Difference</th>
                   <th className="py-3.5 px-4 text-center">Accountant Audit</th>
-                  <th className="py-3.5 px-4 text-center">Branch Decision</th>
+                  {showBranchDecisionColumn && (
+                    <th className="py-3.5 px-4 text-center">Branch Decision</th>
+                  )}
                   <th className="py-3.5 px-4 text-center">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-xs font-medium text-slate-700">
                 {loading ? (
                   <tr>
-                    <td colSpan="12" className="py-12 text-center text-slate-400">
+                    <td colSpan={showBranchDecisionColumn ? 12 : 11} className="py-12 text-center text-slate-400">
                       <div className="flex flex-col items-center justify-center gap-2">
                         <Loader2 className="w-6 h-6 animate-spin text-[#00b4a7]" />
                         <span>Loading branch cash reconciliations...</span>
@@ -706,7 +732,7 @@ export default function BranchManagerCashReconciliation() {
                   </tr>
                 ) : filteredReports.length === 0 ? (
                   <tr>
-                    <td colSpan="12" className="py-12 text-center text-slate-400">
+                    <td colSpan={showBranchDecisionColumn ? 12 : 11} className="py-12 text-center text-slate-400">
                       <div className="max-w-xs mx-auto space-y-2">
                         <Scale className="w-8 h-8 text-slate-300 mx-auto" />
                         <p className="font-bold text-slate-700 text-sm">No cash reconciliations found</p>
@@ -721,7 +747,7 @@ export default function BranchManagerCashReconciliation() {
                 ) : (
                   filteredReports.map((report) => {
                     const diffNum = Number(report.difference || 0);
-                    const hasMismatch = isReportMismatch(report);
+                    const hasMismatch = isReportMismatch(report) || Math.abs(diffNum) > 0.001;
                     const decision = report.branch_admin_decision;
 
                     return (
@@ -756,7 +782,7 @@ export default function BranchManagerCashReconciliation() {
                         <td className="py-3.5 px-4 text-right font-mono font-black">
                           {report.difference === null || report.difference === undefined ? (
                             <span className="text-slate-400">—</span>
-                          ) : diffNum === 0 ? (
+                          ) : Math.abs(diffNum) <= 0.001 ? (
                             <span className="text-emerald-700">₹0.00</span>
                           ) : diffNum > 0 ? (
                             <span className="text-emerald-600">+{formatCurrency(diffNum)} (Surplus)</span>
@@ -781,23 +807,29 @@ export default function BranchManagerCashReconciliation() {
                             </span>
                           )}
                         </td>
-                        <td className="py-3.5 px-4 text-center">
-                          {decision === 'resolved' ? (
-                            <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
-                              <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                              <span>Resolved</span>
-                            </span>
-                          ) : decision === 'escalated' ? (
-                            <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-50 text-rose-800 border border-rose-200">
-                              <AlertTriangle className="w-3 h-3 text-rose-600" />
-                              <span>Escalated</span>
-                            </span>
-                          ) : (
-                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
-                              Decision Pending
-                            </span>
-                          )}
-                        </td>
+                        {showBranchDecisionColumn && (
+                          <td className="py-3.5 px-4 text-center">
+                            {hasMismatch ? (
+                              decision === 'resolved' ? (
+                                <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+                                  <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                                  <span>Resolved</span>
+                                </span>
+                              ) : decision === 'escalated' ? (
+                                <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-50 text-rose-800 border border-rose-200">
+                                  <AlertTriangle className="w-3 h-3 text-rose-600" />
+                                  <span>Escalated</span>
+                                </span>
+                              ) : (
+                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
+                                  Decision Pending
+                                </span>
+                              )
+                            ) : (
+                              <span className="text-slate-400 text-xs">—</span>
+                            )}
+                          </td>
+                        )}
                         <td className="py-3.5 px-4 text-center">
                           <div className="flex items-center justify-center gap-1.5">
                             <button
@@ -809,15 +841,17 @@ export default function BranchManagerCashReconciliation() {
                               <Receipt className="w-3 h-3 text-teal-600" />
                               <span>Details</span>
                             </button>
-                            <button
-                              type="button"
-                              onClick={() => handleOpenDecision(report)}
-                              className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1 shadow-2xs"
-                              title="Record manager resolution or escalation"
-                            >
-                              <ShieldCheck className="w-3 h-3" />
-                              <span>Decide</span>
-                            </button>
+                            {hasMismatch && (
+                              <button
+                                type="button"
+                                onClick={() => handleOpenDecision(report)}
+                                className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1 shadow-2xs"
+                                title="Record manager resolution or escalation"
+                              >
+                                <ShieldCheck className="w-3 h-3" />
+                                <span>Decide</span>
+                              </button>
+                            )}
                           </div>
                         </td>
                       </tr>
@@ -1200,6 +1234,16 @@ export default function BranchManagerCashReconciliation() {
           </div>
         </div>
       )}
+    </>
+  );
+
+  if (embedded) {
+    return content;
+  }
+
+  return (
+    <DashboardLayout role="branch_manager" user={managerUser} activeTab="cash_reconciliation">
+      {content}
     </DashboardLayout>
   );
 }
