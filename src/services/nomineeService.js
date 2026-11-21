@@ -118,6 +118,74 @@ export async function getMemberNominee() {
 }
 
 /**
+ * 1b. GET /member/nominee/documents/{doc_name} - Get Nominee Document
+ */
+export async function getMemberNomineeDocument(docName) {
+  try {
+    const headers = getMemberHeaders(false);
+    delete headers['Content-Type'];
+
+    let endpoint = `${BASE_URL}/member/nominee/documents/${encodeURIComponent(docName)}`;
+    if (typeof docName === 'string') {
+      if (docName.startsWith('http://') || docName.startsWith('https://')) {
+        endpoint = docName;
+      } else if (docName.startsWith('/')) {
+        endpoint = `${BASE_URL}${docName}`;
+      }
+    }
+
+    const res = await fetch(endpoint, {
+      method: 'GET',
+      headers,
+    });
+
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({}));
+      checkMemberResponseStatus(res, errBody, `Failed to load nominee document: ${docName}`);
+    }
+
+    const contentType = res.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      const json = await res.json();
+      const target = json.url || json.document_url || json.data;
+      if (typeof target === 'string') {
+        if (target.startsWith('http://') || target.startsWith('https://') || target.startsWith('data:')) {
+          return {
+            url: target,
+            isPdf: target.toLowerCase().includes('.pdf') || target.startsWith('data:application/pdf')
+          };
+        }
+        if (target.startsWith('/')) {
+          const subRes = await fetch(`${BASE_URL}${target}`, {
+            method: 'GET',
+            headers,
+          });
+          if (subRes.ok) {
+            const subType = subRes.headers.get('content-type') || '';
+            const subBlob = await subRes.blob();
+            return {
+              url: URL.createObjectURL(subBlob),
+              isPdf: subType.includes('pdf') || target.toLowerCase().endsWith('.pdf')
+            };
+          }
+        }
+      }
+      return { url: target || json, isPdf: false };
+    }
+
+    const isPdf = contentType.includes('pdf');
+    const blob = await res.blob();
+    return {
+      url: URL.createObjectURL(blob),
+      isPdf
+    };
+  } catch (error) {
+    console.error(`nomineeService.getMemberNomineeDocument(${docName}) error:`, error);
+    throw error;
+  }
+}
+
+/**
  * 2. POST /member/nominee - Submit Nominee (multipart/form-data)
  * Fields:
  * - nominee_name (string)

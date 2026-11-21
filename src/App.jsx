@@ -53,6 +53,7 @@ import SuperAdminStaff from './pages/dashboard/SuperAdminStaff';
 import SuperAdminMembers from './pages/dashboard/SuperAdminMembers';
 import SuperAdminLoanSchemes from './pages/dashboard/SuperAdminLoanSchemes';
 import SuperAdminStaffRoles from './pages/dashboard/SuperAdminStaffRoles';
+import PasswordUpdate from './pages/dashboard/PasswordUpdate';
 import SuperAdminSavingsSchemes from './pages/dashboard/SuperAdminSavingsSchemes';
 import SuperAdminCashTransactions from './pages/dashboard/SuperAdminCashTransactions';
 import SuperAdminCashReconciliation from './pages/dashboard/SuperAdminCashReconciliation';
@@ -211,6 +212,8 @@ function MainApp() {
         <Route path="/super-admin/security-events" element={<SuperAdminSecurityEvents />} />
         <Route path="/super-admin/security" element={<SuperAdminSecurityEvents />} />
         <Route path="/super-admin/members" element={<SuperAdminMembers />} />
+        <Route path="/super-admin/password-update" element={<PasswordUpdate />} />
+        <Route path="/super-admin/change-password" element={<PasswordUpdate />} />
 
         {/* Branch Manager Routes */}
         <Route path="/branch-manager/dashboard" element={<BranchManagerDashboard />} />
@@ -254,6 +257,10 @@ function MainApp() {
         <Route path="/branch-admin/security" element={<BranchManagerSecurityEvents />} />
         <Route path="/branch-manager/helpdesk" element={<BranchManagerServiceRequests />} />
         <Route path="/branch-admin/helpdesk" element={<BranchManagerServiceRequests />} />
+        <Route path="/branch-manager/password-update" element={<PasswordUpdate />} />
+        <Route path="/branch-admin/password-update" element={<PasswordUpdate />} />
+        <Route path="/branch-manager/change-password" element={<PasswordUpdate />} />
+        <Route path="/branch-admin/change-password" element={<PasswordUpdate />} />
         <Route path="/branch-manager/*" element={<Navigate to="/branch-manager/dashboard" replace />} />
 
         {/* Member Page Routes */}
@@ -274,6 +281,8 @@ function MainApp() {
         <Route path="/member/security-events" element={<MemberSecurityEvents />} />
         <Route path="/member/helpdesk" element={<MemberHelpdesk />} />
         <Route path="/member/service-requests" element={<MemberHelpdesk />} />
+        <Route path="/member/password-update" element={<PasswordUpdate />} />
+        <Route path="/member/change-password" element={<PasswordUpdate />} />
         <Route path="/member/*" element={<Navigate to="/member/dashboard" replace />} />
 
         {/* Staff Dashboard Routes */}
@@ -290,6 +299,8 @@ function MainApp() {
         <Route path="/staff/branch-members" element={<StaffMembers />} />
         <Route path="/staff/announcements" element={<StaffAnnouncements />} />
         <Route path="/staff/notices" element={<StaffAnnouncements />} />
+        <Route path="/staff/password-update" element={<PasswordUpdate />} />
+        <Route path="/staff/change-password" element={<PasswordUpdate />} />
         <Route path="/staff/*" element={<Navigate to="/staff/dashboard" replace />} />
       </Routes>
     );

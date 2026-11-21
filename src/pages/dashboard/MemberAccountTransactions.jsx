@@ -23,6 +23,7 @@ import {
   Clock,
   ChevronRight
 } from 'lucide-react';
+import modernTealBankIllustration from '../../assets/Modern Teal Bank with Coins and Rupee Bag.webp';
 
 function formatCurrency(val) {
   if (val === undefined || val === null || isNaN(val)) return '₹0';
@@ -328,24 +329,32 @@ export default function MemberAccountTransactions() {
             <p className="text-xs sm:text-sm text-slate-600 font-medium mt-2 leading-relaxed">
               Real-time verified ledger of cash deposits and cash withdrawals processed across your cooperative society savings accounts.
             </p>
+
+            <div className="flex items-center gap-3 mt-4 flex-wrap">
+              <button
+                onClick={() => fetchTransactions(selectedAccountId)}
+                disabled={loadingTx}
+                className="px-4 py-2.5 rounded-xl bg-white border border-teal-200/80 hover:bg-teal-50/60 text-[#0f766e] font-bold text-xs flex items-center gap-2 transition-all cursor-pointer shadow-2xs"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 text-[#00b4a7] ${loadingTx ? 'animate-spin' : ''}`} />
+                <span>Refresh Ledger</span>
+              </button>
+              <button
+                onClick={() => navigate('/member/savings-schemes')}
+                className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#14b8a6] to-[#0f766e] text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-xs cursor-pointer hover:shadow-md"
+              >
+                <span>Savings Schemes</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
 
-          <div className="relative z-10 flex items-center gap-3">
-            <button
-              onClick={() => fetchTransactions(selectedAccountId)}
-              disabled={loadingTx}
-              className="px-4 py-2.5 rounded-xl bg-white border border-teal-200/80 hover:bg-teal-50/60 text-[#0f766e] font-bold text-xs flex items-center gap-2 transition-all cursor-pointer shadow-2xs"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 text-[#00b4a7] ${loadingTx ? 'animate-spin' : ''}`} />
-              <span>Refresh Ledger</span>
-            </button>
-            <button
-              onClick={() => navigate('/member/savings-schemes')}
-              className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#14b8a6] to-[#0f766e] text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-xs cursor-pointer hover:shadow-md"
-            >
-              <span>Savings Schemes</span>
-              <ChevronRight className="w-3.5 h-3.5" />
-            </button>
+          <div className="relative z-10 flex justify-center md:justify-end pointer-events-none -my-2 sm:-my-5 lg:-my-6 flex-shrink-0 w-full md:w-auto">
+            <img
+              src={modernTealBankIllustration}
+              alt="Account Transactions"
+              className="h-32 sm:h-44 lg:h-52 max-w-full w-auto object-contain drop-shadow-md select-none pointer-events-none transform hover:scale-102 transition-transform duration-300 mx-auto md:mx-0"
+            />
           </div>
 
           <div className="absolute -right-16 -top-16 w-64 h-64 rounded-full bg-teal-200/30 blur-3xl pointer-events-none" />
@@ -374,7 +383,7 @@ export default function MemberAccountTransactions() {
 
             {/* Account Selector Dropdown */}
             <div className="flex items-center gap-2 self-start md:self-auto">
-              <label className="text-xs font-bold text-slate-500 whitespace-nowrap">Switch Account:</label>
+              <label className="text-xs font-bold text-slate-500 whitespace-nowrap">Switch Scheme:</label>
               <select
                 value={selectedAccountId || ''}
                 onChange={(e) => {

@@ -753,7 +753,7 @@ export default function MemberSavingsSchemes() {
                             </span>
                           </td>
 
-                          {/* Actions: View & Open Account */}
+                          {/* Actions: View & Apply this scheme */}
                           <td className="py-4 px-6 text-right whitespace-nowrap">
                             <div className="flex items-center justify-end gap-2">
                               <button
@@ -774,10 +774,10 @@ export default function MemberSavingsSchemes() {
                                   })
                                 }
                                 className="inline-flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-[#14b8a6] to-[#0f766e] hover:from-[#0d9488] hover:to-[#0f766e] text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer active:scale-95"
-                                title="Submit savings account opening request"
+                                title="Apply this scheme"
                               >
                                 <PlusCircle className="w-3.5 h-3.5" />
-                                <span>Open Account</span>
+                                <span>Apply this scheme</span>
                               </button>
                             </div>
                           </td>

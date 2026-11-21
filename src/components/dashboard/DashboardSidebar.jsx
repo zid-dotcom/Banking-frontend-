@@ -29,6 +29,7 @@ import {
   Calculator,
   Scale,
   FileBarChart,
+  KeyRound,
 } from 'lucide-react';
 import {
   getMemberUnreadCount,
@@ -65,6 +66,7 @@ export default function DashboardSidebar({
       { id: 'announcements', label: 'Announcements', icon: Megaphone, path: '/member/announcements' },
       { id: 'notifications', label: 'Notifications', icon: Bell, path: '/member/notifications' },
       { id: 'security_events', label: 'Security & Access', icon: ShieldCheck, path: '/member/security' },
+      { id: 'password_update', label: 'Password Update', icon: KeyRound, path: '/member/password-update' },
     ],
     branch_manager: [
       { id: 'overview', label: 'Branch Dashboard', icon: LayoutDashboard, path: '/branch-manager/dashboard' },
@@ -81,6 +83,7 @@ export default function DashboardSidebar({
       { id: 'service_requests', label: 'Service Requests', icon: Headset, path: '/branch-manager/service-requests' },
       { id: 'emergency_cases', label: 'Emergency Cases', icon: AlertOctagon, path: '/branch-manager/emergency-cases' },
       { id: 'security_events', label: 'Security Events', icon: ShieldCheck, path: '/branch-manager/security-events' },
+      { id: 'password_update', label: 'Password Update', icon: KeyRound, path: '/branch-manager/password-update' },
     ],
     super_admin: [
       { id: 'overview', label: 'Dashboard', icon: LayoutDashboard, path: '/super-admin/dashboard' },
@@ -99,6 +102,7 @@ export default function DashboardSidebar({
       { id: 'emergency_cases', label: 'Emergency Cases', icon: AlertOctagon, path: '/super-admin/emergency-cases' },
       { id: 'security_events', label: 'Security Events', icon: ShieldAlert, path: '/super-admin/security-events' },
       { id: 'member_base', label: 'View Members', icon: Users, path: '/super-admin/members' },
+      { id: 'password_update', label: 'Password Update', icon: KeyRound, path: '/super-admin/password-update' },
     ],
     staff: (() => {
       const roleStr = String(user?.staff_role?.name || user?.account_role || user?.role || '').toLowerCase();
@@ -114,6 +118,7 @@ export default function DashboardSidebar({
           { id: 'overview', label: 'Staff Dashboard', icon: LayoutDashboard, path: '/staff/dashboard' },
           { id: 'service_requests', label: 'Service Requests', icon: Headset, path: '/staff/service-requests' },
           { id: 'announcements', label: 'Announcements', icon: Megaphone, path: '/staff/announcements' },
+          { id: 'password_update', label: 'Password Update', icon: KeyRound, path: '/staff/password-update' },
         ];
       }
       if (isAccountant) {
@@ -122,6 +127,7 @@ export default function DashboardSidebar({
           { id: 'cash_reconciliation', label: 'Cash Reconciliation', icon: Calculator, path: '/staff/cash-reconciliation' },
           { id: 'members', label: 'View Members', icon: Users, path: '/staff/members' },
           { id: 'announcements', label: 'Announcements', icon: Megaphone, path: '/staff/announcements' },
+          { id: 'password_update', label: 'Password Update', icon: KeyRound, path: '/staff/password-update' },
         ];
       }
       return [
@@ -129,6 +135,7 @@ export default function DashboardSidebar({
         { id: 'cash_operations', label: 'Cash Operations', icon: Wallet, path: '/staff/cash-operations' },
         { id: 'cash_reconciliation', label: 'Cash Reconciliation', icon: Calculator, path: '/staff/cash-reconciliation' },
         { id: 'announcements', label: 'Announcements', icon: Megaphone, path: '/staff/announcements' },
+        { id: 'password_update', label: 'Password Update', icon: KeyRound, path: '/staff/password-update' },
       ];
     })()
   };

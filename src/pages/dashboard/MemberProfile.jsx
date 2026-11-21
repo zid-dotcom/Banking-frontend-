@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import StatCard from '../../components/dashboard/StatCard';
+import PasswordUpdateCard from '../../components/dashboard/PasswordUpdateCard';
 import { getMemberFullProfile, getMemberMe } from '../../services/memberService';
 import { getMemberSecurityEvents, formatSecurityEventType } from '../../services/securityService';
 import { getMemberSavingsAccounts } from '../../services/savingsSchemeService';
@@ -934,7 +935,7 @@ export default function MemberProfile() {
               )}
             </div>
 
-            {/* 5. Security & Account Access Information */}
+            {/* 6. Security & Account Access Information */}
             <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
               <div className="p-5 sm:p-6 bg-slate-50/80 border-b border-slate-100 flex items-center justify-between flex-wrap gap-4">
                 <div className="flex items-center gap-3">
@@ -994,6 +995,14 @@ export default function MemberProfile() {
                   <span>Sign-in activity log is recorded and protected by AurumFX Apex Security.</span>
                 </div>
               )}
+            </div>
+
+            {/* 7. Change Password Section */}
+            <div id="password-update">
+              <PasswordUpdateCard
+                title="Update Member Password"
+                description="Change your login credentials to protect your cooperative accounts and membership assets."
+              />
             </div>
           </div>
         ) : null}

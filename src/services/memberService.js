@@ -429,6 +429,7 @@ export {
 export {
   getMemberNominee,
   submitMemberNominee,
+  getMemberNomineeDocument,
 } from './nomineeService';
 
 /**
@@ -440,6 +441,12 @@ export {
   listAccountantMembers,
   getAccountantMember,
 } from './accountantMemberService';
+
+/**
+ * 18. Auth & Password APIs
+ * - POST /auth/change-password
+ */
+export { changePassword } from './authService';
 
 
 

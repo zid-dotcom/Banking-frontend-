@@ -23,7 +23,7 @@ import {
   X,
   Scale
 } from 'lucide-react';
-import bankTechScene from '../../assets/AurumFX Cooperative Bank Technology Scene.png';
+import modernTealBankIllustration from '../../assets/Modern Teal Bank with Coins and Rupee Bag.webp';
 
 function parseBranchInfo(obj = {}) {
   const b = obj.branch;
@@ -366,7 +366,7 @@ export default function BranchManagerCashTransactions({
 
           <div className="relative z-10 flex justify-center md:justify-end pointer-events-none -my-2 sm:-my-5 lg:-my-6 flex-shrink-0 w-full md:w-auto">
             <img
-              src={bankTechScene}
+              src={modernTealBankIllustration}
               alt="Cash Operations Desk"
               className="h-32 sm:h-44 lg:h-52 max-w-full w-auto object-contain drop-shadow-md select-none pointer-events-none mx-auto md:mx-0"
             />

@@ -154,40 +154,40 @@ export default function MemberLogin() {
 
       {/* =====================================================================
           LEFT PANE: Clean White Member Login Form Section
+          Theme matched exactly to Branch Manager Login design:
           - Mobile: order-1 (Form appears at top)
           - Desktop: lg:order-1 (Form on left)
-          - Fully responsive vertical fit so header, form, and security footer fit cleanly on all desktop displays
          ===================================================================== */}
-      <div className="w-full lg:w-1/2 min-h-screen lg:h-screen lg:max-h-screen flex flex-col justify-between px-6 sm:px-10 lg:px-10 xl:px-14 2xl:px-18 py-4 sm:py-6 lg:py-6 xl:py-8 relative z-10 bg-white order-1 lg:order-1 overflow-y-auto">
+      <div className="w-full lg:w-1/2 min-h-screen flex flex-col justify-between px-6 sm:px-10 lg:px-12 xl:px-16 2xl:px-20 py-4 sm:py-6 lg:py-8 xl:py-10 relative z-10 bg-white order-1 lg:order-1">
         
         {/* Top Section: Brand Logo Header & Mobile Back Button */}
-        <div className="w-full max-w-[540px] xl:max-w-[600px] 2xl:max-w-[640px] mx-auto pt-1 sm:pt-2 flex-shrink-0">
+        <div className="w-full max-w-[560px] xl:max-w-[620px] 2xl:max-w-[660px] mx-auto pt-2 sm:pt-3">
           {/* Mobile Back Button (Cleanly positioned above the logo on mobile screens) */}
-          <div className="lg:hidden mb-3 sm:mb-4">
+          <div className="lg:hidden mb-4 sm:mb-5">
             <Link
               to="/"
               aria-label="Back to Website"
               title="Back to Website"
-              className="inline-flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white text-slate-700 shadow-md border border-slate-200/80 active:scale-95 transition-all"
+              className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white text-slate-700 shadow-md border border-slate-200/80 active:scale-95 transition-all"
             >
-              <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+              <ArrowLeft className="w-5 h-5" />
             </Link>
           </div>
 
-          <div className="flex items-center gap-3 sm:gap-3.5">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-[#ffba00] flex items-center justify-center shadow-xs shadow-amber-200/80 flex-shrink-0">
-              <BankTempleIcon className="w-5 h-5 sm:w-6 sm:h-6 text-slate-900" />
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-[#ffba00] flex items-center justify-center shadow-sm shadow-amber-200/80 flex-shrink-0">
+              <BankTempleIcon className="w-6 h-6 sm:w-7 sm:h-7 text-slate-900" />
             </div>
             <div>
               <div className="flex items-baseline leading-none">
-                <span className="text-slate-900 font-sans font-extrabold text-2xl sm:text-[28px] tracking-tight">
+                <span className="text-slate-900 font-sans font-extrabold text-[28px] sm:text-[32px] tracking-tight">
                   Aurum
                 </span>
-                <span className="text-[#008f85] font-sans font-extrabold text-2xl sm:text-[28px] tracking-tight">
+                <span className="text-[#008f85] font-sans font-extrabold text-[28px] sm:text-[32px] tracking-tight">
                   FX
                 </span>
               </div>
-              <p className="text-slate-500 text-[11px] sm:text-xs font-normal tracking-normal [word-spacing:0.1em] mt-1">
+              <p className="text-slate-500 text-xs sm:text-sm font-normal tracking-normal [word-spacing:0.12em] mt-1">
                 Aurumfx Multi State Agro Co-operative Society Limited
               </p>
             </div>
@@ -195,22 +195,22 @@ export default function MemberLogin() {
         </div>
 
         {/* Center Section: Main Login Form Content */}
-        <div className="w-full max-w-[540px] xl:max-w-[600px] 2xl:max-w-[640px] mx-auto my-auto py-3 sm:py-4 lg:py-3">
+        <div className="w-full max-w-[560px] xl:max-w-[620px] 2xl:max-w-[660px] mx-auto my-auto py-4 sm:py-6">
           
           {/* Member Login Pill Badge */}
-          <div className="mb-2.5 sm:mb-3.5">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#e6f7f6] border border-[#008f85]/30 text-[#008f85] text-xs sm:text-sm font-semibold tracking-wide shadow-xs">
-              <Users className="w-3.5 h-3.5 text-[#008f85]" />
+          <div className="mb-3.5 sm:mb-4">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#e6f7f6] border border-[#008f85]/30 text-[#008f85] text-xs sm:text-sm font-semibold tracking-wide shadow-xs">
+              <Users className="w-4 h-4 text-[#008f85]" />
               <span>Member Login</span>
             </div>
           </div>
 
           {/* Heading & Subtitle */}
-          <div className="mb-4 sm:mb-5">
-            <h1 className="text-2xl sm:text-3xl lg:text-[34px] font-sans font-extrabold text-slate-900 tracking-tight leading-tight">
+          <div className="mb-5 sm:mb-6">
+            <h1 className="text-3xl sm:text-4xl lg:text-[40px] font-sans font-extrabold text-slate-900 tracking-tight leading-tight">
               Member Login
             </h1>
-            <p className="text-slate-500 text-xs sm:text-sm lg:text-base font-normal mt-1 sm:mt-1.5">
+            <p className="text-slate-500 text-sm sm:text-base lg:text-lg font-normal mt-1.5 sm:mt-2">
               Please enter your details to access your account
             </p>
           </div>
@@ -218,7 +218,7 @@ export default function MemberLogin() {
           {/* Status Feedback Toast/Message */}
           {authStatus && (
             <div
-              className={`mb-4 sm:mb-5 p-3.5 sm:p-4 rounded-2xl text-xs sm:text-sm flex items-start gap-3 animate-fadeIn ${
+              className={`mb-5 p-4 rounded-2xl text-sm flex items-start gap-3 animate-fadeIn ${
                 authStatus.type === 'error'
                   ? 'bg-rose-50 border border-rose-200 text-rose-700'
                   : authStatus.type === 'success'
@@ -227,9 +227,9 @@ export default function MemberLogin() {
               }`}
             >
               {authStatus.type === 'error' ? (
-                <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-rose-600 mt-0.5 flex-shrink-0" />
+                <AlertCircle className="w-5 h-5 text-rose-600 mt-0.5 flex-shrink-0" />
               ) : (
-                <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                <CheckCircle2 className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
               )}
               <div className="leading-snug flex-1">
                 <div>{authStatus.message}</div>
@@ -250,16 +250,16 @@ export default function MemberLogin() {
           )}
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-3.5 sm:space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
             
             {/* Member ID Field */}
             <div>
-              <label className="block text-slate-900 text-xs sm:text-sm font-semibold mb-1.5">
+              <label className="block text-slate-900 text-sm sm:text-base font-semibold mb-2">
                 Member ID
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                  <User className="w-4.5 h-4.5 stroke-[1.8]" />
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+                  <User className="w-5 h-5 stroke-[1.8]" />
                 </div>
                 <input
                   type="text"
@@ -267,19 +267,19 @@ export default function MemberLogin() {
                   value={memberId}
                   onChange={(e) => setMemberId(e.target.value)}
                   placeholder="Enter your Member ID"
-                  className="w-full h-11 sm:h-12 pl-11 pr-4 bg-white border border-slate-300 rounded-xl sm:rounded-2xl text-slate-900 placeholder:text-slate-400 text-sm focus:outline-none focus:border-[#008f85] focus:ring-4 focus:ring-teal-100 transition-all shadow-xs"
+                  className="w-full h-12 sm:h-13.5 pl-12 pr-4 bg-white border border-slate-300 rounded-2xl text-slate-900 placeholder:text-slate-400 text-sm sm:text-base focus:outline-none focus:border-[#008f85] focus:ring-4 focus:ring-teal-100 transition-all shadow-xs"
                 />
               </div>
             </div>
 
             {/* Password Field */}
             <div>
-              <label className="block text-slate-900 text-xs sm:text-sm font-semibold mb-1.5">
+              <label className="block text-slate-900 text-sm sm:text-base font-semibold mb-2">
                 Password
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                  <Lock className="w-4.5 h-4.5 stroke-[1.8]" />
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+                  <Lock className="w-5 h-5 stroke-[1.8]" />
                 </div>
                 <input
                   type={showPassword ? 'text' : 'password'}
@@ -287,18 +287,18 @@ export default function MemberLogin() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  className="w-full h-11 sm:h-12 pl-11 pr-11 bg-white border border-slate-300 rounded-xl sm:rounded-2xl text-slate-900 placeholder:text-slate-400 text-sm focus:outline-none focus:border-[#008f85] focus:ring-4 focus:ring-teal-100 transition-all shadow-xs"
+                  className="w-full h-12 sm:h-13.5 pl-12 pr-12 bg-white border border-slate-300 rounded-2xl text-slate-900 placeholder:text-slate-400 text-sm sm:text-base focus:outline-none focus:border-[#008f85] focus:ring-4 focus:ring-teal-100 transition-all shadow-xs"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"
                 >
                   {showPassword ? (
-                    <Eye className="w-4.5 h-4.5 stroke-[1.8]" />
+                    <Eye className="w-5 h-5 stroke-[1.8]" />
                   ) : (
-                    <EyeOff className="w-4.5 h-4.5 stroke-[1.8]" />
+                    <EyeOff className="w-5 h-5 stroke-[1.8]" />
                   )}
                 </button>
               </div>
@@ -309,7 +309,7 @@ export default function MemberLogin() {
               <button
                 type="button"
                 onClick={() => setForgotModalOpen(true)}
-                className="text-[#008f85] hover:text-[#007068] font-semibold text-xs sm:text-sm hover:underline cursor-pointer transition-colors"
+                className="text-[#008f85] hover:text-[#007068] font-semibold text-sm sm:text-base hover:underline cursor-pointer transition-colors"
               >
                 Forgot password?
               </button>
@@ -319,11 +319,11 @@ export default function MemberLogin() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full h-11 sm:h-12 px-6 rounded-xl sm:rounded-2xl bg-[#008579] hover:bg-[#007469] active:bg-[#006359] text-white font-bold text-sm sm:text-base shadow-md hover:shadow-lg shadow-teal-800/20 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70 mt-1"
+              className="w-full h-12 sm:h-13.5 px-6 rounded-2xl bg-[#008579] hover:bg-[#007469] active:bg-[#006359] text-white font-bold text-base sm:text-lg shadow-md hover:shadow-xl shadow-teal-800/20 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70 mt-1"
             >
               {isLoading ? (
                 <>
-                  <svg className="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24" fill="none">
+                  <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24" fill="none">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
@@ -335,8 +335,8 @@ export default function MemberLogin() {
             </button>
 
             {/* New User Registration & Reapply Options */}
-            <div className="pt-2 text-center space-y-1 border-t border-slate-100">
-              <p className="text-xs sm:text-sm text-slate-600">
+            <div className="pt-2 text-center space-y-1.5 border-t border-slate-100">
+              <p className="text-sm text-slate-600">
                 Are you a new user?{' '}
                 <button
                   type="button"
@@ -365,7 +365,7 @@ export default function MemberLogin() {
         </div>
 
         {/* Bottom Section: Security & Society Information Footer */}
-        <div className="w-full max-w-[540px] xl:max-w-[600px] 2xl:max-w-[640px] mx-auto pt-3 sm:pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between text-[11px] sm:text-xs text-slate-400 gap-1.5 flex-shrink-0">
+        <div className="w-full max-w-[560px] xl:max-w-[620px] 2xl:max-w-[660px] mx-auto pt-4 sm:pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between text-xs sm:text-sm text-slate-400 gap-2">
           <span>&copy; {new Date().getFullYear()} Aurumfx Multi State Agro Co-operative Society Limited</span>
           <div className="flex items-center gap-1.5 text-slate-500 font-medium">
             <Lock className="w-3.5 h-3.5 text-[#008f85]" />
@@ -377,18 +377,18 @@ export default function MemberLogin() {
 
       {/* =====================================================================
           RIGHT PANE: Modern Fintech Membership 3D Illustration
-          Responsive full view display:
-          - Entire illustration fully visible without cropping (object-contain)
-          - Generous padding and max-height constraints so all icons and cards fit perfectly
+          Full View Display:
+          - Entire illustration displayed without cropping (object-contain)
+          - Sized and padded exactly matching the Branch Manager login page
           - Seamless white background matching the form section
          ===================================================================== */}
-      <div className="w-full lg:w-1/2 min-h-[300px] sm:min-h-[400px] lg:min-h-screen lg:h-screen bg-white relative flex items-center justify-center p-4 sm:p-6 lg:p-8 xl:p-12 order-2 lg:order-2 select-none overflow-hidden">
+      <div className="w-full lg:w-1/2 min-h-[340px] sm:min-h-[440px] lg:min-h-screen bg-white relative flex items-center justify-center p-3 sm:p-6 lg:p-8 xl:p-12 order-2 lg:order-2 select-none">
         
         {/* Modern Fintech Membership Illustration Image */}
         <img
           src={memberIllustration}
           alt="AurumFX Member Account & Fintech Services"
-          className="w-full h-full max-h-[460px] sm:max-h-[540px] lg:max-h-[85vh] xl:max-h-[88vh] object-contain object-center relative z-10 pointer-events-none"
+          className="w-full h-full max-h-[500px] sm:max-h-[600px] lg:max-h-[88vh] xl:max-h-[92vh] object-contain object-center relative z-10 pointer-events-none"
           loading="eager"
         />
       </div>

@@ -26,7 +26,7 @@ import {
   X,
   Megaphone
 } from 'lucide-react';
-import staffTeamworkIllustration from '../../assets/AurumFX Office Finance Teamwork Cutout.webp';
+import friendlyCashierIllustration from '../../assets/Friendly Cashier with AurumFX Counter Setup.webp';
 import { getStaffMe } from '../../services/branchStaffService';
 import {
   lookupSavingsAccount,
@@ -382,7 +382,7 @@ export default function StaffDashboard() {
         {/* Top Hero Banner matching exact reference design */}
         <div className="bg-gradient-to-r from-[#d8f6f0] via-[#e5faf5] to-[#cbf3eb] rounded-3xl p-6 sm:p-7 lg:p-8 border border-teal-200/70 shadow-sm relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
           {/* Left: Staff Info & Structured Badges */}
-          <div className="relative z-10 flex-1 max-w-3xl">
+          <div className="relative z-10 flex-1 max-w-2xl">
             {/* Top Separate Badges */}
             <div className="flex flex-wrap items-center gap-2 mb-3.5">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur-xs text-xs font-semibold border border-teal-200/80 shadow-2xs text-[#0f766e]">
@@ -444,10 +444,7 @@ export default function StaffDashboard() {
                 <span className="text-slate-500 font-medium">Branch Name:</span>
                 <span className="text-slate-900 font-bold">{staffData?.branch?.name || 'Society Branch'}</span>
               </div>
-            </div>
 
-            {/* Row 4: Location & IFSC Chips */}
-            <div className="mt-2.5 flex flex-wrap items-center gap-2 sm:gap-2.5">
               {/* Location */}
               {(staffData?.branch?.city || staffData?.branch?.state) && (
                 <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/90 border border-teal-200/70 shadow-2xs text-xs text-slate-700 backdrop-blur-xs">
@@ -467,38 +464,21 @@ export default function StaffDashboard() {
                   <span className="font-mono font-bold text-teal-800">{staffData.branch.ifsc_code}</span>
                 </div>
               )}
-
-              {/* Role Announcements Action */}
-              <button
-                onClick={() => navigate('/staff/announcements')}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-teal-50 hover:bg-teal-100 border border-teal-200/80 shadow-2xs text-xs font-semibold text-teal-800 transition-colors cursor-pointer active:scale-95"
-                title="View announcements targeted to your role"
-              >
-                <Megaphone className="w-3.5 h-3.5 text-teal-600" />
-                <span>Role Announcements</span>
-              </button>
-
-              {/* Refresh Action */}
-              <button
-                onClick={() => fetchStaffProfile(true)}
-                disabled={refreshing}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 shadow-2xs text-xs font-semibold text-slate-700 transition-colors cursor-pointer active:scale-95 disabled:opacity-50"
-                title="Refresh staff profile"
-              >
-                <RefreshCw className={`w-3.5 h-3.5 text-[#00b4a7] ${refreshing ? 'animate-spin' : ''}`} />
-                <span>{refreshing ? 'Refreshing...' : 'Refresh'}</span>
-              </button>
             </div>
           </div>
 
           {/* Right Banner Image */}
-          <div className="relative z-10 w-full md:w-auto flex justify-center md:justify-end">
+          <div className="relative z-10 my-[-10px] sm:my-[-20px] lg:my-[-30px] flex justify-end pointer-events-none">
             <img
-              src={staffTeamworkIllustration}
-              alt="Staff Teamwork"
-              className="max-h-[170px] sm:max-h-[200px] lg:max-h-[220px] object-contain drop-shadow-md pointer-events-none"
+              src={friendlyCashierIllustration}
+              alt="Friendly Cashier Counter Setup"
+              className="h-44 sm:h-52 lg:h-64 w-auto object-contain drop-shadow-md select-none"
             />
           </div>
+
+          {/* Background subtle radial glow */}
+          <div className="absolute -right-16 -top-16 w-64 h-64 rounded-full bg-teal-200/30 blur-3xl pointer-events-none" />
+          <div className="absolute -left-16 -bottom-16 w-64 h-64 rounded-full bg-emerald-200/30 blur-3xl pointer-events-none" />
         </div>
 
         {/* Loading state */}

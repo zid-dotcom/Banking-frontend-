@@ -30,7 +30,7 @@ import {
   Calculator,
   Headset
 } from 'lucide-react';
-import staffTeamworkIllustration from '../../assets/AurumFX Office Finance Teamwork Cutout.webp';
+import modernTealBankIllustration from '../../assets/Modern Teal Bank with Coins and Rupee Bag.webp';
 import { getStaffMe } from '../../services/branchStaffService';
 import {
   lookupSavingsAccount,
@@ -553,11 +553,11 @@ export default function StaffCashOperations() {
             </div>
           </div>
 
-          <div className="relative z-10 w-full md:w-auto flex justify-center md:justify-end">
+          <div className="relative z-10 flex justify-center md:justify-end pointer-events-none -my-2 sm:-my-5 lg:-my-6 flex-shrink-0 w-full md:w-auto">
             <img
-              src={staffTeamworkIllustration}
-              alt="Staff Teamwork"
-              className="max-h-[170px] sm:max-h-[200px] lg:max-h-[220px] object-contain drop-shadow-md pointer-events-none"
+              src={modernTealBankIllustration}
+              alt="Cash Operations Desk"
+              className="h-32 sm:h-44 lg:h-52 max-w-full w-auto object-contain drop-shadow-md select-none pointer-events-none mx-auto md:mx-0"
             />
           </div>
         </div>

@@ -4,7 +4,8 @@ import StatCard from '../../components/dashboard/StatCard';
 import {
   getMemberNominee,
   submitMemberNominee,
-  getMemberMe
+  getMemberMe,
+  getMemberNomineeDocument
 } from '../../services/memberService';
 import {
   createMemberNomineeChangeRequest,
@@ -126,7 +127,53 @@ export default function MemberNominee() {
   const [backPreview, setBackPreview] = useState(null);
 
   // Document Viewer Modal
-  const [viewDoc, setViewDoc] = useState(null); // { url, title }
+  const [viewDoc, setViewDoc] = useState(null); // { url, isPdf, title }
+  const [docLoading, setDocLoading] = useState({});
+
+  const handleOpenDocument = async (docType, defaultTitle) => {
+    setDocLoading((prev) => ({ ...prev, [docType]: true }));
+    try {
+      const rawField = nominee?.[`${docType}_url`] || nominee?.[docType];
+      let docResult;
+      try {
+        docResult = await getMemberNomineeDocument(docType);
+      } catch (err1) {
+        if (rawField && typeof rawField === 'string' && rawField !== docType) {
+          docResult = await getMemberNomineeDocument(rawField);
+        } else {
+          throw err1;
+        }
+      }
+
+      const url = typeof docResult === 'string' ? docResult : docResult?.url;
+      const isPdf = typeof docResult === 'object' ? Boolean(docResult?.isPdf) : Boolean(url?.toLowerCase()?.includes('.pdf'));
+
+      if (url) {
+        setViewDoc({
+          url,
+          isPdf,
+          title: defaultTitle || (docType === 'aadhaar_front' ? 'Nominee Aadhaar Card (Front)' : 'Nominee Aadhaar Card (Back)')
+        });
+      }
+    } catch (err) {
+      console.error(`Error opening document ${docType}:`, err);
+      const rawField = nominee?.[`${docType}_url`] || nominee?.[docType];
+      if (rawField && typeof rawField === 'string') {
+        const BASE_URL = import.meta.env.VITE_API_URL || 'https://supercriminally-ununified-arnoldo.ngrok-free.dev';
+        const cleanPath = rawField.startsWith('/') ? rawField : `/${rawField}`;
+        const fullUrl = rawField.startsWith('http') ? rawField : `${BASE_URL}${cleanPath}`;
+        setViewDoc({
+          url: fullUrl,
+          isPdf: fullUrl.toLowerCase().includes('.pdf'),
+          title: defaultTitle || (docType === 'aadhaar_front' ? 'Nominee Aadhaar Card (Front)' : 'Nominee Aadhaar Card (Back)')
+        });
+      } else {
+        alert(err.message || 'Could not load nominee document.');
+      }
+    } finally {
+      setDocLoading((prev) => ({ ...prev, [docType]: false }));
+    }
+  };
 
   const [memberUser, setMemberUser] = useState(() => {
     try {
@@ -516,17 +563,20 @@ export default function MemberNominee() {
           </div>
 
           {/* Right Banner Illustration */}
-          <div className="relative z-10 w-44 sm:w-56 lg:w-64 flex-shrink-0 flex items-center justify-center">
+          <div className="relative z-10 flex justify-center md:justify-end pointer-events-none -my-2 sm:-my-5 lg:-my-6 flex-shrink-0 w-full md:w-auto">
             <img
               src={nomineeIllustration}
               alt="Nominee Registration Family Security"
-              className="w-full h-auto object-contain max-h-48 drop-shadow-md"
+              className="h-32 sm:h-44 lg:h-52 max-w-full w-auto object-contain drop-shadow-md select-none pointer-events-none transform hover:scale-102 transition-transform duration-300 mx-auto md:mx-0"
             />
           </div>
 
-          {/* Background Decorative Rings */}
-          <div className="absolute -top-12 -right-12 w-64 h-64 rounded-full bg-teal-100/40 blur-2xl pointer-events-none" />
-          <div className="absolute -bottom-8 -left-8 w-48 h-48 rounded-full bg-emerald-100/40 blur-xl pointer-events-none" />
+          {/* Decorative ambient gradients */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            <div className="absolute -right-16 -top-16 w-80 h-80 rounded-full bg-teal-200/40 blur-3xl" />
+            <div className="absolute left-1/3 -bottom-20 w-80 h-80 rounded-full bg-emerald-200/30 blur-3xl" />
+            <div className="absolute -left-16 -bottom-16 w-64 h-64 rounded-full bg-teal-100/50 blur-2xl" />
+          </div>
         </div>
 
         {/* Stat Overview Cards */}
@@ -850,23 +900,19 @@ export default function MemberNominee() {
                       </div>
                     </div>
 
-                    {(nominee.aadhaar_front_url || nominee.aadhaar_front) ? (
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setViewDoc({
-                            url: nominee.aadhaar_front_url || nominee.aadhaar_front,
-                            title: 'Nominee Aadhaar Card (Front)'
-                          })
-                        }
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white hover:bg-teal-50 text-teal-800 text-xs font-bold border border-teal-200 shadow-2xs transition-colors cursor-pointer flex-shrink-0"
-                      >
+                    <button
+                      type="button"
+                      onClick={() => handleOpenDocument('aadhaar_front', 'Nominee Aadhaar Card (Front)')}
+                      disabled={docLoading['aadhaar_front']}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-teal-50 text-teal-800 text-xs font-bold border border-teal-200 shadow-2xs transition-colors cursor-pointer flex-shrink-0 disabled:opacity-50"
+                    >
+                      {docLoading['aadhaar_front'] ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin text-teal-600" />
+                      ) : (
                         <Eye className="w-3.5 h-3.5 text-teal-600" />
-                        <span>View</span>
-                      </button>
-                    ) : (
-                      <span className="text-[11px] font-bold text-slate-400 italic">Attached</span>
-                    )}
+                      )}
+                      <span>View</span>
+                    </button>
                   </div>
 
                   {/* Aadhaar Back Card */}
@@ -885,23 +931,19 @@ export default function MemberNominee() {
                       </div>
                     </div>
 
-                    {(nominee.aadhaar_back_url || nominee.aadhaar_back) ? (
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setViewDoc({
-                            url: nominee.aadhaar_back_url || nominee.aadhaar_back,
-                            title: 'Nominee Aadhaar Card (Back)'
-                          })
-                        }
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white hover:bg-teal-50 text-teal-800 text-xs font-bold border border-teal-200 shadow-2xs transition-colors cursor-pointer flex-shrink-0"
-                      >
+                    <button
+                      type="button"
+                      onClick={() => handleOpenDocument('aadhaar_back', 'Nominee Aadhaar Card (Back)')}
+                      disabled={docLoading['aadhaar_back']}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-teal-50 text-teal-800 text-xs font-bold border border-teal-200 shadow-2xs transition-colors cursor-pointer flex-shrink-0 disabled:opacity-50"
+                    >
+                      {docLoading['aadhaar_back'] ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin text-teal-600" />
+                      ) : (
                         <Eye className="w-3.5 h-3.5 text-teal-600" />
-                        <span>View</span>
-                      </button>
-                    ) : (
-                      <span className="text-[11px] font-bold text-slate-400 italic">Attached</span>
-                    )}
+                      )}
+                      <span>View</span>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -1295,18 +1337,38 @@ export default function MemberNominee() {
 
             <div className="p-4 overflow-auto flex items-center justify-center bg-slate-100/50 min-h-[300px]">
               {viewDoc.url ? (
-                viewDoc.url.toLowerCase().endsWith('.pdf') ? (
+                (viewDoc.isPdf || viewDoc.url.toLowerCase().endsWith('.pdf')) ? (
                   <iframe
                     src={viewDoc.url}
                     title={viewDoc.title}
                     className="w-full h-[500px] rounded-xl border border-slate-200"
                   />
                 ) : (
-                  <img
-                    src={viewDoc.url}
-                    alt={viewDoc.title}
-                    className="max-h-[550px] max-w-full rounded-xl object-contain shadow-sm"
-                  />
+                  <div className="flex flex-col items-center max-w-full">
+                    <img
+                      src={viewDoc.url}
+                      alt={viewDoc.title}
+                      className="max-h-[550px] max-w-full rounded-xl object-contain shadow-sm"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        const fallback = e.target.parentElement?.querySelector('.doc-fallback');
+                        if (fallback) fallback.style.display = 'flex';
+                      }}
+                    />
+                    <div style={{ display: 'none' }} className="doc-fallback flex flex-col items-center justify-center p-8 text-center text-slate-500 gap-2">
+                      <AlertCircle className="w-8 h-8 text-amber-500 mx-auto" />
+                      <p className="text-sm font-semibold">Image preview could not be displayed directly.</p>
+                      <a
+                        href={viewDoc.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-teal-600 text-white text-xs font-bold hover:bg-teal-700 transition-colors mt-2"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                        <span>Open / Download Document</span>
+                      </a>
+                    </div>
+                  </div>
                 )
               ) : (
                 <p className="text-xs text-slate-400">Document preview unavailable.</p>
