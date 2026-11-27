@@ -19,7 +19,8 @@ import {
   ArrowLeft,
   Receipt,
   AlertTriangle,
-  Landmark
+  Landmark,
+  PlusCircle
 } from 'lucide-react';
 
 const PAYOUT_OPTIONS = [
@@ -839,7 +840,8 @@ export function FdMisSchemeDetailModal({
   scheme,
   onClose,
   onEditClick,
-  onDeleteClick
+  onDeleteClick,
+  onApplyClick
 }) {
   if (!isOpen || !scheme) return null;
 
@@ -1096,11 +1098,24 @@ export function FdMisSchemeDetailModal({
                   <span>Edit Scheme</span>
                 </button>
               )}
+              {onApplyClick && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    onApplyClick(scheme);
+                  }}
+                  className="inline-flex items-center gap-1.5 px-4 sm:px-5 py-2 bg-gradient-to-r from-[#00b4a7] to-[#0f766e] text-white hover:from-[#00a296] hover:to-[#0c625c] rounded-xl text-xs sm:text-sm font-bold shadow-md shadow-teal-500/20 transition-all cursor-pointer active:scale-95"
+                >
+                  <PlusCircle className="w-4 h-4" />
+                  <span>Apply Scheme</span>
+                </button>
+              )}
               <button
                 onClick={onClose}
-                className="px-5 sm:px-6 py-2 bg-gradient-to-r from-[#00b4a7] to-[#0f766e] text-white hover:from-[#00a296] hover:to-[#0c625c] rounded-xl text-xs sm:text-sm font-bold shadow-md shadow-teal-500/20 transition-all cursor-pointer active:scale-95"
+                className="px-5 sm:px-6 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer active:scale-95"
               >
-                Done
+                Close
               </button>
             </div>
           </div>

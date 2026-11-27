@@ -318,6 +318,164 @@ export async function getMemberFullProfile(explicitToken = null) {
 }
 
 /**
+ * 7c. GET /member/profile/documents/{doc_name} - View Member Profile KYC Document
+ * doc_name can be 'aadhaar_front', 'aadhaar_back', 'pan_image', 'passbook_image' or full/relative URL.
+ */
+export async function getMemberProfileDocument(docName) {
+  try {
+    const token =
+      localStorage.getItem('member_token') ||
+      localStorage.getItem('token') ||
+      localStorage.getItem('access_token') ||
+      localStorage.getItem('auth_token');
+
+    const headers = {
+      'ngrok-skip-browser-warning': 'true',
+      'Accept': 'application/json',
+    };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    let endpoint = `${BASE_URL}/member/profile/documents/${encodeURIComponent(docName)}`;
+    if (typeof docName === 'string') {
+      if (docName.startsWith('http://') || docName.startsWith('https://')) {
+        endpoint = docName;
+      } else if (docName.startsWith('/')) {
+        endpoint = `${BASE_URL}${docName}`;
+      }
+    }
+
+    const res = await fetch(endpoint, {
+      method: 'GET',
+      headers,
+    });
+
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({}));
+      checkResponseStatus(res, errBody, `Failed to load member document: ${docName}`, 'member');
+    }
+
+    const contentType = res.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      const json = await res.json();
+      const target = json.url || json.document_url || json.data;
+      if (typeof target === 'string') {
+        if (target.startsWith('http://') || target.startsWith('https://') || target.startsWith('data:')) {
+          return {
+            url: target,
+            isPdf: target.toLowerCase().includes('.pdf') || target.startsWith('data:application/pdf')
+          };
+        }
+        if (target.startsWith('/')) {
+          const subRes = await fetch(`${BASE_URL}${target}`, {
+            method: 'GET',
+            headers,
+          });
+          if (subRes.ok) {
+            const subType = subRes.headers.get('content-type') || '';
+            const subBlob = await subRes.blob();
+            return {
+              url: URL.createObjectURL(subBlob),
+              isPdf: subType.includes('pdf') || target.toLowerCase().endsWith('.pdf')
+            };
+          }
+        }
+      }
+      return { url: target || json, isPdf: false };
+    }
+
+    const isPdf = contentType.includes('pdf');
+    const blob = await res.blob();
+    return {
+      url: URL.createObjectURL(blob),
+      isPdf
+    };
+  } catch (error) {
+    console.error(`memberService.getMemberProfileDocument(${docName}) error:`, error);
+    throw error;
+  }
+}
+
+/**
+ * 7d. GET /member/profile/documents/{doc_name}/download - Download Member Profile KYC Document
+ */
+export async function downloadMemberProfileDocument(docName, filename = 'document') {
+  try {
+    const token =
+      localStorage.getItem('member_token') ||
+      localStorage.getItem('token') ||
+      localStorage.getItem('access_token') ||
+      localStorage.getItem('auth_token');
+
+    const headers = {
+      'ngrok-skip-browser-warning': 'true',
+      'Accept': 'application/json',
+    };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    let downloadEndpoint = `${BASE_URL}/member/profile/documents/${encodeURIComponent(docName)}/download`;
+    if (typeof docName === 'string') {
+      if (docName.includes('/download')) {
+        downloadEndpoint = docName.startsWith('http') ? docName : `${BASE_URL}${docName.startsWith('/') ? '' : '/'}${docName}`;
+      } else if (docName.startsWith('/')) {
+        downloadEndpoint = `${BASE_URL}${docName}/download`;
+      }
+    }
+
+    let res = await fetch(downloadEndpoint, {
+      method: 'GET',
+      headers,
+    });
+
+    if (!res.ok && res.status === 404) {
+      let viewEndpoint = `${BASE_URL}/member/profile/documents/${encodeURIComponent(docName)}`;
+      if (typeof docName === 'string' && docName.startsWith('/')) {
+        viewEndpoint = `${BASE_URL}${docName.replace(/\/download$/, '')}`;
+      }
+      res = await fetch(viewEndpoint, {
+        method: 'GET',
+        headers,
+      });
+    }
+
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({}));
+      checkResponseStatus(res, errBody, `Failed to download document: ${docName}`, 'member');
+    }
+
+    const contentType = res.headers.get('content-type') || '';
+    const blob = await res.blob();
+
+    let finalFilename = filename;
+    if (!finalFilename.includes('.')) {
+      if (contentType.includes('pdf')) {
+        finalFilename += '.pdf';
+      } else if (contentType.includes('png')) {
+        finalFilename += '.png';
+      } else {
+        finalFilename += '.jpg';
+      }
+    }
+
+    const blobUrl = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = blobUrl;
+    link.download = finalFilename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+    return true;
+  } catch (error) {
+    console.error(`memberService.downloadMemberProfileDocument(${docName}) error:`, error);
+    throw error;
+  }
+}
+
+/**
  * 8. POST /member/register - Register New Member (multipart/form-data)
  */
 export async function registerMember(formData) {
@@ -430,6 +588,7 @@ export {
   getMemberNominee,
   submitMemberNominee,
   getMemberNomineeDocument,
+  downloadMemberNomineeDocument,
 } from './nomineeService';
 
 /**
@@ -445,8 +604,17 @@ export {
 /**
  * 18. Auth & Password APIs
  * - POST /auth/change-password
+ * - POST /member/forgot-password
+ * - POST /member/reset-password
  */
-export { changePassword } from './authService';
+export { changePassword, memberForgotPassword, memberResetPassword } from './authService';
+
+export {
+  getMemberRegistrationSettings,
+  getMemberRegistrationQrCode,
+  resolveBranchQrImageUrl,
+  lookupMemberStaffCode,
+} from './membershipSettingsService';
 
 
 

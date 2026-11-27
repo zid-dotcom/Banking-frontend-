@@ -14,6 +14,7 @@ import MemberLogin from './pages/MemberLogin';
 import StaffLogin from './pages/StaffLogin';
 import MemberDashboard from './pages/dashboard/MemberDashboard';
 import MemberSavingsSchemes from './pages/dashboard/MemberSavingsSchemes';
+import MemberInvestmentSchemes from './pages/dashboard/MemberInvestmentSchemes';
 import MemberAccountTransactions from './pages/dashboard/MemberAccountTransactions';
 import MemberFdMisSchemes from './pages/dashboard/MemberFdMisSchemes';
 import MemberLoanSchemes from './pages/dashboard/MemberLoanSchemes';
@@ -29,13 +30,16 @@ import StaffCashOperations from './pages/dashboard/StaffCashOperations';
 import StaffServiceRequests from './pages/dashboard/StaffServiceRequests';
 import StaffMembers from './pages/dashboard/StaffMembers';
 import StaffAnnouncements from './pages/dashboard/StaffAnnouncements';
+import StaffMonthlyTargets from './pages/dashboard/StaffMonthlyTargets';
+import AccountantProductAccounts from './pages/dashboard/AccountantProductAccounts';
 
 import BranchManagerDashboard from './pages/dashboard/BranchManagerDashboard';
-import BranchManagerOverview from './pages/dashboard/BranchManagerOverview';
 import BranchManagerMembers from './pages/dashboard/BranchManagerMembers';
 import BranchManagerStaff from './pages/dashboard/BranchManagerStaff';
 import BranchManagerLoanSchemes from './pages/dashboard/BranchManagerLoanSchemes';
 import BranchManagerSavingsSchemes from './pages/dashboard/BranchManagerSavingsSchemes';
+import BranchManagerInvestmentSchemes from './pages/dashboard/BranchManagerInvestmentSchemes';
+import BranchManagerMonthlyTargets from './pages/dashboard/BranchManagerMonthlyTargets';
 import BranchManagerCashTransactions from './pages/dashboard/BranchManagerCashTransactions';
 import BranchManagerCashReconciliation from './pages/dashboard/BranchManagerCashReconciliation';
 import BranchManagerFdMisSchemes from './pages/dashboard/BranchManagerFdMisSchemes';
@@ -44,9 +48,10 @@ import BranchManagerAnnouncements from './pages/dashboard/BranchManagerAnnouncem
 import BranchManagerServiceRequests from './pages/dashboard/BranchManagerServiceRequests';
 import BranchManagerEmergencyCases from './pages/dashboard/BranchManagerEmergencyCases';
 import BranchManagerSecurityEvents from './pages/dashboard/BranchManagerSecurityEvents';
+import BranchManagerMemberPasswordUpdate from './pages/dashboard/BranchManagerMemberPasswordUpdate';
+import BranchManagerMembershipSettings from './pages/dashboard/BranchManagerMembershipSettings';
 
 import SuperAdminDashboard from './pages/dashboard/SuperAdminDashboard';
-import SuperAdminBranchOverview from './pages/dashboard/SuperAdminBranchOverview';
 import SuperAdminBranches from './pages/dashboard/SuperAdminBranches';
 import SuperAdminBranchAdmin from './pages/dashboard/SuperAdminBranchAdmin';
 import SuperAdminStaff from './pages/dashboard/SuperAdminStaff';
@@ -55,6 +60,8 @@ import SuperAdminLoanSchemes from './pages/dashboard/SuperAdminLoanSchemes';
 import SuperAdminStaffRoles from './pages/dashboard/SuperAdminStaffRoles';
 import PasswordUpdate from './pages/dashboard/PasswordUpdate';
 import SuperAdminSavingsSchemes from './pages/dashboard/SuperAdminSavingsSchemes';
+import SuperAdminInvestmentSchemes from './pages/dashboard/SuperAdminInvestmentSchemes';
+import SuperAdminMonthlyTargets from './pages/dashboard/SuperAdminMonthlyTargets';
 import SuperAdminCashTransactions from './pages/dashboard/SuperAdminCashTransactions';
 import SuperAdminCashReconciliation from './pages/dashboard/SuperAdminCashReconciliation';
 import SuperAdminFdMisSchemes from './pages/dashboard/SuperAdminFdMisSchemes';
@@ -179,8 +186,8 @@ function MainApp() {
       <Routes>
         {/* Super Admin Individual Page Routes */}
         <Route path="/super-admin/dashboard" element={<SuperAdminDashboard />} />
-        <Route path="/super-admin/branch-overview" element={<SuperAdminBranchOverview />} />
-        <Route path="/super-admin/overview" element={<SuperAdminBranchOverview />} />
+        <Route path="/super-admin/branch-overview" element={<Navigate to="/super-admin/dashboard" replace />} />
+        <Route path="/super-admin/overview" element={<Navigate to="/super-admin/dashboard" replace />} />
         <Route path="/super-admin/branches" element={<SuperAdminBranches />} />
         <Route path="/super-admin/branch-admins" element={<SuperAdminBranchAdmin />} />
         <Route path="/super-admin/branch-admin" element={<SuperAdminBranchAdmin />} />
@@ -193,6 +200,12 @@ function MainApp() {
         <Route path="/super-admin/savings-schemes" element={<SuperAdminSavingsSchemes />} />
         <Route path="/super-admin/savings-scheme" element={<SuperAdminSavingsSchemes />} />
         <Route path="/super-admin/savings" element={<SuperAdminSavingsSchemes />} />
+        <Route path="/super-admin/investment-schemes" element={<SuperAdminInvestmentSchemes />} />
+        <Route path="/super-admin/investment-scheme" element={<SuperAdminInvestmentSchemes />} />
+        <Route path="/super-admin/investments" element={<SuperAdminInvestmentSchemes />} />
+        <Route path="/super-admin/monthly-targets" element={<SuperAdminMonthlyTargets />} />
+        <Route path="/super-admin/monthly-target" element={<SuperAdminMonthlyTargets />} />
+        <Route path="/super-admin/targets" element={<SuperAdminMonthlyTargets />} />
         <Route path="/super-admin/cash-transactions" element={<SuperAdminCashTransactions />} />
         <Route path="/super-admin/cash-operations" element={<SuperAdminCashTransactions />} />
         <Route path="/super-admin/cash-reconciliation" element={<SuperAdminCashReconciliation />} />
@@ -217,12 +230,14 @@ function MainApp() {
 
         {/* Branch Manager Routes */}
         <Route path="/branch-manager/dashboard" element={<BranchManagerDashboard />} />
-        <Route path="/branch-manager/branch-overview" element={<BranchManagerOverview />} />
-        <Route path="/branch-admin/branch-overview" element={<BranchManagerOverview />} />
-        <Route path="/branch-manager/overview" element={<BranchManagerOverview />} />
-        <Route path="/branch-admin/overview" element={<BranchManagerOverview />} />
+        <Route path="/branch-manager/branch-overview" element={<Navigate to="/branch-manager/dashboard" replace />} />
+        <Route path="/branch-admin/branch-overview" element={<Navigate to="/branch-manager/dashboard" replace />} />
+        <Route path="/branch-manager/overview" element={<Navigate to="/branch-manager/dashboard" replace />} />
+        <Route path="/branch-admin/overview" element={<Navigate to="/branch-manager/dashboard" replace />} />
         <Route path="/branch-manager/members" element={<BranchManagerMembers />} />
         <Route path="/branch-admin/members" element={<BranchManagerMembers />} />
+        <Route path="/branch-manager/membership-settings" element={<BranchManagerMembershipSettings />} />
+        <Route path="/branch-admin/membership-settings" element={<BranchManagerMembershipSettings />} />
         <Route path="/branch-manager/nominees" element={<BranchManagerNominees />} />
         <Route path="/branch-admin/nominees" element={<BranchManagerNominees />} />
         <Route path="/branch-manager/nominee" element={<BranchManagerNominees />} />
@@ -231,6 +246,16 @@ function MainApp() {
         <Route path="/branch-admin/staff" element={<BranchManagerStaff />} />
         <Route path="/branch-manager/savings-schemes" element={<BranchManagerSavingsSchemes />} />
         <Route path="/branch-admin/savings-schemes" element={<BranchManagerSavingsSchemes />} />
+        <Route path="/branch-manager/investment-schemes" element={<BranchManagerInvestmentSchemes />} />
+        <Route path="/branch-admin/investment-schemes" element={<BranchManagerInvestmentSchemes />} />
+        <Route path="/branch-manager/investments" element={<BranchManagerInvestmentSchemes />} />
+        <Route path="/branch-admin/investments" element={<BranchManagerInvestmentSchemes />} />
+        <Route path="/branch-manager/monthly-targets" element={<BranchManagerMonthlyTargets />} />
+        <Route path="/branch-admin/monthly-targets" element={<BranchManagerMonthlyTargets />} />
+        <Route path="/branch-manager/monthly-target" element={<BranchManagerMonthlyTargets />} />
+        <Route path="/branch-admin/monthly-target" element={<BranchManagerMonthlyTargets />} />
+        <Route path="/branch-manager/targets" element={<BranchManagerMonthlyTargets />} />
+        <Route path="/branch-admin/targets" element={<BranchManagerMonthlyTargets />} />
         <Route path="/branch-manager/cash-transactions" element={<BranchManagerCashTransactions />} />
         <Route path="/branch-admin/cash-transactions" element={<BranchManagerCashTransactions />} />
         <Route path="/branch-manager/cash-operations" element={<BranchManagerCashTransactions />} />
@@ -257,6 +282,8 @@ function MainApp() {
         <Route path="/branch-admin/security" element={<BranchManagerSecurityEvents />} />
         <Route path="/branch-manager/helpdesk" element={<BranchManagerServiceRequests />} />
         <Route path="/branch-admin/helpdesk" element={<BranchManagerServiceRequests />} />
+        <Route path="/branch-manager/member-password-update" element={<BranchManagerMemberPasswordUpdate />} />
+        <Route path="/branch-admin/member-password-update" element={<BranchManagerMemberPasswordUpdate />} />
         <Route path="/branch-manager/password-update" element={<PasswordUpdate />} />
         <Route path="/branch-admin/password-update" element={<PasswordUpdate />} />
         <Route path="/branch-manager/change-password" element={<PasswordUpdate />} />
@@ -270,9 +297,11 @@ function MainApp() {
         <Route path="/member/nominee" element={<MemberNominee />} />
         <Route path="/member/nominees" element={<MemberNominee />} />
         <Route path="/member/savings-schemes" element={<MemberSavingsSchemes />} />
-        <Route path="/member/account-transactions" element={<MemberAccountTransactions />} />
-        <Route path="/member/transactions" element={<MemberAccountTransactions />} />
-        <Route path="/member/cash-transactions" element={<MemberAccountTransactions />} />
+        <Route path="/member/investment-schemes" element={<MemberInvestmentSchemes />} />
+        <Route path="/member/investments" element={<MemberInvestmentSchemes />} />
+        <Route path="/member/account-transactions" element={<Navigate to="/member/dashboard" replace />} />
+        <Route path="/member/transactions" element={<Navigate to="/member/dashboard" replace />} />
+        <Route path="/member/cash-transactions" element={<Navigate to="/member/dashboard" replace />} />
         <Route path="/member/fd-mis-schemes" element={<MemberFdMisSchemes />} />
         <Route path="/member/loan-schemes" element={<MemberLoanSchemes />} />
         <Route path="/member/announcements" element={<MemberAnnouncements />} />
@@ -287,6 +316,9 @@ function MainApp() {
 
         {/* Staff Dashboard Routes */}
         <Route path="/staff/dashboard" element={<StaffDashboard />} />
+        <Route path="/staff/monthly-targets" element={<StaffMonthlyTargets />} />
+        <Route path="/staff/monthly-target" element={<StaffMonthlyTargets />} />
+        <Route path="/staff/targets" element={<StaffMonthlyTargets />} />
         <Route path="/staff/cash-reconciliation" element={<StaffCashReconciliation />} />
         <Route path="/staff/cash-day" element={<StaffCashReconciliation />} />
         <Route path="/staff/reconciliation" element={<StaffCashReconciliation />} />
@@ -297,6 +329,9 @@ function MainApp() {
         <Route path="/staff/members" element={<StaffMembers />} />
         <Route path="/staff/view-members" element={<StaffMembers />} />
         <Route path="/staff/branch-members" element={<StaffMembers />} />
+        <Route path="/staff/product-accounts" element={<AccountantProductAccounts />} />
+        <Route path="/staff/fd-mis-accounts" element={<AccountantProductAccounts />} />
+        <Route path="/staff/investment-accounts" element={<AccountantProductAccounts />} />
         <Route path="/staff/announcements" element={<StaffAnnouncements />} />
         <Route path="/staff/notices" element={<StaffAnnouncements />} />
         <Route path="/staff/password-update" element={<PasswordUpdate />} />

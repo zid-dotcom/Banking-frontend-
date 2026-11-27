@@ -1,17 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import StatCard from '../../components/dashboard/StatCard';
 import { SavingsSchemeDetailModal } from '../../components/dashboard/SavingsSchemeModals';
 import {
-  ApplySavingsAccountModal,
-  SavingsAccountDetailModal
-} from '../../components/dashboard/SavingsAccountModals';
-import {
-  getMemberSavingsSchemes,
-  createMemberSavingsAccountRequest,
-  getMemberSavingsAccountRequests,
-  getMemberSavingsAccounts
+  getMemberSavingsSchemes
 } from '../../services/savingsSchemeService';
 import { getMemberMe } from '../../services/memberService';
 import {
@@ -31,17 +23,7 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
-  Send,
-  PlusCircle,
-  Clock,
-  XCircle,
-  FileText,
-  Sparkles,
-  Receipt,
-  ArrowDownLeft,
-  ArrowUpRight,
-  Calendar,
-  Filter
+  Clock
 } from 'lucide-react';
 import savingsGrowthIllustration from '../../assets/Cooperative Bank Savings Growth.webp';
 
@@ -69,92 +51,12 @@ function formatDate(isoString) {
   }
 }
 
-function formatDateTime(isoString) {
-  if (!isoString) return 'N/A';
-  try {
-    const d = new Date(isoString);
-    if (isNaN(d.getTime())) return isoString;
-    return d.toLocaleString('en-IN', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true
-    });
-  } catch {
-    return isoString;
-  }
-}
-
-function renderAccountStatusBadge(status) {
-  if (!status) return null;
-  const s = String(status).toLowerCase();
-  const label = String(status).replace(/_/g, ' ');
-
-  if (s === 'active' || s === 'approved' || s === 'awaiting_initial_deposit' || s === 'opened' || s === 'account_opened') {
-    return (
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-        <span>Account Opened</span>
-      </span>
-    );
-  }
-
-  if (s.includes('pending')) {
-    return (
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200 capitalize">
-        <Clock className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
-        <span>{label}</span>
-      </span>
-    );
-  }
-
-  if (s.includes('closed') || s.includes('rejected') || s.includes('inactive')) {
-    return (
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200 capitalize">
-        <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-        <span>{label}</span>
-      </span>
-    );
-  }
-
-  return (
-    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200 capitalize">
-      <span>{label}</span>
-    </span>
-  );
-}
-
 export default function MemberSavingsSchemes() {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const urlTab = searchParams.get('tab');
-  const initialTab = ['schemes', 'requests', 'accounts'].includes(urlTab)
-    ? urlTab
-    : 'schemes';
-  const [activeTab, setActiveTab] = useState(initialTab);
-
-  const handleTabChange = (tabKey) => {
-    setActiveTab(tabKey);
-    setSearchParams({ tab: tabKey });
-  };
-
   // 1. Schemes state (GET /member/savings-schemes)
   const [schemes, setSchemes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
-
-  // 2. Member Requests state (GET /member/savings-account-requests)
-  const [requests, setRequests] = useState([]);
-  const [loadingRequests, setLoadingRequests] = useState(false);
-  const [errorRequests, setErrorRequests] = useState(null);
-
-  // 3. Member Savings Accounts state (GET /member/savings-accounts)
-  const [accounts, setAccounts] = useState([]);
-  const [loadingAccounts, setLoadingAccounts] = useState(false);
-  const [errorAccounts, setErrorAccounts] = useState(null);
 
   // Search & Filters
   const [searchQuery, setSearchQuery] = useState('');
@@ -168,13 +70,6 @@ export default function MemberSavingsSchemes() {
     scheme: null,
   });
 
-  const [applyModal, setApplyModal] = useState({
-    isOpen: false,
-    scheme: null,
-    isSubmitting: false,
-  });
-
-  const [selectedAccount, setSelectedAccount] = useState(null);
   const [toastMessage, setToastMessage] = useState(null);
 
   const showToast = (msg) => {
@@ -270,61 +165,6 @@ export default function MemberSavingsSchemes() {
     } finally {
       setLoading(false);
       setRefreshing(false);
-    }
-  };
-
-  // 2. Fetch Member Savings Account Requests from GET /member/savings-account-requests
-  const fetchMemberRequests = async (isManual = false) => {
-    setLoadingRequests(true);
-    setErrorRequests(null);
-    try {
-      const data = await getMemberSavingsAccountRequests({ limit: 100 });
-      setRequests(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.warn('getMemberSavingsAccountRequests error:', err);
-      setErrorRequests(err.message || 'Failed to load savings account requests.');
-    } finally {
-      setLoadingRequests(false);
-    }
-  };
-
-  // 3. Fetch Member Active Savings Accounts from GET /member/savings-accounts
-  const fetchMemberAccounts = async (isManual = false) => {
-    setLoadingAccounts(true);
-    setErrorAccounts(null);
-    try {
-      const data = await getMemberSavingsAccounts({ limit: 100 });
-      setAccounts(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.warn('getMemberSavingsAccounts error:', err);
-      setErrorAccounts(err.message || 'Failed to load active savings accounts.');
-    } finally {
-      setLoadingAccounts(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchSavingsSchemes();
-    fetchMemberRequests();
-    fetchMemberAccounts();
-  }, []);
-
-  // Handle Apply / Open Account submission via POST /member/savings-account-requests
-  const handleApplyAccount = async (scheme) => {
-    setApplyModal((prev) => ({ ...prev, isSubmitting: true }));
-    try {
-      const schemeId = scheme.id || scheme.scheme_id;
-      const res = await createMemberSavingsAccountRequest({ savings_scheme_id: schemeId });
-      showToast(
-        `Savings account opening request #${res?.id || ''} for "${scheme.scheme_name || scheme.name}" submitted successfully!`
-      );
-      setApplyModal({ isOpen: false, scheme: null, isSubmitting: false });
-      await fetchMemberRequests();
-      setActiveTab('requests');
-    } catch (err) {
-      console.error('Account request submit error:', err);
-      alert(err.message || 'Failed to submit savings account request.');
-      setApplyModal((prev) => ({ ...prev, isSubmitting: false }));
     }
   };
 
@@ -428,93 +268,33 @@ export default function MemberSavingsSchemes() {
             trendType="up"
           />
           <StatCard
-            title="Account Requests"
-            value={requests.length.toString()}
-            subtitle="Submitted Applications"
-            icon={FileText}
-            trend={
-              requests.filter((r) => r.status === 'pending').length > 0
-                ? `${requests.filter((r) => r.status === 'pending').length} pending`
-                : 'All processed'
-            }
-            trendType={requests.filter((r) => r.status === 'pending').length > 0 ? 'alert' : 'up'}
+            title="Active Deposit Schemes"
+            value={activeCount.toString()}
+            subtitle="Current Live Offers"
+            icon={CheckCircle2}
+            trend={totalCount > 0 ? `${Math.round((activeCount / totalCount) * 100)}% available` : '100%'}
+            trendType="up"
           />
           <StatCard
-            title="My Savings Accounts"
-            value={accounts.length.toString()}
-            subtitle="Active Society Folios"
+            title="Min Opening Deposit"
+            value={lowestOpeningBal > 0 ? formatCurrency(lowestOpeningBal) : '₹500'}
+            subtitle="Lowest Entry Point"
             icon={Wallet}
-            trend={`${accounts.length} online`}
-            trendType="up"
+            trend="Base Entry"
+            trendType="neutral"
           />
           <StatCard
             title="Top Annual Yield"
             value={`${maxInterest}%`}
             subtitle="Maximum Return"
             icon={Percent}
+            trend="Per Annum"
+            trendType="neutral"
           />
         </div>
 
-        {/* Navigation Tabs: Available Schemes | My Requests | My Accounts | Account Transactions */}
-        <div className="flex flex-wrap items-center gap-2 p-1.5 bg-slate-100/90 rounded-2xl w-fit border border-slate-200/80 shadow-2xs">
-          <button
-            type="button"
-            onClick={() => handleTabChange('schemes')}
-            className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-              activeTab === 'schemes'
-                ? 'bg-white text-teal-900 shadow-sm'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            <PiggyBank className="w-4 h-4 text-[#00b4a7]" />
-            <span>Available Schemes</span>
-            <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 font-mono">
-              {schemes.length}
-            </span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleTabChange('requests')}
-            className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-              activeTab === 'requests'
-                ? 'bg-white text-teal-900 shadow-sm'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            <Clock className="w-4 h-4 text-amber-500" />
-            <span>My Account Requests</span>
-            {requests.filter((r) => r.status === 'pending').length > 0 ? (
-              <span className="text-[11px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 font-bold animate-pulse">
-                {requests.filter((r) => r.status === 'pending').length} Pending
-              </span>
-            ) : (
-              <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 font-mono">
-                {requests.length}
-              </span>
-            )}
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleTabChange('accounts')}
-            className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-              activeTab === 'accounts'
-                ? 'bg-white text-teal-900 shadow-sm'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            <Wallet className="w-4 h-4 text-emerald-600" />
-            <span>My Savings Accounts</span>
-            <span className="text-[11px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-bold border border-emerald-200">
-              {accounts.length} Active
-            </span>
-          </button>
-        </div>
-
-        {/* TAB 1: SCHEMES CATALOGUE VIEW */}
-        {activeTab === 'schemes' && (
-          <div className="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
+        {/* Schemes Catalogue View */}
+        <div className="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
             {/* Action & Filter Toolbar */}
             <div className="p-5 sm:p-6 border-b border-slate-100 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
               <div>
@@ -573,7 +353,7 @@ export default function MemberSavingsSchemes() {
                     <option value="inactive">Inactive Only</option>
                   </select>
                 </div>
-
+   
                 <button
                   onClick={() => fetchSavingsSchemes(true)}
                   disabled={refreshing}
@@ -753,7 +533,7 @@ export default function MemberSavingsSchemes() {
                             </span>
                           </td>
 
-                          {/* Actions: View & Apply this scheme */}
+                          {/* Actions: View scheme */}
                           <td className="py-4 px-6 text-right whitespace-nowrap">
                             <div className="flex items-center justify-end gap-2">
                               <button
@@ -763,21 +543,6 @@ export default function MemberSavingsSchemes() {
                               >
                                 <Eye className="w-3.5 h-3.5 text-[#00b4a7]" />
                                 <span>View</span>
-                              </button>
-
-                              <button
-                                onClick={() =>
-                                  setApplyModal({
-                                    isOpen: true,
-                                    scheme,
-                                    isSubmitting: false,
-                                  })
-                                }
-                                className="inline-flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-[#14b8a6] to-[#0f766e] hover:from-[#0d9488] hover:to-[#0f766e] text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer active:scale-95"
-                                title="Apply this scheme"
-                              >
-                                <PlusCircle className="w-3.5 h-3.5" />
-                                <span>Apply this scheme</span>
                               </button>
                             </div>
                           </td>
@@ -838,326 +603,13 @@ export default function MemberSavingsSchemes() {
               </div>
             )}
           </div>
-        )}
+        </div>
 
-        {/* TAB 2: MY ACCOUNT OPENING REQUESTS VIEW (GET /member/savings-account-requests) */}
-        {activeTab === 'requests' && (
-          <div className="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden animate-fadeIn">
-            <div className="p-5 sm:p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50/50">
-              <div>
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center">
-                    <Clock className="w-4 h-4 text-amber-600" />
-                  </div>
-                  <h3 className="font-serif font-bold text-slate-900 text-lg">
-                    My Savings Account Opening Requests
-                  </h3>
-                </div>
-                <p className="text-xs text-slate-500 mt-1 font-medium">
-                  Track real-time status of your deposit opening applications submitted to your branch
-                </p>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => fetchMemberRequests(true)}
-                  disabled={loadingRequests}
-                  className="px-3.5 py-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
-                >
-                  <RefreshCw className={`w-3.5 h-3.5 text-[#00b4a7] ${loadingRequests ? 'animate-spin' : ''}`} />
-                  <span>Refresh Requests</span>
-                </button>
-                <button
-                  onClick={() => setActiveTab('schemes')}
-                  className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#14b8a6] to-[#0f766e] text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
-                >
-                  <PlusCircle className="w-3.5 h-3.5" />
-                  <span>New Request</span>
-                </button>
-              </div>
-            </div>
-
-            {loadingRequests ? (
-              <div className="py-20 text-center space-y-3">
-                <Loader2 className="w-8 h-8 text-[#00b4a7] animate-spin mx-auto" />
-                <p className="text-xs text-slate-500 font-medium">Fetching your account requests...</p>
-              </div>
-            ) : errorRequests ? (
-              <div className="p-8 text-center text-rose-600 text-xs font-semibold">
-                <AlertCircle className="w-6 h-6 mx-auto mb-2 text-rose-500" />
-                <span>{errorRequests}</span>
-              </div>
-            ) : requests.length === 0 ? (
-              <div className="p-16 text-center space-y-3">
-                <div className="w-14 h-14 rounded-2xl bg-teal-50 text-[#00b4a7] flex items-center justify-center mx-auto">
-                  <Clock className="w-7 h-7" />
-                </div>
-                <h4 className="text-base font-bold text-slate-900">No Account Opening Requests Found</h4>
-                <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                  You have not submitted any savings account opening requests yet. Browse the schemes catalogue to request your deposit folio.
-                </p>
-                <button
-                  onClick={() => setActiveTab('schemes')}
-                  className="mt-2 px-4 py-2 bg-gradient-to-r from-[#14b8a6] to-[#0f766e] text-white font-bold text-xs rounded-xl shadow-xs cursor-pointer"
-                >
-                  Browse Savings Schemes
-                </button>
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse min-w-[750px]">
-                  <thead>
-                    <tr className="border-b border-slate-100 bg-slate-50/75 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                      <th className="py-3.5 px-6">Request ID</th>
-                      <th className="py-3.5 px-6">Scheme Requested</th>
-                      <th className="py-3.5 px-6">Submission Date</th>
-                      <th className="py-3.5 px-6 text-center">Status</th>
-                      <th className="py-3.5 px-6">Decision / Remarks</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100 text-sm">
-                    {requests.map((req) => {
-                      const isPending = req.status === 'pending';
-                      const isApproved = req.status === 'approved';
-                      const isRejected = req.status === 'rejected';
-
-                      return (
-                        <tr key={req.id} className="hover:bg-slate-50/50 transition-colors">
-                          <td className="py-4 px-6 font-bold text-[#0f766e] font-mono">
-                            #{req.id}
-                          </td>
-                          <td className="py-4 px-6">
-                            <span className="font-extrabold text-slate-900 block">
-                              {req.scheme_name || req.scheme?.scheme_name || `Scheme #${req.savings_scheme_id || req.scheme_id}`}
-                            </span>
-                            {req.scheme_code && (
-                              <span className="font-mono text-[11px] text-slate-400 mt-0.5 block">
-                                Code: {req.scheme_code}
-                              </span>
-                            )}
-                          </td>
-                          <td className="py-4 px-6 text-xs text-slate-600 font-medium">
-                            {formatDateTime(req.created_at || req.requested_at)}
-                          </td>
-                          <td className="py-4 px-6 text-center whitespace-nowrap">
-                            {isPending && (
-                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200">
-                                <Clock className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
-                                <span>Pending Approval</span>
-                              </span>
-                            )}
-                            {isApproved && (
-                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                                <span>Approved</span>
-                              </span>
-                            )}
-                            {isRejected && (
-                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200">
-                                <XCircle className="w-3.5 h-3.5 text-rose-600" />
-                                <span>Rejected</span>
-                              </span>
-                            )}
-                            {!isPending && !isApproved && !isRejected && (
-                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200 capitalize">
-                                {req.status}
-                              </span>
-                            )}
-                          </td>
-                          <td className="py-4 px-6 text-xs text-slate-600">
-                            {req.rejection_reason ? (
-                              <span className="text-rose-700 font-medium bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-100 inline-block">
-                                Reason: {req.rejection_reason}
-                              </span>
-                            ) : isApproved ? (
-                              <span className="text-emerald-700 font-semibold">
-                                Folio verified and active. View in "My Savings Accounts"
-                              </span>
-                            ) : isPending ? (
-                              <span className="text-slate-400 italic">Awaiting branch manager verification</span>
-                            ) : (
-                              '—'
-                            )}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* TAB 3: MY SAVINGS ACCOUNTS VIEW (GET /member/savings-accounts) */}
-        {activeTab === 'accounts' && (
-          <div className="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden animate-fadeIn">
-            <div className="p-5 sm:p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50/50">
-              <div>
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center">
-                    <Wallet className="w-4 h-4 text-emerald-600" />
-                  </div>
-                  <h3 className="font-serif font-bold text-slate-900 text-lg">
-                    My Active Savings Accounts Ledger
-                  </h3>
-                </div>
-                <p className="text-xs text-slate-500 mt-1 font-medium">
-                  Central record of your opened cooperative society savings folios and balances
-                </p>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => fetchMemberAccounts(true)}
-                  disabled={loadingAccounts}
-                  className="px-3.5 py-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
-                >
-                  <RefreshCw className={`w-3.5 h-3.5 text-[#00b4a7] ${loadingAccounts ? 'animate-spin' : ''}`} />
-                  <span>Refresh Accounts</span>
-                </button>
-              </div>
-            </div>
-
-            {loadingAccounts ? (
-              <div className="py-20 text-center space-y-3">
-                <Loader2 className="w-8 h-8 text-emerald-600 animate-spin mx-auto" />
-                <p className="text-xs text-slate-500 font-medium">Fetching your active savings accounts...</p>
-              </div>
-            ) : errorAccounts ? (
-              <div className="p-8 text-center text-rose-600 text-xs font-semibold">
-                <AlertCircle className="w-6 h-6 mx-auto mb-2 text-rose-500" />
-                <span>{errorAccounts}</span>
-              </div>
-            ) : accounts.length === 0 ? (
-              <div className="p-16 text-center space-y-3">
-                <div className="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto">
-                  <Wallet className="w-7 h-7" />
-                </div>
-                <h4 className="text-base font-bold text-slate-900">No Active Savings Accounts Yet</h4>
-                <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                  You do not currently have any active savings accounts in your branch. Explore the available schemes to apply for a deposit folio.
-                </p>
-                <button
-                  onClick={() => setActiveTab('schemes')}
-                  className="mt-2 px-4 py-2 bg-gradient-to-r from-[#14b8a6] to-[#0f766e] text-white font-bold text-xs rounded-xl shadow-xs cursor-pointer"
-                >
-                  Open a Savings Account
-                </button>
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse min-w-[850px]">
-                  <thead>
-                    <tr className="border-b border-slate-100 bg-slate-50/75 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                      <th className="py-3.5 px-6">Account Number</th>
-                      <th className="py-3.5 px-6">Scheme</th>
-                      <th className="py-3.5 px-6">Branch</th>
-                      <th className="py-3.5 px-6">IFSC Code</th>
-                      <th className="py-3.5 px-6">Balance</th>
-                      <th className="py-3.5 px-6 text-center">Status</th>
-                      <th className="py-3.5 px-6">Opened On</th>
-                      <th className="py-3.5 px-6 text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100 text-sm">
-                    {accounts.map((acc) => (
-                      <tr key={acc.id} className="hover:bg-slate-50/50 transition-colors">
-                        <td className="py-4 px-6 font-mono font-extrabold text-teal-800 text-sm whitespace-nowrap">
-                          {acc.account_number || `#SB-${acc.id}`}
-                        </td>
-                        <td className="py-4 px-6">
-                          <div className="font-bold text-slate-900 capitalize">
-                            {acc.scheme_name || 'Savings Scheme'}
-                          </div>
-                          {acc.scheme_code && (
-                            <span className="font-mono text-[11px] text-slate-400 block font-normal mt-0.5">
-                              Code: {acc.scheme_code}
-                            </span>
-                          )}
-                        </td>
-                        <td className="py-4 px-6 whitespace-nowrap">
-                          <div className="font-semibold text-slate-800 text-xs">
-                            {acc.branch_name || 'Society Branch'}
-                          </div>
-                          {acc.branch_code && (
-                            <span className="text-[11px] text-slate-500 font-mono mt-0.5 block">
-                              Code: {acc.branch_code}
-                            </span>
-                          )}
-                        </td>
-                        <td className="py-4 px-6 whitespace-nowrap">
-                          {acc.ifsc_code ? (
-                            <span className="font-mono font-bold text-teal-800 bg-teal-50 px-2.5 py-1 rounded-lg border border-teal-200 text-xs">
-                              {acc.ifsc_code}
-                            </span>
-                          ) : (
-                            <span className="text-slate-400 font-mono text-xs">—</span>
-                          )}
-                        </td>
-                        <td className="py-4 px-6 font-black font-sans text-base text-slate-900 whitespace-nowrap">
-                          {formatCurrency(acc.balance ?? 0)}
-                        </td>
-                        <td className="py-4 px-6 text-center whitespace-nowrap">
-                          {renderAccountStatusBadge(acc.status)}
-                        </td>
-                        <td className="py-4 px-6 text-xs text-slate-600 font-medium whitespace-nowrap">
-                          {formatDateTime(acc.opened_at)}
-                        </td>
-                        <td className="py-4 px-6 text-right whitespace-nowrap">
-                          <div className="flex items-center justify-end gap-2">
-                            <button
-                              type="button"
-                              onClick={() => navigate(`/member/account-transactions?account_id=${acc.id}`)}
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-teal-50 hover:bg-teal-100 text-[#0f766e] font-bold text-xs transition-colors cursor-pointer border border-teal-200/60 shadow-2xs"
-                              title="View full transactions ledger for this account"
-                            >
-                              <Receipt className="w-3.5 h-3.5 text-[#00b4a7]" />
-                              <span>Passbook</span>
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setSelectedAccount(acc)}
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors cursor-pointer"
-                              title="View Account Details Modal"
-                            >
-                              <Eye className="w-3.5 h-3.5 text-slate-500" />
-                              <span>Details</span>
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* 1. Member Apply / Open Account Modal */}
-      <ApplySavingsAccountModal
-        isOpen={applyModal.isOpen}
-        scheme={applyModal.scheme}
-        memberUser={memberUser}
-        onClose={() => setApplyModal({ isOpen: false, scheme: null, isSubmitting: false })}
-        onSubmit={handleApplyAccount}
-        isSubmitting={applyModal.isSubmitting}
-      />
-
-      {/* 2. View Scheme Details Modal */}
+      {/* 1. View Scheme Details Modal */}
       <SavingsSchemeDetailModal
         isOpen={detailModal.isOpen}
         scheme={detailModal.scheme}
         onClose={() => setDetailModal({ isOpen: false, scheme: null })}
-      />
-
-      {/* 3. View Savings Account Detail Dossier Modal */}
-      <SavingsAccountDetailModal
-        isOpen={Boolean(selectedAccount)}
-        account={selectedAccount}
-        onClose={() => setSelectedAccount(null)}
       />
 
       {/* Floating Centered Toast */}

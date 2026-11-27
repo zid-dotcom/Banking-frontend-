@@ -3,6 +3,7 @@ import { ArrowUpRight, ArrowDownRight } from 'lucide-react';
 
 export default function StatCard({
   title,
+  label,
   value,
   subtitle,
   subtext,
@@ -13,6 +14,7 @@ export default function StatCard({
   valueClassName,
   className = ''
 }) {
+  const displayTitle = title || label;
   const trendText = typeof trend === 'object' && trend !== null ? trend.text : trend;
   const effectiveTrendType =
     typeof trend === 'object' && trend !== null && trend.isPositive !== undefined
@@ -24,7 +26,7 @@ export default function StatCard({
       <div>
         <div className="flex items-center justify-between gap-2 mb-1.5">
           <p className="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider leading-snug flex-1 min-w-0 break-normal">
-            {title}
+            {displayTitle}
           </p>
           {Icon && (
             <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-teal-50/80 group-hover:bg-gradient-to-br group-hover:from-[#14b8a6] group-hover:to-[#2dd4bf] text-[#0d9488] group-hover:text-white flex items-center justify-center transition-all duration-200 shadow-2xs flex-shrink-0">

@@ -4,6 +4,7 @@ import { User, Lock, Eye, EyeOff, ArrowLeft, CheckCircle2, AlertCircle, Users, U
 import memberIllustration from '../assets/Modern Fintech Membership Illustration.png';
 import { memberLogin } from '../services/memberService';
 import MemberRegistrationModal from '../components/MemberRegistrationModal';
+import MemberForgotPasswordModal from '../components/MemberForgotPasswordModal';
 
 // Exact Solid Bank Temple Icon matching reference logo & badge
 function BankTempleIcon({ className = 'w-6 h-6 text-slate-900' }) {
@@ -37,8 +38,6 @@ export default function MemberLogin() {
   const [isLoading, setIsLoading] = useState(false);
   const [authStatus, setAuthStatus] = useState(null);
   const [forgotModalOpen, setForgotModalOpen] = useState(false);
-  const [recoveryEmail, setRecoveryEmail] = useState('');
-  const [recoverySent, setRecoverySent] = useState(false);
   const [regModalOpen, setRegModalOpen] = useState(false);
   const [regMode, setRegMode] = useState('register');
 
@@ -124,19 +123,13 @@ export default function MemberLogin() {
     });
   };
 
-  const handleForgotPasswordSubmit = (e) => {
-    e.preventDefault();
-    if (!recoveryEmail) return;
-    setRecoverySent(true);
-    setTimeout(() => {
-      setForgotModalOpen(false);
-      setRecoverySent(false);
-      setRecoveryEmail('');
-      setAuthStatus({
-        type: 'info',
-        message: `Member password reset instructions sent to ${recoveryEmail}`,
-      });
-    }, 1200);
+  const handlePasswordResetSuccess = ({ memberCode: resetCode, newPassword: pwd }) => {
+    if (resetCode) setMemberId(resetCode);
+    if (pwd) setPassword(pwd);
+    setAuthStatus({
+      type: 'success',
+      message: `Password reset successfully for Member #${resetCode}! You can now sign in with your new password.`,
+    });
   };
 
   return (
@@ -394,58 +387,14 @@ export default function MemberLogin() {
       </div>
 
       {/* =====================================================================
-          Forgot Password Modal for Members
+          Forgot Password Modal for Members (POST /member/forgot-password & /member/reset-password)
          ===================================================================== */}
-      {forgotModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fadeIn">
-          <div className="bg-white rounded-2xl p-6 sm:p-8 max-w-md w-full shadow-2xl border border-slate-100">
-            <h3 className="text-xl font-bold text-slate-900 font-sans">
-              Reset Member Password
-            </h3>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1.5 mb-5">
-              Enter your registered Society Member ID or Email address to receive password reset instructions.
-            </p>
-
-            {recoverySent ? (
-              <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs sm:text-sm flex items-center gap-2">
-                <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
-                <span>Password reset link sent! Please check your registered email.</span>
-              </div>
-            ) : (
-              <form onSubmit={handleForgotPasswordSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                    Member ID or Email
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. AFX-MEM-2026-XXXX or member@gmail.com"
-                    value={recoveryEmail}
-                    onChange={(e) => setRecoveryEmail(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm text-slate-900 focus:outline-none focus:border-[#008f85] focus:ring-4 focus:ring-teal-100 transition-all"
-                  />
-                </div>
-                <div className="flex items-center justify-end gap-3 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => setForgotModalOpen(false)}
-                    className="px-4 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-800 transition-colors cursor-pointer"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-5 py-2.5 bg-[#008579] hover:bg-[#007469] text-white font-bold text-sm rounded-xl shadow-sm transition-colors cursor-pointer"
-                  >
-                    Send Reset Link
-                  </button>
-                </div>
-              </form>
-            )}
-          </div>
-        </div>
-      )}
+      <MemberForgotPasswordModal
+        isOpen={forgotModalOpen}
+        initialMemberCode={memberId}
+        onClose={() => setForgotModalOpen(false)}
+        onResetSuccess={handlePasswordResetSuccess}
+      />
 
       {/* =====================================================================
           Member Registration & Reapply Modal

@@ -5,7 +5,8 @@ import {
   getMemberNominee,
   submitMemberNominee,
   getMemberMe,
-  getMemberNomineeDocument
+  getMemberNomineeDocument,
+  downloadMemberNomineeDocument
 } from '../../services/memberService';
 import {
   createMemberNomineeChangeRequest,
@@ -26,6 +27,7 @@ import {
   PlusCircle,
   RefreshCw,
   Eye,
+  Download,
   X,
   ExternalLink,
   Edit2,
@@ -127,8 +129,9 @@ export default function MemberNominee() {
   const [backPreview, setBackPreview] = useState(null);
 
   // Document Viewer Modal
-  const [viewDoc, setViewDoc] = useState(null); // { url, isPdf, title }
+  const [viewDoc, setViewDoc] = useState(null); // { url, isPdf, title, docType }
   const [docLoading, setDocLoading] = useState({});
+  const [downloadingDoc, setDownloadingDoc] = useState({});
 
   const handleOpenDocument = async (docType, defaultTitle) => {
     setDocLoading((prev) => ({ ...prev, [docType]: true }));
@@ -152,7 +155,8 @@ export default function MemberNominee() {
         setViewDoc({
           url,
           isPdf,
-          title: defaultTitle || (docType === 'aadhaar_front' ? 'Nominee Aadhaar Card (Front)' : 'Nominee Aadhaar Card (Back)')
+          title: defaultTitle || (docType === 'aadhaar_front' ? 'Nominee Aadhaar Card (Front)' : 'Nominee Aadhaar Card (Back)'),
+          docType
         });
       }
     } catch (err) {
@@ -165,13 +169,28 @@ export default function MemberNominee() {
         setViewDoc({
           url: fullUrl,
           isPdf: fullUrl.toLowerCase().includes('.pdf'),
-          title: defaultTitle || (docType === 'aadhaar_front' ? 'Nominee Aadhaar Card (Front)' : 'Nominee Aadhaar Card (Back)')
+          title: defaultTitle || (docType === 'aadhaar_front' ? 'Nominee Aadhaar Card (Front)' : 'Nominee Aadhaar Card (Back)'),
+          docType
         });
       } else {
         alert(err.message || 'Could not load nominee document.');
       }
     } finally {
       setDocLoading((prev) => ({ ...prev, [docType]: false }));
+    }
+  };
+
+  const handleDownloadDocument = async (docType, filename) => {
+    setDownloadingDoc((prev) => ({ ...prev, [docType]: true }));
+    try {
+      const nomineeName = nominee?.nominee_name ? nominee.nominee_name.trim().replace(/\s+/g, '_') : 'nominee';
+      const defaultFilename = filename || `${nomineeName}_${docType}`;
+      await downloadMemberNomineeDocument(docType, defaultFilename);
+    } catch (err) {
+      console.error(`Error downloading nominee document ${docType}:`, err);
+      alert(err.message || 'Could not download nominee document.');
+    } finally {
+      setDownloadingDoc((prev) => ({ ...prev, [docType]: false }));
     }
   };
 
@@ -900,19 +919,41 @@ export default function MemberNominee() {
                       </div>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={() => handleOpenDocument('aadhaar_front', 'Nominee Aadhaar Card (Front)')}
-                      disabled={docLoading['aadhaar_front']}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-teal-50 text-teal-800 text-xs font-bold border border-teal-200 shadow-2xs transition-colors cursor-pointer flex-shrink-0 disabled:opacity-50"
-                    >
-                      {docLoading['aadhaar_front'] ? (
-                        <Loader2 className="w-3.5 h-3.5 animate-spin text-teal-600" />
-                      ) : (
-                        <Eye className="w-3.5 h-3.5 text-teal-600" />
-                      )}
-                      <span>View</span>
-                    </button>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => handleOpenDocument('aadhaar_front', 'Nominee Aadhaar Card (Front)')}
+                        disabled={docLoading['aadhaar_front']}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-teal-50 text-teal-800 text-xs font-bold border border-teal-200 shadow-2xs transition-colors cursor-pointer disabled:opacity-50"
+                      >
+                        {docLoading['aadhaar_front'] ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin text-teal-600" />
+                        ) : (
+                          <Eye className="w-3.5 h-3.5 text-teal-600" />
+                        )}
+                        <span>View</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleDownloadDocument(
+                            'aadhaar_front',
+                            `nominee_${nominee?.nominee_name ? nominee.nominee_name.trim().replace(/\s+/g, '_') : 'nominee'}_aadhaar_front`
+                          )
+                        }
+                        disabled={downloadingDoc['aadhaar_front']}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-800 text-xs font-bold border border-teal-200/80 shadow-2xs transition-colors cursor-pointer disabled:opacity-50"
+                        title="Download Document"
+                      >
+                        {downloadingDoc['aadhaar_front'] ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin text-teal-600" />
+                        ) : (
+                          <Download className="w-3.5 h-3.5 text-teal-700" />
+                        )}
+                        <span>Download</span>
+                      </button>
+                    </div>
                   </div>
 
                   {/* Aadhaar Back Card */}
@@ -931,19 +972,41 @@ export default function MemberNominee() {
                       </div>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={() => handleOpenDocument('aadhaar_back', 'Nominee Aadhaar Card (Back)')}
-                      disabled={docLoading['aadhaar_back']}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-teal-50 text-teal-800 text-xs font-bold border border-teal-200 shadow-2xs transition-colors cursor-pointer flex-shrink-0 disabled:opacity-50"
-                    >
-                      {docLoading['aadhaar_back'] ? (
-                        <Loader2 className="w-3.5 h-3.5 animate-spin text-teal-600" />
-                      ) : (
-                        <Eye className="w-3.5 h-3.5 text-teal-600" />
-                      )}
-                      <span>View</span>
-                    </button>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => handleOpenDocument('aadhaar_back', 'Nominee Aadhaar Card (Back)')}
+                        disabled={docLoading['aadhaar_back']}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-teal-50 text-teal-800 text-xs font-bold border border-teal-200 shadow-2xs transition-colors cursor-pointer disabled:opacity-50"
+                      >
+                        {docLoading['aadhaar_back'] ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin text-teal-600" />
+                        ) : (
+                          <Eye className="w-3.5 h-3.5 text-teal-600" />
+                        )}
+                        <span>View</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleDownloadDocument(
+                            'aadhaar_back',
+                            `nominee_${nominee?.nominee_name ? nominee.nominee_name.trim().replace(/\s+/g, '_') : 'nominee'}_aadhaar_back`
+                          )
+                        }
+                        disabled={downloadingDoc['aadhaar_back']}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-800 text-xs font-bold border border-teal-200/80 shadow-2xs transition-colors cursor-pointer disabled:opacity-50"
+                        title="Download Document"
+                      >
+                        {downloadingDoc['aadhaar_back'] ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin text-teal-600" />
+                        ) : (
+                          <Download className="w-3.5 h-3.5 text-teal-700" />
+                        )}
+                        <span>Download</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1314,6 +1377,20 @@ export default function MemberNominee() {
                 </h4>
               </div>
               <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleDownloadDocument(
+                      viewDoc.docType || 'aadhaar_front',
+                      `nominee_${nominee?.nominee_name ? nominee.nominee_name.trim().replace(/\s+/g, '_') : 'nominee'}_${viewDoc.docType || 'doc'}`
+                    )
+                  }
+                  disabled={downloadingDoc[viewDoc.docType || 'aadhaar_front']}
+                  className="p-1.5 rounded-lg text-slate-500 hover:text-teal-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                  title="Download Document"
+                >
+                  <Download className="w-4 h-4" />
+                </button>
                 {viewDoc.url && (
                   <a
                     href={viewDoc.url}

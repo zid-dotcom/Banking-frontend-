@@ -18,7 +18,10 @@ import {
   Eye,
   Loader2,
   Landmark,
-  Wallet
+  Wallet,
+  Coins,
+  TrendingUp,
+  PiggyBank
 } from 'lucide-react';
 import {
   getSuperadminBranchMember,
@@ -207,6 +210,10 @@ export default function MemberDetailModal({
   const statusUpper = (currentMember.status || 'PENDING').toUpperCase();
   const isActive = currentMember.is_active !== false;
 
+  const allProductAccounts = Array.isArray(currentMember.product_accounts) ? currentMember.product_accounts : [];
+  const fdAccounts = allProductAccounts.filter((acc) => acc.product_type !== 'investment');
+  const investmentAccounts = allProductAccounts.filter((acc) => acc.product_type === 'investment');
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-slate-900/60 backdrop-blur-xs overflow-y-auto animate-fadeIn">
       <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-100 w-full max-w-4xl max-h-[96vh] sm:max-h-[92vh] flex flex-col overflow-hidden my-auto">
@@ -294,7 +301,21 @@ export default function MemberDetailModal({
           {[
             { id: 'profile', label: 'Personal & KYC', icon: User },
             { id: 'address', label: 'Address & Location', icon: MapPin },
-            { id: 'savings', label: 'Savings Account', icon: Landmark },
+            {
+              id: 'savings',
+              label: `Savings Accounts (${currentMember.accounts?.length || 0})`,
+              icon: Landmark
+            },
+            {
+              id: 'fd_accounts',
+              label: `FD Accounts (${fdAccounts.length})`,
+              icon: Coins
+            },
+            {
+              id: 'investment_accounts',
+              label: `Investment Accounts (${investmentAccounts.length})`,
+              icon: TrendingUp
+            },
             { id: 'banking', label: 'Bank Account Details', icon: CreditCard },
             { id: 'nominee', label: 'Nominee Information', icon: ShieldCheck },
             { id: 'documents', label: 'Uploaded Documents', icon: FileText },
@@ -574,6 +595,306 @@ export default function MemberDetailModal({
                       <h4 className="font-bold text-slate-800 text-sm">No Savings Account Found</h4>
                       <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
                         This member does not have any active cooperative society savings accounts registered under this folio.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Tab: FD Accounts */}
+              {activeTab === 'fd_accounts' && (
+                <div className="space-y-4">
+                  {fdAccounts.length > 0 ? (
+                    <div className="space-y-4">
+                      {fdAccounts.map((acc, idx) => {
+                        const accStatus = (acc.status || 'ACTIVE').toLowerCase();
+                        const isPending = accStatus.includes('pending') || accStatus.includes('awaiting');
+                        const isApproved = accStatus === 'active' || accStatus === 'approved';
+
+                        return (
+                          <div
+                            key={acc.id || acc.account_number || idx}
+                            className="bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden"
+                          >
+                            {/* Card Visual Header Banner */}
+                            <div className="bg-gradient-to-br from-slate-900 via-teal-950 to-slate-900 text-white p-5 sm:p-6 relative overflow-hidden">
+                              <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                <div className="space-y-1">
+                                  <div className="flex items-center gap-2 flex-wrap">
+                                    <span className="text-[11px] font-bold uppercase tracking-wider text-teal-300 flex items-center gap-1.5">
+                                      <Coins className="w-3.5 h-3.5" /> Fixed Deposit / MIS Scheme
+                                    </span>
+                                    {acc.scheme_code && (
+                                      <span className="font-mono text-xs font-bold bg-teal-400/20 text-teal-200 px-2 py-0.5 rounded border border-teal-400/30">
+                                        {acc.scheme_code}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <h3 className="text-lg sm:text-xl font-black text-white capitalize tracking-tight">
+                                    {acc.scheme_name || 'Fixed Deposit Account'}
+                                  </h3>
+                                </div>
+
+                                <span
+                                  className={`self-start sm:self-auto inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold capitalize ${
+                                    isApproved
+                                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/40'
+                                      : isPending
+                                      ? 'bg-amber-500/20 text-amber-300 border border-amber-400/40'
+                                      : 'bg-slate-700 text-slate-300 border border-slate-600'
+                                  }`}
+                                >
+                                  {isPending ? (
+                                    <Clock className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
+                                  ) : (
+                                    <span className={`w-1.5 h-1.5 rounded-full ${isApproved ? 'bg-emerald-400' : 'bg-slate-400'}`} />
+                                  )}
+                                  {acc.status ? String(acc.status).replace(/_/g, ' ') : 'Active'}
+                                </span>
+                              </div>
+
+                              {/* Balance & Account Number Prominent Display */}
+                              <div className="mt-5 pt-4 border-t border-teal-800/60 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                                <div className="flex flex-wrap items-baseline gap-6">
+                                  <div>
+                                    <p className="text-[11px] uppercase tracking-wider text-teal-200/80 font-bold">
+                                      Portfolio Balance
+                                    </p>
+                                    <p className="text-2xl sm:text-3xl font-black text-white mt-1 font-sans tracking-tight">
+                                      {formatCurrency(acc.balance)}
+                                    </p>
+                                  </div>
+                                  {acc.requested_principal !== undefined && acc.requested_principal !== null && (
+                                    <div className="pl-6 border-l border-teal-800/60">
+                                      <p className="text-[11px] uppercase tracking-wider text-teal-200/80 font-bold">
+                                        Principal / Deposit
+                                      </p>
+                                      <p className="text-xl sm:text-2xl font-black text-teal-100 mt-1 font-sans tracking-tight">
+                                        {formatCurrency(acc.requested_principal)}
+                                      </p>
+                                    </div>
+                                  )}
+                                </div>
+
+                                <div className="text-left sm:text-right">
+                                  <p className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">
+                                    Account Number
+                                  </p>
+                                  <p className="font-mono text-base sm:text-lg font-bold text-teal-200 tracking-wider mt-0.5">
+                                    {acc.account_number || '—'}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Detailed Metadata Grid */}
+                            <div className="p-4 sm:p-5 bg-slate-50/70 border-t border-slate-100">
+                              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 text-xs">
+                                <div className="bg-white p-3 rounded-xl border border-slate-200/70 shadow-2xs">
+                                  <span className="font-bold text-slate-400 uppercase text-[10px]">Scheme Category</span>
+                                  <p className="text-xs font-bold text-slate-900 mt-1 capitalize truncate" title={acc.scheme_name}>
+                                    {acc.scheme_name || '—'}
+                                  </p>
+                                  <p className="font-mono text-[10px] text-teal-700 font-semibold mt-0.5">
+                                    Term Fixed Deposit / MIS
+                                  </p>
+                                </div>
+
+                                <div className="bg-white p-3 rounded-xl border border-slate-200/70 shadow-2xs">
+                                  <span className="font-bold text-slate-400 uppercase text-[10px]">Branch Office</span>
+                                  <p className="text-xs font-bold text-slate-900 mt-1 truncate" title={acc.branch_name}>
+                                    {acc.branch_name || '—'}
+                                  </p>
+                                  {acc.branch_id && (
+                                    <p className="font-mono text-[10px] text-slate-500 mt-0.5">
+                                      Branch ID #{acc.branch_id}
+                                    </p>
+                                  )}
+                                </div>
+
+                                <div className="bg-white p-3 rounded-xl border border-slate-200/70 shadow-2xs">
+                                  <span className="font-bold text-slate-400 uppercase text-[10px]">Linked Savings A/C</span>
+                                  <p className="font-mono text-xs font-bold text-slate-900 mt-1">
+                                    {acc.savings_account_id ? `Account #${acc.savings_account_id}` : '—'}
+                                  </p>
+                                  <p className="text-[10px] text-teal-600 font-semibold mt-0.5">
+                                    {acc.opening_request_id ? `Application #${acc.opening_request_id}` : 'Direct Folio'}
+                                  </p>
+                                </div>
+
+                                <div className="bg-white p-3 rounded-xl border border-slate-200/70 shadow-2xs">
+                                  <span className="font-bold text-slate-400 uppercase text-[10px]">Opened Date &amp; Time</span>
+                                  <p className="text-xs font-bold text-slate-900 mt-1">
+                                    {formatDateTime(acc.opened_at)}
+                                  </p>
+                                  <p className="text-[10px] text-slate-400 mt-0.5">
+                                    Activation Timestamp
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="bg-slate-50 rounded-2xl p-8 border border-slate-200/80 text-center">
+                      <div className="w-12 h-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center mx-auto mb-3">
+                        <Coins className="w-6 h-6 stroke-[1.8]" />
+                      </div>
+                      <h4 className="font-bold text-slate-800 text-sm">No FD Accounts Found</h4>
+                      <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+                        This member does not have any active Fixed Deposit or MIS accounts opened under this folio.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Tab: Investment Accounts */}
+              {activeTab === 'investment_accounts' && (
+                <div className="space-y-4">
+                  {investmentAccounts.length > 0 ? (
+                    <div className="space-y-4">
+                      {investmentAccounts.map((acc, idx) => {
+                        const accStatus = (acc.status || 'ACTIVE').toLowerCase();
+                        const isPending = accStatus.includes('pending') || accStatus.includes('awaiting');
+                        const isApproved = accStatus === 'active' || accStatus === 'approved';
+
+                        return (
+                          <div
+                            key={acc.id || acc.account_number || idx}
+                            className="bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden"
+                          >
+                            {/* Card Visual Header Banner */}
+                            <div className="bg-gradient-to-br from-slate-900 via-teal-950 to-slate-900 text-white p-5 sm:p-6 relative overflow-hidden">
+                              <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                <div className="space-y-1">
+                                  <div className="flex items-center gap-2 flex-wrap">
+                                    <span className="text-[11px] font-bold uppercase tracking-wider text-teal-300 flex items-center gap-1.5">
+                                      <TrendingUp className="w-3.5 h-3.5" /> Recurring Investment Scheme
+                                    </span>
+                                    {acc.scheme_code && (
+                                      <span className="font-mono text-xs font-bold bg-teal-400/20 text-teal-200 px-2 py-0.5 rounded border border-teal-400/30">
+                                        {acc.scheme_code}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <h3 className="text-lg sm:text-xl font-black text-white capitalize tracking-tight">
+                                    {acc.scheme_name || 'Recurring Investment Folio'}
+                                  </h3>
+                                </div>
+
+                                <span
+                                  className={`self-start sm:self-auto inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold capitalize ${
+                                    isApproved
+                                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/40'
+                                      : isPending
+                                      ? 'bg-amber-500/20 text-amber-300 border border-amber-400/40'
+                                      : 'bg-slate-700 text-slate-300 border border-slate-600'
+                                  }`}
+                                >
+                                  {isPending ? (
+                                    <Clock className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
+                                  ) : (
+                                    <span className={`w-1.5 h-1.5 rounded-full ${isApproved ? 'bg-emerald-400' : 'bg-slate-400'}`} />
+                                  )}
+                                  {acc.status ? String(acc.status).replace(/_/g, ' ') : 'Active'}
+                                </span>
+                              </div>
+
+                              {/* Balance & Account Number Prominent Display */}
+                              <div className="mt-5 pt-4 border-t border-teal-800/60 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                                <div className="flex flex-wrap items-baseline gap-6">
+                                  <div>
+                                    <p className="text-[11px] uppercase tracking-wider text-teal-200/80 font-bold">
+                                      Investment Balance
+                                    </p>
+                                    <p className="text-2xl sm:text-3xl font-black text-white mt-1 font-sans tracking-tight">
+                                      {formatCurrency(acc.balance)}
+                                    </p>
+                                  </div>
+                                  {acc.requested_principal !== undefined && acc.requested_principal !== null && Number(acc.requested_principal) > 0 && (
+                                    <div className="pl-6 border-l border-teal-800/60">
+                                      <p className="text-[11px] uppercase tracking-wider text-teal-200/80 font-bold">
+                                        Installment / Principal
+                                      </p>
+                                      <p className="text-xl sm:text-2xl font-black text-teal-100 mt-1 font-sans tracking-tight">
+                                        {formatCurrency(acc.requested_principal)}
+                                      </p>
+                                    </div>
+                                  )}
+                                </div>
+
+                                <div className="text-left sm:text-right">
+                                  <p className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">
+                                    Account Number
+                                  </p>
+                                  <p className="font-mono text-base sm:text-lg font-bold text-teal-200 tracking-wider mt-0.5">
+                                    {acc.account_number || '—'}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Detailed Metadata Grid */}
+                            <div className="p-4 sm:p-5 bg-slate-50/70 border-t border-slate-100">
+                              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 text-xs">
+                                <div className="bg-white p-3 rounded-xl border border-slate-200/70 shadow-2xs">
+                                  <span className="font-bold text-slate-400 uppercase text-[10px]">Scheme Category</span>
+                                  <p className="text-xs font-bold text-slate-900 mt-1 capitalize truncate" title={acc.scheme_name}>
+                                    {acc.scheme_name || '—'}
+                                  </p>
+                                  <p className="font-mono text-[10px] text-teal-700 font-semibold mt-0.5">
+                                    Recurring Investment
+                                  </p>
+                                </div>
+
+                                <div className="bg-white p-3 rounded-xl border border-slate-200/70 shadow-2xs">
+                                  <span className="font-bold text-slate-400 uppercase text-[10px]">Branch Office</span>
+                                  <p className="text-xs font-bold text-slate-900 mt-1 truncate" title={acc.branch_name}>
+                                    {acc.branch_name || '—'}
+                                  </p>
+                                  {acc.branch_id && (
+                                    <p className="font-mono text-[10px] text-slate-500 mt-0.5">
+                                      Branch ID #{acc.branch_id}
+                                    </p>
+                                  )}
+                                </div>
+
+                                <div className="bg-white p-3 rounded-xl border border-slate-200/70 shadow-2xs">
+                                  <span className="font-bold text-slate-400 uppercase text-[10px]">Linked Savings A/C</span>
+                                  <p className="font-mono text-xs font-bold text-slate-900 mt-1">
+                                    {acc.savings_account_id ? `Account #${acc.savings_account_id}` : '—'}
+                                  </p>
+                                  <p className="text-[10px] text-teal-600 font-semibold mt-0.5">
+                                    {acc.opening_request_id ? `Application #${acc.opening_request_id}` : 'Direct Folio'}
+                                  </p>
+                                </div>
+
+                                <div className="bg-white p-3 rounded-xl border border-slate-200/70 shadow-2xs">
+                                  <span className="font-bold text-slate-400 uppercase text-[10px]">Opened Date &amp; Time</span>
+                                  <p className="text-xs font-bold text-slate-900 mt-1">
+                                    {formatDateTime(acc.opened_at)}
+                                  </p>
+                                  <p className="text-[10px] text-slate-400 mt-0.5">
+                                    Activation Timestamp
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="bg-slate-50 rounded-2xl p-8 border border-slate-200/80 text-center">
+                      <div className="w-12 h-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center mx-auto mb-3">
+                        <TrendingUp className="w-6 h-6 stroke-[1.8]" />
+                      </div>
+                      <h4 className="font-bold text-slate-800 text-sm">No Investment Accounts Found</h4>
+                      <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+                        This member does not have any active Recurring Investment accounts opened under this folio.
                       </p>
                     </div>
                   )}

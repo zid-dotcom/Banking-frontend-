@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import MemberDetailModal from '../../components/dashboard/MemberDetailModal';
 import {
@@ -21,6 +21,7 @@ import {
 import memberRegistryScene from '../../assets/Membership Registry Illustration.png';
 import { getBranches } from '../../services/branchService';
 import { getSuperadminBranchMembers } from '../../services/memberService';
+import { getSuperAdminSavingsAccounts } from '../../services/savingsAccountService';
 import MemberCashTransactionsModal from '../../components/dashboard/MemberCashTransactionsModal';
 
 export default function SuperAdminMembers({ embedded = false, branchId = null }) {
@@ -35,6 +36,7 @@ export default function SuperAdminMembers({ embedded = false, branchId = null })
   }, [branchId]);
 
   const [members, setMembers] = useState([]);
+  const [savingsAccounts, setSavingsAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
@@ -73,40 +75,34 @@ export default function SuperAdminMembers({ embedded = false, branchId = null })
     office: storedUser?.office || 'Head Office - Apex Central Administration',
   };
 
+  const loadData = async (isBackground = false) => {
+    if (!isBackground) setLoading(true);
+    else setRefreshing(true);
+    setError(null);
+    try {
+      let branchList = branches;
+      if (!branchList || branchList.length === 0) {
+        branchList = await getBranches().catch(() => []);
+        setBranches(branchList);
+      }
+
+      // Fetch savings accounts in parallel for savings account number search lookup
+      const saList = await getSuperAdminSavingsAccounts({ limit: 500 }).catch(() => []);
+      setSavingsAccounts(Array.isArray(saList) ? saList : []);
+
+      await loadMembersForSelection(selectedBranchId, branchList, saList);
+    } catch (err) {
+      console.error('SuperAdminMembers fetch error:', err);
+      setError(err.message || 'Failed to connect to members API.');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
   // Fetch branches and members whenever selectedBranchId changes
   useEffect(() => {
-    let isMounted = true;
-
-    async function loadData() {
-      setLoading(true);
-      setError(null);
-      try {
-        let branchList = branches;
-        if (!branchList || branchList.length === 0) {
-          branchList = await getBranches().catch(() => []);
-          if (isMounted) setBranches(branchList);
-        }
-        if (isMounted) {
-          await loadMembersForSelection(selectedBranchId, branchList);
-        }
-      } catch (err) {
-        if (isMounted) {
-          console.error('SuperAdminMembers fetch error:', err);
-          setError(err.message || 'Failed to connect to members API.');
-        }
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-          setRefreshing(false);
-        }
-      }
-    }
-
     loadData();
-
-    return () => {
-      isMounted = false;
-    };
   }, [selectedBranchId]);
 
   // When branch filter selection changes
@@ -114,7 +110,7 @@ export default function SuperAdminMembers({ embedded = false, branchId = null })
     setSelectedBranchId(newBranchId);
   };
 
-  const loadMembersForSelection = async (branchSelection, branchList) => {
+  const loadMembersForSelection = async (branchSelection, branchList, saList = []) => {
     try {
       setError(null);
       if (!branchList || branchList.length === 0) {
@@ -127,18 +123,26 @@ export default function SuperAdminMembers({ embedded = false, branchId = null })
         branchMap[b.id] = b.name || `Branch #${b.branch_code || b.id}`;
       });
 
+      const enrichMember = (m, bId, bName, bCode) => {
+        const matchedSa = (saList || []).find(
+          sa => String(sa.member_id) === String(m.id) || String(sa.member_code) === String(m.member_code)
+        );
+        return {
+          ...m,
+          branch_id: bId,
+          branch_name: bName,
+          branch_code: bCode,
+          savings_account_number: matchedSa?.account_number || m.savings_account_number || null,
+        };
+      };
+
       if (branchSelection === 'all') {
         // Fetch members across all branches concurrently
         const branchPromises = branchList.map(b =>
           getSuperadminBranchMembers(b.id)
             .then(res => {
               const bMembers = Array.isArray(res?.members) ? res.members : (Array.isArray(res) ? res : []);
-              return bMembers.map(m => ({
-                ...m,
-                branch_id: b.id,
-                branch_name: b.name || `Branch #${b.branch_code || b.id}`,
-                branch_code: b.branch_code
-              }));
+              return bMembers.map(m => enrichMember(m, b.id, b.name || `Branch #${b.branch_code || b.id}`, b.branch_code));
             })
             .catch(err => {
               console.warn(`Could not load members for branch ${b.id}:`, err);
@@ -154,11 +158,7 @@ export default function SuperAdminMembers({ embedded = false, branchId = null })
         const numId = parseInt(branchSelection, 10);
         const res = await getSuperadminBranchMembers(numId);
         const bMembers = Array.isArray(res?.members) ? res.members : (Array.isArray(res) ? res : []);
-        const enriched = bMembers.map(m => ({
-          ...m,
-          branch_id: numId,
-          branch_name: branchMap[numId] || `Branch #${numId}`
-        }));
+        const enriched = bMembers.map(m => enrichMember(m, numId, branchMap[numId] || `Branch #${numId}`, null));
         setMembers(enriched);
       }
     } catch (err) {
@@ -168,8 +168,7 @@ export default function SuperAdminMembers({ embedded = false, branchId = null })
   };
 
   const handleRefresh = async () => {
-    setRefreshing(true);
-    await fetchBranchesAndMembers();
+    await loadData(true);
   };
 
   // Inspect member
@@ -185,17 +184,51 @@ export default function SuperAdminMembers({ embedded = false, branchId = null })
   const pendingCount = members.filter(m => (m.status || '').toUpperCase() === 'PENDING').length;
   const verifiedPercentage = totalCount > 0 ? Math.round((approvedCount / totalCount) * 100) : 0;
 
+  // Savings accounts lookup map for rapid search
+  const memberSavingsMap = useMemo(() => {
+    const map = {};
+    (savingsAccounts || []).forEach(sa => {
+      const mId = sa.member_id || sa.member?.id;
+      const mCode = sa.member_code || sa.member?.member_code;
+      const accNo = sa.account_number;
+      if (accNo) {
+        const accLower = String(accNo).toLowerCase();
+        if (mId) {
+          if (!map[mId]) map[mId] = [];
+          map[mId].push(accLower);
+        }
+        if (mCode) {
+          if (!map[mCode]) map[mCode] = [];
+          map[mCode].push(accLower);
+        }
+      }
+    });
+    return map;
+  }, [savingsAccounts]);
+
   // Filtering logic
   const filteredMembers = members.filter(m => {
     // Search match
     const q = memberSearch.toLowerCase().trim();
+    const saNumbers = memberSavingsMap[m.id] || memberSavingsMap[m.member_code] || [];
+    const matchSavings =
+      saNumbers.some(no => no.includes(q)) ||
+      (m.savings_account_number && String(m.savings_account_number).toLowerCase().includes(q)) ||
+      (m.savings_account_no && String(m.savings_account_no).toLowerCase().includes(q)) ||
+      (m.account_number && String(m.account_number).toLowerCase().includes(q)) ||
+      (m.account_no && String(m.account_no).toLowerCase().includes(q)) ||
+      (m.bank_account_number && String(m.bank_account_number).toLowerCase().includes(q)) ||
+      (Array.isArray(m.accounts) && m.accounts.some(a => String(a.account_number || a.account_no || '').toLowerCase().includes(q))) ||
+      (Array.isArray(m.savings_accounts) && m.savings_accounts.some(a => String(a.account_number || a.account_no || '').toLowerCase().includes(q)));
+
     const matchSearch = !q ||
       (m.full_name && m.full_name.toLowerCase().includes(q)) ||
       (m.member_code && m.member_code.toLowerCase().includes(q)) ||
       (m.email && m.email.toLowerCase().includes(q)) ||
       (m.mobile && m.mobile.toLowerCase().includes(q)) ||
       (m.city && m.city.toLowerCase().includes(q)) ||
-      (m.branch_name && m.branch_name.toLowerCase().includes(q));
+      (m.branch_name && m.branch_name.toLowerCase().includes(q)) ||
+      matchSavings;
 
     // Status match
     const mStatus = (m.status || '').toUpperCase();
@@ -404,7 +437,7 @@ export default function SuperAdminMembers({ embedded = false, branchId = null })
                   <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
-                    placeholder="Search name, code, phone..."
+                    placeholder="Search name, code, phone, savings A/C..."
                     value={memberSearch}
                     onChange={(e) => setMemberSearch(e.target.value)}
                     className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 focus:outline-none focus:border-[#2dd4bf] shadow-2xs"

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import StatCard from '../../components/dashboard/StatCard';
 import MemberDetailModal from '../../components/dashboard/MemberDetailModal';
@@ -31,6 +31,7 @@ import {
   resetBranchAdminMemberPassword,
   unlockBranchAdminMember
 } from '../../services/branchAdminService';
+import { getBranchAdminSavingsAccounts } from '../../services/savingsAccountService';
 import { getMemberBranches } from '../../services/memberService';
 
 function parseBranchInfo(obj = {}) {
@@ -57,6 +58,7 @@ function parseBranchInfo(obj = {}) {
 
 export default function BranchManagerMembers({ embedded = false }) {
   const [members, setMembers] = useState([]);
+  const [savingsAccounts, setSavingsAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
@@ -185,13 +187,29 @@ export default function BranchManagerMembers({ embedded = false }) {
     loadAdminProfile();
   }, []);
 
-  // Fetch branch members
+  // Fetch branch members & savings accounts
   const fetchMembers = async () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await getBranchAdminMembers();
-      setMembers(Array.isArray(data) ? data : []);
+      const [membersData, saData] = await Promise.all([
+        getBranchAdminMembers(),
+        getBranchAdminSavingsAccounts({ limit: 500 }).catch(() => [])
+      ]);
+      const saList = Array.isArray(saData) ? saData : [];
+      setSavingsAccounts(saList);
+
+      const rawMembers = Array.isArray(membersData) ? membersData : [];
+      const enrichedMembers = rawMembers.map(m => {
+        const matchedSa = saList.find(
+          sa => String(sa.member_id) === String(m.id) || String(sa.member_code) === String(m.member_code)
+        );
+        return {
+          ...m,
+          savings_account_number: matchedSa?.account_number || m.savings_account_number || null,
+        };
+      });
+      setMembers(enrichedMembers);
     } catch (err) {
       console.error('Failed to load branch members:', err);
       setError(err.message || 'Failed to load branch members.');
@@ -321,6 +339,28 @@ export default function BranchManagerMembers({ embedded = false }) {
   const approvedMembers = members.filter(m => (m.status || '').toLowerCase() === 'approved');
   const rejectedMembers = members.filter(m => (m.status || '').toLowerCase() === 'rejected');
 
+  // Savings accounts lookup map for rapid search
+  const memberSavingsMap = useMemo(() => {
+    const map = {};
+    (savingsAccounts || []).forEach(sa => {
+      const mId = sa.member_id || sa.member?.id;
+      const mCode = sa.member_code || sa.member?.member_code;
+      const accNo = sa.account_number;
+      if (accNo) {
+        const accLower = String(accNo).toLowerCase();
+        if (mId) {
+          if (!map[mId]) map[mId] = [];
+          map[mId].push(accLower);
+        }
+        if (mCode) {
+          if (!map[mCode]) map[mCode] = [];
+          map[mCode].push(accLower);
+        }
+      }
+    });
+    return map;
+  }, [savingsAccounts]);
+
   // Filtered members list
   const filteredMembers = members.filter(m => {
     // Status tab
@@ -340,7 +380,19 @@ export default function BranchManagerMembers({ embedded = false }) {
       const matchMobile = (m.mobile || '').toLowerCase().includes(q);
       const matchEmail = (m.email || '').toLowerCase().includes(q);
       const matchCity = (m.city || '').toLowerCase().includes(q);
-      return matchName || matchCode || matchMobile || matchEmail || matchCity;
+
+      const saNumbers = memberSavingsMap[m.id] || memberSavingsMap[m.member_code] || [];
+      const matchSavings =
+        saNumbers.some(no => no.includes(q)) ||
+        (m.savings_account_number && String(m.savings_account_number).toLowerCase().includes(q)) ||
+        (m.savings_account_no && String(m.savings_account_no).toLowerCase().includes(q)) ||
+        (m.account_number && String(m.account_number).toLowerCase().includes(q)) ||
+        (m.account_no && String(m.account_no).toLowerCase().includes(q)) ||
+        (m.bank_account_number && String(m.bank_account_number).toLowerCase().includes(q)) ||
+        (Array.isArray(m.accounts) && m.accounts.some(a => String(a.account_number || a.account_no || '').toLowerCase().includes(q))) ||
+        (Array.isArray(m.savings_accounts) && m.savings_accounts.some(a => String(a.account_number || a.account_no || '').toLowerCase().includes(q)));
+
+      return matchName || matchCode || matchMobile || matchEmail || matchCity || matchSavings;
     }
 
     return true;
@@ -516,7 +568,7 @@ export default function BranchManagerMembers({ embedded = false }) {
                 <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
-                  placeholder="Search name, code, phone..."
+                  placeholder="Search name, code, phone, savings A/C..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-teal-500 shadow-2xs"

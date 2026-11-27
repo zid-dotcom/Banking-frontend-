@@ -795,5 +795,16 @@ export {
 
 export { getBranchAdminMemberCashTransactions } from './cashTransactionService';
 
+export {
+  getBranchAdminMembershipSettings,
+  createBranchAdminMembershipSettings,
+  updateBranchAdminMembershipSettings,
+  getBranchAdminMemberRegistrationApplications,
+  getBranchAdminMemberRegistrationApplication,
+  getBranchAdminMemberRegistrationDocument,
+  decideBranchAdminMemberRegistrationApplication,
+  resolveBranchQrImageUrl,
+} from './membershipSettingsService';
+
 
 

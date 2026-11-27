@@ -21,7 +21,8 @@ import {
   Building2,
   ChevronLeft,
   ChevronRight,
-  Landmark
+  Landmark,
+  PlusCircle
 } from 'lucide-react';
 import mintFdMisIllustration from '../../assets/Mint FD & MIS Investment Growth.webp';
 
@@ -516,14 +517,17 @@ export default function MemberFdMisSchemes() {
 
                         {/* Actions */}
                         <td className="py-4 px-6 text-right whitespace-nowrap">
-                          <button
-                            onClick={() => setDetailModal({ isOpen: true, scheme })}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-800 font-bold text-xs rounded-xl transition-colors cursor-pointer border border-teal-200/60 shadow-2xs"
-                            title="View scheme details"
-                          >
-                            <Eye className="w-3.5 h-3.5 text-[#00b4a7]" />
-                            <span>View</span>
-                          </button>
+                          <div className="flex items-center justify-end gap-2">
+                            <button
+                              type="button"
+                              onClick={() => setDetailModal({ isOpen: true, scheme })}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-800 font-bold text-xs rounded-xl transition-colors cursor-pointer border border-teal-200/60 shadow-2xs"
+                              title="View scheme details"
+                            >
+                              <Eye className="w-3.5 h-3.5 text-[#00b4a7]" />
+                              <span>View</span>
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     );

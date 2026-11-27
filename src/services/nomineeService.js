@@ -186,6 +186,75 @@ export async function getMemberNomineeDocument(docName) {
 }
 
 /**
+ * 1c. GET /member/nominee/documents/{doc_name}/download - Download Nominee Document
+ * doc_name can be 'aadhaar_front' or 'aadhaar_back'
+ */
+export async function downloadMemberNomineeDocument(docName, filename = 'nominee_document') {
+  try {
+    const headers = getMemberHeaders(false);
+    delete headers['Content-Type'];
+
+    let downloadEndpoint = `${BASE_URL}/member/nominee/documents/${encodeURIComponent(docName)}/download`;
+    if (typeof docName === 'string') {
+      if (docName.includes('/download')) {
+        downloadEndpoint = docName.startsWith('http') ? docName : `${BASE_URL}${docName.startsWith('/') ? '' : '/'}${docName}`;
+      } else if (docName.startsWith('/')) {
+        downloadEndpoint = `${BASE_URL}${docName}/download`;
+      }
+    }
+
+    let res = await fetch(downloadEndpoint, {
+      method: 'GET',
+      headers,
+    });
+
+    // Fallback to regular document endpoint if /download returns 404
+    if (!res.ok && res.status === 404) {
+      let viewEndpoint = `${BASE_URL}/member/nominee/documents/${encodeURIComponent(docName)}`;
+      if (typeof docName === 'string' && docName.startsWith('/')) {
+        viewEndpoint = `${BASE_URL}${docName.replace(/\/download$/, '')}`;
+      }
+      res = await fetch(viewEndpoint, {
+        method: 'GET',
+        headers,
+      });
+    }
+
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({}));
+      checkMemberResponseStatus(res, errBody, `Failed to download nominee document: ${docName}`);
+    }
+
+    const contentType = res.headers.get('content-type') || '';
+    const blob = await res.blob();
+
+    let finalFilename = filename;
+    if (!finalFilename.includes('.')) {
+      if (contentType.includes('pdf')) {
+        finalFilename += '.pdf';
+      } else if (contentType.includes('png')) {
+        finalFilename += '.png';
+      } else {
+        finalFilename += '.jpg';
+      }
+    }
+
+    const blobUrl = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = blobUrl;
+    link.download = finalFilename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+    return true;
+  } catch (error) {
+    console.error(`nomineeService.downloadMemberNomineeDocument(${docName}) error:`, error);
+    throw error;
+  }
+}
+
+/**
  * 2. POST /member/nominee - Submit Nominee (multipart/form-data)
  * Fields:
  * - nominee_name (string)

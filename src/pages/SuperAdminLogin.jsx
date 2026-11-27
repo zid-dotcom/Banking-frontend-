@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { User, Lock, Eye, EyeOff, ArrowLeft, CheckCircle2, AlertCircle } from 'lucide-react';
 import dashboardIllustration from '../assets/AurumFX Secure Digital Banking Dashboard.png';
+import SuperAdminForgotPasswordModal from '../components/SuperAdminForgotPasswordModal';
 
 // Exact Solid Bank Temple Icon matching reference badge
 function BankTempleIcon({ className = 'w-6 h-6 text-slate-900' }) {
@@ -37,8 +38,6 @@ export default function SuperAdminLogin() {
   const [isLoading, setIsLoading] = useState(false);
   const [authStatus, setAuthStatus] = useState(null);
   const [forgotModalOpen, setForgotModalOpen] = useState(false);
-  const [recoveryEmail, setRecoveryEmail] = useState('');
-  const [recoverySent, setRecoverySent] = useState(false);
 
   useEffect(() => {
     const expiredQuery = searchParams.get('expired') === 'true';
@@ -122,19 +121,13 @@ export default function SuperAdminLogin() {
     }
   };
 
-  const handleForgotPasswordSubmit = (e) => {
-    e.preventDefault();
-    if (!recoveryEmail) return;
-    setRecoverySent(true);
-    setTimeout(() => {
-      setForgotModalOpen(false);
-      setRecoverySent(false);
-      setRecoveryEmail('');
-      setAuthStatus({
-        type: 'info',
-        message: `Password reset instructions sent to ${recoveryEmail}`,
-      });
-    }, 1800);
+  const handlePasswordResetSuccess = ({ email: resetEmail, newPassword: pwd }) => {
+    if (resetEmail) setUsername(resetEmail);
+    if (pwd) setPassword(pwd);
+    setAuthStatus({
+      type: 'success',
+      message: `Super Admin password reset successfully for ${resetEmail}! You can now log in with your new credentials.`,
+    });
   };
 
   return (
@@ -466,58 +459,14 @@ export default function SuperAdminLogin() {
       </div>
 
       {/* =====================================================================
-          Forgot Password Modal
+          Forgot Password Modal (POST /auth/superadmin/forgot-password & /auth/superadmin/reset-password)
          ===================================================================== */}
-      {forgotModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fadeIn">
-          <div className="bg-white rounded-2xl p-6 sm:p-8 max-w-md w-full shadow-2xl border border-slate-100">
-            <h3 className="text-lg font-bold text-slate-900 font-sans">
-              Reset Super Admin Password
-            </h3>
-            <p className="text-xs text-slate-500 mt-1 mb-4">
-              Enter your registered administrative email address to receive password recovery instructions and 2FA token.
-            </p>
-
-            {recoverySent ? (
-              <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-                <span>Recovery instructions dispatched! Check your secure inbox.</span>
-              </div>
-            ) : (
-              <form onSubmit={handleForgotPasswordSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Administrative Email Address
-                  </label>
-                  <input
-                    type="email"
-                    required
-                    placeholder="admin@aurumfx.com"
-                    value={recoveryEmail}
-                    onChange={(e) => setRecoveryEmail(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#6f46ed] focus:ring-2 focus:ring-[#6f46ed]/20"
-                  />
-                </div>
-                <div className="flex items-center justify-end gap-2.5 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => setForgotModalOpen(false)}
-                    className="px-4 py-2 text-xs font-medium text-slate-600 hover:text-slate-800 transition-colors cursor-pointer"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 bg-[#6f46ed] hover:bg-[#5c35cc] text-white text-xs font-semibold rounded-lg shadow-sm transition-colors cursor-pointer"
-                  >
-                    Send Reset Link
-                  </button>
-                </div>
-              </form>
-            )}
-          </div>
-        </div>
-      )}
+      <SuperAdminForgotPasswordModal
+        isOpen={forgotModalOpen}
+        initialEmail={username.includes('@') ? username : ''}
+        onClose={() => setForgotModalOpen(false)}
+        onResetSuccess={handlePasswordResetSuccess}
+      />
 
     </div>
   );

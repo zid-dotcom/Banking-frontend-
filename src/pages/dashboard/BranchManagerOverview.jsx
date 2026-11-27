@@ -27,7 +27,8 @@ import {
   FileText,
   Coins,
   Scale,
-  ShieldAlert
+  ShieldAlert,
+  KeyRound
 } from 'lucide-react';
 import StatCard from '../../components/dashboard/StatCard';
 import bankTechScene from '../../assets/AurumFX Cooperative Bank Technology Scene.png';
@@ -40,6 +41,7 @@ import BranchManagerCashTransactions from './BranchManagerCashTransactions';
 import BranchManagerCashReconciliation from './BranchManagerCashReconciliation';
 import BranchManagerStaff from './BranchManagerStaff';
 import BranchManagerSecurityEvents from './BranchManagerSecurityEvents';
+import BranchManagerMemberPasswordUpdate from './BranchManagerMemberPasswordUpdate';
 
 function formatCurrency(val) {
   const num = Number(val || 0);
@@ -304,6 +306,7 @@ export default function BranchManagerOverview() {
               { id: 'cash_reconciliation', label: 'Cash Reconciliation', icon: Scale },
               { id: 'staff', label: 'Staff', icon: UserCheck },
               { id: 'security_events', label: 'Security Events', icon: ShieldAlert },
+              { id: 'member_password_update', label: 'Member Password Update', icon: KeyRound },
             ].map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -638,6 +641,11 @@ export default function BranchManagerOverview() {
         {/* TAB 6: SECURITY EVENTS */}
         {activeTab === 'security_events' && (
           <BranchManagerSecurityEvents embedded={true} />
+        )}
+
+        {/* TAB 7: MEMBER PASSWORD UPDATE */}
+        {activeTab === 'member_password_update' && (
+          <BranchManagerMemberPasswordUpdate embedded={true} />
         )}
       </div>
 

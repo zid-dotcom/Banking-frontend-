@@ -131,6 +131,15 @@ export default function StaffMembers() {
   const filteredMembers = members.filter((m) => {
     // Search match
     const q = memberSearch.toLowerCase().trim();
+    const matchSavings =
+      (m.savings_account_number && String(m.savings_account_number).toLowerCase().includes(q)) ||
+      (m.savings_account_no && String(m.savings_account_no).toLowerCase().includes(q)) ||
+      (m.account_number && String(m.account_number).toLowerCase().includes(q)) ||
+      (m.account_no && String(m.account_no).toLowerCase().includes(q)) ||
+      (m.bank_account_number && String(m.bank_account_number).toLowerCase().includes(q)) ||
+      (Array.isArray(m.accounts) && m.accounts.some(a => String(a.account_number || a.account_no || '').toLowerCase().includes(q))) ||
+      (Array.isArray(m.savings_accounts) && m.savings_accounts.some(a => String(a.account_number || a.account_no || '').toLowerCase().includes(q)));
+
     const matchSearch =
       !q ||
       (m.full_name && m.full_name.toLowerCase().includes(q)) ||
@@ -139,7 +148,8 @@ export default function StaffMembers() {
       (m.email && m.email.toLowerCase().includes(q)) ||
       (m.mobile && m.mobile.toLowerCase().includes(q)) ||
       (m.city && m.city.toLowerCase().includes(q)) ||
-      (m.branch_name && m.branch_name.toLowerCase().includes(q));
+      (m.branch_name && m.branch_name.toLowerCase().includes(q)) ||
+      matchSavings;
 
     // KYC Status match
     const mStatus = (m.status || '').toUpperCase();
@@ -356,7 +366,7 @@ export default function StaffMembers() {
                   <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
-                    placeholder="Search name, code, phone..."
+                    placeholder="Search name, code, phone, savings A/C..."
                     value={memberSearch}
                     onChange={(e) => setMemberSearch(e.target.value)}
                     className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 focus:outline-none focus:border-[#2dd4bf] shadow-2xs"

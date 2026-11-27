@@ -28,8 +28,10 @@ import {
   ShieldAlert,
   Calculator,
   Scale,
-  FileBarChart,
   KeyRound,
+  Target,
+  QrCode,
+  Receipt,
 } from 'lucide-react';
 import {
   getMemberUnreadCount,
@@ -53,6 +55,29 @@ export default function DashboardSidebar({
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Resolve user data with localStorage fallback
+  const effectiveUser = (() => {
+    if (user && (user.staff_role || user.name || user.account_role || user.role || user.branch)) {
+      return user;
+    }
+    try {
+      if (role === 'staff') {
+        const cached = localStorage.getItem('staff_user');
+        if (cached) return JSON.parse(cached);
+      } else if (role === 'branch_manager') {
+        const cached = localStorage.getItem('branch_user');
+        if (cached) return JSON.parse(cached);
+      } else if (role === 'super_admin') {
+        const cached = localStorage.getItem('superadmin_user');
+        if (cached) return JSON.parse(cached);
+      } else if (role === 'member') {
+        const cached = localStorage.getItem('member_user');
+        if (cached) return JSON.parse(cached);
+      }
+    } catch {}
+    return user || {};
+  })();
+
   // Role based navigation menus with dedicated page routes
   const roleNavItems = {
     member: [
@@ -60,8 +85,8 @@ export default function DashboardSidebar({
       { id: 'profile', label: 'My Profile', icon: User, path: '/member/profile' },
       { id: 'nominee', label: 'Nominee Details', icon: HeartHandshake, path: '/member/nominee' },
       { id: 'savings_schemes', label: 'Savings Schemes', icon: PiggyBank, path: '/member/savings-schemes' },
-      { id: 'account_transactions', label: 'Account Transactions', icon: History, path: '/member/account-transactions' },
       { id: 'fd_mis_schemes', label: 'FD / MIS Schemes', icon: Coins, path: '/member/fd-mis-schemes' },
+      { id: 'investment_schemes', label: 'Investment Schemes', icon: TrendingUp, path: '/member/investment-schemes' },
       { id: 'loan_schemes', label: 'Loan Schemes', icon: Landmark, path: '/member/loan-schemes' },
       { id: 'announcements', label: 'Announcements', icon: Megaphone, path: '/member/announcements' },
       { id: 'notifications', label: 'Notifications', icon: Bell, path: '/member/notifications' },
@@ -70,32 +95,32 @@ export default function DashboardSidebar({
     ],
     branch_manager: [
       { id: 'overview', label: 'Branch Dashboard', icon: LayoutDashboard, path: '/branch-manager/dashboard' },
-      { id: 'branch_overview', label: 'Branch Overview', icon: FileBarChart, path: '/branch-manager/branch-overview' },
       { id: 'members', label: 'Branch Members', icon: Users, path: '/branch-manager/members' },
+      { id: 'membership_settings', label: 'Membership Fee Settings', icon: QrCode, path: '/branch-manager/membership-settings' },
       { id: 'nominees', label: 'Branch Nominees', icon: HeartHandshake, path: '/branch-manager/nominees' },
       { id: 'staff', label: 'Branch Staff', icon: ShieldCheck, path: '/branch-manager/staff' },
       { id: 'savings_schemes', label: 'Savings Schemes', icon: PiggyBank, path: '/branch-manager/savings-schemes' },
-      { id: 'cash_transactions', label: 'Cash Transactions', icon: Coins, path: '/branch-manager/cash-transactions' },
-      { id: 'cash_reconciliation', label: 'Cash Reconciliation', icon: Scale, path: '/branch-manager/cash-reconciliation' },
       { id: 'fd_mis_schemes', label: 'FD / MIS Schemes', icon: Coins, path: '/branch-manager/fd-mis-schemes' },
+      { id: 'investment_schemes', label: 'Investment Schemes', icon: TrendingUp, path: '/branch-manager/investment-schemes' },
+      { id: 'monthly_targets', label: 'Monthly Targets', icon: Target, path: '/branch-manager/monthly-targets' },
       { id: 'loan_schemes', label: 'Loan Schemes', icon: Landmark, path: '/branch-manager/loan-schemes' },
       { id: 'announcements', label: 'Announcements', icon: Megaphone, path: '/branch-manager/announcements' },
       { id: 'service_requests', label: 'Service Requests', icon: Headset, path: '/branch-manager/service-requests' },
       { id: 'emergency_cases', label: 'Emergency Cases', icon: AlertOctagon, path: '/branch-manager/emergency-cases' },
       { id: 'security_events', label: 'Security Events', icon: ShieldCheck, path: '/branch-manager/security-events' },
+      { id: 'member_password_update', label: 'Member Password Update', icon: KeyRound, path: '/branch-manager/member-password-update' },
       { id: 'password_update', label: 'Password Update', icon: KeyRound, path: '/branch-manager/password-update' },
     ],
     super_admin: [
       { id: 'overview', label: 'Dashboard', icon: LayoutDashboard, path: '/super-admin/dashboard' },
-      { id: 'branch_overview', label: 'Branch Overview', icon: FileBarChart, path: '/super-admin/branch-overview' },
       { id: 'branches', label: 'Branches', icon: Building2, path: '/super-admin/branches' },
       { id: 'branch_admins', label: 'Branch Manager', icon: UserCheck, path: '/super-admin/branch-admins' },
       { id: 'staff_roles', label: 'Staff Roles', icon: ShieldCheck, path: '/super-admin/staff-roles' },
       { id: 'staff', label: 'Staff Registry', icon: Users, path: '/super-admin/staff' },
+      { id: 'monthly_targets', label: 'Monthly Targets', icon: Target, path: '/super-admin/monthly-targets' },
       { id: 'savings_schemes', label: 'Savings Schemes', icon: PiggyBank, path: '/super-admin/savings-schemes' },
-      { id: 'cash_transactions', label: 'Cash Transactions', icon: Coins, path: '/super-admin/cash-transactions' },
-      { id: 'cash_reconciliation', label: 'Cash Reconciliation', icon: Scale, path: '/super-admin/cash-reconciliation' },
       { id: 'fd_mis_schemes', label: 'FD / MIS Schemes', icon: Coins, path: '/super-admin/fd-mis-schemes' },
+      { id: 'investment_schemes', label: 'Investment Schemes', icon: TrendingUp, path: '/super-admin/investment-schemes' },
       { id: 'loan_schemes', label: 'Loan Schemes', icon: Landmark, path: '/super-admin/loan-schemes' },
       { id: 'announcements', label: 'Announcements', icon: Megaphone, path: '/super-admin/announcements' },
       { id: 'service_requests', label: 'Service Requests', icon: Headset, path: '/super-admin/service-requests' },
@@ -105,17 +130,29 @@ export default function DashboardSidebar({
       { id: 'password_update', label: 'Password Update', icon: KeyRound, path: '/super-admin/password-update' },
     ],
     staff: (() => {
-      const roleStr = String(user?.staff_role?.name || user?.account_role || user?.role || '').toLowerCase();
+      const roleStr = String(
+        effectiveUser?.staff_role?.name ||
+        effectiveUser?.account_role ||
+        effectiveUser?.role ||
+        effectiveUser?.staff_role_name ||
+        effectiveUser?.staff_role?.role_name ||
+        ''
+      ).toLowerCase();
+
       const isAccountant = roleStr.includes('accountant') || roleStr.includes('auditor');
       const isCustomerService =
         roleStr.includes('customer') ||
         roleStr.includes('cso') ||
         roleStr.includes('support') ||
         (roleStr.includes('service') && !roleStr.includes('cashier'));
+      const isCollectionAgent =
+        roleStr.includes('collection') ||
+        (roleStr.includes('agent') && !roleStr.includes('customer'));
 
       if (isCustomerService) {
         return [
           { id: 'overview', label: 'Staff Dashboard', icon: LayoutDashboard, path: '/staff/dashboard' },
+          { id: 'monthly_targets', label: 'Monthly Targets', icon: Target, path: '/staff/monthly-targets' },
           { id: 'service_requests', label: 'Service Requests', icon: Headset, path: '/staff/service-requests' },
           { id: 'announcements', label: 'Announcements', icon: Megaphone, path: '/staff/announcements' },
           { id: 'password_update', label: 'Password Update', icon: KeyRound, path: '/staff/password-update' },
@@ -124,16 +161,28 @@ export default function DashboardSidebar({
       if (isAccountant) {
         return [
           { id: 'overview', label: 'Staff Dashboard', icon: LayoutDashboard, path: '/staff/dashboard' },
-          { id: 'cash_reconciliation', label: 'Cash Reconciliation', icon: Calculator, path: '/staff/cash-reconciliation' },
+          { id: 'monthly_targets', label: 'Monthly Targets', icon: Target, path: '/staff/monthly-targets' },
           { id: 'members', label: 'View Members', icon: Users, path: '/staff/members' },
+          { id: 'product_accounts', label: 'Deposit & Investment Accounts', icon: Landmark, path: '/staff/product-accounts' },
           { id: 'announcements', label: 'Announcements', icon: Megaphone, path: '/staff/announcements' },
           { id: 'password_update', label: 'Password Update', icon: KeyRound, path: '/staff/password-update' },
         ];
       }
+      // Dedicated sidebar menu for Collection Agent
+      if (isCollectionAgent) {
+        return [
+          { id: 'overview', label: 'Staff Dashboard', icon: LayoutDashboard, path: '/staff/dashboard' },
+          { id: 'monthly_targets', label: 'Monthly Targets', icon: Target, path: '/staff/monthly-targets' },
+          { id: 'cash_operations', label: 'Cash Operations', icon: Wallet, path: '/staff/cash-operations' },
+          { id: 'announcements', label: 'Announcements', icon: Megaphone, path: '/staff/announcements' },
+          { id: 'password_update', label: 'Password Update', icon: KeyRound, path: '/staff/password-update' },
+        ];
+      }
+      // General Cashier / Teller / Default Staff
       return [
         { id: 'overview', label: 'Staff Dashboard', icon: LayoutDashboard, path: '/staff/dashboard' },
+        { id: 'monthly_targets', label: 'Monthly Targets', icon: Target, path: '/staff/monthly-targets' },
         { id: 'cash_operations', label: 'Cash Operations', icon: Wallet, path: '/staff/cash-operations' },
-        { id: 'cash_reconciliation', label: 'Cash Reconciliation', icon: Calculator, path: '/staff/cash-reconciliation' },
         { id: 'announcements', label: 'Announcements', icon: Megaphone, path: '/staff/announcements' },
         { id: 'password_update', label: 'Password Update', icon: KeyRound, path: '/staff/password-update' },
       ];
@@ -143,11 +192,11 @@ export default function DashboardSidebar({
   const currentNavItems = roleNavItems[role] || roleNavItems.member;
 
   const branchDisplayName =
-    typeof user?.branch === 'string'
-      ? user.branch
-      : (user?.branch_name || user?.branch?.name || user?.branch?.branch_name || 'Society Branch');
+    typeof effectiveUser?.branch === 'string'
+      ? effectiveUser.branch
+      : (effectiveUser?.branch_name || effectiveUser?.branch?.name || effectiveUser?.branch?.branch_name || 'Society Branch');
 
-  const rawStaffTitle = user?.staff_role?.name || 'Branch Staff';
+  const rawStaffTitle = effectiveUser?.staff_role?.name || effectiveUser?.staff_role_name || 'Branch Staff';
   const staffTitle = /cashier\/teller/i.test(String(rawStaffTitle)) ? 'Cashier' : rawStaffTitle;
 
   const roleLabels = {

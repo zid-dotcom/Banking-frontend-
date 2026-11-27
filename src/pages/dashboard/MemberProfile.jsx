@@ -3,9 +3,15 @@ import { Link, useNavigate } from 'react-router-dom';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import StatCard from '../../components/dashboard/StatCard';
 import PasswordUpdateCard from '../../components/dashboard/PasswordUpdateCard';
-import { getMemberFullProfile, getMemberMe } from '../../services/memberService';
+import {
+  getMemberFullProfile,
+  getMemberMe,
+  getMemberProfileDocument,
+  downloadMemberProfileDocument
+} from '../../services/memberService';
 import { getMemberSecurityEvents, formatSecurityEventType } from '../../services/securityService';
 import { getMemberSavingsAccounts } from '../../services/savingsSchemeService';
+import { getMemberProductAccounts } from '../../services/productAccountService';
 import { handleAuthExpired, isTokenExpiredError } from '../../services/branchService';
 import {
   User,
@@ -29,11 +35,15 @@ import {
   BadgeCheck,
   Check,
   X,
+  Eye,
+  Download,
+  ExternalLink,
   FileCheck2,
   Compass,
   Wallet,
   PiggyBank,
-  Coins
+  Coins,
+  TrendingUp
 } from 'lucide-react';
 
 function formatCurrency(val) {
@@ -92,7 +102,7 @@ function renderAccountStatusBadge(status) {
     );
   }
 
-  if (s.includes('pending')) {
+  if (s.includes('pending') || s.includes('awaiting')) {
     return (
       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200 capitalize">
         <Clock className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
@@ -135,9 +145,63 @@ export default function MemberProfile() {
   const [profile, setProfile] = useState(null);
   const [securityEvents, setSecurityEvents] = useState([]);
   const [savingsAccounts, setSavingsAccounts] = useState([]);
+  const [productAccounts, setProductAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
+
+  // Document Viewer & Downloader State
+  const [viewDoc, setViewDoc] = useState(null); // { url, isPdf, title, docType }
+  const [docLoading, setDocLoading] = useState({});
+  const [downloadingDoc, setDownloadingDoc] = useState({});
+
+  const handleOpenDocument = async (docType, defaultTitle) => {
+    setDocLoading((prev) => ({ ...prev, [docType]: true }));
+    try {
+      const rawUrl = profile?.[`${docType}_url`] || profile?.[docType] || docType;
+      const res = await getMemberProfileDocument(rawUrl);
+      if (res?.url) {
+        setViewDoc({
+          url: res.url,
+          isPdf: res.isPdf,
+          title: defaultTitle,
+          docType
+        });
+      }
+    } catch (err) {
+      console.error(`Error opening document ${docType}:`, err);
+      const rawUrl = profile?.[`${docType}_url`] || profile?.[docType];
+      if (rawUrl && typeof rawUrl === 'string') {
+        const BASE_URL = import.meta.env.VITE_API_URL || 'https://supercriminally-ununified-arnoldo.ngrok-free.dev';
+        const cleanPath = rawUrl.startsWith('/') ? rawUrl : `/${rawUrl}`;
+        const fullUrl = rawUrl.startsWith('http') ? rawUrl : `${BASE_URL}${cleanPath}`;
+        setViewDoc({
+          url: fullUrl,
+          isPdf: fullUrl.toLowerCase().includes('.pdf'),
+          title: defaultTitle,
+          docType
+        });
+      } else {
+        alert(err.message || 'Could not load document preview.');
+      }
+    } finally {
+      setDocLoading((prev) => ({ ...prev, [docType]: false }));
+    }
+  };
+
+  const handleDownloadDocument = async (docType, filename) => {
+    setDownloadingDoc((prev) => ({ ...prev, [docType]: true }));
+    try {
+      const rawDownloadUrl = profile?.[`${docType}_download_url`] || profile?.[`${docType}_url`] || docType;
+      const defaultFilename = filename || `member_${profile?.member_code || 'kyc'}_${docType}`;
+      await downloadMemberProfileDocument(rawDownloadUrl, defaultFilename);
+    } catch (err) {
+      console.error(`Error downloading document ${docType}:`, err);
+      alert(err.message || 'Could not download document.');
+    } finally {
+      setDownloadingDoc((prev) => ({ ...prev, [docType]: false }));
+    }
+  };
 
   const [memberUser, setMemberUser] = useState(() => {
     try {
@@ -193,14 +257,33 @@ export default function MemberProfile() {
           })
           .catch(() => {});
 
-        getMemberSavingsAccounts()
-          .then((accs) => {
-            if (Array.isArray(accs)) setSavingsAccounts(accs);
-            else if (accs && Array.isArray(accs.data)) setSavingsAccounts(accs.data);
-            else if (accs && Array.isArray(accs.items)) setSavingsAccounts(accs.items);
-            else setSavingsAccounts([]);
-          })
-          .catch((err) => console.warn('getMemberSavingsAccounts error in profile:', err));
+        // Cooperative Savings Accounts (from profile response or service fallback)
+        if (Array.isArray(data.accounts)) {
+          setSavingsAccounts(data.accounts);
+        } else {
+          getMemberSavingsAccounts()
+            .then((accs) => {
+              if (Array.isArray(accs)) setSavingsAccounts(accs);
+              else if (accs && Array.isArray(accs.data)) setSavingsAccounts(accs.data);
+              else if (accs && Array.isArray(accs.items)) setSavingsAccounts(accs.items);
+              else setSavingsAccounts([]);
+            })
+            .catch((err) => console.warn('getMemberSavingsAccounts error in profile:', err));
+        }
+
+        // Cooperative Product Accounts (FD, MIS & Investments)
+        if (Array.isArray(data.product_accounts)) {
+          setProductAccounts(data.product_accounts);
+        } else {
+          getMemberProductAccounts()
+            .then((prods) => {
+              if (Array.isArray(prods)) setProductAccounts(prods);
+              else if (prods && Array.isArray(prods.data)) setProductAccounts(prods.data);
+              else if (prods && Array.isArray(prods.items)) setProductAccounts(prods.items);
+              else setProductAccounts([]);
+            })
+            .catch((err) => console.warn('getMemberProductAccounts error in profile:', err));
+        }
 
         const name = data.full_name || 'Member';
         const branchObj = typeof data.branch === 'object' && data.branch !== null ? data.branch : null;
@@ -236,6 +319,8 @@ export default function MemberProfile() {
         const fallback = await getMemberMe();
         if (fallback) {
           setProfile(fallback);
+          if (Array.isArray(fallback.accounts)) setSavingsAccounts(fallback.accounts);
+          if (Array.isArray(fallback.product_accounts)) setProductAccounts(fallback.product_accounts);
         } else {
           setError(err.message || 'Failed to load member profile.');
         }
@@ -265,6 +350,9 @@ export default function MemberProfile() {
   const memberAge = profile?.date_of_birth ? calculateAge(profile.date_of_birth) : null;
   const nominee = profile?.nominee;
   const nomineeStatus = (nominee?.status || 'not_submitted').toLowerCase();
+
+  const fdAccounts = productAccounts.filter((acc) => acc.product_type !== 'investment');
+  const investmentAccounts = productAccounts.filter((acc) => acc.product_type === 'investment');
 
   return (
     <DashboardLayout role="member" user={memberUser} activeTab="profile">
@@ -670,6 +758,102 @@ export default function MemberProfile() {
                   </p>
                 </div>
               </div>
+
+              {/* KYC Document Verification & Download Gallery */}
+              <div className="p-5 sm:p-7 pt-0 border-t border-slate-100">
+                <div className="flex items-center justify-between mb-3.5 pt-4">
+                  <div className="flex items-center gap-2">
+                    <FileCheck2 className="w-4 h-4 text-teal-600" />
+                    <h4 className="text-xs sm:text-sm font-extrabold text-slate-800 uppercase tracking-wider">
+                      Verified Identity Documents &amp; Compliance Dossier
+                    </h4>
+                  </div>
+                  <span className="text-[11px] font-semibold text-slate-400">
+                    4 Statutory Records Attached
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                  {[
+                    {
+                      key: 'aadhaar_front',
+                      title: 'Aadhaar Card (Front)',
+                      desc: 'Official UIDAI Photo Identity Document',
+                    },
+                    {
+                      key: 'aadhaar_back',
+                      title: 'Aadhaar Card (Back)',
+                      desc: 'UIDAI Address & QR Code Side',
+                    },
+                    {
+                      key: 'pan_image',
+                      title: 'PAN Card Copy',
+                      desc: 'Income Tax Dept Permanent Account Number',
+                    },
+                    {
+                      key: 'passbook_image',
+                      title: 'Bank Passbook / Cheque',
+                      desc: 'Verified Account Holder & IFSC Credentials',
+                    },
+                  ].map((doc) => (
+                    <div
+                      key={doc.key}
+                      className="p-3.5 sm:p-4 rounded-2xl border border-slate-200/90 bg-slate-50/60 flex items-center justify-between gap-3 shadow-2xs hover:border-teal-300 hover:bg-slate-50 transition-all"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-10 h-10 rounded-xl bg-teal-100/70 text-teal-800 flex items-center justify-center flex-shrink-0">
+                          <FileText className="w-5 h-5 text-teal-700" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-xs font-bold text-slate-900 truncate">
+                            {doc.title}
+                          </p>
+                          <p className="text-[11px] text-slate-500 font-medium truncate">
+                            {doc.desc}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => handleOpenDocument(doc.key, doc.title)}
+                          disabled={docLoading[doc.key]}
+                          className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-xl bg-white hover:bg-teal-50 text-teal-800 text-xs font-bold border border-teal-200 shadow-2xs transition-colors cursor-pointer disabled:opacity-50"
+                          title="View Document"
+                        >
+                          {docLoading[doc.key] ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin text-teal-600" />
+                          ) : (
+                            <Eye className="w-3.5 h-3.5 text-teal-600" />
+                          )}
+                          <span>View</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleDownloadDocument(
+                              doc.key,
+                              `member_${profile.member_code || 'kyc'}_${doc.key}`
+                            )
+                          }
+                          disabled={downloadingDoc[doc.key]}
+                          className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-800 text-xs font-bold border border-teal-200/80 shadow-2xs transition-colors cursor-pointer disabled:opacity-50"
+                          title="Download Document"
+                        >
+                          {downloadingDoc[doc.key] ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin text-teal-600" />
+                          ) : (
+                            <Download className="w-3.5 h-3.5 text-teal-700" />
+                          )}
+                          <span>Download</span>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
 
             {/* 4. Banking & Settlement Accounts Card */}
@@ -825,6 +1009,230 @@ export default function MemberProfile() {
                               </span>
                             ) : (
                               <span className="text-slate-400 font-mono text-xs">—</span>
+                            )}
+                          </td>
+                          <td className="py-4 px-6 font-black font-sans text-base text-slate-900 whitespace-nowrap">
+                            {formatCurrency(acc.balance ?? 0)}
+                          </td>
+                          <td className="py-4 px-6 text-center whitespace-nowrap">
+                            {renderAccountStatusBadge(acc.status)}
+                          </td>
+                          <td className="py-4 px-6 text-xs text-slate-600 font-medium whitespace-nowrap">
+                            {formatDateTime(acc.opened_at)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            {/* Cooperative Fixed Deposit & MIS Accounts Card */}
+            <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+              <div className="p-5 sm:p-6 bg-slate-50/80 border-b border-slate-100 flex items-center justify-between flex-wrap gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-teal-50 text-teal-700 flex items-center justify-center border border-teal-100 shadow-2xs">
+                    <Coins className="w-5 h-5 text-[#00b4a7]" />
+                  </div>
+                  <div>
+                    <h3 className="text-base sm:text-lg font-black text-slate-900">
+                      Cooperative Fixed Deposit &amp; MIS Accounts
+                    </h3>
+                    <p className="text-xs text-slate-500 font-medium">
+                      Active term fixed deposits and monthly income schemes
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-teal-50 text-teal-800 font-bold text-xs rounded-full border border-teal-200">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-teal-600" />
+                    <span>{fdAccounts.length} Active {fdAccounts.length === 1 ? 'Folio' : 'Folios'}</span>
+                  </span>
+                  <Link
+                    to="/member/fd-mis-schemes"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors"
+                  >
+                    <span>Manage FD &amp; MIS</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
+              </div>
+
+              {fdAccounts.length === 0 ? (
+                <div className="p-8 text-center space-y-2">
+                  <div className="w-12 h-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center mx-auto mb-2">
+                    <Coins className="w-6 h-6" />
+                  </div>
+                  <p className="text-sm font-bold text-slate-700">
+                    No Fixed Deposit or MIS Accounts Opened
+                  </p>
+                  <p className="text-xs text-slate-500 max-w-md mx-auto">
+                    You currently do not have any active term fixed deposits or MIS accounts. Explore high-yield deposit schemes to start earning guaranteed returns.
+                  </p>
+                  <div className="pt-2">
+                    <Link
+                      to="/member/fd-mis-schemes"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-[#14b8a6] to-[#0f766e] text-white font-bold text-xs rounded-xl shadow-xs transition-all"
+                    >
+                      <Coins className="w-3.5 h-3.5" />
+                      <span>Explore FD &amp; MIS Schemes</span>
+                    </Link>
+                  </div>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse min-w-[750px]">
+                    <thead>
+                      <tr className="border-b border-slate-100 bg-slate-50/75 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                        <th className="py-3.5 px-6">Account Number</th>
+                        <th className="py-3.5 px-6">Scheme</th>
+                        <th className="py-3.5 px-6">Branch</th>
+                        <th className="py-3.5 px-6">Principal Amount</th>
+                        <th className="py-3.5 px-6">Current Balance</th>
+                        <th className="py-3.5 px-6 text-center">Status</th>
+                        <th className="py-3.5 px-6">Opened On</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 text-sm">
+                      {fdAccounts.map((acc, idx) => (
+                        <tr key={acc.id || acc.account_number || idx} className="hover:bg-slate-50/50 transition-colors">
+                          <td className="py-4 px-6 font-mono font-extrabold text-teal-800 text-sm whitespace-nowrap">
+                            {acc.account_number || `Folio #${acc.id}`}
+                          </td>
+                          <td className="py-4 px-6">
+                            <div className="font-bold text-slate-900 capitalize">
+                              {acc.scheme_name || 'Fixed Deposit Scheme'}
+                            </div>
+                            {acc.scheme_code && (
+                              <span className="font-mono text-[11px] text-slate-400 block font-normal mt-0.5">
+                                Code: {acc.scheme_code}
+                              </span>
+                            )}
+                          </td>
+                          <td className="py-4 px-6 whitespace-nowrap">
+                            <div className="font-semibold text-slate-800 text-xs">
+                              {acc.branch_name || 'Society Branch'}
+                            </div>
+                            {acc.branch_id && (
+                              <span className="text-[11px] text-slate-500 font-mono mt-0.5 block">
+                                Branch ID #{acc.branch_id}
+                              </span>
+                            )}
+                          </td>
+                          <td className="py-4 px-6 whitespace-nowrap font-sans font-bold text-slate-700">
+                            {acc.requested_principal !== undefined && acc.requested_principal !== null && Number(acc.requested_principal) > 0
+                              ? formatCurrency(acc.requested_principal)
+                              : '—'}
+                          </td>
+                          <td className="py-4 px-6 font-black font-sans text-base text-slate-900 whitespace-nowrap">
+                            {formatCurrency(acc.balance ?? 0)}
+                          </td>
+                          <td className="py-4 px-6 text-center whitespace-nowrap">
+                            {renderAccountStatusBadge(acc.status)}
+                          </td>
+                          <td className="py-4 px-6 text-xs text-slate-600 font-medium whitespace-nowrap">
+                            {formatDateTime(acc.opened_at)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            {/* Cooperative Recurring Investment Accounts Card */}
+            <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+              <div className="p-5 sm:p-6 bg-slate-50/80 border-b border-slate-100 flex items-center justify-between flex-wrap gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-purple-50 text-purple-700 flex items-center justify-center border border-purple-100 shadow-2xs">
+                    <TrendingUp className="w-5 h-5 text-purple-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-base sm:text-lg font-black text-slate-900">
+                      Cooperative Recurring Investment Accounts
+                    </h3>
+                    <p className="text-xs text-slate-500 font-medium">
+                      Active recurring daily, weekly, and monthly investment accounts
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-purple-50 text-purple-800 font-bold text-xs rounded-full border border-purple-200">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-purple-600" />
+                    <span>{investmentAccounts.length} Active {investmentAccounts.length === 1 ? 'Folio' : 'Folios'}</span>
+                  </span>
+                  <Link
+                    to="/member/investment-schemes"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors"
+                  >
+                    <span>Manage Investments</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
+              </div>
+
+              {investmentAccounts.length === 0 ? (
+                <div className="p-8 text-center space-y-2">
+                  <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center mx-auto mb-2">
+                    <TrendingUp className="w-6 h-6" />
+                  </div>
+                  <p className="text-sm font-bold text-slate-700">
+                    No Recurring Investment Accounts Opened
+                  </p>
+                  <p className="text-xs text-slate-500 max-w-md mx-auto">
+                    You currently do not have any active recurring investment accounts. Subscribe to flexible wealth creation schemes designed for cooperative members.
+                  </p>
+                  <div className="pt-2">
+                    <Link
+                      to="/member/investment-schemes"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold text-xs rounded-xl shadow-xs transition-all"
+                    >
+                      <TrendingUp className="w-3.5 h-3.5" />
+                      <span>Explore Investment Schemes</span>
+                    </Link>
+                  </div>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse min-w-[700px]">
+                    <thead>
+                      <tr className="border-b border-slate-100 bg-slate-50/75 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                        <th className="py-3.5 px-6">Account Number</th>
+                        <th className="py-3.5 px-6">Scheme</th>
+                        <th className="py-3.5 px-6">Branch</th>
+                        <th className="py-3.5 px-6">Portfolio Balance</th>
+                        <th className="py-3.5 px-6 text-center">Status</th>
+                        <th className="py-3.5 px-6">Opened On</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 text-sm">
+                      {investmentAccounts.map((acc, idx) => (
+                        <tr key={acc.id || acc.account_number || idx} className="hover:bg-slate-50/50 transition-colors">
+                          <td className="py-4 px-6 font-mono font-extrabold text-teal-800 text-sm whitespace-nowrap">
+                            {acc.account_number || `Folio #${acc.id}`}
+                          </td>
+                          <td className="py-4 px-6">
+                            <div className="font-bold text-slate-900 capitalize">
+                              {acc.scheme_name || 'Investment Scheme'}
+                            </div>
+                            {acc.scheme_code && (
+                              <span className="font-mono text-[11px] text-slate-400 block font-normal mt-0.5">
+                                Code: {acc.scheme_code}
+                              </span>
+                            )}
+                          </td>
+                          <td className="py-4 px-6 whitespace-nowrap">
+                            <div className="font-semibold text-slate-800 text-xs">
+                              {acc.branch_name || 'Society Branch'}
+                            </div>
+                            {acc.branch_id && (
+                              <span className="text-[11px] text-slate-500 font-mono mt-0.5 block">
+                                Branch ID #{acc.branch_id}
+                              </span>
                             )}
                           </td>
                           <td className="py-4 px-6 font-black font-sans text-base text-slate-900 whitespace-nowrap">
@@ -1002,11 +1410,109 @@ export default function MemberProfile() {
               <PasswordUpdateCard
                 title="Update Member Password"
                 description="Change your login credentials to protect your cooperative accounts and membership assets."
+                role="member"
               />
             </div>
           </div>
         ) : null}
       </div>
+
+      {/* Document Preview Modal */}
+      {viewDoc && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/70 backdrop-blur-xs animate-fadeIn">
+          <div className="bg-white rounded-3xl max-w-2xl w-full shadow-2xl border border-slate-100 overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="p-4 sm:p-5 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <FileText className="w-4 h-4 text-teal-600" />
+                <h4 className="font-extrabold text-sm sm:text-base text-slate-900">
+                  {viewDoc.title}
+                </h4>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleDownloadDocument(
+                      viewDoc.docType,
+                      `member_${profile?.member_code || 'kyc'}_${viewDoc.docType}`
+                    )
+                  }
+                  disabled={downloadingDoc[viewDoc.docType]}
+                  className="p-1.5 rounded-lg text-slate-500 hover:text-teal-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                  title="Download Document"
+                >
+                  <Download className="w-4 h-4" />
+                </button>
+                {viewDoc.url && (
+                  <a
+                    href={viewDoc.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="p-1.5 rounded-lg text-slate-400 hover:text-teal-700 hover:bg-slate-100 transition-colors"
+                    title="Open in new window"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                  </a>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setViewDoc(null)}
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-4 overflow-auto flex items-center justify-center bg-slate-100/50 min-h-[300px]">
+              {viewDoc.url ? (
+                viewDoc.isPdf || viewDoc.url.toLowerCase().endsWith('.pdf') ? (
+                  <iframe
+                    src={viewDoc.url}
+                    title={viewDoc.title}
+                    className="w-full h-[500px] rounded-xl border border-slate-200"
+                  />
+                ) : (
+                  <div className="flex flex-col items-center max-w-full">
+                    <img
+                      src={viewDoc.url}
+                      alt={viewDoc.title}
+                      className="max-h-[550px] max-w-full rounded-xl object-contain shadow-sm"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        const fallback = e.target.parentElement?.querySelector('.doc-fallback');
+                        if (fallback) fallback.style.display = 'flex';
+                      }}
+                    />
+                    <div
+                      style={{ display: 'none' }}
+                      className="doc-fallback flex flex-col items-center justify-center p-8 text-center text-slate-500 gap-2"
+                    >
+                      <AlertCircle className="w-8 h-8 text-amber-500 mx-auto" />
+                      <p className="text-sm font-semibold">Image preview could not be displayed directly.</p>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleDownloadDocument(
+                            viewDoc.docType,
+                            `member_${profile?.member_code || 'kyc'}_${viewDoc.docType}`
+                          )
+                        }
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-teal-600 text-white text-xs font-bold hover:bg-teal-700 transition-colors mt-2 cursor-pointer"
+                      >
+                        <Download className="w-4 h-4" />
+                        <span>Download Document</span>
+                      </button>
+                    </div>
+                  </div>
+                )
+              ) : (
+                <p className="text-xs text-slate-400">Document preview unavailable.</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </DashboardLayout>
   );
 }

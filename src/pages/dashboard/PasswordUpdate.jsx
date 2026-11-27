@@ -135,6 +135,7 @@ export default function PasswordUpdate() {
             <PasswordUpdateCard
               title="Change Account Password"
               description="Enter your current password followed by your new password to complete verification."
+              role={currentRole}
             />
           </div>
 

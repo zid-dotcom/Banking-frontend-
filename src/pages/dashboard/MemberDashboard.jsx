@@ -704,7 +704,6 @@ export default function MemberDashboard() {
           title="Recent Member Transactions"
           subtitle="Your verified cash counter and deposit transactions"
           transactions={transactions}
-          onViewAll={() => navigate('/member/account-transactions')}
         />
       </div>
 

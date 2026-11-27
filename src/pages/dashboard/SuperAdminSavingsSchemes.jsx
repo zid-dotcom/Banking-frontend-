@@ -6,7 +6,6 @@ import {
   SavingsSchemeDetailModal,
   SavingsSchemeDeleteModal
 } from '../../components/dashboard/SavingsSchemeModals';
-import { SavingsAccountDetailModal } from '../../components/dashboard/SavingsAccountModals';
 import * as savingsSchemeService from '../../services/savingsSchemeService';
 import { getBranches } from '../../services/branchService';
 import {
@@ -124,18 +123,6 @@ export default function SuperAdminSavingsSchemes() {
   const [statusFilter, setStatusFilter] = useState('all'); // 'all' | 'active' | 'inactive'
   const [actionLoadingId, setActionLoadingId] = useState(null);
 
-  const [activeTab, setActiveTab] = useState('schemes'); // 'schemes' | 'accounts'
-
-  // Central Savings Accounts state (GET /superadmin/savings-accounts?branch_id=...)
-  const [accounts, setAccounts] = useState([]);
-  const [loadingAccounts, setLoadingAccounts] = useState(false);
-  const [errorAccounts, setErrorAccounts] = useState(null);
-  const [accountSearch, setAccountSearch] = useState('');
-  const [selectedBranchId, setSelectedBranchId] = useState('all');
-  const [branches, setBranches] = useState([]);
-  const [selectedAccount, setSelectedAccount] = useState(null);
-  const [loadingAccountDetail, setLoadingAccountDetail] = useState(false);
-
   // Modals state
   const [formModal, setFormModal] = useState({
     isOpen: false,
@@ -183,67 +170,9 @@ export default function SuperAdminSavingsSchemes() {
     }
   };
 
-  const fetchBranchesList = async () => {
-    try {
-      const data = await getBranches();
-      if (Array.isArray(data)) setBranches(data);
-    } catch (err) {
-      console.warn('Could not fetch branches list for selector:', err);
-    }
-  };
-
-  const fetchAccounts = async (silent = false) => {
-    if (!silent) setLoadingAccounts(true);
-    setErrorAccounts(null);
-    try {
-      const params = {};
-      if (selectedBranchId !== 'all') {
-        params.branch_id = selectedBranchId;
-      }
-      const data = await savingsSchemeService.getSuperAdminSavingsAccounts(params);
-      if (Array.isArray(data)) {
-        setAccounts(data);
-      } else {
-        setAccounts([]);
-      }
-    } catch (err) {
-      console.error('Fetch superadmin savings accounts error:', err);
-      setErrorAccounts(err.message || 'Failed to load savings accounts');
-    } finally {
-      setLoadingAccounts(false);
-    }
-  };
-
   useEffect(() => {
     fetchSchemes();
-    fetchBranchesList();
   }, []);
-
-  useEffect(() => {
-    if (activeTab === 'accounts') {
-      fetchAccounts();
-    }
-  }, [activeTab, selectedBranchId]);
-
-  const handleViewAccountDossier = async (acc) => {
-    const accId = acc.id || acc.account_id;
-    setSelectedAccount(acc);
-    setLoadingAccountDetail(true);
-    try {
-      const params = {};
-      if (selectedBranchId !== 'all') {
-        params.branch_id = selectedBranchId;
-      } else if (acc.branch_id) {
-        params.branch_id = acc.branch_id;
-      }
-      const detail = await savingsSchemeService.getSuperAdminSavingsAccount(accId, params);
-      if (detail) setSelectedAccount(detail);
-    } catch (err) {
-      console.warn('Could not fetch single account dossier, using row data:', err);
-    } finally {
-      setLoadingAccountDetail(false);
-    }
-  };
 
   const handleCreateOpen = () => {
     setFormModal({
@@ -361,23 +290,6 @@ export default function SuperAdminSavingsSchemes() {
   const maxInterest = schemes.length > 0 ? Math.max(...schemes.map((s) => Number(s.annual_interest_rate) || 0)) : 0;
   const lowestOpeningBal = schemes.length > 0 ? Math.min(...schemes.map((s) => Number(s.min_opening_balance) || 0)) : 0;
 
-  // Central accounts calculation
-  const totalCentralDeposits = accounts.reduce(
-    (sum, a) => sum + (Number(a.balance || a.current_balance) || 0),
-    0
-  );
-
-  const filteredAccounts = accounts.filter((a) => {
-    const q = accountSearch.toLowerCase().trim();
-    const accNoMatch = !q || (a.account_number || a.account_no || '').toLowerCase().includes(q);
-    const nameMatch = !q || (a.member_name || a.member?.full_name || a.member?.name || '').toLowerCase().includes(q);
-    const codeMatch = !q || (a.member_code || a.member?.user_code || '').toLowerCase().includes(q);
-    const branchMatch = !q || (a.branch_name || a.branch?.name || '').toLowerCase().includes(q);
-    const schemeMatch = !q || (a.scheme_name || a.savings_scheme_name || a.scheme?.name || '').toLowerCase().includes(q);
-
-    return accNoMatch || nameMatch || codeMatch || branchMatch || schemeMatch;
-  });
-
   // Filter schemes
   const filteredSchemes = schemes.filter((s) => {
     const q = searchQuery.toLowerCase().trim();
@@ -445,41 +357,7 @@ export default function SuperAdminSavingsSchemes() {
           </div>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="flex flex-wrap items-center gap-2 sm:gap-3 p-1.5 bg-slate-100/80 rounded-2xl border border-slate-200/80 w-fit">
-          <button
-            onClick={() => setActiveTab('schemes')}
-            className={`flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer ${
-              activeTab === 'schemes'
-                ? 'bg-white text-teal-900 shadow-sm'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
-            }`}
-          >
-            <PiggyBank className="w-4 h-4 text-[#00b4a7]" />
-            <span>Savings Schemes Catalogue</span>
-            <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 text-slate-700">
-              {schemes.length}
-            </span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('accounts')}
-            className={`flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer ${
-              activeTab === 'accounts'
-                ? 'bg-white text-teal-900 shadow-sm'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
-            }`}
-          >
-            <Wallet className="w-4 h-4 text-emerald-600" />
-            <span>Central Accounts Ledger</span>
-            <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 text-slate-700">
-              {accounts.length}
-            </span>
-          </button>
-        </div>
-
-        {activeTab === 'schemes' && (
-          <div className="space-y-6 sm:space-y-8">
+        <div className="space-y-6 sm:space-y-8">
         {/* 4 Summary Metric Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <StatCard
@@ -792,217 +670,6 @@ export default function SuperAdminSavingsSchemes() {
           )}
         </div>
       </div>
-      )}
-
-      {/* TAB 2: CENTRAL SAVINGS ACCOUNTS LEDGER */}
-      {activeTab === 'accounts' && (
-        <div className="space-y-6 animate-fadeIn">
-          {/* Central Accounts Table Panel */}
-          <div className="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
-            <div className="p-5 sm:p-6 border-b border-slate-100 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-              <div>
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-teal-50 text-teal-700 flex items-center justify-center">
-                    <Wallet className="w-4 h-4 text-[#00b4a7]" />
-                  </div>
-                  <h3 className="font-serif font-bold text-slate-900 text-lg">
-                    Central Savings Accounts Ledger
-                  </h3>
-                </div>
-                <p className="text-xs text-slate-500 mt-1 font-medium">
-                  Apex society ledger of verified member savings accounts across all branches
-                </p>
-              </div>
-
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                {/* Branch selector */}
-                <div className="flex items-center gap-2">
-                  <Building2 className="w-4 h-4 text-slate-400 flex-shrink-0" />
-                  <select
-                    value={selectedBranchId}
-                    onChange={(e) => setSelectedBranchId(e.target.value)}
-                    aria-label="Filter savings accounts by branch"
-                    className="px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-teal-100 focus:border-teal-500 transition-all cursor-pointer max-w-[200px]"
-                  >
-                    <option value="all">All Branches (Apex Overview)</option>
-                    {branches.map((b) => (
-                      <option key={b.id} value={b.id}>
-                        {b.name || b.branch_name} ({b.branch_code || `BRA-${b.id}`})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Search Input */}
-                <div className="relative min-w-[220px]">
-                  <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                  <input
-                    type="text"
-                    placeholder="Search account, member, branch..."
-                    value={accountSearch}
-                    onChange={(e) => setAccountSearch(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-teal-100 focus:border-teal-500"
-                  />
-                </div>
-
-                <button
-                  onClick={() => fetchAccounts(true)}
-                  disabled={loadingAccounts}
-                  className="p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 disabled:opacity-50 transition-colors cursor-pointer flex-shrink-0"
-                  title="Refresh accounts ledger"
-                >
-                  <RefreshCw className={`w-4 h-4 ${loadingAccounts ? 'animate-spin text-[#00b4a7]' : ''}`} />
-                </button>
-              </div>
-            </div>
-
-            {/* Error */}
-            {errorAccounts && (
-              <div className="m-6 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0" />
-                  <span>{errorAccounts}</span>
-                </div>
-                <button
-                  onClick={() => fetchAccounts()}
-                  className="font-bold underline text-amber-900 hover:text-amber-700 cursor-pointer"
-                >
-                  Retry
-                </button>
-              </div>
-            )}
-
-            {/* Table */}
-            <div className="overflow-x-auto">
-              {loadingAccounts ? (
-                <div className="p-12 text-center text-slate-400">
-                  <Loader2 className="w-8 h-8 animate-spin mx-auto text-[#00b4a7] mb-3" />
-                  <p className="text-sm font-medium">Loading central savings accounts ledger...</p>
-                </div>
-              ) : filteredAccounts.length === 0 ? (
-                <div className="p-12 text-center text-slate-400">
-                  <Wallet className="w-12 h-12 mx-auto text-slate-300 mb-3" />
-                  <p className="text-base font-serif font-bold text-slate-700">No savings accounts found</p>
-                  <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
-                    {accountSearch || selectedBranchId !== 'all'
-                      ? 'No accounts match the current branch or search criteria.'
-                      : 'No member savings accounts have been registered yet.'}
-                  </p>
-                </div>
-              ) : (
-                <table className="w-full text-left text-xs sm:text-sm">
-                  <thead>
-                    <tr className="bg-slate-50/75 border-b border-slate-100 text-slate-500 font-semibold uppercase tracking-wider text-[10px] sm:text-[11px]">
-                      <th className="py-3.5 px-6">Account Number</th>
-                      <th className="py-3.5 px-6">Member</th>
-                      <th className="py-3.5 px-6">Scheme</th>
-                      <th className="py-3.5 px-6">Branch</th>
-                      <th className="py-3.5 px-6">IFSC Code</th>
-                      <th className="py-3.5 px-6">Balance</th>
-                      <th className="py-3.5 px-6">Status</th>
-                      <th className="py-3.5 px-6 text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {filteredAccounts.map((acc) => {
-                      const accNo = acc.account_number || `SB-${acc.id}`;
-                      const bal = Number(acc.balance ?? acc.current_balance) || 0;
-
-                      return (
-                        <tr key={acc.id} className="hover:bg-slate-50/60 transition-colors">
-                          {/* 1. Account Number */}
-                          <td className="py-4 px-6 font-mono font-bold text-slate-900 whitespace-nowrap">
-                            <div className="flex items-center gap-2">
-                              <Wallet className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
-                              <span className="tracking-wide">{accNo}</span>
-                            </div>
-                          </td>
-
-                          {/* 2. Member */}
-                          <td className="py-4 px-6 whitespace-nowrap">
-                            <div className="font-bold text-slate-900">
-                              {acc.member_name || acc.member?.full_name || acc.member?.name || 'Society Member'}
-                            </div>
-                            {acc.member_code && (
-                              <div className="text-[11px] text-slate-500 font-mono mt-0.5">
-                                Code: {acc.member_code}
-                              </div>
-                            )}
-                          </td>
-
-                          {/* 3. Scheme */}
-                          <td className="py-4 px-6 whitespace-nowrap">
-                            <div className="font-semibold text-teal-900 capitalize">
-                              {acc.scheme_name || acc.savings_scheme_name || acc.scheme?.scheme_name || 'Savings Product'}
-                            </div>
-                          </td>
-
-                          {/* 4. Branch */}
-                          <td className="py-4 px-6 whitespace-nowrap">
-                            <div className="font-semibold text-slate-800">
-                              {acc.branch_name || acc.branch?.name || (acc.branch_id ? `Branch #${acc.branch_id}` : 'Main Branch')}
-                            </div>
-                            {acc.branch_code && (
-                              <div className="text-[11px] text-slate-500 font-mono mt-0.5">
-                                Code: {acc.branch_code}
-                              </div>
-                            )}
-                          </td>
-
-                          {/* 5. IFSC Code */}
-                          <td className="py-4 px-6 whitespace-nowrap">
-                            {acc.ifsc_code ? (
-                              <span className="font-mono font-bold text-teal-800 bg-teal-50 px-2.5 py-1 rounded-lg border border-teal-200 text-xs">
-                                {acc.ifsc_code}
-                              </span>
-                            ) : (
-                              <span className="text-slate-400 font-mono text-xs">—</span>
-                            )}
-                          </td>
-
-                          {/* 6. Balance */}
-                          <td className="py-4 px-6 whitespace-nowrap">
-                            <span className="font-serif font-bold text-slate-900 text-sm">
-                              {formatCurrency(bal)}
-                            </span>
-                          </td>
-
-                          {/* 7. Status */}
-                          <td className="py-4 px-6 whitespace-nowrap">
-                            {renderAccountStatusBadge(acc.status)}
-                          </td>
-
-                          {/* 8. Actions */}
-                          <td className="py-4 px-6 text-right whitespace-nowrap">
-                            <button
-                              onClick={() => handleViewAccountDossier(acc)}
-                              title="View Account Details"
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-800 font-bold text-xs rounded-xl border border-teal-200 transition-all cursor-pointer active:scale-95"
-                            >
-                              <Eye className="w-3.5 h-3.5" />
-                              <span>View Details</span>
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              )}
-            </div>
-
-            {/* Footer Count */}
-            {!loadingAccounts && filteredAccounts.length > 0 && (
-              <div className="px-6 py-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-medium bg-slate-50/50">
-                <span>
-                  Showing <strong className="text-slate-700">{filteredAccounts.length}</strong> of{' '}
-                  <strong className="text-slate-700">{accounts.length}</strong> savings accounts
-                </span>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
 
       </div>
 
@@ -1079,14 +746,6 @@ export default function SuperAdminSavingsSchemes() {
           </div>
         </div>
       )}
-
-      {/* Central Account Dossier Modal */}
-      <SavingsAccountDetailModal
-        isOpen={!!selectedAccount}
-        account={selectedAccount}
-        onClose={() => setSelectedAccount(null)}
-        role="superadmin"
-      />
     </DashboardLayout>
   );
 }

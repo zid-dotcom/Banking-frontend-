@@ -12,12 +12,14 @@ import {
   ShieldAlert
 } from 'lucide-react';
 import { changePassword } from '../../services/authService';
+import { validateStrongPassword } from '../../utils/passwordValidation';
 
 export default function PasswordUpdateCard({
   title = 'Change Account Password',
   description = 'Update your credentials to maintain security across your cooperative society records.',
   showCardHeader = true,
   className = '',
+  role = null,
 }) {
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -31,8 +33,14 @@ export default function PasswordUpdateCard({
   const [successMessage, setSuccessMessage] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
 
+  // Check if current context is Member portal
+  const isMember =
+    role === 'member' ||
+    (typeof window !== 'undefined' && window.location.pathname.startsWith('/member'));
+
   // Password rules validation
-  const isMinLength = newPassword.length >= 6;
+  const memberStrongValidation = isMember ? validateStrongPassword(newPassword) : null;
+  const isMinLength = isMember ? newPassword.length >= 8 : newPassword.length >= 6;
   const isDifferentFromOld = oldPassword && newPassword ? oldPassword !== newPassword : true;
   const isMatching = newPassword && confirmPassword ? newPassword === confirmPassword : false;
 
@@ -50,10 +58,22 @@ export default function PasswordUpdateCard({
       setErrorMessage('Please enter a new password.');
       return;
     }
-    if (newPassword.length < 6) {
-      setErrorMessage('New password must be at least 6 characters long.');
-      return;
+
+    // Strong password validation strictly on Member side
+    if (isMember) {
+      const strongCheck = validateStrongPassword(newPassword);
+      if (!strongCheck.isValid) {
+        setErrorMessage(strongCheck.message);
+        return;
+      }
+    } else {
+      // Other roles retain standard minimum length
+      if (newPassword.length < 6) {
+        setErrorMessage('New password must be at least 6 characters long.');
+        return;
+      }
     }
+
     if (oldPassword === newPassword) {
       setErrorMessage('New password cannot be the same as your current password.');
       return;
@@ -197,32 +217,152 @@ export default function PasswordUpdateCard({
               </button>
             </div>
 
-            {/* Password Requirement Chips */}
+            {/* Password Requirement Guidance */}
             {newPassword && (
-              <div className="mt-2 flex flex-wrap gap-2 text-[11px] font-medium">
-                <span
-                  className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md border ${
-                    isMinLength
-                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                      : 'bg-slate-50 text-slate-500 border-slate-200'
-                  }`}
-                >
-                  <Check className={`w-3 h-3 ${isMinLength ? 'text-emerald-600' : 'text-slate-400'}`} />
-                  At least 6 characters
-                </span>
-                {oldPassword && (
+              isMember ? (
+                <div className="mt-2.5 p-3 bg-slate-50 border border-slate-200/90 rounded-2xl space-y-2">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-semibold text-slate-600">Password Strength:</span>
+                    <span
+                      className={`font-black uppercase tracking-wider text-[11px] ${
+                        memberStrongValidation.score <= 2
+                          ? 'text-rose-600'
+                          : memberStrongValidation.score <= 4
+                          ? 'text-amber-600'
+                          : 'text-emerald-600'
+                      }`}
+                    >
+                      {memberStrongValidation.strengthLabel}
+                    </span>
+                  </div>
+
+                  {/* 5-Segment Strength Bar */}
+                  <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden flex gap-0.5">
+                    {[1, 2, 3, 4, 5].map((seg) => (
+                      <div
+                        key={seg}
+                        className={`h-full flex-1 transition-all duration-200 ${
+                          memberStrongValidation.score >= seg
+                            ? memberStrongValidation.score <= 2
+                              ? 'bg-rose-500'
+                              : memberStrongValidation.score <= 4
+                              ? 'bg-amber-500'
+                              : 'bg-emerald-500'
+                            : 'bg-transparent'
+                        }`}
+                      />
+                    ))}
+                  </div>
+
+                  {/* Criteria Checklist Pills */}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 pt-1 text-[11px]">
+                    <span
+                      className={`inline-flex items-center gap-1.5 ${
+                        memberStrongValidation.hasMinLength ? 'text-emerald-700 font-bold' : 'text-slate-400'
+                      }`}
+                    >
+                      <Check
+                        className={`w-3.5 h-3.5 ${
+                          memberStrongValidation.hasMinLength ? 'text-emerald-600 stroke-[3]' : 'opacity-30'
+                        }`}
+                      />
+                      <span>8+ characters</span>
+                    </span>
+
+                    <span
+                      className={`inline-flex items-center gap-1.5 ${
+                        memberStrongValidation.hasUppercase ? 'text-emerald-700 font-bold' : 'text-slate-400'
+                      }`}
+                    >
+                      <Check
+                        className={`w-3.5 h-3.5 ${
+                          memberStrongValidation.hasUppercase ? 'text-emerald-600 stroke-[3]' : 'opacity-30'
+                        }`}
+                      />
+                      <span>Uppercase (A-Z)</span>
+                    </span>
+
+                    <span
+                      className={`inline-flex items-center gap-1.5 ${
+                        memberStrongValidation.hasLowercase ? 'text-emerald-700 font-bold' : 'text-slate-400'
+                      }`}
+                    >
+                      <Check
+                        className={`w-3.5 h-3.5 ${
+                          memberStrongValidation.hasLowercase ? 'text-emerald-600 stroke-[3]' : 'opacity-30'
+                        }`}
+                      />
+                      <span>Lowercase (a-z)</span>
+                    </span>
+
+                    <span
+                      className={`inline-flex items-center gap-1.5 ${
+                        memberStrongValidation.hasNumber ? 'text-emerald-700 font-bold' : 'text-slate-400'
+                      }`}
+                    >
+                      <Check
+                        className={`w-3.5 h-3.5 ${
+                          memberStrongValidation.hasNumber ? 'text-emerald-600 stroke-[3]' : 'opacity-30'
+                        }`}
+                      />
+                      <span>Number (0-9)</span>
+                    </span>
+
+                    <span
+                      className={`inline-flex items-center gap-1.5 ${
+                        memberStrongValidation.hasSpecial ? 'text-emerald-700 font-bold' : 'text-slate-400'
+                      }`}
+                    >
+                      <Check
+                        className={`w-3.5 h-3.5 ${
+                          memberStrongValidation.hasSpecial ? 'text-emerald-600 stroke-[3]' : 'opacity-30'
+                        }`}
+                      />
+                      <span>Symbol (!@#$...)</span>
+                    </span>
+
+                    {oldPassword && (
+                      <span
+                        className={`inline-flex items-center gap-1.5 ${
+                          isDifferentFromOld ? 'text-emerald-700 font-bold' : 'text-rose-600 font-bold'
+                        }`}
+                      >
+                        <Check
+                          className={`w-3.5 h-3.5 ${
+                            isDifferentFromOld ? 'text-emerald-600 stroke-[3]' : 'text-rose-600'
+                          }`}
+                        />
+                        <span>Different from old</span>
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-2 flex flex-wrap gap-2 text-[11px] font-medium">
                   <span
                     className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md border ${
-                      isDifferentFromOld
+                      isMinLength
                         ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                        : 'bg-rose-50 text-rose-700 border-rose-200'
+                        : 'bg-slate-50 text-slate-500 border-slate-200'
                     }`}
                   >
-                    <Check className={`w-3 h-3 ${isDifferentFromOld ? 'text-emerald-600' : 'text-rose-600'}`} />
-                    Different from current password
+                    <Check className={`w-3 h-3 ${isMinLength ? 'text-emerald-600' : 'text-slate-400'}`} />
+                    At least 6 characters
                   </span>
-                )}
-              </div>
+                  {oldPassword && (
+                    <span
+                      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md border ${
+                        isDifferentFromOld
+                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                          : 'bg-rose-50 text-rose-700 border-rose-200'
+                      }`}
+                    >
+                      <Check className={`w-3 h-3 ${isDifferentFromOld ? 'text-emerald-600' : 'text-rose-600'}`} />
+                      Different from current password
+                    </span>
+                  )}
+                </div>
+              )
             )}
           </div>
 

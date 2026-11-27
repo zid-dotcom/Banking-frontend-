@@ -19,7 +19,8 @@ import {
   Calendar,
   Layers,
   Building2,
-  ChevronRight
+  ChevronRight,
+  Landmark
 } from 'lucide-react';
 import mintFdMisIllustration from '../../assets/Fixed Deposit Growth & Security.png';
 
