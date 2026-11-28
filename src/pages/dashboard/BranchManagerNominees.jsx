@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import StatCard from '../../components/dashboard/StatCard';
 import NomineeDetailModal from '../../components/dashboard/NomineeDetailModal';
@@ -73,6 +74,7 @@ function formatDateTime(isoString) {
 }
 
 export default function BranchManagerNominees() {
+  const { t } = useTranslation();
   const [nominees, setNominees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -428,7 +430,7 @@ export default function BranchManagerNominees() {
             <div className="inline-flex flex-wrap items-center gap-x-2 gap-y-1 px-3 sm:px-3.5 py-1.5 rounded-2xl sm:rounded-full bg-white/95 backdrop-blur-xs text-[11px] sm:text-xs font-semibold border border-teal-200/80 shadow-2xs text-[#0f766e] mb-3 max-w-full">
               <span className="inline-flex items-center gap-1.5 flex-shrink-0">
                 <HeartHandshake className="w-3.5 h-3.5 text-[#00b4a7]" />
-                <span>Role: <strong className="font-bold text-teal-950">Branch Manager</strong></span>
+                <span>{t("dashboardModule.monthlyTargets.roleLabel", "Role:")} <strong className="font-bold text-teal-950">{t("nav.branchManager", "Branch Manager")}</strong></span>
               </span>
               <span className="text-teal-300 hidden sm:inline">•</span>
               <span className="text-slate-600 sm:text-[#0f766e]">
@@ -437,26 +439,26 @@ export default function BranchManagerNominees() {
               <span className="text-teal-300 hidden sm:inline">•</span>
               <span className="inline-flex items-center gap-1.5 font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full text-[10px] sm:text-xs flex-shrink-0">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                Active Registry
+                {t("branchManagerNominees.activeRegistry", "Active Registry")}
               </span>
             </div>
 
             <div className="flex items-center gap-2.5 sm:gap-3">
               <span className="w-1.5 h-7 sm:h-9 bg-[#00b4a7] rounded-full flex-shrink-0" />
               <h1 className="text-xl sm:text-3xl lg:text-4xl font-serif font-bold text-slate-900 tracking-tight">
-                Branch Nominees Registry
+                {t("branchManagerNominees.branchNomineesRegistry", "Branch Nominees Registry")}
               </h1>
             </div>
 
             <p className="text-slate-600 text-xs sm:text-sm mt-2 sm:mt-2.5 font-medium leading-relaxed max-w-xl">
-              Review and verify member nominee registrations, inspect Aadhaar identification documents, and approve or reject nomination claims.
+              {t("branchManagerNominees.reviewAndVerifyMemberNominee", "Review and verify member nominee registrations, inspect Aadhaar identification documents, and approve or reject nomination claims.")}
             </p>
           </div>
 
           <div className="relative z-10 flex justify-center md:justify-end pointer-events-none -my-2 sm:-my-5 lg:-my-6 flex-shrink-0 w-full md:w-auto">
             <img
               src={nomineeIllustration}
-              alt="Branch Nominees Illustration"
+              alt={t("branchManagerNominees.branchNomineesIllustration", "Branch Nominees Illustration")}
               className="h-32 sm:h-44 lg:h-52 max-w-full w-auto object-contain drop-shadow-md select-none pointer-events-none transform hover:scale-102 transition-transform duration-300 mx-auto md:mx-0"
             />
           </div>
@@ -472,33 +474,33 @@ export default function BranchManagerNominees() {
         {/* 4 Stat Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <StatCard
-            title="Total Nominees"
+            title={t("branchManagerNominees.totalNominees", "Total Nominees")}
             value={totalCount.toString()}
-            subtitle="Registered Nominations"
+            subtitle={t("branchManagerNominees.registeredNominations", "Registered Nominations")}
             icon={HeartHandshake}
             trend={`${totalCount} recorded`}
             trendType="up"
           />
           <StatCard
-            title="Pending Verification"
+            title={t("modal.member.pendingVerification", "Pending Verification")}
             value={pendingCount.toString()}
-            subtitle="Awaiting Verification"
+            subtitle={t("branchManagerNominees.awaitingVerification", "Awaiting Verification")}
             icon={Clock}
             trend={pendingCount > 0 ? `${pendingCount} action required` : 'All cleared'}
             trendType={pendingCount > 0 ? 'down' : 'up'}
           />
           <StatCard
-            title="Approved Nominees"
+            title={t("branchManagerNominees.approvedNominees", "Approved Nominees")}
             value={approvedCount.toString()}
-            subtitle="Verified & Active"
+            subtitle={t("branchManagerNominees.verifiedActive", "Verified & Active")}
             icon={CheckCircle2}
             trend={totalCount > 0 ? `${Math.round((approvedCount / totalCount) * 100)}% approved` : '0%'}
             trendType="up"
           />
           <StatCard
-            title="Rejected Nominees"
+            title={t("branchManagerNominees.rejectedNominees", "Rejected Nominees")}
             value={rejectedCount.toString()}
-            subtitle="Declined Claims"
+            subtitle={t("branchManagerNominees.declinedClaims", "Declined Claims")}
             icon={XCircle}
           />
         </div>
@@ -531,7 +533,7 @@ export default function BranchManagerNominees() {
             }`}
           >
             <UserCheck className="w-4 h-4" />
-            <span>Nominee Registrations</span>
+            <span>{t("branchManagerNominees.nomineeRegistrations", "Nominee Registrations")}</span>
             <span
               className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
                 activeSubTab === 'registrations' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
@@ -554,10 +556,10 @@ export default function BranchManagerNominees() {
             }`}
           >
             <FileText className="w-4 h-4" />
-            <span>Nominee Change Requests</span>
+            <span>{t("branchManagerNominees.nomineeChangeRequests", "Nominee Change Requests")}</span>
             {pendingChangeRequestsCount > 0 ? (
               <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-500 text-white animate-pulse">
-                {pendingChangeRequestsCount} pending
+                {pendingChangeRequestsCount} {t("branchManagerNominees.pending", "pending")}
               </span>
             ) : (
               <span
@@ -583,11 +585,11 @@ export default function BranchManagerNominees() {
                   <UserCheck className="w-4 h-4 text-[#00b4a7]" />
                 </div>
                 <h3 className="font-serif font-bold text-slate-900 text-lg">
-                  Member Nominees Catalogue
+                  {t("branchManagerNominees.memberNomineesCatalogue", "Member Nominees Catalogue")}
                 </h3>
               </div>
               <p className="text-xs text-slate-500 mt-1 font-medium">
-                Official nominee records for members registered under this branch
+                {t("branchManagerNominees.officialNomineeRecordsForMembers", "Official nominee records for members registered under this branch")}
               </p>
             </div>
 
@@ -597,7 +599,7 @@ export default function BranchManagerNominees() {
                 <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
                   type="text"
-                  placeholder="Search nominee, member name or code..."
+                  placeholder={t("branchManagerNominees.searchNomineeMemberNameOr", "Search nominee, member name or code...")}
                   value={searchQuery}
                   onChange={(e) => {
                     setSearchQuery(e.target.value);
@@ -628,10 +630,10 @@ export default function BranchManagerNominees() {
                   }}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-sm text-slate-700 font-semibold focus:outline-none focus:ring-2 focus:ring-teal-100 focus:border-teal-500 transition-all cursor-pointer"
                 >
-                  <option value="all">All Nominees</option>
-                  <option value="pending">Pending Review</option>
-                  <option value="approved">Approved</option>
-                  <option value="rejected">Rejected</option>
+                  <option value="all">{t("branchManagerNominees.allNominees", "All Nominees")}</option>
+                  <option value="pending">{t("branchManagerMembers.pendingReview", "Pending Review")}</option>
+                  <option value="approved">{t("common.approved", "Approved")}</option>
+                  <option value="rejected">{t("common.rejected", "Rejected")}</option>
                 </select>
               </div>
 
@@ -639,7 +641,7 @@ export default function BranchManagerNominees() {
               <button
                 onClick={() => fetchNominees(true)}
                 disabled={refreshing}
-                title="Refresh nominee list"
+                title={t("branchManagerNominees.refreshNomineeList", "Refresh nominee list")}
                 className="p-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-800 transition-colors cursor-pointer disabled:opacity-50 flex-shrink-0"
               >
                 <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin text-teal-600' : ''}`} />
@@ -653,7 +655,7 @@ export default function BranchManagerNominees() {
               <div className="flex items-start gap-2.5">
                 <AlertCircle className="w-5 h-5 flex-shrink-0 text-red-600 mt-0.5" />
                 <div>
-                  <p className="text-sm font-bold text-red-900">Failed to load nominees</p>
+                  <p className="text-sm font-bold text-red-900">{t("branchManagerNominees.failedToLoadNominees", "Failed to load nominees")}</p>
                   <p className="text-xs text-red-700 mt-0.5">{error}</p>
                 </div>
               </div>
@@ -661,7 +663,7 @@ export default function BranchManagerNominees() {
                 onClick={() => fetchNominees()}
                 className="text-xs font-bold text-red-700 hover:text-red-900 underline cursor-pointer flex-shrink-0"
               >
-                Retry
+                {t("common.retry", "Retry")}
               </button>
             </div>
           )}
@@ -671,7 +673,7 @@ export default function BranchManagerNominees() {
             {loading ? (
               <div className="py-20 text-center space-y-3">
                 <div className="w-10 h-10 border-3 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto" />
-                <p className="text-sm text-slate-500 font-medium">Loading nominee records from branch registry...</p>
+                <p className="text-sm text-slate-500 font-medium">{t("branchManagerNominees.loadingNomineeRecordsFromBranch", "Loading nominee records from branch registry...")}</p>
               </div>
             ) : filteredNominees.length === 0 ? (
               <div className="py-20 text-center space-y-4 max-w-sm mx-auto p-4">
@@ -680,12 +682,12 @@ export default function BranchManagerNominees() {
                 </div>
                 <div>
                   <p className="text-base font-bold text-slate-800">
-                    {searchQuery ? 'No matching nominees found' : 'No nominees registered yet'}
+                    {searchQuery ? t("branchManagerNominees.noMatchingNomineesFound", "No matching nominees found") : t("branchManagerNominees.noNomineesRegisteredYet", "No nominees registered yet")}
                   </p>
                   <p className="text-xs text-slate-500 mt-1 font-medium leading-relaxed">
                     {searchQuery
-                      ? 'Try adjusting your search query or clear the filter.'
-                      : 'When members register their nominees through the portal, their records will appear here for verification.'}
+                      ? t("branchManagerFdMisSchemes.tryAdjustingYourSearchQuery", "Try adjusting your search query or clear the filter.")
+                      : t("branchManagerNominees.whenMembersRegisterTheirNominees", "When members register their nominees through the portal, their records will appear here for verification.")}
                   </p>
                 </div>
               </div>
@@ -693,19 +695,20 @@ export default function BranchManagerNominees() {
               <table className="w-full text-left border-collapse min-w-[1100px]">
                 <thead>
                   <tr className="border-b border-slate-100 bg-slate-50/75 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                    <th className="py-3.5 px-5">Nominee Name</th>
-                    <th className="py-3.5 px-5">Member Account</th>
-                    <th className="py-3.5 px-5">Member Code</th>
-                    <th className="py-3.5 px-5">Relationship</th>
-                    <th className="py-3.5 px-5">Submitted At</th>
-                    <th className="py-3.5 px-5 text-center">Status</th>
-                    <th className="py-3.5 px-4 text-center">Details</th>
-                    <th className="py-3.5 px-4 text-center">Approve</th>
-                    <th className="py-3.5 px-4 text-center">Reject</th>
+                    <th className="py-3.5 px-5">{t("branchManagerNominees.nomineeName", "Nominee Name")}</th>
+                    <th className="py-3.5 px-5">{t("branchManagerNominees.memberAccount", "Member Account")}</th>
+                    <th className="py-3.5 px-5">{t("modal.member.memberCode", "Member Code")}</th>
+                    <th className="py-3.5 px-5">{t("modal.nominee.relationship", "Relationship")}</th>
+                    <th className="py-3.5 px-5">{t("dashboardModule.branchOverview.colSubmittedAt", "Submitted At")}</th>
+                    <th className="py-3.5 px-5 text-center">{t("common.status", "Status")}</th>
+                    <th className="py-3.5 px-4 text-center">{t("dashboardModule.monthlyTargets.details", "Details")}</th>
+                    <th className="py-3.5 px-4 text-center">{t("branchManagerMembers.approve", "Approve")}</th>
+                    <th className="py-3.5 px-4 text-center">{t("modal.nominee.reject", "Reject")}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-sm">
                   {paginatedNominees.map((nominee) => {
+  const { t } = useTranslation();
                     const status = (nominee.status || 'pending').toLowerCase();
                     const isActing = quickActionLoadingId === nominee.id;
 
@@ -725,7 +728,7 @@ export default function BranchManagerNominees() {
                                 {nominee.nominee_name}
                               </div>
                               <span className="text-[11px] text-slate-400 capitalize">
-                                Nominee #{nominee.id}
+                                {t("branchManagerNominees.nominee", "Nominee #")}{nominee.id}
                               </span>
                             </div>
                           </div>
@@ -796,11 +799,11 @@ export default function BranchManagerNominees() {
                                 initialData: nominee
                               })
                             }
-                            title="Inspect Nominee Details"
+                            title={t("branchManagerNominees.inspectNomineeDetails", "Inspect Nominee Details")}
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-800 font-bold text-xs rounded-xl border border-teal-200/80 transition-all cursor-pointer active:scale-95"
                           >
                             <Eye className="w-3.5 h-3.5" />
-                            <span>Details</span>
+                            <span>{t("dashboardModule.monthlyTargets.details", "Details")}</span>
                           </button>
                         </td>
 
@@ -810,7 +813,7 @@ export default function BranchManagerNominees() {
                             <button
                               onClick={() => handleQuickApprove(nominee)}
                               disabled={isActing}
-                              title="Approve Nominee"
+                              title={t("modal.nominee.approveNominee", "Approve Nominee")}
                               className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs rounded-xl border border-emerald-200 transition-all cursor-pointer active:scale-95 disabled:opacity-50"
                             >
                               {isActing ? (
@@ -818,12 +821,12 @@ export default function BranchManagerNominees() {
                               ) : (
                                 <Check className="w-3.5 h-3.5 stroke-[2.5] text-emerald-600" />
                               )}
-                              <span>Approve</span>
+                              <span>{t("branchManagerMembers.approve", "Approve")}</span>
                             </button>
                           ) : status === 'approved' ? (
                             <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
                               <Check className="w-3.5 h-3.5 stroke-[2.5]" />
-                              <span>Approved</span>
+                              <span>{t("common.approved", "Approved")}</span>
                             </span>
                           ) : (
                             <span className="text-slate-300 font-bold text-sm">—</span>
@@ -844,16 +847,16 @@ export default function BranchManagerNominees() {
                                 })
                               }
                               disabled={isActing}
-                              title="Reject Nominee"
+                              title={t("branchManagerNominees.rejectNominee", "Reject Nominee")}
                               className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-800 font-bold text-xs rounded-xl border border-rose-200 transition-all cursor-pointer active:scale-95 disabled:opacity-50"
                             >
                               <X className="w-3.5 h-3.5 stroke-[2.5] text-rose-600" />
-                              <span>Reject</span>
+                              <span>{t("modal.nominee.reject", "Reject")}</span>
                             </button>
                           ) : status === 'rejected' ? (
                             <span className="inline-flex items-center gap-1 text-xs font-bold text-rose-600 bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-200">
                               <X className="w-3.5 h-3.5 stroke-[2.5]" />
-                              <span>Rejected</span>
+                              <span>{t("common.rejected", "Rejected")}</span>
                             </span>
                           ) : (
                             <span className="text-slate-300 font-bold text-sm">—</span>
@@ -871,8 +874,8 @@ export default function BranchManagerNominees() {
             {!loading && filteredNominees.length > itemsPerPage && (
               <div className="px-6 py-4 border-t border-slate-100 flex items-center justify-between">
                 <span className="text-xs text-slate-500 font-medium">
-                  Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
-                  {Math.min(currentPage * itemsPerPage, filteredNominees.length)} of {filteredNominees.length} nominees
+                  {t("common.showing", "Showing")} {(currentPage - 1) * itemsPerPage + 1} {t("common.to", "to")}{' '}
+                  {Math.min(currentPage * itemsPerPage, filteredNominees.length)} {t("common.of", "of")} {filteredNominees.length} {t("branchManagerNominees.nominees", "nominees")}
                 </span>
                 <div className="flex items-center gap-2">
                   <button
@@ -880,7 +883,7 @@ export default function BranchManagerNominees() {
                     disabled={currentPage === 1}
                     className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed font-semibold text-xs text-slate-700 transition-colors cursor-pointer"
                   >
-                    Previous
+                    {t("branchManagerFdMisSchemes.previous", "Previous")}
                   </button>
                   <span className="text-xs font-bold text-slate-700 px-2">
                     {currentPage} / {totalPages}
@@ -890,7 +893,7 @@ export default function BranchManagerNominees() {
                     disabled={currentPage === totalPages}
                     className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed font-semibold text-xs text-slate-700 transition-colors cursor-pointer"
                   >
-                    Next
+                    {t("branchManagerFdMisSchemes.next", "Next")}
                   </button>
                 </div>
               </div>
@@ -907,11 +910,11 @@ export default function BranchManagerNominees() {
                     <FileText className="w-4 h-4 text-[#00b4a7]" />
                   </div>
                   <h3 className="font-serif font-bold text-slate-900 text-lg">
-                    Nominee Change Requests
+                    {t("branchManagerNominees.nomineeChangeRequests", "Nominee Change Requests")}
                   </h3>
                 </div>
                 <p className="text-xs text-slate-500 mt-1 font-medium">
-                  Requests submitted by branch members to authorize updating their nominee
+                  {t("branchManagerNominees.requestsSubmittedByBranchMembers", "Requests submitted by branch members to authorize updating their nominee")}
                 </p>
               </div>
 
@@ -921,7 +924,7 @@ export default function BranchManagerNominees() {
                   <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
                     type="text"
-                    placeholder="Search by member, code, or subject..."
+                    placeholder={t("branchManagerNominees.searchByMemberCodeOr", "Search by member, code, or subject...")}
                     value={changeRequestsSearchQuery}
                     onChange={(e) => {
                       setChangeRequestsSearchQuery(e.target.value);
@@ -952,10 +955,10 @@ export default function BranchManagerNominees() {
                     }}
                     className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-sm text-slate-700 font-semibold focus:outline-none focus:ring-2 focus:ring-teal-100 focus:border-teal-500 transition-all cursor-pointer"
                   >
-                    <option value="all">All Requests</option>
-                    <option value="pending">Pending</option>
-                    <option value="approved">Approved</option>
-                    <option value="rejected">Rejected</option>
+                    <option value="all">{t("branchManagerNominees.allRequests", "All Requests")}</option>
+                    <option value="pending">{t("common.pending", "Pending")}</option>
+                    <option value="approved">{t("common.approved", "Approved")}</option>
+                    <option value="rejected">{t("common.rejected", "Rejected")}</option>
                   </select>
                 </div>
 
@@ -963,7 +966,7 @@ export default function BranchManagerNominees() {
                 <button
                   onClick={() => fetchChangeRequests(true)}
                   disabled={changeRequestsRefreshing}
-                  title="Refresh requests"
+                  title={t("branchManagerNominees.refreshRequests", "Refresh requests")}
                   className="p-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-800 transition-colors cursor-pointer disabled:opacity-50 flex-shrink-0"
                 >
                   <RefreshCw
@@ -979,7 +982,7 @@ export default function BranchManagerNominees() {
             {changeRequestsLoading ? (
               <div className="py-24 text-center space-y-3">
                 <Loader2 className="w-8 h-8 animate-spin text-[#00b4a7] mx-auto" />
-                <p className="text-xs text-slate-500 font-medium">Loading nominee change requests...</p>
+                <p className="text-xs text-slate-500 font-medium">{t("branchManagerNominees.loadingNomineeChangeRequests", "Loading nominee change requests...")}</p>
               </div>
             ) : filteredChangeRequests.length === 0 ? (
               <div className="py-20 text-center space-y-3 p-4">
@@ -987,10 +990,10 @@ export default function BranchManagerNominees() {
                   <FileText className="w-7 h-7 text-[#00b4a7]" />
                 </div>
                 <p className="text-base font-bold text-slate-800">
-                  {changeRequestsSearchQuery ? 'No matching change requests found' : 'No change requests received'}
+                  {changeRequestsSearchQuery ? t("branchManagerNominees.noMatchingChangeRequestsFound", "No matching change requests found") : t("branchManagerNominees.noChangeRequestsReceived", "No change requests received")}
                 </p>
                 <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                  When members request to update an approved nominee, their requests will appear here for review and approval.
+                  {t("branchManagerNominees.whenMembersRequestToUpdate", "When members request to update an approved nominee, their requests will appear here for review and approval.")}
                 </p>
               </div>
             ) : (
@@ -998,18 +1001,19 @@ export default function BranchManagerNominees() {
                 <table className="w-full text-left border-collapse min-w-[850px]">
                   <thead>
                     <tr className="border-b border-slate-100 bg-slate-50/75 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                      <th className="py-3.5 px-6">Request ID</th>
-                      <th className="py-3.5 px-6">Member Account</th>
-                      <th className="py-3.5 px-6">Subject &amp; Reason</th>
-                      <th className="py-3.5 px-6">Created At</th>
-                      <th className="py-3.5 px-6 text-center">Status</th>
-                      <th className="py-3.5 px-4 text-center">Details</th>
-                      <th className="py-3.5 px-4 text-center">Approve</th>
-                      <th className="py-3.5 px-4 text-center">Reject</th>
+                      <th className="py-3.5 px-6">{t("branchManagerNominees.requestId", "Request ID")}</th>
+                      <th className="py-3.5 px-6">{t("branchManagerNominees.memberAccount", "Member Account")}</th>
+                      <th className="py-3.5 px-6">{t("branchManagerNominees.subjectReason", "Subject & Reason")}</th>
+                      <th className="py-3.5 px-6">{t("dashboardModule.emergency.table.createdAt", "Created At")}</th>
+                      <th className="py-3.5 px-6 text-center">{t("common.status", "Status")}</th>
+                      <th className="py-3.5 px-4 text-center">{t("dashboardModule.monthlyTargets.details", "Details")}</th>
+                      <th className="py-3.5 px-4 text-center">{t("branchManagerMembers.approve", "Approve")}</th>
+                      <th className="py-3.5 px-4 text-center">{t("modal.nominee.reject", "Reject")}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 text-sm">
                     {paginatedChangeRequests.map((req) => {
+  const { t } = useTranslation();
                       const st = (req.status || 'pending').toLowerCase();
                       const isPending = st === 'pending';
                       const isApproved = st === 'approved';
@@ -1029,7 +1033,7 @@ export default function BranchManagerNominees() {
                               {req.member_name || `Member #${req.member_id}`}
                             </p>
                             <span className="text-xs text-[#0f766e] font-semibold">
-                              Code: #{req.member_code || req.member_id}
+                              {t("branchManagerNominees.code", "Code: #")}{req.member_code || req.member_id}
                             </span>
                           </td>
 
@@ -1043,7 +1047,7 @@ export default function BranchManagerNominees() {
                             </p>
                             {isRejected && req.rejection_reason && (
                               <p className="text-xs font-bold text-red-600 mt-1">
-                                Rejection: {req.rejection_reason}
+                                {t("branchManagerNominees.rejection", "Rejection:")} {req.rejection_reason}
                               </p>
                             )}
                           </td>
@@ -1085,7 +1089,7 @@ export default function BranchManagerNominees() {
                               className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-[#0f766e] font-bold text-xs rounded-xl border border-teal-200 transition-all cursor-pointer"
                             >
                               <Eye className="w-3.5 h-3.5" />
-                              <span>Details</span>
+                              <span>{t("dashboardModule.monthlyTargets.details", "Details")}</span>
                             </button>
                           </td>
 
@@ -1103,12 +1107,12 @@ export default function BranchManagerNominees() {
                                 ) : (
                                   <Check className="w-3.5 h-3.5 stroke-[2.5] text-emerald-600" />
                                 )}
-                                <span>Approve</span>
+                                <span>{t("branchManagerMembers.approve", "Approve")}</span>
                               </button>
                             ) : isApproved ? (
                               <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
                                 <Check className="w-3.5 h-3.5 stroke-[2.5]" />
-                                <span>Approved</span>
+                                <span>{t("common.approved", "Approved")}</span>
                               </span>
                             ) : (
                               <span className="text-slate-300 font-bold text-sm">—</span>
@@ -1125,12 +1129,12 @@ export default function BranchManagerNominees() {
                                 className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-800 font-bold text-xs rounded-xl border border-rose-200 transition-all cursor-pointer disabled:opacity-50"
                               >
                                 <X className="w-3.5 h-3.5 stroke-[2.5] text-rose-600" />
-                                <span>Reject</span>
+                                <span>{t("modal.nominee.reject", "Reject")}</span>
                               </button>
                             ) : isRejected ? (
                               <span className="inline-flex items-center gap-1 text-xs font-bold text-rose-600 bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-200">
                                 <X className="w-3.5 h-3.5 stroke-[2.5]" />
-                                <span>Rejected</span>
+                                <span>{t("common.rejected", "Rejected")}</span>
                               </span>
                             ) : (
                               <span className="text-slate-300 font-bold text-sm">—</span>
@@ -1148,8 +1152,8 @@ export default function BranchManagerNominees() {
             {!changeRequestsLoading && filteredChangeRequests.length > changeRequestItemsPerPage && (
               <div className="px-6 py-4 border-t border-slate-100 flex items-center justify-between">
                 <span className="text-xs text-slate-500 font-medium">
-                  Showing {(changeRequestPage - 1) * changeRequestItemsPerPage + 1} to{' '}
-                  {Math.min(changeRequestPage * changeRequestItemsPerPage, filteredChangeRequests.length)} of {filteredChangeRequests.length} requests
+                  {t("common.showing", "Showing")} {(changeRequestPage - 1) * changeRequestItemsPerPage + 1} {t("common.to", "to")}{' '}
+                  {Math.min(changeRequestPage * changeRequestItemsPerPage, filteredChangeRequests.length)} {t("common.of", "of")} {filteredChangeRequests.length} {t("branchManagerNominees.requests", "requests")}
                 </span>
                 <div className="flex items-center gap-2">
                   <button
@@ -1157,7 +1161,7 @@ export default function BranchManagerNominees() {
                     disabled={changeRequestPage === 1}
                     className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed font-semibold text-xs text-slate-700 transition-colors cursor-pointer"
                   >
-                    Previous
+                    {t("branchManagerFdMisSchemes.previous", "Previous")}
                   </button>
                   <span className="text-xs font-bold text-slate-700 px-2">
                     {changeRequestPage} / {changeRequestTotalPages}
@@ -1167,7 +1171,7 @@ export default function BranchManagerNominees() {
                     disabled={changeRequestPage === changeRequestTotalPages}
                     className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed font-semibold text-xs text-slate-700 transition-colors cursor-pointer"
                   >
-                    Next
+                    {t("branchManagerFdMisSchemes.next", "Next")}
                   </button>
                 </div>
               </div>
@@ -1196,10 +1200,10 @@ export default function BranchManagerNominees() {
               </div>
               <div>
                 <h3 className="text-base font-bold text-slate-900">
-                  Reject Nominee Application
+                  {t("branchManagerNominees.rejectNomineeApplication", "Reject Nominee Application")}
                 </h3>
                 <p className="text-xs text-slate-500">
-                  {rejectModal.nominee?.nominee_name} (Member: {rejectModal.nominee?.member_name})
+                  {rejectModal.nominee?.nominee_name} {t("branchManagerNominees.member", "(Member:")} {rejectModal.nominee?.member_name})
                 </p>
               </div>
             </div>
@@ -1212,7 +1216,7 @@ export default function BranchManagerNominees() {
 
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                Rejection Reason <span className="text-red-500">*</span>
+                {t("branchManagerMembershipSettings.rejectionReason", "Rejection Reason")} <span className="text-red-500">*</span>
               </label>
               <textarea
                 rows={3}
@@ -1221,7 +1225,7 @@ export default function BranchManagerNominees() {
                 onChange={(e) =>
                   setRejectModal((prev) => ({ ...prev, reason: e.target.value, error: null }))
                 }
-                placeholder="Specify the reason why this nominee was rejected (e.g. document mismatch)..."
+                placeholder={t("branchManagerNominees.specifyTheReasonWhyThis", "Specify the reason why this nominee was rejected (e.g. document mismatch)...")}
                 className="w-full p-3 rounded-xl border border-slate-200 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-rose-200 focus:border-rose-400 font-medium"
               />
               <span className="text-[10px] text-slate-400 block text-right mt-1">
@@ -1238,7 +1242,7 @@ export default function BranchManagerNominees() {
                 disabled={rejectModal.loading}
                 className="px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 cursor-pointer"
               >
-                Cancel
+                {t("common.cancel", "Cancel")}
               </button>
               <button
                 type="button"
@@ -1251,7 +1255,7 @@ export default function BranchManagerNominees() {
                 ) : (
                   <XCircle className="w-3.5 h-3.5" />
                 )}
-                <span>Confirm Rejection</span>
+                <span>{t("modal.nominee.confirmRejection", "Confirm Rejection")}</span>
               </button>
             </div>
           </div>
@@ -1268,10 +1272,10 @@ export default function BranchManagerNominees() {
               </div>
               <div>
                 <h3 className="text-base font-bold text-slate-900">
-                  Reject Nominee Change Request
+                  {t("branchManagerNominees.rejectNomineeChangeRequest", "Reject Nominee Change Request")}
                 </h3>
                 <p className="text-xs text-slate-500">
-                  Request #{changeRequestRejectModal.request?.id} — {changeRequestRejectModal.request?.member_name}
+                  {t("branchManagerNominees.request", "Request #")}{changeRequestRejectModal.request?.id} — {changeRequestRejectModal.request?.member_name}
                 </p>
               </div>
             </div>
@@ -1284,7 +1288,7 @@ export default function BranchManagerNominees() {
 
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                Rejection Reason <span className="text-red-500">*</span>
+                {t("branchManagerMembershipSettings.rejectionReason", "Rejection Reason")} <span className="text-red-500">*</span>
               </label>
               <textarea
                 rows={3}
@@ -1293,7 +1297,7 @@ export default function BranchManagerNominees() {
                 onChange={(e) =>
                   setChangeRequestRejectModal((prev) => ({ ...prev, reason: e.target.value, error: null }))
                 }
-                placeholder="Specify the reason why this nominee change request was rejected..."
+                placeholder={t("branchManagerNominees.specifyTheReasonWhyThis2", "Specify the reason why this nominee change request was rejected...")}
                 className="w-full p-3 rounded-xl border border-slate-200 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-rose-200 focus:border-rose-400 font-medium"
               />
               <span className="text-[10px] text-slate-400 block text-right mt-1">
@@ -1310,7 +1314,7 @@ export default function BranchManagerNominees() {
                 disabled={changeRequestRejectModal.loading}
                 className="px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 cursor-pointer"
               >
-                Cancel
+                {t("common.cancel", "Cancel")}
               </button>
               <button
                 type="button"
@@ -1323,7 +1327,7 @@ export default function BranchManagerNominees() {
                 ) : (
                   <XCircle className="w-3.5 h-3.5" />
                 )}
-                <span>Confirm Rejection</span>
+                <span>{t("modal.nominee.confirmRejection", "Confirm Rejection")}</span>
               </button>
             </div>
           </div>
@@ -1341,10 +1345,10 @@ export default function BranchManagerNominees() {
                 </div>
                 <div>
                   <h3 className="text-base font-bold text-slate-900">
-                    Nominee Change Request #{changeRequestDetailModal.request?.id}
+                    {t("branchManagerNominees.nomineeChangeRequest", "Nominee Change Request #")}{changeRequestDetailModal.request?.id}
                   </h3>
                   <p className="text-xs text-slate-500">
-                    Member: {changeRequestDetailModal.request?.member_name} (#{changeRequestDetailModal.request?.member_code || changeRequestDetailModal.request?.member_id})
+                    {t("branchManagerNominees.member2", "Member:")} {changeRequestDetailModal.request?.member_name} (#{changeRequestDetailModal.request?.member_code || changeRequestDetailModal.request?.member_id})
                   </p>
                 </div>
               </div>
@@ -1358,14 +1362,14 @@ export default function BranchManagerNominees() {
 
             <div className="space-y-3.5 text-xs text-slate-700">
               <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 space-y-1">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Subject</span>
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t("dashboardModule.emergency.table.subject", "Subject")}</span>
                 <p className="font-bold text-slate-800 text-sm">
                   {changeRequestDetailModal.request?.subject}
                 </p>
               </div>
 
               <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 space-y-1">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Reason / Message</span>
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t("branchManagerNominees.reasonMessage", "Reason / Message")}</span>
                 <p className="font-medium text-slate-700 whitespace-pre-wrap leading-relaxed">
                   {changeRequestDetailModal.request?.message}
                 </p>
@@ -1373,7 +1377,7 @@ export default function BranchManagerNominees() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 space-y-0.5">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Status</span>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t("common.status", "Status")}</span>
                   <div className="pt-0.5">
                     <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold capitalize ${
                       changeRequestDetailModal.request?.status === 'approved'
@@ -1388,7 +1392,7 @@ export default function BranchManagerNominees() {
                 </div>
 
                 <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 space-y-0.5">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Submitted On</span>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t("dashboardModule.branchOverview.submittedOn", "Submitted On")}</span>
                   <p className="font-semibold text-slate-800 text-[11px]">
                     {formatDateTime(changeRequestDetailModal.request?.created_at)}
                   </p>
@@ -1397,7 +1401,7 @@ export default function BranchManagerNominees() {
 
               {changeRequestDetailModal.request?.rejection_reason && (
                 <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 space-y-1">
-                  <span className="text-[10px] font-bold text-rose-700 uppercase tracking-wider">Rejection Reason</span>
+                  <span className="text-[10px] font-bold text-rose-700 uppercase tracking-wider">{t("branchManagerMembershipSettings.rejectionReason", "Rejection Reason")}</span>
                   <p className="font-semibold text-rose-900 text-xs">
                     {changeRequestDetailModal.request.rejection_reason}
                   </p>
@@ -1406,7 +1410,7 @@ export default function BranchManagerNominees() {
 
               {changeRequestDetailModal.request?.reviewed_at && (
                 <p className="text-[11px] text-slate-400 text-right">
-                  Reviewed on: {formatDateTime(changeRequestDetailModal.request.reviewed_at)}
+                  {t("branchManagerNominees.reviewedOn", "Reviewed on:")} {formatDateTime(changeRequestDetailModal.request.reviewed_at)}
                 </p>
               )}
             </div>
@@ -1417,7 +1421,7 @@ export default function BranchManagerNominees() {
                 onClick={() => setChangeRequestDetailModal({ isOpen: false, request: null, loading: false })}
                 className="px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 cursor-pointer"
               >
-                Close
+                {t("common.close", "Close")}
               </button>
             </div>
           </div>

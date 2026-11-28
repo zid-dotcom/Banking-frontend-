@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   X,
   Headset,
@@ -108,6 +109,7 @@ export function BranchServiceRequestModal({
   onUpdated,
   showToast
 }) {
+  const { t } = useTranslation();
   const [currentRequest, setCurrentRequest] = useState(request);
   const [status, setStatus] = useState(() => normalizeStatus(request?.status));
   const [statusUpdating, setStatusUpdating] = useState(false);
@@ -316,14 +318,14 @@ export function BranchServiceRequestModal({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-base sm:text-lg font-black tracking-tight">Service Request Desk</h3>
+                <h3 className="text-base sm:text-lg font-black tracking-tight">{t("branchServiceRequestModal.serviceRequestDesk", "Service Request Desk")}</h3>
                 {reqId && (
                   <span className="font-mono text-xs font-bold text-teal-900 bg-white/80 px-2 py-0.5 rounded-md">
                     #{reqId}
                   </span>
                 )}
               </div>
-              <p className="text-xs text-teal-100 font-medium">Branch Member Inquiry & Assistance Folio</p>
+              <p className="text-xs text-teal-100 font-medium">{t("branchServiceRequestModal.branchMemberInquiryAssistanceFolio", "Branch Member Inquiry & Assistance Folio")}</p>
             </div>
           </div>
           <button
@@ -372,21 +374,21 @@ export function BranchServiceRequestModal({
             {/* Quick Status Selector */}
             <div className="flex items-center gap-2">
               <span className="text-xs font-bold text-slate-500 uppercase tracking-wider text-[11px]">
-                Status:
+                {t("applyProductAccountModal.status", "Status:")}
               </span>
               <div className="relative inline-flex items-center">
                 <select
                   value={normalizeStatus(status)}
                   onChange={(e) => handleStatusChange(e.target.value)}
                   disabled={statusUpdating}
-                  title="Click to directly change status"
+                  title={t("branchServiceRequestModal.clickToDirectlyChangeStatus", "Click to directly change status")}
                   className={`text-xs font-bold pl-3 pr-7 py-1 rounded-full border transition-all cursor-pointer focus:outline-none appearance-none capitalize ${getStatusColor(
                     status
                   )}`}
                 >
-                  <option value="pending" className="bg-white text-rose-800 font-semibold">Pending</option>
-                  <option value="in_progress" className="bg-white text-amber-800 font-semibold">In Progress</option>
-                  <option value="solved" className="bg-white text-emerald-800 font-semibold">Solved</option>
+                  <option value="pending" className="bg-white text-rose-800 font-semibold">{t("common.pending", "Pending")}</option>
+                  <option value="in_progress" className="bg-white text-amber-800 font-semibold">{t("dashboardModule.branchOverview.statusInProgress", "In Progress")}</option>
+                  <option value="solved" className="bg-white text-emerald-800 font-semibold">{t("dashboardModule.branchOverview.statusSolved", "Solved")}</option>
                 </select>
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2 text-current opacity-70">
                   {statusUpdating ? (
@@ -404,19 +406,19 @@ export function BranchServiceRequestModal({
             <div className="flex items-center justify-between text-xs text-slate-500 font-medium">
               <span className="flex items-center gap-1.5 font-bold uppercase tracking-wider text-[11px] text-slate-400">
                 <Clock className="w-3.5 h-3.5" />
-                Submitted on {formatDateTime(currentRequest.created_at || currentRequest.date)}
+                {t("branchManagerMembershipSettings.submittedOn", "Submitted on")} {formatDateTime(currentRequest.created_at || currentRequest.date)}
               </span>
             </div>
 
             <div className="p-4 rounded-2xl bg-teal-50/40 border border-teal-100">
               <p className="text-[11px] font-bold uppercase tracking-wider text-teal-800 mb-1">
-                Subject
+                {t("dashboardModule.emergency.table.subject", "Subject")}
               </p>
               <h3 className="text-base font-extrabold text-slate-900 mb-2">
                 {currentRequest.subject}
               </h3>
               <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">
-                Member Message
+                {t("branchServiceRequestModal.memberMessage", "Member Message")}
               </p>
               <p className="text-xs sm:text-sm text-slate-700 font-medium whitespace-pre-wrap leading-relaxed">
                 {currentRequest.message}
@@ -429,17 +431,18 @@ export function BranchServiceRequestModal({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-slate-900 font-black text-xs sm:text-sm uppercase tracking-wider">
                 <MessageSquare className="w-4 h-4 text-teal-600" />
-                <span>Responses & Desk Replies ({replies.length})</span>
+                <span>{t("branchServiceRequestModal.responsesDeskReplies", "Responses & Desk Replies (")}{replies.length})</span>
               </div>
             </div>
 
             {replies.length === 0 ? (
               <div className="p-4 rounded-2xl bg-slate-50 border border-dashed border-slate-200 text-center text-xs text-slate-500">
-                No replies posted yet. Use the reply composer below to contact this member.
+                {t("branchServiceRequestModal.noRepliesPostedYetUse", "No replies posted yet. Use the reply composer below to contact this member.")}
               </div>
             ) : (
               <div className="space-y-3">
                 {replies.map((rep, idx) => {
+  const { t } = useTranslation();
                   const repId = rep.id || idx;
                   const isEditing = String(editingReplyId) === String(repId);
                   const roleDisplayName = getSenderRoleLabel(rep.sender, rep);
@@ -454,7 +457,7 @@ export function BranchServiceRequestModal({
 
                   const senderName =
                     isSuperAdminSender
-                      ? (rep.sender?.full_name && rep.sender.full_name.toLowerCase() !== 'super admin' ? rep.sender.full_name : 'Main Administration')
+                      ? (rep.sender?.full_name && rep.sender.full_name.toLowerCase() !== 'super admin' ? rep.sender.full_name : t("branchServiceRequestModal.mainAdministration", "Main Administration"))
                       : (rep.sender?.full_name || (isStaff ? roleDisplayName : memberName));
 
                   return (
@@ -482,7 +485,7 @@ export function BranchServiceRequestModal({
                           </span>
                           {rep.edited_at && (
                             <span className="text-[10px] font-medium text-slate-400 italic">
-                              (edited)
+                              {t("branchServiceRequestModal.edited", "(edited)")}
                             </span>
                           )}
                         </div>
@@ -493,7 +496,7 @@ export function BranchServiceRequestModal({
                             type="button"
                             onClick={() => startEditReply(rep)}
                             className="p-1 rounded-md text-slate-400 hover:text-teal-700 hover:bg-teal-50 transition-colors cursor-pointer"
-                            title="Edit Reply"
+                            title={t("branchServiceRequestModal.editReply", "Edit Reply")}
                           >
                             <Edit2 className="w-3.5 h-3.5" />
                           </button>
@@ -516,7 +519,7 @@ export function BranchServiceRequestModal({
                               disabled={savingEdit}
                               className="px-3 py-1 text-xs rounded-lg border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 cursor-pointer"
                             >
-                              Cancel
+                              {t("common.cancel", "Cancel")}
                             </button>
                             <button
                               type="button"
@@ -529,7 +532,7 @@ export function BranchServiceRequestModal({
                               ) : (
                                 <Check className="w-3 h-3" />
                               )}
-                              <span>Save Changes</span>
+                              <span>{t("memberNominee.saveChanges", "Save Changes")}</span>
                             </button>
                           </div>
                         </div>
@@ -550,10 +553,10 @@ export function BranchServiceRequestModal({
             <div className="flex items-center justify-between">
               <label className="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
                 <Send className="w-3.5 h-3.5 text-teal-600" />
-                <span>Post Reply to Member</span>
+                <span>{t("branchServiceRequestModal.postReplyToMember", "Post Reply to Member")}</span>
               </label>
               <span className="text-[11px] text-slate-400 font-medium">
-                {replyText.length} characters
+                {replyText.length} {t("branchServiceRequestModal.characters", "characters")}
               </span>
             </div>
 
@@ -564,7 +567,7 @@ export function BranchServiceRequestModal({
                 setReplyText(e.target.value);
                 if (replyError) setReplyError(null);
               }}
-              placeholder="Type your official resolution or response to this service request..."
+              placeholder={t("branchServiceRequestModal.typeYourOfficialResolutionOr", "Type your official resolution or response to this service request...")}
               className={`w-full p-3.5 text-xs sm:text-sm bg-slate-50 border rounded-2xl font-medium focus:outline-none focus:bg-white transition-all resize-none ${
                 replyError
                   ? 'border-rose-400 focus:border-rose-500 ring-2 ring-rose-100'
@@ -581,7 +584,7 @@ export function BranchServiceRequestModal({
 
             <div className="flex items-center justify-between flex-wrap gap-2 pt-1">
               <div className="text-[11px] text-slate-500 font-medium">
-                Sending a reply notifies the cooperative member in their portal.
+                {t("branchServiceRequestModal.sendingAReplyNotifiesThe", "Sending a reply notifies the cooperative member in their portal.")}
               </div>
               <button
                 type="submit"
@@ -591,12 +594,12 @@ export function BranchServiceRequestModal({
                 {submittingReply ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Sending Reply...</span>
+                    <span>{t("branchServiceRequestModal.sendingReply", "Sending Reply...")}</span>
                   </>
                 ) : (
                   <>
                     <Send className="w-4 h-4" />
-                    <span>Send Reply</span>
+                    <span>{t("branchServiceRequestModal.sendReply", "Send Reply")}</span>
                   </>
                 )}
               </button>
@@ -607,14 +610,14 @@ export function BranchServiceRequestModal({
         {/* Modal Footer */}
         <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
           <span className="text-xs text-slate-500 font-medium">
-            Branch Admin Helpdesk & Ticket Console
+            {t("branchServiceRequestModal.branchAdminHelpdeskTicketConsole", "Branch Admin Helpdesk & Ticket Console")}
           </span>
           <button
             type="button"
             onClick={onClose}
             className="px-5 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs transition-colors cursor-pointer"
           >
-            Close
+            {t("common.close", "Close")}
           </button>
         </div>
       </div>

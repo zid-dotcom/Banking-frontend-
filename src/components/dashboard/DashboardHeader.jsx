@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Menu,
@@ -13,6 +14,7 @@ import {
   X
 } from 'lucide-react';
 import { SOCIETY_INFO } from '../../data/societyData';
+import LanguageSelector from '../LanguageSelector';
 import {
   fetchNotificationsForRole,
   fetchUnreadCountForRole,
@@ -21,6 +23,7 @@ import {
   NOTIFICATIONS_UPDATED_EVENT,
   notifyNotificationsUpdated
 } from '../../services/notificationService';
+
 
 function formatNotificationTime(dateStr) {
   if (!dateStr) return '';
@@ -65,6 +68,7 @@ export default function DashboardHeader({
   user = {},
   onMenuToggle
 }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [notificationsList, setNotificationsList] = useState([]);
@@ -212,17 +216,17 @@ export default function DashboardHeader({
         <button
           onClick={onMenuToggle}
           className="lg:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100 cursor-pointer"
-          aria-label="Toggle navigation menu"
+          aria-label={t("dashboardHeader.toggleNavigationMenu", "Toggle navigation menu")}
         >
           <Menu className="w-5 h-5 text-slate-700" />
         </button>
 
         <div className="hidden sm:block">
           <p className="text-[11px] sm:text-xs font-bold text-[#0d9488] uppercase tracking-wider">
-            {SOCIETY_INFO.shortName} Multi-State Cooperative
+            {SOCIETY_INFO.shortName} {t("dashboardHeader.multiStateCooperative", "Multi-State Cooperative")}
           </p>
           <h2 className="text-base sm:text-lg lg:text-xl font-bold text-slate-900 leading-snug mt-0.5">
-            Welcome back, <span className="text-[#0d9488]">{role === 'super_admin' ? (user?.name || 'Super Admin') : resolvedFirstName}</span>
+            {t("common.welcomeBack", "Welcome back")}, <span className="text-[#0d9488]">{role === 'super_admin' ? (user?.name || 'Super Admin') : resolvedFirstName}</span>
           </h2>
         </div>
       </div>
@@ -233,7 +237,7 @@ export default function DashboardHeader({
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Search account no, folio, or transaction..."
+            placeholder={t("common.searchPlaceholder", "Search account no, folio, or transaction...")}
             className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#2dd4bf] focus:bg-white transition-all shadow-xs"
           />
         </div>
@@ -244,19 +248,22 @@ export default function DashboardHeader({
         {/* Visit public site link */}
         <Link
           to="/"
-          title="Back to Public Website"
+          title={t("dashboardHeader.backToPublicWebsite", "Back to Public Website")}
           className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-colors border border-slate-200/80 shadow-xs"
         >
           <Globe className="w-3.5 h-3.5 text-slate-400" />
-          <span>Website</span>
+          <span>{t("common.website", "Website")}</span>
         </Link>
+
+        {/* Multi-language Selector for All Role Dashboards */}
+        <LanguageSelector variant="dashboard" />
 
         {/* Notifications Dropdown */}
         <div className="relative">
           <button
             onClick={handleToggleNotes}
             className="p-2.5 rounded-xl text-slate-600 hover:bg-slate-100 relative cursor-pointer transition-colors flex items-center justify-center"
-            aria-label="Notifications"
+            aria-label={t("sidebar.notifications", "Notifications")}
           >
             <div className="relative inline-flex items-center justify-center">
               <Bell className="w-5 h-5 text-slate-600" />
@@ -273,10 +280,10 @@ export default function DashboardHeader({
               {/* Dropdown Header */}
               <div className="px-4 sm:px-5 pb-3 border-b border-slate-100 flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-black text-slate-900">Notifications</span>
+                  <span className="text-sm font-black text-slate-900">{t("sidebar.notifications", "Notifications")}</span>
                   {unreadCount > 0 && (
                     <span className="text-[11px] font-bold text-[#0f766e] bg-teal-50 px-2.5 py-0.5 rounded-full border border-teal-200/60 shadow-2xs">
-                      {unreadCount} unread
+                      {unreadCount} {t("dashboardHeader.unread", "unread")}
                     </span>
                   )}
                 </div>
@@ -288,14 +295,14 @@ export default function DashboardHeader({
                       onClick={handleMarkAll}
                       className="text-xs text-teal-700 hover:text-teal-900 hover:underline font-bold cursor-pointer"
                     >
-                      Mark all read
+                      {t("dashboardHeader.markAllRead", "Mark all read")}
                     </button>
                   )}
                   <button
                     type="button"
                     onClick={() => setNotificationsOpen(false)}
                     className="p-1 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
-                    title="Close"
+                    title={t("common.close", "Close")}
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -307,18 +314,19 @@ export default function DashboardHeader({
                 {loadingNotes ? (
                   <div className="py-8 text-center text-slate-400 space-y-1">
                     <Loader2 className="w-5 h-5 animate-spin text-teal-600 mx-auto" />
-                    <span className="text-xs font-medium">Loading alerts...</span>
+                    <span className="text-xs font-medium">{t("dashboardHeader.loadingAlerts", "Loading alerts...")}</span>
                   </div>
                 ) : notificationsList.length === 0 ? (
                   <div className="py-8 text-center text-slate-400 text-xs font-medium">
-                    No notifications logged.
+                    {t("dashboardHeader.noNotificationsLogged", "No notifications logged.")}
                   </div>
                 ) : (
                   notificationsList.map((n) => {
+  const { t } = useTranslation();
                     const id = n.id || n.notification_id || n._id;
                     const isRead = n.is_read === true || n.read === true || n.status === 'read';
                     const timeStr = formatNotificationTime(n.created_at || n.timestamp || n.date || n.time);
-                    const title = n.title || n.subject || n.alert_type || (role === 'super_admin' ? 'Superadmin Alert' : role === 'staff' ? 'Staff Alert' : role === 'branch_manager' ? 'Branch Alert' : 'Member Alert');
+                    const title = n.title || n.subject || n.alert_type || (role === 'super_admin' ? t("dashboardHeader.superadminAlert", "Superadmin Alert") : role === 'staff' ? t("dashboardHeader.staffAlert", "Staff Alert") : role === 'branch_manager' ? t("dashboardHeader.branchAlert", "Branch Alert") : t("dashboardHeader.memberAlert", "Member Alert"));
                     const message = n.message || n.description || n.desc || n.body || '';
 
                     return (
@@ -337,7 +345,7 @@ export default function DashboardHeader({
                               <>
                                 <span className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200/80">
                                   <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
-                                  Unread
+                                  {t("memberNotifications.unread", "Unread")}
                                 </span>
                                 <button
                                   type="button"
@@ -345,17 +353,17 @@ export default function DashboardHeader({
                                     e.stopPropagation();
                                     handleMarkOne(id);
                                   }}
-                                  title="Mark as read"
+                                  title={t("memberNotifications.markAsRead", "Mark as read")}
                                   className="inline-flex items-center gap-1 text-[10px] font-bold text-teal-800 hover:text-teal-950 bg-teal-50 hover:bg-teal-100 px-2 py-0.5 rounded-full border border-teal-200/80 shadow-2xs transition-all cursor-pointer"
                                 >
                                   <Check className="w-3 h-3 text-teal-600" />
-                                  <span>Mark read</span>
+                                  <span>{t("memberNotifications.markRead", "Mark read")}</span>
                                 </button>
                               </>
                             ) : (
                               <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/80">
                                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                                Read
+                                {t("dashboardModule.branchOverview.read", "Read")}
                               </span>
                             )}
                           </div>
@@ -385,7 +393,7 @@ export default function DashboardHeader({
                     }}
                     className="w-full py-2.5 bg-teal-50 hover:bg-teal-100 text-teal-900 rounded-xl text-xs font-bold text-center block transition-colors cursor-pointer border border-teal-200/60"
                   >
-                    View All Notifications →
+                    {t("dashboardHeader.viewAllNotifications", "View All Notifications →")}
                   </button>
                 </div>
               )}
@@ -405,7 +413,7 @@ export default function DashboardHeader({
               ? 'cursor-pointer hover:opacity-90 group transition-all'
               : ''
           }`}
-          title={role === 'member' ? 'View My Full Profile' : ''}
+          title={role === 'member' ? t("dashboardHeader.viewMyFullProfile", "View My Full Profile") : ''}
         >
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#2dd4bf] to-[#14b8a6] text-white flex items-center justify-center font-bold text-sm shadow-sm shadow-teal-500/20 flex-shrink-0 group-hover:scale-105 transition-transform">
             {resolvedHeaderAvatar}
@@ -429,11 +437,11 @@ export default function DashboardHeader({
         {/* TOP RIGHT LOGOUT BUTTON */}
         <button
           onClick={handleLogout}
-          title="Sign out of portal"
+          title={t("common.logout", "Logout")}
           className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 hover:text-rose-700 text-xs sm:text-sm font-bold border border-rose-200/70 transition-all cursor-pointer shadow-xs active:scale-95"
         >
           <LogOut className="w-4 h-4" />
-          <span className="hidden sm:inline">Logout</span>
+          <span className="hidden sm:inline">{t("common.logout", "Logout")}</span>
         </button>
       </div>
     </header>

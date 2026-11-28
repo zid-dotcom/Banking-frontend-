@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import StatCard from '../../components/dashboard/StatCard';
 import {
@@ -71,6 +72,7 @@ export function formatNotificationText(text) {
 }
 
 export default function MemberNotifications() {
+  const { t } = useTranslation();
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -359,7 +361,7 @@ export default function MemberNotifications() {
             <div className="inline-flex flex-wrap items-center gap-x-2 gap-y-1 px-3 sm:px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-xs text-[11px] sm:text-xs font-semibold border border-teal-200/80 shadow-2xs text-[#0f766e] mb-3">
               <span className="inline-flex items-center gap-1.5 flex-shrink-0">
                 <Bell className="w-3.5 h-3.5 text-[#00b4a7]" />
-                <span>Member Activity &amp; Alert Center</span>
+                <span>{t("memberNotifications.memberActivityAlertCenter", "Member Activity & Alert Center")}</span>
               </span>
               <span className="text-teal-300 hidden sm:inline">•</span>
               <span className="text-slate-600">
@@ -370,7 +372,7 @@ export default function MemberNotifications() {
                   <span className="text-teal-300 hidden sm:inline">•</span>
                   <span className="inline-flex items-center gap-1 font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-full text-[10px]">
                     <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
-                    {computedUnread} Unread
+                    {computedUnread} {t("memberNotifications.unread", "Unread")}
                   </span>
                 </>
               )}
@@ -380,12 +382,12 @@ export default function MemberNotifications() {
             <div className="flex items-center gap-3">
               <span className="w-1.5 h-8 sm:h-9 bg-[#00b4a7] rounded-full flex-shrink-0" />
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0f2e2e] tracking-tight">
-                Notifications &amp; Alerts
+                {t("memberNotifications.notificationsAlerts", "Notifications & Alerts")}
               </h1>
             </div>
 
             <p className="text-slate-600 text-xs sm:text-sm mt-2.5 font-medium leading-relaxed max-w-xl">
-              Real-time activity ledger for your society deposit folios, loan EMI installments, share dividends, and branch service request updates.
+              {t("memberNotifications.realTimeActivityLedgerFor", "Real-time activity ledger for your society deposit folios, loan EMI installments, share dividends, and branch service request updates.")}
             </p>
 
             <div className="mt-4 flex items-center gap-3 flex-wrap">
@@ -397,7 +399,7 @@ export default function MemberNotifications() {
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-md shadow-teal-500/20 transition-all cursor-pointer disabled:opacity-50"
                 >
                   <CheckCheck className="w-4 h-4" />
-                  <span>{markingAll ? 'Marking All Read...' : 'Mark All as Read'}</span>
+                  <span>{markingAll ? t("memberNotifications.markingAllRead", "Marking All Read...") : t("memberNotifications.markAllAsRead", "Mark All as Read")}</span>
                 </button>
               )}
             </div>
@@ -407,7 +409,7 @@ export default function MemberNotifications() {
           <div className="relative z-10 flex justify-center md:justify-end pointer-events-none -my-2 sm:-my-5 lg:-my-6 flex-shrink-0">
             <img
               src={friendlySupportIllustration}
-              alt="Member Notifications"
+              alt={t("memberNotifications.memberNotifications", "Member Notifications")}
               className="h-36 sm:h-48 lg:h-56 w-auto object-contain drop-shadow-md select-none pointer-events-none"
             />
           </div>
@@ -421,24 +423,24 @@ export default function MemberNotifications() {
         {/* 3 Summary Stat Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
           <StatCard
-            title="Total Notifications"
+            title={t("memberNotifications.totalNotifications", "Total Notifications")}
             value={totalCount}
-            subtitle="Logged Folio Events"
+            subtitle={t("memberNotifications.loggedFolioEvents", "Logged Folio Events")}
             icon={Bell}
             trend="Active Ledger"
             trendType="up"
           />
           <StatCard
-            title="Unread Alerts"
+            title={t("memberNotifications.unreadAlerts", "Unread Alerts")}
             value={computedUnread}
-            subtitle="Awaiting Attention"
+            subtitle={t("memberNotifications.awaitingAttention", "Awaiting Attention")}
             icon={Clock}
             badge={computedUnread > 0 ? `${computedUnread} Pending` : 'All Caught Up'}
           />
           <StatCard
-            title="Read"
+            title={t("dashboardModule.branchOverview.read", "Read")}
             value={readCount}
-            subtitle="Marked as Read"
+            subtitle={t("memberNotifications.markedAsRead", "Marked as Read")}
             icon={CheckCircle2}
             trend={totalCount > 0 ? `${Math.round((readCount / totalCount) * 100)}% Read` : '100%'}
             trendType="up"
@@ -455,11 +457,11 @@ export default function MemberNotifications() {
                   <Bell className="w-4 h-4 text-[#00b4a7]" />
                 </div>
                 <h3 className="font-serif font-bold text-slate-900 text-lg">
-                  Recent Notification Stream
+                  {t("memberNotifications.recentNotificationStream", "Recent Notification Stream")}
                 </h3>
               </div>
               <p className="text-xs text-slate-500 font-medium mt-0.5">
-                Official alerts delivered by society branch operations
+                {t("memberNotifications.officialAlertsDeliveredBySociety", "Official alerts delivered by society branch operations")}
               </p>
             </div>
 
@@ -478,7 +480,7 @@ export default function MemberNotifications() {
                       : 'hover:text-slate-900'
                   }`}
                 >
-                  All ({totalCount})
+                  {t("branchManagerCashReconciliation.all", "All (")}{totalCount})
                 </button>
                 <button
                   onClick={() => {
@@ -491,7 +493,7 @@ export default function MemberNotifications() {
                       : 'hover:text-slate-900'
                   }`}
                 >
-                  Unread ({computedUnread})
+                  {t("memberNotifications.unread2", "Unread (")}{computedUnread})
                 </button>
                 <button
                   onClick={() => {
@@ -504,7 +506,7 @@ export default function MemberNotifications() {
                       : 'hover:text-slate-900'
                   }`}
                 >
-                  Read ({readCount})
+                  {t("memberNotifications.read", "Read (")}{readCount})
                 </button>
               </div>
 
@@ -513,7 +515,7 @@ export default function MemberNotifications() {
                 <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
                   type="text"
-                  placeholder="Search notifications..."
+                  placeholder={t("memberNotifications.searchNotifications", "Search notifications...")}
                   value={searchQuery}
                   onChange={(e) => {
                     setSearchQuery(e.target.value);
@@ -538,7 +540,7 @@ export default function MemberNotifications() {
               <button
                 onClick={() => fetchAllNotifications(true)}
                 disabled={refreshing}
-                title="Refresh notifications"
+                title={t("memberNotifications.refreshNotifications", "Refresh notifications")}
                 className="p-2 border border-slate-200 rounded-xl hover:bg-slate-50 text-slate-600 transition-colors disabled:opacity-50 cursor-pointer"
               >
                 <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin text-teal-600' : ''}`} />
@@ -552,7 +554,7 @@ export default function MemberNotifications() {
                   className="px-3 py-2 bg-teal-50 hover:bg-teal-100 text-teal-800 rounded-xl text-xs font-bold transition-all border border-teal-200/80 cursor-pointer disabled:opacity-50 flex items-center gap-1.5 shadow-2xs"
                 >
                   <CheckCheck className="w-3.5 h-3.5 text-teal-600" />
-                  <span className="hidden sm:inline">Mark All Read</span>
+                  <span className="hidden sm:inline">{t("memberNotifications.markAllRead", "Mark All Read")}</span>
                 </button>
               )}
             </div>
@@ -564,7 +566,7 @@ export default function MemberNotifications() {
               <div className="flex items-start gap-2.5">
                 <AlertCircle className="w-5 h-5 flex-shrink-0 text-red-600 mt-0.5" />
                 <div>
-                  <p className="text-sm font-bold text-red-900">Failed to load notifications</p>
+                  <p className="text-sm font-bold text-red-900">{t("memberNotifications.failedToLoadNotifications", "Failed to load notifications")}</p>
                   <p className="text-xs text-red-700 mt-0.5">{error}</p>
                 </div>
               </div>
@@ -572,7 +574,7 @@ export default function MemberNotifications() {
                 onClick={() => fetchAllNotifications()}
                 className="text-xs font-bold text-red-700 hover:text-red-900 underline cursor-pointer flex-shrink-0"
               >
-                Retry
+                {t("common.retry", "Retry")}
               </button>
             </div>
           )}
@@ -582,7 +584,7 @@ export default function MemberNotifications() {
             {loading ? (
               <div className="py-20 text-center space-y-3">
                 <div className="w-10 h-10 border-3 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto" />
-                <p className="text-sm text-slate-500 font-medium">Checking notification registry...</p>
+                <p className="text-sm text-slate-500 font-medium">{t("memberNotifications.checkingNotificationRegistry", "Checking notification registry...")}</p>
               </div>
             ) : filteredNotifications.length === 0 ? (
               <div className="py-20 text-center space-y-4 max-w-sm mx-auto p-4">
@@ -592,23 +594,24 @@ export default function MemberNotifications() {
                 <div>
                   <p className="text-base font-bold text-slate-800">
                     {searchQuery
-                      ? 'No matching notifications found'
+                      ? t("memberNotifications.noMatchingNotificationsFound", "No matching notifications found")
                       : filterType === 'unread'
-                      ? 'No unread notifications'
-                      : 'No notifications logged yet'}
+                      ? t("memberNotifications.noUnreadNotifications", "No unread notifications")
+                      : t("memberNotifications.noNotificationsLoggedYet", "No notifications logged yet")}
                   </p>
                   <p className="text-xs text-slate-500 mt-1 font-medium leading-relaxed">
                     {searchQuery
-                      ? 'Try adjusting your search query or reset filter to All.'
+                      ? t("memberNotifications.tryAdjustingYourSearchQuery", "Try adjusting your search query or reset filter to All.")
                       : filterType === 'unread'
-                      ? 'You are all caught up! There are no unread alerts.'
-                      : 'Activity notifications regarding your account will appear here.'}
+                      ? t("memberNotifications.youAreAllCaughtUp", "You are all caught up! There are no unread alerts.")
+                      : t("memberNotifications.activityNotificationsRegardingYourAccount", "Activity notifications regarding your account will appear here.")}
                   </p>
                 </div>
               </div>
             ) : (
               <div className="divide-y divide-slate-100">
                 {paginatedNotifications.map((item) => {
+  const { t } = useTranslation();
                   const id = item.id || item.notification_id || Math.random();
                   const isRead = item.is_read === true || item.read === true || item.status === 'read';
                   const isBeingMarked = markingId === id;
@@ -648,12 +651,12 @@ export default function MemberNotifications() {
                             {!isRead ? (
                               <span className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200">
                                 <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
-                                Unread
+                                {t("memberNotifications.unread", "Unread")}
                               </span>
                             ) : (
                               <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
                                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                                Read
+                                {t("dashboardModule.branchOverview.read", "Read")}
                               </span>
                             )}
                           </div>
@@ -687,17 +690,17 @@ export default function MemberNotifications() {
                               handleViewReplies(item);
                             }}
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-800 font-bold text-xs rounded-xl border border-teal-200/80 shadow-2xs transition-all cursor-pointer"
-                            title="View service request replies"
+                            title={t("memberNotifications.viewServiceRequestReplies", "View service request replies")}
                           >
                             <Eye className="w-3.5 h-3.5 text-[#00b4a7]" />
-                            <span>View Replies</span>
+                            <span>{t("memberHelpdesk.viewReplies", "View Replies")}</span>
                           </button>
                         )}
 
                         {isRead ? (
                           <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 font-bold text-xs rounded-xl border border-emerald-200 shadow-2xs select-none">
                             <CheckCheck className="w-3.5 h-3.5 text-emerald-600" />
-                            <span>Read</span>
+                            <span>{t("dashboardModule.branchOverview.read", "Read")}</span>
                           </span>
                         ) : (
                           <button
@@ -706,12 +709,12 @@ export default function MemberNotifications() {
                               handleMarkAsRead(id);
                             }}
                             disabled={isBeingMarked}
-                            title="Mark as read"
+                            title={t("memberNotifications.markAsRead", "Mark as read")}
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-rose-50 text-rose-700 font-bold text-xs rounded-xl border border-rose-200/80 shadow-2xs transition-all cursor-pointer disabled:opacity-50"
                           >
                             <Check className="w-3.5 h-3.5 text-rose-600" />
                             <span className="hidden sm:inline">
-                              {isBeingMarked ? 'Updating...' : 'Mark read'}
+                              {isBeingMarked ? t("branchManagerMemberPasswordUpdate.updating", "Updating...") : t("memberNotifications.markRead", "Mark read")}
                             </span>
                           </button>
                         )}
@@ -727,15 +730,15 @@ export default function MemberNotifications() {
           {filteredNotifications.length > itemsPerPage && (
             <div className="p-4 sm:p-5 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-medium">
               <div>
-                Showing{' '}
+                {t("common.showing", "Showing")}{' '}
                 <span className="font-bold text-slate-800">
                   {(currentPage - 1) * itemsPerPage + 1}
                 </span>{' '}
-                to{' '}
+                {t("common.to", "to")}{' '}
                 <span className="font-bold text-slate-800">
                   {Math.min(currentPage * itemsPerPage, filteredNotifications.length)}
                 </span>{' '}
-                of <span className="font-bold text-slate-800">{filteredNotifications.length}</span> alerts
+                {t("common.of", "of")} <span className="font-bold text-slate-800">{filteredNotifications.length}</span> {t("memberNotifications.alerts", "alerts")}
               </div>
 
               <div className="flex items-center gap-1">

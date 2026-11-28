@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { i18n } from '../../i18n/index.js';
+import { useTranslation } from 'react-i18next';
 import { useSearchParams, Navigate, useNavigate } from 'react-router-dom';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import StatCard from '../../components/dashboard/StatCard';
@@ -46,7 +48,9 @@ import {
 import cooperativeSupportSticker from '../../assets/Cooperative Banking Support Sticker.png';
 import completeNomineeIllustration from '../../assets/Complete Your Nominee Details.png';
 
+
 export default function MemberDashboard() {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const tab = searchParams.get('tab');
@@ -295,13 +299,13 @@ export default function MemberDashboard() {
     if (type === 'deposit') {
       setModalConfig({
         isOpen: true,
-        title: 'Quick Deposit / Thrift Payment',
-        description: 'Transfer funds into your savings or recurring deposit folio.',
+        title: i18n.t("memberDashboard.quickDepositThriftPayment", "Quick Deposit / Thrift Payment"),
+        description: i18n.t("memberDashboard.transferFundsIntoYourSavings", "Transfer funds into your savings or recurring deposit folio."),
         actionLabel: 'Confirm Deposit',
         fields: [
-          { name: 'accountType', label: 'Target Account', type: 'select', options: ['Primary Savings (₹1,48,250)', 'Recurring Thrift Deposit', 'Share Capital Increment'] },
-          { name: 'amount', label: 'Amount (₹)', type: 'number', placeholder: 'e.g. 5000' },
-          { name: 'upiId', label: 'Payment Method', type: 'select', options: ['UPI / GooglePay / PhonePe', 'Net Banking Transfer', 'Society Branch Counter Token'] }
+          { name: 'accountType', label: i18n.t("memberDashboard.targetAccount", "Target Account"), type: 'select', options: ['Primary Savings (₹1,48,250)', 'Recurring Thrift Deposit', 'Share Capital Increment'] },
+          { name: 'amount', label: i18n.t("memberDashboard.amount", "Amount (₹)"), type: 'number', placeholder: 'e.g. 5000' },
+          { name: 'upiId', label: i18n.t("memberDashboard.paymentMethod", "Payment Method"), type: 'select', options: ['UPI / GooglePay / PhonePe', 'Net Banking Transfer', 'Society Branch Counter Token'] }
         ]
       });
     }
@@ -322,19 +326,19 @@ export default function MemberDashboard() {
             <div className="flex flex-wrap items-center gap-2 mb-3.5">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur-xs text-xs font-semibold border border-teal-200/80 shadow-2xs text-[#0f766e]">
                 <ShieldCheck className="w-3.5 h-3.5 text-[#00b4a7]" />
-                <span>Role: Cooperative Member</span>
+                <span>{t("memberDashboard.roleCooperativeMember", "Role: Cooperative Member")}</span>
               </div>
 
               {memberUser.branch_code && (
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur-xs text-xs font-semibold border border-teal-200/80 shadow-2xs text-slate-700">
                   <Building2 className="w-3.5 h-3.5 text-teal-600" />
-                  <span>Branch Code: <span className="font-mono text-teal-800 font-bold">#{memberUser.branch_code}</span></span>
+                  <span>{t("branchManagerCashTransactions.branchCode", "Branch Code:")} <span className="font-mono text-teal-800 font-bold">#{memberUser.branch_code}</span></span>
                 </div>
               )}
 
               <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50/95 backdrop-blur-xs text-xs font-semibold border border-emerald-200 shadow-2xs text-emerald-700">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="capitalize">{memberUser.status === 'approved' ? 'Active' : (memberUser.status || 'Active')}</span>
+                <span className="capitalize">{memberUser.status === 'approved' ? t("common.active", "Active") : (memberUser.status || 'Active')}</span>
               </div>
             </div>
 
@@ -342,7 +346,7 @@ export default function MemberDashboard() {
             <div className="flex items-center gap-3">
               <span className="w-1.5 h-8 sm:h-9 bg-[#00b4a7] rounded-full flex-shrink-0" />
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
-                <span>Welcome, {memberUser.full_name || memberUser.name || 'Member'}</span>
+                <span>{t("common.welcomeBack", "Welcome back")}, {memberUser.full_name || memberUser.name || 'Member'}</span>
                 <span className="inline-block text-2xl sm:text-3xl">👋</span>
               </h1>
             </div>
@@ -352,13 +356,13 @@ export default function MemberDashboard() {
               {/* Logged in as */}
               <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/90 border border-teal-200/70 shadow-2xs text-xs text-slate-700 backdrop-blur-xs">
                 <User className="w-3.5 h-3.5 text-teal-600" />
-                <span className="text-slate-500 font-medium">Logged in as:</span>
+                <span className="text-slate-500 font-medium">{t("branchManagerCashTransactions.loggedInAs", "Logged in as:")}</span>
                 <span className="text-slate-900 font-bold capitalize">{memberUser.full_name || memberUser.name || 'Member'}</span>
               </div>
 
               {/* Member Code */}
               <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/90 border border-teal-200/70 shadow-2xs text-xs text-slate-700 backdrop-blur-xs">
-                <span className="text-slate-500 font-medium">Member Code:</span>
+                <span className="text-slate-500 font-medium">{t("modal.nominee.memberCode", "Member Code:")}</span>
                 <span className="font-mono font-bold text-teal-800 bg-teal-50 px-1.5 py-0.5 rounded border border-teal-200/60">
                   {memberUser.member_code || memberUser.id}
                 </span>
@@ -368,7 +372,7 @@ export default function MemberDashboard() {
               {memberUser.email && (
                 <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/90 border border-teal-200/70 shadow-2xs text-xs text-slate-700 backdrop-blur-xs">
                   <Mail className="w-3.5 h-3.5 text-teal-600" />
-                  <span className="text-slate-500 font-medium">Email:</span>
+                  <span className="text-slate-500 font-medium">{t("memberDashboard.email", "Email:")}</span>
                   <span className="text-slate-900 font-semibold">{memberUser.email}</span>
                 </div>
               )}
@@ -377,7 +381,7 @@ export default function MemberDashboard() {
               {memberUser.mobile && (
                 <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/90 border border-teal-200/70 shadow-2xs text-xs text-slate-700 backdrop-blur-xs">
                   <Phone className="w-3.5 h-3.5 text-teal-600" />
-                  <span className="text-slate-500 font-medium">Mobile:</span>
+                  <span className="text-slate-500 font-medium">{t("memberDashboard.mobile", "Mobile:")}</span>
                   <span className="text-slate-900 font-semibold">{memberUser.mobile}</span>
                 </div>
               )}
@@ -386,7 +390,7 @@ export default function MemberDashboard() {
               {memberUser.branchName && (
                 <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/90 border border-teal-200/70 shadow-2xs text-xs text-slate-700 backdrop-blur-xs">
                   <Building2 className="w-3.5 h-3.5 text-teal-600" />
-                  <span className="text-slate-500 font-medium">Branch Name:</span>
+                  <span className="text-slate-500 font-medium">{t("branchManagerDashboard.branchName", "Branch Name:")}</span>
                   <span className="text-slate-900 font-bold">{memberUser.branchName}</span>
                 </div>
               )}
@@ -395,7 +399,7 @@ export default function MemberDashboard() {
               {memberUser.branchLocation && (
                 <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/90 border border-teal-200/70 shadow-2xs text-xs text-slate-700 backdrop-blur-xs">
                   <MapPin className="w-3.5 h-3.5 text-emerald-600" />
-                  <span className="text-slate-500 font-medium">Location:</span>
+                  <span className="text-slate-500 font-medium">{t("branchManagerCashTransactions.location", "Location:")}</span>
                   <span className="text-slate-800 font-semibold capitalize">{memberUser.branchLocation}</span>
                 </div>
               )}
@@ -406,7 +410,7 @@ export default function MemberDashboard() {
           <div className="relative z-10 my-[-10px] sm:my-[-20px] lg:my-[-30px] flex justify-end pointer-events-none">
             <img
               src={cooperativeSupportSticker}
-              alt="Cooperative Banking Support"
+              alt={t("memberDashboard.cooperativeBankingSupport", "Cooperative Banking Support")}
               className="h-44 sm:h-52 lg:h-64 w-auto object-contain drop-shadow-md select-none"
             />
           </div>
@@ -426,7 +430,7 @@ export default function MemberDashboard() {
               <div>
                 <div className="flex items-center gap-2">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-teal-800 bg-teal-100/80 px-2 py-0.5 rounded-md">
-                    Society Notice
+                    {t("memberDashboard.societyNotice", "Society Notice")}
                   </span>
                   <span className="text-xs sm:text-sm font-black text-slate-900 line-clamp-1">
                     {announcements[0]?.title}
@@ -441,7 +445,7 @@ export default function MemberDashboard() {
               onClick={() => navigate('/member/announcements')}
               className="text-xs font-bold text-teal-700 hover:text-teal-900 bg-white/80 hover:bg-white px-3 py-1.5 rounded-xl border border-teal-200/70 transition-all flex items-center gap-1.5 self-end sm:self-auto cursor-pointer shadow-2xs flex-shrink-0"
             >
-              <span>View Notice Board</span>
+              <span>{t("branchManagerDashboard.viewNoticeBoard", "View Notice Board")}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -450,34 +454,34 @@ export default function MemberDashboard() {
         {/* 4 Member Key Stat Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <StatCard
-            title="Total Savings Deposit"
+            title={t("memberDashboard.totalSavingsDeposit", "Total Savings Deposit")}
             value={totalSavingsDeposit !== null ? `₹${totalSavingsDeposit.toLocaleString('en-IN')}` : '₹0'}
-            subtitle={primaryAccount ? `Acc #${primaryAccount.account_number}` : 'Savings Folio'}
+            subtitle={primaryAccount ? `Acc #${primaryAccount.account_number}` : t("memberDashboard.savingsFolio", "Savings Folio")}
             icon={Wallet}
             trend="+5.5% Annual Interest"
             trendType="up"
           />
 
           <StatCard
-            title="Active Borrowing Outstanding"
+            title={t("memberDashboard.activeBorrowingOutstanding", "Active Borrowing Outstanding")}
             value="₹3,20,000"
-            subtitle="Agro Dairy Term Loan"
+            subtitle={t("memberDashboard.agroDairyTermLoan", "Agro Dairy Term Loan")}
             icon={CreditCard}
             badge="Subsidized 7.25%"
           />
 
           <StatCard
-            title="Next Repayment Due"
+            title={t("memberDashboard.nextRepaymentDue", "Next Repayment Due")}
             value="₹12,450"
-            subtitle="Due on 18 Nov 2026"
+            subtitle={t("memberDashboard.dueOn18Nov2026", "Due on 18 Nov 2026")}
             icon={Calendar}
             badge="Due in 7 Days"
           />
 
           <StatCard
-            title="Society Shareholding"
+            title={t("memberDashboard.societyShareholding", "Society Shareholding")}
             value="₹25,000"
-            subtitle="250 Class A Shares"
+            subtitle={t("memberDashboard.250ClassAShares", "250 Class A Shares")}
             icon={Award}
             trend="8.5% Dividend"
             trendType="up"
@@ -491,41 +495,41 @@ export default function MemberDashboard() {
             <div className="flex items-center justify-between pb-4 border-b border-slate-100">
               <div>
                 <span className="text-[11px] font-bold uppercase tracking-wider text-[#0f766e] bg-teal-50 px-2.5 py-0.5 rounded-full border border-teal-200/50">
-                  Sanctioned Facility
+                  {t("memberDashboard.sanctionedFacility", "Sanctioned Facility")}
                 </span>
                 <h3 className="text-lg font-bold text-slate-900 mt-1">
-                  Agricultural Dairy &amp; Cold Storage Facility
+                  {t("memberDashboard.agriculturalDairyColdStorageFacility", "Agricultural Dairy & Cold Storage Facility")}
                 </h3>
               </div>
               <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full flex items-center gap-1">
                 <CheckCircle2 className="w-3.5 h-3.5" />
-                Regular Payer
+                {t("memberDashboard.regularPayer", "Regular Payer")}
               </span>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 my-6">
               <div>
-                <p className="text-xs text-slate-400">Total Sanctioned</p>
+                <p className="text-xs text-slate-400">{t("memberDashboard.totalSanctioned", "Total Sanctioned")}</p>
                 <p className="text-base font-extrabold text-slate-900 mt-0.5">₹4,50,000</p>
               </div>
               <div>
-                <p className="text-xs text-slate-400">Paid So Far</p>
+                <p className="text-xs text-slate-400">{t("memberDashboard.paidSoFar", "Paid So Far")}</p>
                 <p className="text-base font-extrabold text-emerald-600 mt-0.5">₹1,30,000</p>
               </div>
               <div>
-                <p className="text-xs text-slate-400">Subsidized Rate</p>
+                <p className="text-xs text-slate-400">{t("memberDashboard.subsidizedRate", "Subsidized Rate")}</p>
                 <p className="text-base font-extrabold text-slate-900 mt-0.5">7.25% p.a.</p>
               </div>
               <div>
-                <p className="text-xs text-slate-400">Tenure Completed</p>
-                <p className="text-base font-extrabold text-slate-900 mt-0.5">8 of 36 Months</p>
+                <p className="text-xs text-slate-400">{t("memberDashboard.tenureCompleted", "Tenure Completed")}</p>
+                <p className="text-base font-extrabold text-slate-900 mt-0.5">{t("memberDashboard.8Of36Months", "8 of 36 Months")}</p>
               </div>
             </div>
 
             <div>
               <div className="flex items-center justify-between text-xs font-bold mb-1.5">
-                <span className="text-slate-500">Repayment Progress</span>
-                <span className="text-[#0d9488]">28.8% Completed</span>
+                <span className="text-slate-500">{t("memberDashboard.repaymentProgress", "Repayment Progress")}</span>
+                <span className="text-[#0d9488]">{t("memberDashboard.288Completed", "28.8% Completed")}</span>
               </div>
               <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
                 <div className="h-full bg-gradient-to-r from-[#14b8a6] to-[#2dd4bf] rounded-full" style={{ width: '28.8%' }} />
@@ -535,28 +539,28 @@ export default function MemberDashboard() {
 
           <div className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs flex flex-col justify-between">
             <div>
-              <h3 className="text-base font-bold text-slate-900">Member Shortcuts</h3>
-              <p className="text-xs text-slate-500 mt-0.5">Society documents &amp; tools</p>
+              <h3 className="text-base font-bold text-slate-900">{t("memberDashboard.memberShortcuts", "Member Shortcuts")}</h3>
+              <p className="text-xs text-slate-500 mt-0.5">{t("memberDashboard.societyDocumentsTools", "Society documents & tools")}</p>
 
               <div className="mt-4 space-y-2.5">
                 <button
-                  onClick={() => alert('Downloading official stamped passbook statement...')}
+                  onClick={() => alert(i18n.t("memberDashboard.downloadingOfficialStampedPassbookStatement", "Downloading official stamped passbook statement..."))}
                   className="w-full flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-teal-50/70 border border-slate-100 transition-colors text-xs font-bold text-slate-800 cursor-pointer group"
                 >
                   <span className="flex items-center gap-2.5">
                     <Download className="w-4 h-4 text-[#0d9488]" />
-                    <span>Download Stamped Passbook</span>
+                    <span>{t("memberDashboard.downloadStampedPassbook", "Download Stamped Passbook")}</span>
                   </span>
                   <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
                 </button>
 
                 <button
-                  onClick={() => alert('Viewing official stamped Society Share Certificate...')}
+                  onClick={() => alert(i18n.t("memberDashboard.viewingOfficialStampedSocietyShare", "Viewing official stamped Society Share Certificate..."))}
                   className="w-full flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-teal-50/70 border border-slate-100 transition-colors text-xs font-bold text-slate-800 cursor-pointer group"
                 >
                   <span className="flex items-center gap-2.5">
                     <FileCheck className="w-4 h-4 text-[#0d9488]" />
-                    <span>View Share Certificate</span>
+                    <span>{t("memberDashboard.viewShareCertificate", "View Share Certificate")}</span>
                   </span>
                   <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
                 </button>
@@ -567,7 +571,7 @@ export default function MemberDashboard() {
                 >
                   <span className="flex items-center gap-2.5">
                     <Send className="w-4 h-4 text-[#0d9488]" />
-                    <span>Pay Next Installment (UPI)</span>
+                    <span>{t("memberDashboard.payNextInstallmentUpi", "Pay Next Installment (UPI)")}</span>
                   </span>
                   <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
                 </button>
@@ -578,7 +582,7 @@ export default function MemberDashboard() {
                 >
                   <span className="flex items-center gap-2.5">
                     <User className="w-4 h-4 text-[#0d9488]" />
-                    <span>My Full Profile &amp; KYC Records</span>
+                    <span>{t("memberDashboard.myFullProfileKycRecords", "My Full Profile & KYC Records")}</span>
                   </span>
                   <ChevronRight className="w-4 h-4 text-teal-600 group-hover:translate-x-0.5 transition-transform" />
                 </button>
@@ -589,7 +593,7 @@ export default function MemberDashboard() {
                 >
                   <span className="flex items-center gap-2.5">
                     <LifeBuoy className="w-4 h-4 text-[#0d9488]" />
-                    <span>Society Helpdesk &amp; Tickets</span>
+                    <span>{t("memberDashboard.societyHelpdeskTickets", "Society Helpdesk & Tickets")}</span>
                   </span>
                   <ChevronRight className="w-4 h-4 text-teal-600 group-hover:translate-x-0.5 transition-transform" />
                 </button>
@@ -598,7 +602,7 @@ export default function MemberDashboard() {
 
             <div className="mt-6 pt-4 border-t border-slate-100 flex items-center gap-2 text-[11px] text-slate-400">
               <ShieldCheck className="w-4 h-4 text-[#0d9488] flex-shrink-0" />
-              <span>Regulated under Multi-State Cooperative Society rules</span>
+              <span>{t("memberDashboard.regulatedUnderMultiStateCooperative", "Regulated under Multi-State Cooperative Society rules")}</span>
             </div>
           </div>
         </div>
@@ -611,21 +615,21 @@ export default function MemberDashboard() {
                 <div className="w-8 h-8 rounded-lg bg-teal-50 text-[#0d9488] flex items-center justify-center">
                   <PiggyBank className="w-4 h-4" />
                 </div>
-                <h3 className="text-lg font-bold text-slate-900">Available Society Savings Schemes</h3>
+                <h3 className="text-lg font-bold text-slate-900">{t("memberDashboard.availableSocietySavingsSchemes", "Available Society Savings Schemes")}</h3>
                 {savingsSchemes.length > 0 && (
                   <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-teal-50 text-[#0f766e] border border-teal-200/60">
-                    {savingsSchemes.length} Available
+                    {savingsSchemes.length} {t("common.available", "Available")}
                   </span>
                 )}
               </div>
-              <p className="text-xs text-slate-500 mt-1">High-yield cooperative savings and thrift plans designed for members</p>
+              <p className="text-xs text-slate-500 mt-1">{t("memberDashboard.highYieldCooperativeSavingsAnd", "High-yield cooperative savings and thrift plans designed for members")}</p>
             </div>
 
             <button
               onClick={() => navigate('/member/savings-schemes')}
               className="text-xs font-bold text-[#0d9488] hover:text-[#0f766e] flex items-center gap-1 self-start sm:self-auto cursor-pointer"
             >
-              <span>Explore All Schemes</span>
+              <span>{t("memberDashboard.exploreAllSchemes", "Explore All Schemes")}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -642,7 +646,7 @@ export default function MemberDashboard() {
             </div>
           ) : savingsSchemes.length === 0 ? (
             <div className="text-center py-8 text-slate-500 text-xs">
-              No active savings schemes are currently published. Check back soon or contact society helpdesk.
+              {t("memberDashboard.noActiveSavingsSchemesAre", "No active savings schemes are currently published. Check back soon or contact society helpdesk.")}
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -670,7 +674,7 @@ export default function MemberDashboard() {
                     </p>
 
                     <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600">
-                      <span>Min: <strong className="text-slate-800">₹{scheme.min_balance || 500}</strong></span>
+                      <span>{t("memberDashboard.min", "Min:")} <strong className="text-slate-800">₹{scheme.min_balance || 500}</strong></span>
                       <span className="capitalize text-slate-500 font-medium">{scheme.interest_calculation_frequency || 'quarterly'}</span>
                     </div>
                   </div>
@@ -684,14 +688,14 @@ export default function MemberDashboard() {
                       className="flex-1 py-1.5 px-2.5 rounded-xl bg-slate-100 hover:bg-teal-50 text-slate-700 hover:text-[#0f766e] text-xs font-bold transition-colors flex items-center justify-center gap-1 cursor-pointer"
                     >
                       <Eye className="w-3.5 h-3.5" />
-                      <span>Details</span>
+                      <span>{t("dashboardModule.monthlyTargets.details", "Details")}</span>
                     </button>
                     <button
                       onClick={() => handleOpenAction('deposit')}
                       className="flex-1 py-1.5 px-2.5 rounded-xl bg-gradient-to-r from-[#14b8a6] to-[#2dd4bf] text-white text-xs font-bold shadow-2xs hover:from-[#0d9488] hover:to-[#14b8a6] transition-colors flex items-center justify-center gap-1 cursor-pointer"
                     >
                       <Send className="w-3.5 h-3.5" />
-                      <span>Deposit</span>
+                      <span>{t("dashboardModule.accountTransactions.deposit", "Deposit")}</span>
                     </button>
                   </div>
                 </div>
@@ -701,8 +705,8 @@ export default function MemberDashboard() {
         </div>
 
         <RecentTransactionsTable
-          title="Recent Member Transactions"
-          subtitle="Your verified cash counter and deposit transactions"
+          title={t("memberDashboard.recentMemberTransactions", "Recent Member Transactions")}
+          subtitle={t("memberDashboard.yourVerifiedCashCounterAnd", "Your verified cash counter and deposit transactions")}
           transactions={transactions}
         />
       </div>
@@ -736,7 +740,7 @@ export default function MemberDashboard() {
               type="button"
               onClick={() => setNomineeModalOpen(false)}
               className="absolute top-6 right-6 z-20 w-10 h-10 rounded-full bg-[#f1f5f9] hover:bg-[#e2e8f0] text-slate-500 hover:text-slate-800 flex items-center justify-center transition-colors cursor-pointer shadow-xs"
-              title="Close"
+              title={t("common.close", "Close")}
             >
               <X className="w-5 h-5 text-slate-500" />
             </button>
@@ -745,7 +749,7 @@ export default function MemberDashboard() {
             <div className="w-full flex items-center justify-center pt-1 pb-3 px-2">
               <img
                 src={completeNomineeIllustration}
-                alt="Complete Your Nominee Details"
+                alt={t("memberDashboard.completeYourNomineeDetails", "Complete Your Nominee Details")}
                 className="w-full max-w-[360px] h-auto object-contain select-none pointer-events-none drop-shadow-xs"
               />
             </div>
@@ -754,18 +758,18 @@ export default function MemberDashboard() {
             <div className="flex justify-center mt-1">
               <span className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#fef3c7] text-[#b45309] font-black text-xs sm:text-[13px] tracking-wide select-none">
                 <AlertTriangle className="w-4 h-4 fill-[#d97706] text-[#fef3c7] flex-shrink-0" />
-                <span>Action Required</span>
+                <span>{t("memberDashboard.actionRequired", "Action Required")}</span>
               </span>
             </div>
 
             {/* Heading */}
             <h3 className="text-2xl sm:text-[28px] font-black text-[#0f172a] tracking-tight mt-3.5 sm:mt-4 leading-tight">
-              Complete Your Nominee Details
+              {t("memberDashboard.completeYourNomineeDetails", "Complete Your Nominee Details")}
             </h3>
 
             {/* Description */}
             <p className="text-xs sm:text-sm text-[#475569] font-medium leading-relaxed max-w-[390px] mx-auto mt-2.5 sm:mt-3">
-              You haven’t registered a nominee yet. Please add your nominee details to help secure your savings, deposits, and other cooperative benefits.
+              {t("memberDashboard.youHavenTRegisteredA", "You haven’t registered a nominee yet. Please add your nominee details to help secure your savings, deposits, and other cooperative benefits.")}
             </p>
 
             {/* Pill Action Button */}
@@ -778,7 +782,7 @@ export default function MemberDashboard() {
                 }}
                 className="px-9 py-3.5 sm:py-4 rounded-full bg-[#009b8d] hover:bg-[#00867a] active:scale-95 text-white font-black text-sm sm:text-base shadow-md hover:shadow-lg transition-all inline-flex items-center justify-center gap-2.5 cursor-pointer"
               >
-                <span>Register Nominee Now</span>
+                <span>{t("memberDashboard.registerNomineeNow", "Register Nominee Now")}</span>
                 <ArrowRight className="w-4 h-4 text-white stroke-[2.5]" />
               </button>
             </div>

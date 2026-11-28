@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import StatCard from '../../components/dashboard/StatCard';
 import EmergencyCaseThreadModal from '../../components/dashboard/EmergencyCaseThreadModal';
@@ -49,6 +50,7 @@ function formatDateTime(isoString) {
 }
 
 export default function SuperAdminEmergencyCases() {
+  const { t } = useTranslation();
   const [cases, setCases] = useState([]);
   const [unreadInfo, setUnreadInfo] = useState({ total_unread_count: 0, branches: [] });
   const [branchesList, setBranchesList] = useState([]);
@@ -184,20 +186,20 @@ export default function SuperAdminEmergencyCases() {
             <div className="inline-flex flex-wrap items-center gap-x-2 gap-y-1 px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-xs text-[11px] sm:text-xs font-semibold border border-teal-200/80 shadow-2xs text-[#0f766e] mb-3">
               <span className="inline-flex items-center gap-1.5 flex-shrink-0">
                 <AlertOctagon className="w-4 h-4 text-[#00b4a7]" />
-                <span>HQ Emergency Operations Center</span>
+                <span>{t("superAdminEmergencyCases.hqEmergencyOperationsCenter", "HQ Emergency Operations Center")}</span>
               </span>
               <span className="text-teal-300 hidden sm:inline">•</span>
-              <span className="text-slate-600">All Registered Branches</span>
+              <span className="text-slate-600">{t("superAdminEmergencyCases.allRegisteredBranches", "All Registered Branches")}</span>
             </div>
 
             <div className="flex items-center gap-2.5 sm:gap-3">
               <span className="w-1.5 h-7 sm:h-9 bg-[#00b4a7] rounded-full flex-shrink-0" />
               <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-                Branch Emergency Hotlines
+                {t("superAdminEmergencyCases.branchEmergencyHotlines", "Branch Emergency Hotlines")}
               </h1>
             </div>
             <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed mt-2">
-              Real-time hotline channels connecting all branch managers directly with Superadmin. Review crisis reports, vault security alerts, or urgent operational escalations.
+              {t("superAdminEmergencyCases.realTimeHotlineChannelsConnecting", "Real-time hotline channels connecting all branch managers directly with Superadmin. Review crisis reports, vault security alerts, or urgent operational escalations.")}
             </p>
 
             <div className="flex items-center gap-3 mt-4 flex-wrap">
@@ -208,7 +210,7 @@ export default function SuperAdminEmergencyCases() {
                 className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs border border-slate-200 shadow-2xs transition-all cursor-pointer disabled:opacity-50"
               >
                 <RefreshCw className={`w-3.5 h-3.5 text-[#00b4a7] ${refreshing ? 'animate-spin' : ''}`} />
-                <span>Refresh Escalations</span>
+                <span>{t("superAdminEmergencyCases.refreshEscalations", "Refresh Escalations")}</span>
               </button>
             </div>
           </div>
@@ -225,7 +227,7 @@ export default function SuperAdminEmergencyCases() {
         {/* 2 Stat Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 lg:gap-5">
           <StatCard
-            title="Total Unread Messages"
+            title={t("superAdminEmergencyCases.totalUnreadMessages", "Total Unread Messages")}
             value={unreadInfo.total_unread_count}
             valueClassName={
               unreadInfo.total_unread_count > 0
@@ -243,7 +245,7 @@ export default function SuperAdminEmergencyCases() {
           />
 
           <StatCard
-            title="Total Emergency Cases"
+            title={t("dashboardModule.emergency.totalCases", "Total Emergency Cases")}
             value={cases.length}
             valueClassName="text-xl sm:text-2xl font-semibold text-slate-900 tracking-normal font-sans"
             subtext="System-wide Branch Escalations"
@@ -256,7 +258,7 @@ export default function SuperAdminEmergencyCases() {
           <div className="p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-xs sm:text-sm font-semibold flex items-center justify-between">
             <span>{error}</span>
             <button onClick={() => fetchCasesAndUnread(true)} className="underline cursor-pointer">
-              Retry
+              {t("common.retry", "Retry")}
             </button>
           </div>
         )}
@@ -267,10 +269,10 @@ export default function SuperAdminEmergencyCases() {
           <div className="p-5 sm:p-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-50/60">
             <div>
               <h3 className="text-base sm:text-lg font-black text-slate-900">
-                All Branch Emergency Cases
+                {t("superAdminEmergencyCases.allBranchEmergencyCases", "All Branch Emergency Cases")}
               </h3>
               <p className="text-xs text-slate-500 font-medium">
-                Live communication threads escalated by individual branches
+                {t("superAdminEmergencyCases.liveCommunicationThreadsEscalatedBy", "Live communication threads escalated by individual branches")}
               </p>
             </div>
 
@@ -278,13 +280,13 @@ export default function SuperAdminEmergencyCases() {
             <div className="flex items-center gap-3 flex-wrap">
               {/* Branch Filter */}
               <div className="flex items-center gap-1.5">
-                <span className="text-xs font-bold text-slate-500">Branch:</span>
+                <span className="text-xs font-bold text-slate-500">{t("branchManagerCashReconciliation.branch", "Branch:")}</span>
                 <select
                   value={selectedBranchId}
                   onChange={(e) => setSelectedBranchId(e.target.value)}
                   className="px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-[#14b8a6]"
                 >
-                  <option value="all">All Branches</option>
+                  <option value="all">{t("superAdminDashboard.allBranches", "All Branches")}</option>
                   {branchesList.map((b) => (
                     <option key={b.id} value={b.id}>
                       {b.name} (#{b.branch_code || b.id})
@@ -304,7 +306,7 @@ export default function SuperAdminEmergencyCases() {
                 }`}
               >
                 <MessageSquare className="w-3.5 h-3.5" />
-                <span>Unread Only</span>
+                <span>{t("superAdminEmergencyCases.unreadOnly", "Unread Only")}</span>
               </button>
 
               {/* Search */}
@@ -312,7 +314,7 @@ export default function SuperAdminEmergencyCases() {
                 <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
-                  placeholder="Search subject or case..."
+                  placeholder={t("superAdminEmergencyCases.searchSubjectOrCase", "Search subject or case...")}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-8 pr-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-[#14b8a6] text-xs font-medium text-slate-800 bg-white"
@@ -325,18 +327,18 @@ export default function SuperAdminEmergencyCases() {
           {loading ? (
             <div className="py-24 text-center space-y-3">
               <Loader2 className="w-8 h-8 animate-spin text-[#00b4a7] mx-auto" />
-              <p className="text-xs text-slate-500 font-medium">Loading emergency cases...</p>
+              <p className="text-xs text-slate-500 font-medium">{t("superAdminEmergencyCases.loadingEmergencyCases", "Loading emergency cases...")}</p>
             </div>
           ) : cases.length === 0 ? (
             <div className="py-20 text-center space-y-3 p-4">
               <div className="w-14 h-14 rounded-2xl bg-teal-50 text-[#0f766e] flex items-center justify-center mx-auto">
                 <AlertOctagon className="w-7 h-7 text-[#00b4a7]" />
               </div>
-              <p className="text-base font-bold text-slate-800">No emergency cases found</p>
+              <p className="text-base font-bold text-slate-800">{t("superAdminEmergencyCases.noEmergencyCasesFound", "No emergency cases found")}</p>
               <p className="text-xs text-slate-500 max-w-sm mx-auto">
                 {unreadOnly
-                  ? 'There are no unread emergency messages awaiting HQ response.'
-                  : 'No branch managers have opened an emergency case matching this filter.'}
+                  ? t("superAdminEmergencyCases.thereAreNoUnreadEmergency", "There are no unread emergency messages awaiting HQ response.")
+                  : t("superAdminEmergencyCases.noBranchManagersHaveOpened", "No branch managers have opened an emergency case matching this filter.")}
               </p>
             </div>
           ) : (
@@ -344,16 +346,17 @@ export default function SuperAdminEmergencyCases() {
               <table className="w-full text-left border-collapse min-w-[800px]">
                 <thead>
                   <tr className="border-b border-slate-100 bg-slate-50/75 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                    <th className="py-3.5 px-6">Case ID</th>
-                    <th className="py-3.5 px-6">Branch</th>
-                    <th className="py-3.5 px-6">Subject</th>
-                    <th className="py-3.5 px-6">Created At</th>
-                    <th className="py-3.5 px-6 text-center">Unread Messages</th>
-                    <th className="py-3.5 px-6 text-right">Actions</th>
+                    <th className="py-3.5 px-6">{t("dashboardModule.emergency.table.caseId", "Case ID")}</th>
+                    <th className="py-3.5 px-6">{t("dashboard.branch", "Branch")}</th>
+                    <th className="py-3.5 px-6">{t("dashboardModule.emergency.table.subject", "Subject")}</th>
+                    <th className="py-3.5 px-6">{t("dashboardModule.emergency.table.createdAt", "Created At")}</th>
+                    <th className="py-3.5 px-6 text-center">{t("dashboardModule.emergency.table.unreadMessages", "Unread Messages")}</th>
+                    <th className="py-3.5 px-6 text-right">{t("common.actions", "Actions")}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-sm">
                   {cases.map((c) => {
+  const { t } = useTranslation();
                     const hasUnread = Number(c.unread_count) > 0;
                     return (
                       <tr key={c.id} className="hover:bg-teal-50/25 transition-colors group">
@@ -365,7 +368,7 @@ export default function SuperAdminEmergencyCases() {
                             {c.branch?.name || 'Society Branch'}
                           </p>
                           <span className="text-xs text-slate-400">
-                            Code: #{c.branch?.branch_code || '—'}
+                            {t("branchManagerNominees.code", "Code: #")}{c.branch?.branch_code || '—'}
                           </span>
                         </td>
                         <td className="py-4 px-6">
@@ -380,10 +383,10 @@ export default function SuperAdminEmergencyCases() {
                           {hasUnread ? (
                             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-100 text-amber-800 font-extrabold text-xs rounded-full border border-amber-200 animate-pulse">
                               <MessageSquare className="w-3.5 h-3.5" />
-                              <span>{c.unread_count} new</span>
+                              <span>{c.unread_count} {t("superAdminEmergencyCases.new", "new")}</span>
                             </span>
                           ) : (
-                            <span className="text-xs text-slate-400 font-medium">All Read</span>
+                            <span className="text-xs text-slate-400 font-medium">{t("superAdminEmergencyCases.allRead", "All Read")}</span>
                           )}
                         </td>
                         <td className="py-4 px-6 text-right whitespace-nowrap">
@@ -393,7 +396,7 @@ export default function SuperAdminEmergencyCases() {
                             className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-gradient-to-r from-[#14b8a6] to-[#0f766e] hover:from-[#0d9488] hover:to-[#0f766e] text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer active:scale-95"
                           >
                             <Eye className="w-3.5 h-3.5" />
-                            <span>Reply / View Hotline</span>
+                            <span>{t("superAdminEmergencyCases.replyViewHotline", "Reply / View Hotline")}</span>
                           </button>
                         </td>
                       </tr>

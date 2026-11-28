@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import StatCard from '../../components/dashboard/StatCard';
 import EmergencyCaseThreadModal from '../../components/dashboard/EmergencyCaseThreadModal';
@@ -29,6 +30,7 @@ import {
   AlertOctagon,
 } from 'lucide-react';
 
+
 function formatDateTime(isoString) {
   if (!isoString) return '—';
   try {
@@ -48,6 +50,7 @@ function formatDateTime(isoString) {
 }
 
 export default function BranchManagerEmergencyCases() {
+  const { t } = useTranslation();
   const [cases, setCases] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -72,8 +75,8 @@ export default function BranchManagerEmergencyCases() {
       const parsed = u ? JSON.parse(u) : null;
       if (parsed) {
         return {
-          name: parsed.full_name || parsed.name || 'Branch Manager',
-          full_name: parsed.full_name || parsed.name || 'Branch Manager',
+          name: parsed.full_name || parsed.name || t("nav.branchManager", "Branch Manager"),
+          full_name: parsed.full_name || parsed.name || t("nav.branchManager", "Branch Manager"),
           id: parsed.id || 'MGR-001',
           user_code: parsed.user_code || 'MGR-001',
           avatarText: (parsed.full_name || parsed.name || 'BM')
@@ -82,21 +85,21 @@ export default function BranchManagerEmergencyCases() {
             .join('')
             .slice(0, 2)
             .toUpperCase(),
-          role: parsed.role || 'Branch Manager',
-          branch: parsed.branch?.name || parsed.branch_name || 'Society Branch',
-          branch_name: parsed.branch?.name || parsed.branch_name || 'Society Branch',
+          role: parsed.role || t("nav.branchManager", "Branch Manager"),
+          branch: parsed.branch?.name || parsed.branch_name || t("dashboardModule.emergency.societyBranch", "Society Branch"),
+          branch_name: parsed.branch?.name || parsed.branch_name || t("dashboardModule.emergency.societyBranch", "Society Branch"),
           branch_code: parsed.branch?.branch_code || parsed.branch_code || 'BRA-01',
         };
       }
     } catch {}
     return {
-      name: 'Branch Manager',
-      full_name: 'Branch Manager',
+      name: t("nav.branchManager", "Branch Manager"),
+      full_name: t("nav.branchManager", "Branch Manager"),
       id: 'MGR-001',
       avatarText: 'BM',
-      role: 'Branch Manager',
-      branch: 'Society Branch',
-      branch_name: 'Society Branch',
+      role: t("nav.branchManager", "Branch Manager"),
+      branch: t("dashboardModule.emergency.societyBranch", "Society Branch"),
+      branch_name: t("dashboardModule.emergency.societyBranch", "Society Branch"),
       branch_code: 'BRA-01',
     };
   });
@@ -122,7 +125,7 @@ export default function BranchManagerEmergencyCases() {
         handleAuthExpired('branch_manager');
         return;
       }
-      setError(err.message || 'Failed to load emergency cases.');
+      setError(err.message || t("dashboardModule.emergency.loadError", "Failed to load emergency cases."));
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -179,12 +182,12 @@ export default function BranchManagerEmergencyCases() {
       const created = await createBranchAdminEmergencyCase(createForm);
       setCreateModalOpen(false);
       setCreateForm({ subject: '', message: '' });
-      setSuccessToast(`Emergency case #${created.id} created and dispatched to Superadmin HQ!`);
+      setSuccessToast(t("dashboardModule.emergency.createdToast", "Emergency case #{id} created and dispatched to Superadmin HQ!", { id: created.id }));
       setTimeout(() => setSuccessToast(null), 5000);
       fetchCasesAndUnread(true);
       setActiveCaseId(created.id);
     } catch (err) {
-      setCreateError(err.message || 'Failed to open emergency case.');
+      setCreateError(err.message || t("modal.emergency.createError", "Failed to open emergency case."));
     } finally {
       setCreating(false);
     }
@@ -223,7 +226,7 @@ export default function BranchManagerEmergencyCases() {
             <div className="inline-flex flex-wrap items-center gap-x-2 gap-y-1 px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-xs text-[11px] sm:text-xs font-semibold border border-teal-200/80 shadow-2xs text-[#0f766e] mb-3">
               <span className="inline-flex items-center gap-1.5 flex-shrink-0">
                 <AlertOctagon className="w-4 h-4 text-[#00b4a7]" />
-                <span>Superadmin Emergency Hotline</span>
+                <span>{t("dashboardModule.emergency.hotlineBadge", "Superadmin Emergency Hotline")}</span>
               </span>
               <span className="text-teal-300 hidden sm:inline">•</span>
               <span className="text-slate-600">{branchUser.branch_name}</span>
@@ -232,11 +235,11 @@ export default function BranchManagerEmergencyCases() {
             <div className="flex items-center gap-2.5 sm:gap-3">
               <span className="w-1.5 h-7 sm:h-9 bg-[#00b4a7] rounded-full flex-shrink-0" />
               <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-                Branch Emergency Cases
+                {t("dashboardModule.emergency.title", "Branch Emergency Cases")}
               </h1>
             </div>
             <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed mt-2">
-              Open and monitor direct high-priority escalation cases with Superadmin HQ. Use this emergency channel for branch lockouts, urgent liquidity matters, or compliance alerts.
+              {t("dashboardModule.emergency.subtitle", "Open and monitor direct high-priority escalation cases with Superadmin HQ. Use this emergency channel for branch lockouts, urgent liquidity matters, or compliance alerts.")}
             </p>
 
             <div className="flex items-center gap-3 mt-4 flex-wrap">
@@ -246,7 +249,7 @@ export default function BranchManagerEmergencyCases() {
                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-[#14b8a6] to-[#0f766e] hover:from-[#0d9488] hover:to-[#0f766e] text-white font-bold text-xs sm:text-sm shadow-md shadow-teal-500/20 hover:shadow-lg transition-all cursor-pointer"
               >
                 <PlusCircle className="w-4 h-4" />
-                <span>Raise Emergency Case</span>
+                <span>{t("dashboardModule.emergency.raiseCase", "Raise Emergency Case")}</span>
               </button>
 
               <button
@@ -256,7 +259,7 @@ export default function BranchManagerEmergencyCases() {
                 className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-2xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs border border-slate-200 shadow-2xs transition-all cursor-pointer disabled:opacity-50"
               >
                 <RefreshCw className={`w-3.5 h-3.5 text-[#00b4a7] ${refreshing ? 'animate-spin' : ''}`} />
-                <span>Refresh</span>
+                <span>{t("common.refresh", "Refresh")}</span>
               </button>
             </div>
           </div>
@@ -273,32 +276,32 @@ export default function BranchManagerEmergencyCases() {
         {/* 3 Stat Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 lg:gap-5">
           <StatCard
-            title="Total Emergency Cases"
+            title={t("dashboardModule.emergency.totalCases", "Total Emergency Cases")}
             value={cases.length}
             valueClassName="text-xl sm:text-2xl font-semibold text-slate-900 tracking-normal font-sans"
-            subtext="Escalations Raised by Branch"
+            subtext={t("dashboardModule.emergency.totalCasesSubtext", "Escalations Raised by Branch")}
             icon={ShieldAlert}
           />
 
           <StatCard
-            title="Unread Superadmin Replies"
+            title={t("dashboardModule.emergency.unreadReplies", "Unread Superadmin Replies")}
             value={unreadCount}
             valueClassName={
               unreadCount > 0
                 ? 'text-xl sm:text-2xl font-bold text-amber-600 tracking-normal font-sans'
                 : 'text-xl sm:text-2xl font-semibold text-emerald-600 tracking-normal font-sans'
             }
-            subtext={unreadCount > 0 ? 'Urgent attention required' : 'All replies read'}
+            subtext={unreadCount > 0 ? t("dashboardModule.emergency.urgentAttention", "Urgent attention required") : t("dashboardModule.emergency.allRepliesRead", "All replies read")}
             icon={MessageSquare}
-            trend={unreadCount > 0 ? `${unreadCount} Unread` : 'Clear'}
+            trend={unreadCount > 0 ? t("dashboardModule.emergency.unreadCount", { count: unreadCount, defaultValue: "{{count}} unread replies" }) : t("dashboardModule.emergency.clear", "Clear")}
             trendType={unreadCount > 0 ? 'down' : 'up'}
           />
 
           <StatCard
-            title="Channel Status"
-            value="Connected"
+            title={t("dashboardModule.emergency.channelStatus", "Channel Status")}
+            value={t("dashboardModule.emergency.connected", "Connected")}
             valueClassName="text-xl sm:text-2xl font-semibold text-emerald-600 tracking-normal font-sans"
-            subtext="HQ Direct Priority Line"
+            subtext={t("dashboardModule.emergency.channelStatusSubtext", "HQ Direct Priority Line")}
             icon={CheckCircle2}
           />
         </div>
@@ -308,7 +311,7 @@ export default function BranchManagerEmergencyCases() {
           <div className="p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-xs sm:text-sm font-semibold flex items-center justify-between">
             <span>{error}</span>
             <button onClick={() => fetchCasesAndUnread(true)} className="underline cursor-pointer">
-              Retry
+              {t("dashboardModule.emergency.retry", "Retry")}
             </button>
           </div>
         )}
@@ -319,10 +322,10 @@ export default function BranchManagerEmergencyCases() {
           <div className="p-5 sm:p-6 border-b border-slate-100 flex items-center justify-between flex-wrap gap-4 bg-slate-50/60">
             <div>
               <h3 className="text-base sm:text-lg font-black text-slate-900">
-                Active Emergency Threads
+                {t("dashboardModule.emergency.activeThreads", "Active Emergency Threads")}
               </h3>
               <p className="text-xs text-slate-500 font-medium">
-                Live communication cases established with Superadmin
+                {t("dashboardModule.emergency.activeThreadsDesc", "Live communication cases established with Superadmin")}
               </p>
             </div>
 
@@ -331,7 +334,7 @@ export default function BranchManagerEmergencyCases() {
                 <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
-                  placeholder="Search case subject or ID..."
+                  placeholder={t("dashboardModule.emergency.searchPlaceholder", "Search case subject or ID...")}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-[#14b8a6] text-xs sm:text-sm font-medium text-slate-800 bg-white"
@@ -344,7 +347,7 @@ export default function BranchManagerEmergencyCases() {
                 className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#14b8a6] to-[#0f766e] hover:from-[#0d9488] hover:to-[#0f766e] text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
               >
                 <PlusCircle className="w-3.5 h-3.5" />
-                <span>Raise Emergency Case</span>
+                <span>{t("dashboardModule.emergency.raiseCase", "Raise Emergency Case")}</span>
               </button>
             </div>
           </div>
@@ -353,7 +356,7 @@ export default function BranchManagerEmergencyCases() {
           {loading ? (
             <div className="py-24 text-center space-y-3">
               <Loader2 className="w-8 h-8 animate-spin text-[#00b4a7] mx-auto" />
-              <p className="text-xs text-slate-500 font-medium">Loading branch emergency cases...</p>
+              <p className="text-xs text-slate-500 font-medium">{t("dashboardModule.emergency.loadingCases", "Loading branch emergency cases...")}</p>
             </div>
           ) : filteredCases.length === 0 ? (
             <div className="py-20 text-center space-y-3 p-4">
@@ -361,10 +364,10 @@ export default function BranchManagerEmergencyCases() {
                 <AlertOctagon className="w-7 h-7 text-[#00b4a7]" />
               </div>
               <p className="text-base font-bold text-slate-800">
-                {searchQuery ? 'No matching emergency cases found' : 'No emergency cases raised'}
+                {searchQuery ? t("dashboardModule.emergency.noMatchingCases", "No matching emergency cases found") : t("dashboardModule.emergency.noCasesRaised", "No emergency cases raised")}
               </p>
               <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                When you encounter a critical issue requiring Superadmin intervention, click &quot;Raise Emergency Case&quot; to open an immediate hotline.
+                {t("dashboardModule.emergency.emptyStateDesc", "When you encounter a critical issue requiring Superadmin intervention, click \"Raise Emergency Case\" to open an immediate hotline.")}
               </p>
               {!searchQuery && (
                 <button
@@ -373,7 +376,7 @@ export default function BranchManagerEmergencyCases() {
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-[#14b8a6] to-[#0f766e] hover:from-[#0d9488] hover:to-[#0f766e] text-white font-bold text-xs shadow-xs transition-colors cursor-pointer mt-2"
                 >
                   <PlusCircle className="w-4 h-4" />
-                  <span>Raise Emergency Case</span>
+                  <span>{t("dashboardModule.emergency.raiseCase", "Raise Emergency Case")}</span>
                 </button>
               )}
             </div>
@@ -382,11 +385,11 @@ export default function BranchManagerEmergencyCases() {
               <table className="w-full text-left border-collapse min-w-[700px]">
                 <thead>
                   <tr className="border-b border-slate-100 bg-slate-50/75 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                    <th className="py-3.5 px-6">Case ID</th>
-                    <th className="py-3.5 px-6">Subject</th>
-                    <th className="py-3.5 px-6">Created At</th>
-                    <th className="py-3.5 px-6 text-center">Unread Messages</th>
-                    <th className="py-3.5 px-6 text-right">Actions</th>
+                    <th className="py-3.5 px-6">{t("dashboardModule.emergency.table.caseId", "Case ID")}</th>
+                    <th className="py-3.5 px-6">{t("dashboardModule.emergency.table.subject", "Subject")}</th>
+                    <th className="py-3.5 px-6">{t("dashboardModule.emergency.table.createdAt", "Created At")}</th>
+                    <th className="py-3.5 px-6 text-center">{t("dashboardModule.emergency.table.unreadMessages", "Unread Messages")}</th>
+                    <th className="py-3.5 px-6 text-right">{t("common.actions", "Actions")}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-sm">
@@ -402,7 +405,7 @@ export default function BranchManagerEmergencyCases() {
                             {c.subject}
                           </p>
                           <span className="text-xs text-slate-400">
-                            By {c.created_by?.full_name || 'Branch Admin'}
+                            {t("dashboardModule.emergency.byAuthor", "By {{name}}", { name: c.created_by?.full_name || t("dashboardModule.emergency.branchAdmin", "Branch Admin") })}
                           </span>
                         </td>
                         <td className="py-4 px-6 text-xs text-slate-600 font-medium whitespace-nowrap">
@@ -412,10 +415,10 @@ export default function BranchManagerEmergencyCases() {
                           {hasUnread ? (
                             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-100 text-amber-800 font-extrabold text-xs rounded-full border border-amber-200 animate-pulse">
                               <MessageSquare className="w-3.5 h-3.5" />
-                              <span>{c.unread_count} new reply</span>
+                              <span>{t("dashboardModule.emergency.newReplyCount", "{count} new reply", { count: c.unread_count })}</span>
                             </span>
                           ) : (
-                            <span className="text-xs text-slate-400 font-medium">0 unread</span>
+                            <span className="text-xs text-slate-400 font-medium">{t("dashboardModule.emergency.zeroUnread", "0 unread")}</span>
                           )}
                         </td>
                         <td className="py-4 px-6 text-right whitespace-nowrap">
@@ -425,7 +428,7 @@ export default function BranchManagerEmergencyCases() {
                             className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-teal-50 hover:bg-teal-100 text-[#0f766e] font-bold text-xs rounded-xl border border-teal-200 transition-all cursor-pointer active:scale-95"
                           >
                             <Eye className="w-3.5 h-3.5" />
-                            <span>View Conversation</span>
+                            <span>{t("dashboardModule.emergency.viewConversation", "View Conversation")}</span>
                           </button>
                         </td>
                       </tr>
@@ -449,10 +452,10 @@ export default function BranchManagerEmergencyCases() {
                 </div>
                 <div>
                   <h3 className="text-base sm:text-lg font-black text-slate-900">
-                    Open Emergency Case
+                    {t("modal.emergency.openTitle", "Open Emergency Case")}
                   </h3>
                   <p className="text-xs text-slate-500 font-medium">
-                    Immediate notification sent to Superadmin HQ
+                    {t("modal.emergency.openSubtitle", "Immediate notification sent to Superadmin HQ")}
                   </p>
                 </div>
               </div>
@@ -474,14 +477,14 @@ export default function BranchManagerEmergencyCases() {
 
               <div className="space-y-1.5">
                 <label className="block text-xs font-bold text-slate-700">
-                  Case Subject / Brief Title <span className="text-rose-500">*</span>
+                  {t("modal.emergency.subjectLabel", "Case Subject / Brief Title")} <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
                   required
                   maxLength={150}
                   minLength={2}
-                  placeholder="e.g. Critical Cash Deficit at Agra Hub Vault"
+                  placeholder={t("modal.emergency.subjectPlaceholder", "e.g. Critical Cash Deficit at Agra Hub Vault")}
                   value={createForm.subject}
                   onChange={(e) => setCreateForm({ ...createForm, subject: e.target.value })}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-[#14b8a6] font-medium text-slate-800 text-sm"
@@ -490,14 +493,14 @@ export default function BranchManagerEmergencyCases() {
 
               <div className="space-y-1.5">
                 <label className="block text-xs font-bold text-slate-700">
-                  Initial Message &amp; Emergency Details <span className="text-rose-500">*</span>
+                  {t("modal.emergency.messageLabel", "Initial Message & Emergency Details")} <span className="text-rose-500">*</span>
                 </label>
                 <textarea
                   rows={4}
                   required
                   maxLength={5000}
                   minLength={1}
-                  placeholder="Explain the urgent situation, root cause, and immediate assistance requested from Superadmin..."
+                  placeholder={t("modal.emergency.messagePlaceholder", "Explain the urgent situation, root cause, and immediate assistance requested from Superadmin...")}
                   value={createForm.message}
                   onChange={(e) => setCreateForm({ ...createForm, message: e.target.value })}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-[#14b8a6] font-medium text-slate-800 text-sm resize-none"
@@ -510,7 +513,7 @@ export default function BranchManagerEmergencyCases() {
                   onClick={() => setCreateModalOpen(false)}
                   className="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 font-bold text-xs hover:bg-slate-50 transition-colors cursor-pointer"
                 >
-                  Cancel
+                  {t("common.cancel", "Cancel")}
                 </button>
                 <button
                   type="submit"
@@ -518,7 +521,7 @@ export default function BranchManagerEmergencyCases() {
                   className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#14b8a6] to-[#0f766e] hover:from-[#0d9488] hover:to-[#0f766e] text-white font-bold text-xs shadow-md shadow-teal-500/20 transition-all disabled:opacity-50 cursor-pointer"
                 >
                   {creating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                  <span>{creating ? 'Dispatching...' : 'Dispatch Emergency Case'}</span>
+                  <span>{creating ? t("modal.emergency.dispatching", "Dispatching...") : t("modal.emergency.dispatchButton", "Dispatch Emergency Case")}</span>
                 </button>
               </div>
             </form>

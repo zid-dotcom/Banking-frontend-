@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { i18n } from '../i18n/index.js';
+import { useTranslation } from 'react-i18next';
 import {
   CheckCircle2,
   ArrowRight,
@@ -14,6 +16,7 @@ import {
 import PageBanner from '../components/PageBanner';
 import LoanCalculator from '../components/LoanCalculator';
 import { SOCIETY_INFO } from '../data/societyData';
+
 
 /* -------------------------------------------------------------------------
    Helpers
@@ -104,54 +107,54 @@ const LOAN_IMAGES = {
 const loanCategories = [
   {
     id: 'agro-crop',
-    title: 'Seasonal Agro & Crop Cultivation Loan',
+    title: i18n.t("loans.seasonalAgroCropCultivationLoan", "Seasonal Agro & Crop Cultivation Loan"),
     badge: 'Priority Agricultural Scheme',
-    description: 'Short to medium-term credit tailored to finance seasonal inputs such as seeds, natural fertilizers, pest control, irrigation, and labor expenses.',
+    description: i18n.t("loans.shortToMediumTermCredit", "Short to medium-term credit tailored to finance seasonal inputs such as seeds, natural fertilizers, pest control, irrigation, and labor expenses."),
     tenure: '6 to 24 Months (Aligned to Harvest)',
     documents: ['Society Membership Pass', 'Aadhaar / Voter ID', 'Land Holding / Lease Details', 'Crop Plan Declaration'],
     features: ['Disbursed in tranches if required', 'Repayable post-harvest sale', 'No prepayment penalty']
   },
   {
     id: 'msme-enterprise',
-    title: 'Rural MSME & Enterprise Working Capital',
+    title: i18n.t("loans.ruralMsmeEnterpriseWorkingCapital", "Rural MSME & Enterprise Working Capital"),
     badge: 'Small Business Growth',
-    description: 'Term and revolving credit for local retailers, spice processors, agro-commodity traders, and cottage manufacturing enterprises in rural and semi-urban belts.',
+    description: i18n.t("loans.termAndRevolvingCreditFor", "Term and revolving credit for local retailers, spice processors, agro-commodity traders, and cottage manufacturing enterprises in rural and semi-urban belts."),
     tenure: '12 to 60 Months',
     documents: ['Society Membership Number', 'Identity & Address Proof', 'Business Trade / Registration Proof', 'Bank Statement (Last 6 Months)'],
     features: ['Structured working capital lines', 'Flexible quarterly or monthly review', 'Fast local committee sanctions']
   },
   {
     id: 'machinery-equipment',
-    title: 'Farm Mechanization & Machinery Finance',
+    title: i18n.t("loans.farmMechanizationMachineryFinance", "Farm Mechanization & Machinery Finance"),
     badge: 'Asset Modernization',
-    description: 'Longer-tenure financing to acquire tractors, power tillers, solar irrigation sets, harvesters, and cold chain equipment for enhanced agricultural productivity.',
+    description: i18n.t("loans.longerTenureFinancingToAcquire", "Longer-tenure financing to acquire tractors, power tillers, solar irrigation sets, harvesters, and cold chain equipment for enhanced agricultural productivity."),
     tenure: '12 to 84 Months',
     documents: ['Society Membership Verification', 'Identity & Address Proof', 'Equipment Quotation / Proforma Invoice', 'Land Revenue Records'],
     features: ['Hypothecation of asset', 'Direct supplier settlement', 'Competitive cooperative terms']
   },
   {
     id: 'gold-secured',
-    title: 'Instant Secured Gold Loan Facility',
+    title: i18n.t("loans.instantSecuredGoldLoanFacility", "Instant Secured Gold Loan Facility"),
     badge: 'Immediate Disbursal',
-    description: 'Emergency and seasonal credit against gold ornaments evaluated by certified appraisers, stored in insured bank-grade society vaults.',
+    description: i18n.t("loans.emergencyAndSeasonalCreditAgainst", "Emergency and seasonal credit against gold ornaments evaluated by certified appraisers, stored in insured bank-grade society vaults."),
     tenure: '3 to 12 Months (Renewable)',
     documents: ['Society Membership Form', 'Government Photo ID Proof', 'Gold Ornaments for Appraisal'],
     features: ['Sanctioned within 30-45 minutes', 'High per-gram valuation', 'Insured safety custody']
   },
   {
     id: 'dairy-allied',
-    title: 'Dairy & Allied Animal Husbandry Loan',
+    title: i18n.t("loans.dairyAlliedAnimalHusbandryLoan", "Dairy & Allied Animal Husbandry Loan"),
     badge: 'Allied Agriculture',
-    description: 'Dedicated financial assistance to procure milch cattle, shed construction, feed supply, and chilling equipment for dairy farming families.',
+    description: i18n.t("loans.dedicatedFinancialAssistanceToProcure", "Dedicated financial assistance to procure milch cattle, shed construction, feed supply, and chilling equipment for dairy farming families."),
     tenure: '12 to 36 Months',
     documents: ['Society Membership Card', 'Identity Proof', 'Veterinary Health & Purchase Certificate'],
     features: ['Lactation cycle synchronized repayments', 'Livestock insurance facilitation', 'Direct milk society linkages']
   },
   {
     id: 'thrift-personal',
-    title: 'Member Thrift & Emergency Assistance',
+    title: i18n.t("loans.memberThriftEmergencyAssistance", "Member Thrift & Emergency Assistance"),
     badge: 'Member Welfare',
-    description: 'Clean personal credit facility available exclusively for standing registered cooperative members to meet educational, medical, or family requirements.',
+    description: i18n.t("loans.cleanPersonalCreditFacilityAvailable", "Clean personal credit facility available exclusively for standing registered cooperative members to meet educational, medical, or family requirements."),
     tenure: '12 to 36 Months',
     documents: ['Society Membership Record', 'Two Member Co-signatories / Guarantees', 'Income / KYC Documents'],
     features: ['Clean member credit line', 'Nominal administration processing', 'Transparent statutory terms']
@@ -185,15 +188,16 @@ const faqIcons = [UserCheck, ClipboardList, Percent, Sprout];
    ------------------------------------------------------------------------- */
 
 export default function Loans({ onOpenEnquiry }) {
+  const { t } = useTranslation();
   const [openFaq, setOpenFaq] = useState(0);
 
   return (
     <div className="bg-white">
       {/* Banner: calculator and loan papers */}
       <PageBanner
-        title="Cooperative Loan Schemes"
-        subtitle="Ethical, member-first credit options designed to foster agrarian resilience, asset creation, and enterprise growth."
-        breadcrumbs={[{ name: 'Loans' }]}
+        title={t("loans.bannerTitle", "Cooperative Credit & Loan Schemes")}
+        subtitle={t("loans.bannerDesc", "Tailored financing with zero hidden fees and member-first interest rates.")}
+        breadcrumbs={[{ name: t("nav.loans", "Loans") }]}
         image="https://images.unsplash.com/photo-1560520653-9e0e4c89eb11?auto=format&fit=crop&w=1920&q=80"
       />
 
@@ -202,15 +206,14 @@ export default function Loans({ onOpenEnquiry }) {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <Reveal className="mx-auto mb-16 max-w-3xl text-center">
             <span className="mb-2 block text-xs font-bold uppercase tracking-widest text-[#00b4a7]">
-              Credit Categories
+              {t("loans.creditCategories", "Credit Categories")}
             </span>
             <h2 className="font-serif text-3xl font-bold leading-tight text-slate-900 sm:text-4xl">
-              Flexible Loan Solutions for Every Agrarian & Commercial Need
+              {t("loans.flexibleLoanSolutionsForEvery", "Flexible Loan Solutions for Every Agrarian & Commercial Need")}
             </h2>
             <p className="mt-4 text-sm text-slate-600 sm:text-base">
-              All loan products are governed by the democratic bye-laws of{' '}
-              <strong>{SOCIETY_INFO.fullName}</strong>. Review our categories
-              below and submit an enquiry for counter processing.
+              {t("loans.allLoanProductsAreGoverned", "All loan products are governed by the democratic bye-laws of")}{' '}
+              <strong>{SOCIETY_INFO.fullName}</strong>{t("loans.reviewOurCategoriesBelowAnd", ". Review our categories below and submit an enquiry for counter processing.")}
             </p>
           </Reveal>
 
@@ -246,7 +249,7 @@ export default function Loans({ onOpenEnquiry }) {
                         <Clock className="h-[18px] w-[18px]" strokeWidth={1.8} />
                       </span>
                       <div>
-                        <span className="block text-xs text-slate-500">Available tenure</span>
+                        <span className="block text-xs text-slate-500">{t("loans.availableTenure", "Available tenure")}</span>
                         <span className="text-xs font-semibold text-slate-800 sm:text-sm">
                           {loan.tenure}
                         </span>
@@ -254,7 +257,7 @@ export default function Loans({ onOpenEnquiry }) {
                     </div>
 
                     <div className="mb-6 space-y-2">
-                      <span className="block text-xs font-bold text-slate-700">Key highlights</span>
+                      <span className="block text-xs font-bold text-slate-700">{t("loans.keyHighlights", "Key highlights")}</span>
                       {loan.features.map((feat) => (
                         <div key={feat} className="flex items-center gap-2 text-xs text-slate-600">
                           <CheckCircle2 className="h-3.5 w-3.5 flex-shrink-0 text-[#00b4a7]" />
@@ -266,7 +269,7 @@ export default function Loans({ onOpenEnquiry }) {
                     <div className="mt-auto border-t border-slate-100 pt-4">
                       <span className="mb-2 flex items-center gap-1.5 text-xs font-bold text-slate-700">
                         <FileText className="h-3.5 w-3.5 text-[#00b4a7]" />
-                        Required documents
+                        {t("loans.requiredDocuments", "Required documents")}
                       </span>
                       <ul className="space-y-1 text-xs text-slate-500">
                         {loan.documents.map((doc) => (
@@ -284,7 +287,7 @@ export default function Loans({ onOpenEnquiry }) {
                       onClick={() => onOpenEnquiry(loan)}
                       className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-[#00b4a7] px-4 py-3 text-xs font-bold text-white shadow-sm transition-colors hover:bg-[#008f85] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00b4a7]"
                     >
-                      <span>Apply for this Scheme</span>
+                      <span>{t("loans.applyForThisScheme", "Apply for this Scheme")}</span>
                       <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
                     </button>
                   </div>
@@ -300,14 +303,13 @@ export default function Loans({ onOpenEnquiry }) {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <Reveal className="mx-auto mb-12 max-w-2xl text-center">
             <span className="mb-2 block text-xs font-bold uppercase tracking-widest text-[#00b4a7]">
-              EMI Simulation
+              {t("loans.emiSimulation", "EMI Simulation")}
             </span>
             <h2 className="font-serif text-3xl font-bold text-slate-900 sm:text-4xl">
-              Calculate Your Loan Commitment
+              {t("loans.calculateYourLoanCommitment", "Calculate Your Loan Commitment")}
             </h2>
             <p className="mt-2 text-sm text-slate-600">
-              Adjust amount and tenure to estimate your monthly outflow before
-              visiting the society branch.
+              {t("loans.adjustAmountAndTenureTo", "Adjust amount and tenure to estimate your monthly outflow before visiting the society branch.")}
             </p>
           </Reveal>
 
@@ -333,23 +335,21 @@ export default function Loans({ onOpenEnquiry }) {
 
               <div className="relative">
                 <span className="inline-block rounded-full bg-white/20 px-3.5 py-1 text-xs font-semibold text-white">
-                  Common inquiries
+                  {t("loans.commonInquiries", "Common inquiries")}
                 </span>
                 <h2 className="mt-5 font-serif text-3xl font-bold leading-tight sm:text-4xl">
-                  Frequently Asked Questions
+                  {t("loans.frequentlyAskedQuestions", "Frequently Asked Questions")}
                 </h2>
                 <p className="mt-4 text-sm leading-relaxed text-teal-50 sm:text-base">
-                  Essential clarity for members regarding lending policies and
-                  documentation.
+                  {t("loans.essentialClarityForMembersRegarding", "Essential clarity for members regarding lending policies and documentation.")}
                 </p>
 
                 <div className="mt-8 rounded-2xl bg-white p-5 text-slate-800 shadow-lg">
                   <p className="text-sm font-semibold text-slate-900">
-                    Still have a question?
+                    {t("loans.stillHaveAQuestion", "Still have a question?")}
                   </p>
                   <p className="mt-1 text-xs leading-relaxed text-slate-500">
-                    Ask about customized agricultural financing or share capital
-                    requirements.
+                    {t("loans.askAboutCustomizedAgriculturalFinancing", "Ask about customized agricultural financing or share capital requirements.")}
                   </p>
 
                   <a
@@ -363,10 +363,10 @@ export default function Loans({ onOpenEnquiry }) {
                   </a>
 
                   <button
-                    onClick={() => onOpenEnquiry({ title: 'Specialized Loan Query' })}
+                    onClick={() => onOpenEnquiry({ title: i18n.t("loans.specializedLoanQuery", "Specialized Loan Query") })}
                     className="mt-4 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-[#00b4a7] px-4 py-2.5 text-xs font-bold text-white transition-colors hover:bg-[#008f85] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00b4a7]"
                   >
-                    <span>Speak with a Credit Officer</span>
+                    <span>{t("loans.speakWithACreditOfficer", "Speak with a Credit Officer")}</span>
                     <ArrowRight className="h-3.5 w-3.5" />
                   </button>
                 </div>

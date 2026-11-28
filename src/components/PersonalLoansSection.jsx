@@ -1,31 +1,35 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
-const LOAN_PURPOSES = [
-  {
-    id: 1,
-    title: 'Home Improvement',
-    description: 'Home is an important part of life, get a home improvement loan.',
-    image: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=900&q=80',
-    buttonText: 'Find out more'
-  },
-  {
-    id: 2,
-    title: 'Student Loans',
-    description: 'A student loan can help students pay for post-secondary education.',
-    image: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=900&q=80',
-    buttonText: 'Find out more'
-  },
-  {
-    id: 3,
-    title: 'Personal Loans',
-    description: 'Take control of your financial life with AurumFX personal loan.',
-    image: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=900&q=80',
-    buttonText: 'Find out more'
-  }
-];
 
 export default function PersonalLoansSection() {
+  const { t } = useTranslation();
+
+  const LOAN_PURPOSES = [
+    {
+      id: 1,
+      title: t("personalLoans.homeImprovementTitle", "Home Improvement"),
+      description: t("personalLoans.homeImprovementDesc", "Home is an important part of life, get a home improvement loan."),
+      image: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=900&q=80',
+      buttonText: t("common.findOutMore", "Find out more")
+    },
+    {
+      id: 2,
+      title: t("personalLoans.studentLoansTitle", "Student Loans"),
+      description: t("personalLoans.studentLoansDesc", "A student loan can help students pay for post-secondary education."),
+      image: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=900&q=80',
+      buttonText: t("common.findOutMore", "Find out more")
+    },
+    {
+      id: 3,
+      title: t("personalLoans.personalLoansTitle", "Personal Loans"),
+      description: t("personalLoans.personalLoansDesc", "Take control of your financial life with AurumFX personal loan."),
+      image: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=900&q=80',
+      buttonText: t("common.findOutMore", "Find out more")
+    }
+  ];
+
   return (
     <section className="py-20 lg:py-28 bg-white select-none">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -33,10 +37,10 @@ export default function PersonalLoansSection() {
         {/* Section Header - Left-aligned starting from the left edge */}
         <div className="text-left mb-12 sm:mb-14">
           <h2 className="text-3xl sm:text-4xl lg:text-[44px] font-serif font-bold text-slate-900 leading-[1.15]">
-            Personal loans for most purposes
+            {t("personalLoans.title", "Personal loans for most purposes")}
           </h2>
           <p className="text-sm sm:text-base text-slate-400 mt-2.5 font-normal">
-            Building a brighter financial future
+            {t("personalLoans.subtitle", "Building a brighter financial future")}
           </p>
         </div>
 

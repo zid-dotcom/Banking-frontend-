@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import StatCard from '../../components/dashboard/StatCard';
 import { LoanSchemeDetailModal } from '../../components/dashboard/LoanSchemeModals';
@@ -65,6 +66,7 @@ function formatDateTime(isoString) {
 }
 
 export default function BranchManagerLoanSchemes() {
+  const { t } = useTranslation();
   const [schemes, setSchemes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -212,7 +214,7 @@ export default function BranchManagerLoanSchemes() {
             <div className="inline-flex flex-wrap items-center gap-x-2 gap-y-1 px-3 sm:px-3.5 py-1.5 rounded-2xl sm:rounded-full bg-white/95 backdrop-blur-xs text-[11px] sm:text-xs font-semibold border border-teal-200/80 shadow-2xs text-[#0f766e] mb-3 max-w-full">
               <span className="inline-flex items-center gap-1.5 flex-shrink-0">
                 <Home className="w-3.5 h-3.5 text-[#00b4a7]" />
-                <span>Role: <strong className="font-bold text-teal-950">Branch Manager</strong></span>
+                <span>{t("dashboardModule.monthlyTargets.roleLabel", "Role:")} <strong className="font-bold text-teal-950">{t("nav.branchManager", "Branch Manager")}</strong></span>
               </span>
               <span className="text-teal-300 hidden sm:inline">•</span>
               <span className="inline-flex items-center gap-1 text-slate-600 sm:text-[#0f766e]">
@@ -222,26 +224,26 @@ export default function BranchManagerLoanSchemes() {
               <span className="text-teal-300 hidden sm:inline">•</span>
               <span className="inline-flex items-center gap-1.5 font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full text-[10px] sm:text-xs flex-shrink-0">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                Active
+                {t("common.active", "Active")}
               </span>
             </div>
 
             <div className="flex items-center gap-2.5 sm:gap-3">
               <span className="w-1.5 h-7 sm:h-9 bg-[#00b4a7] rounded-full flex-shrink-0" />
               <h1 className="text-xl sm:text-3xl lg:text-4xl font-serif font-bold text-slate-900 tracking-tight">
-                Liabilities Loan Schemes
+                {t("branchManagerLoanSchemes.liabilitiesLoanSchemes", "Liabilities Loan Schemes")}
               </h1>
             </div>
 
             <p className="text-slate-600 text-xs sm:text-sm mt-2 sm:mt-2.5 font-medium leading-relaxed max-w-xl">
-              Manage and track various liabilities loan schemes offered by the cooperative society.
+              {t("branchManagerLoanSchemes.manageAndTrackVariousLiabilities", "Manage and track various liabilities loan schemes offered by the cooperative society.")}
             </p>
           </div>
 
           <div className="relative z-10 flex justify-center md:justify-end pointer-events-none -my-2 sm:-my-5 lg:-my-6 flex-shrink-0 w-full md:w-auto">
             <img
               src={loanIllustration}
-              alt="Liabilities Loan Schemes Illustration"
+              alt={t("branchManagerLoanSchemes.liabilitiesLoanSchemesIllustration", "Liabilities Loan Schemes Illustration")}
               className="h-32 sm:h-44 lg:h-52 max-w-full w-auto object-contain drop-shadow-md select-none pointer-events-none transform hover:scale-102 transition-transform duration-300 mx-auto md:mx-0"
             />
           </div>
@@ -257,31 +259,31 @@ export default function BranchManagerLoanSchemes() {
         {/* 4 Summary Stat Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <StatCard
-            title="Total Loan Schemes"
+            title={t("branchManagerLoanSchemes.totalLoanSchemes", "Total Loan Schemes")}
             value={totalCount}
-            subtitle="Registered Products"
+            subtitle={t("branchManagerLoanSchemes.registeredProducts", "Registered Products")}
             icon={Landmark}
             trend={`${activeCount} active`}
             trendType="up"
           />
           <StatCard
-            title="Active Schemes"
+            title={t("branchManagerFdMisSchemes.activeSchemes", "Active Schemes")}
             value={activeCount}
-            subtitle="Ready for Member Loans"
+            subtitle={t("branchManagerLoanSchemes.readyForMemberLoans", "Ready for Member Loans")}
             icon={CheckCircle2}
             trend={totalCount > 0 ? `${Math.round((activeCount / totalCount) * 100)}% ratio` : '100%'}
             trendType="up"
           />
           <StatCard
-            title="Maximum Loan Amount"
+            title={t("branchManagerLoanSchemes.maximumLoanAmount", "Maximum Loan Amount")}
             value={formatCurrency(maxCap)}
-            subtitle="Highest Permissible Limit"
+            subtitle={t("branchManagerLoanSchemes.highestPermissibleLimit", "Highest Permissible Limit")}
             icon={Coins}
           />
           <StatCard
-            title="Avg Annual Rate"
+            title={t("branchManagerLoanSchemes.avgAnnualRate", "Avg Annual Rate")}
             value={`${avgRate}%`}
-            subtitle="Across Active Schemes"
+            subtitle={t("branchManagerLoanSchemes.acrossActiveSchemes", "Across Active Schemes")}
             icon={Percent}
             trend="Reducing EMI"
             trendType="up"
@@ -295,10 +297,10 @@ export default function BranchManagerLoanSchemes() {
           <div className="p-4 sm:p-6 border-b border-slate-100 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>
               <h2 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight">
-                Society Credit Schemes Catalogue
+                {t("branchManagerLoanSchemes.societyCreditSchemesCatalogue", "Society Credit Schemes Catalogue")}
               </h2>
               <p className="text-xs text-slate-500 font-medium">
-                Official loan products available for members at this branch
+                {t("branchManagerLoanSchemes.officialLoanProductsAvailableFor", "Official loan products available for members at this branch")}
               </p>
             </div>
 
@@ -308,7 +310,7 @@ export default function BranchManagerLoanSchemes() {
                 <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
-                  placeholder="Search scheme name or code..."
+                  placeholder={t("dashboardModule.productAccounts.searchSchemePlaceholder", "Search scheme name or code...")}
                   value={searchQuery}
                   onChange={(e) => {
                     setSearchQuery(e.target.value);
@@ -327,9 +329,9 @@ export default function BranchManagerLoanSchemes() {
                 }}
                 className="px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-700 focus:outline-none focus:border-teal-500 cursor-pointer"
               >
-                <option value="all">All Status</option>
-                <option value="active">Active Only</option>
-                <option value="inactive">Inactive Only</option>
+                <option value="all">{t("branchManagerLoanSchemes.allStatus", "All Status")}</option>
+                <option value="active">{t("branchManagerFdMisSchemes.activeOnly", "Active Only")}</option>
+                <option value="inactive">{t("branchManagerFdMisSchemes.inactiveOnly", "Inactive Only")}</option>
               </select>
 
               {/* Interest Method Filter */}
@@ -341,16 +343,16 @@ export default function BranchManagerLoanSchemes() {
                 }}
                 className="px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-700 focus:outline-none focus:border-teal-500 cursor-pointer"
               >
-                <option value="all">All Methods</option>
-                <option value="reducing_emi">Reducing EMI</option>
-                <option value="flat">Flat Interest</option>
+                <option value="all">{t("branchManagerLoanSchemes.allMethods", "All Methods")}</option>
+                <option value="reducing_emi">{t("branchManagerLoanSchemes.reducingEmi", "Reducing EMI")}</option>
+                <option value="flat">{t("branchManagerLoanSchemes.flatInterest", "Flat Interest")}</option>
               </select>
 
               {/* Refresh Button */}
               <button
                 onClick={() => fetchLoanSchemes(true)}
                 disabled={refreshing}
-                title="Refresh scheme catalogue"
+                title={t("branchManagerLoanSchemes.refreshSchemeCatalogue", "Refresh scheme catalogue")}
                 className="p-2 sm:px-3 sm:py-2 text-slate-600 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl font-semibold text-xs transition-colors cursor-pointer disabled:opacity-50"
               >
                 <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin text-teal-600' : ''}`} />
@@ -364,7 +366,7 @@ export default function BranchManagerLoanSchemes() {
               <div className="flex items-start gap-2.5">
                 <AlertCircle className="w-5 h-5 flex-shrink-0 text-red-600 mt-0.5" />
                 <div>
-                  <p className="text-sm font-bold text-red-900">Failed to load loan schemes</p>
+                  <p className="text-sm font-bold text-red-900">{t("branchManagerLoanSchemes.failedToLoadLoanSchemes", "Failed to load loan schemes")}</p>
                   <p className="text-xs text-red-700 mt-0.5">{error}</p>
                 </div>
               </div>
@@ -372,7 +374,7 @@ export default function BranchManagerLoanSchemes() {
                 onClick={() => fetchLoanSchemes()}
                 className="text-xs font-bold text-red-700 hover:text-red-900 underline cursor-pointer flex-shrink-0"
               >
-                Retry
+                {t("common.retry", "Retry")}
               </button>
             </div>
           )}
@@ -382,20 +384,20 @@ export default function BranchManagerLoanSchemes() {
             <table className="w-full text-left text-sm">
               <thead className="bg-slate-50 text-[11px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">
                 <tr>
-                  <th className="py-3.5 px-4 whitespace-nowrap">Scheme Code</th>
-                  <th className="py-3.5 px-5 whitespace-nowrap">Scheme Name</th>
-                  <th className="py-3.5 px-4 whitespace-nowrap">Max Loan Amount</th>
-                  <th className="py-3.5 px-3 text-center whitespace-nowrap">Duration</th>
-                  <th className="py-3.5 px-3 text-center whitespace-nowrap">Annual Rate</th>
-                  <th className="py-3.5 px-3 text-center whitespace-nowrap">Overdue Rate</th>
-                  <th className="py-3.5 px-3 text-center whitespace-nowrap">Grace Period</th>
-                  <th className="py-3.5 px-3 text-center whitespace-nowrap">Processing Fee</th>
-                  <th className="py-3.5 px-3 text-center whitespace-nowrap">Stamp Duty</th>
-                  <th className="py-3.5 px-3 text-center whitespace-nowrap">Insurance Fee</th>
-                  <th className="py-3.5 px-3 text-center whitespace-nowrap">SMS Fee</th>
-                  <th className="py-3.5 px-4 whitespace-nowrap">Created At</th>
-                  <th className="py-3.5 px-4 whitespace-nowrap">Status</th>
-                  <th className="py-3.5 px-4 text-right whitespace-nowrap sticky right-0 bg-slate-50 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.05)]">Actions</th>
+                  <th className="py-3.5 px-4 whitespace-nowrap">{t("dashboardModule.productAccounts.schemeCode", "Scheme Code")}</th>
+                  <th className="py-3.5 px-5 whitespace-nowrap">{t("dashboardModule.productAccounts.schemeName", "Scheme Name")}</th>
+                  <th className="py-3.5 px-4 whitespace-nowrap">{t("branchManagerLoanSchemes.maxLoanAmount", "Max Loan Amount")}</th>
+                  <th className="py-3.5 px-3 text-center whitespace-nowrap">{t("branchManagerFdMisSchemes.duration", "Duration")}</th>
+                  <th className="py-3.5 px-3 text-center whitespace-nowrap">{t("branchManagerLoanSchemes.annualRate", "Annual Rate")}</th>
+                  <th className="py-3.5 px-3 text-center whitespace-nowrap">{t("branchManagerLoanSchemes.overdueRate", "Overdue Rate")}</th>
+                  <th className="py-3.5 px-3 text-center whitespace-nowrap">{t("branchManagerLoanSchemes.gracePeriod", "Grace Period")}</th>
+                  <th className="py-3.5 px-3 text-center whitespace-nowrap">{t("branchManagerLoanSchemes.processingFee", "Processing Fee")}</th>
+                  <th className="py-3.5 px-3 text-center whitespace-nowrap">{t("branchManagerLoanSchemes.stampDuty", "Stamp Duty")}</th>
+                  <th className="py-3.5 px-3 text-center whitespace-nowrap">{t("branchManagerLoanSchemes.insuranceFee", "Insurance Fee")}</th>
+                  <th className="py-3.5 px-3 text-center whitespace-nowrap">{t("branchManagerLoanSchemes.smsFee", "SMS Fee")}</th>
+                  <th className="py-3.5 px-4 whitespace-nowrap">{t("dashboardModule.emergency.table.createdAt", "Created At")}</th>
+                  <th className="py-3.5 px-4 whitespace-nowrap">{t("common.status", "Status")}</th>
+                  <th className="py-3.5 px-4 text-right whitespace-nowrap sticky right-0 bg-slate-50 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.05)]">{t("common.actions", "Actions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-slate-700 text-xs sm:text-sm">
@@ -404,7 +406,7 @@ export default function BranchManagerLoanSchemes() {
                     <td colSpan={14} className="py-14 text-center text-slate-400">
                       <div className="inline-flex items-center gap-2 font-medium">
                         <RefreshCw className="w-4 h-4 animate-spin text-teal-600" />
-                        <span>Loading available loan schemes from registry...</span>
+                        <span>{t("branchManagerLoanSchemes.loadingAvailableLoanSchemesFrom", "Loading available loan schemes from registry...")}</span>
                       </div>
                     </td>
                   </tr>
@@ -413,17 +415,18 @@ export default function BranchManagerLoanSchemes() {
                     <td colSpan={14} className="py-14 text-center text-slate-400">
                       <div className="max-w-xs mx-auto space-y-1">
                         <Landmark className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-                        <p className="font-bold text-slate-700">No Loan Schemes Found</p>
+                        <p className="font-bold text-slate-700">{t("branchManagerLoanSchemes.noLoanSchemesFound", "No Loan Schemes Found")}</p>
                         <p className="text-xs text-slate-400">
                           {searchQuery || statusFilter !== 'all' || interestTypeFilter !== 'all'
-                            ? 'Try clearing your search or filter options.'
-                            : 'No credit products currently provisioned by apex administration.'}
+                            ? t("branchManagerLoanSchemes.tryClearingYourSearchOr", "Try clearing your search or filter options.")
+                            : t("branchManagerLoanSchemes.noCreditProductsCurrentlyProvisioned", "No credit products currently provisioned by apex administration.")}
                         </p>
                       </div>
                     </td>
                   </tr>
                 ) : (
                   paginatedSchemes.map((scheme) => {
+  const { t } = useTranslation();
                     const schemeId = scheme.id || scheme.scheme_id;
                     const isActive = scheme.is_active !== false;
 
@@ -456,7 +459,7 @@ export default function BranchManagerLoanSchemes() {
 
                         {/* Tenure */}
                         <td className="py-4 px-3 text-center whitespace-nowrap text-slate-700 font-semibold">
-                          {scheme.max_tenure_months || 0} mos
+                          {scheme.max_tenure_months || 0} {t("branchManagerLoanSchemes.mos", "mos")}
                         </td>
 
                         {/* Annual Interest Rate */}
@@ -515,7 +518,7 @@ export default function BranchManagerLoanSchemes() {
                                 isActive ? 'bg-emerald-500' : 'bg-slate-400'
                               }`}
                             />
-                            {isActive ? 'Active' : 'Inactive'}
+                            {isActive ? t("common.active", "Active") : t("common.inactive", "Inactive")}
                           </span>
                         </td>
 
@@ -523,11 +526,11 @@ export default function BranchManagerLoanSchemes() {
                         <td className="py-4 px-4 text-right whitespace-nowrap sticky right-0 bg-white group-hover:bg-[#f6fcfb] shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.05)] transition-colors">
                           <button
                             onClick={() => setDetailModal({ isOpen: true, scheme })}
-                            title="View Complete Scheme Policy"
+                            title={t("branchManagerLoanSchemes.viewCompleteSchemePolicy", "View Complete Scheme Policy")}
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-800 font-bold text-xs rounded-xl border border-teal-200/80 transition-all cursor-pointer active:scale-95"
                           >
                             <Eye className="w-3.5 h-3.5" />
-                            <span>View Details</span>
+                            <span>{t("branchManagerFdMisSchemes.viewDetails", "View Details")}</span>
                           </button>
                         </td>
                       </tr>
@@ -542,8 +545,8 @@ export default function BranchManagerLoanSchemes() {
           {!loading && filteredSchemes.length > 0 && (
             <div className="px-6 py-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 font-medium bg-slate-50/50">
               <span>
-                Showing <strong className="text-slate-700">{paginatedSchemes.length}</strong> of{' '}
-                <strong className="text-slate-700">{filteredSchemes.length}</strong> available loan schemes
+                {t("common.showing", "Showing")} <strong className="text-slate-700">{paginatedSchemes.length}</strong> {t("common.of", "of")}{' '}
+                <strong className="text-slate-700">{filteredSchemes.length}</strong> {t("branchManagerLoanSchemes.availableLoanSchemes", "available loan schemes")}
               </span>
 
               {totalPages > 1 && (
@@ -553,17 +556,17 @@ export default function BranchManagerLoanSchemes() {
                     disabled={currentPage === 1}
                     className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed font-semibold text-slate-700 transition-colors cursor-pointer"
                   >
-                    Previous
+                    {t("branchManagerFdMisSchemes.previous", "Previous")}
                   </button>
                   <span className="px-2 font-bold text-slate-700">
-                    Page {currentPage} of {totalPages}
+                    {t("branchManagerInvestmentSchemes.page", "Page")} {currentPage} {t("common.of", "of")} {totalPages}
                   </span>
                   <button
                     onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                     disabled={currentPage === totalPages}
                     className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed font-semibold text-slate-700 transition-colors cursor-pointer"
                   >
-                    Next
+                    {t("branchManagerFdMisSchemes.next", "Next")}
                   </button>
                 </div>
               )}

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Lock,
   KeyRound,
@@ -14,13 +15,24 @@ import {
 import { changePassword } from '../../services/authService';
 import { validateStrongPassword } from '../../utils/passwordValidation';
 
+
 export default function PasswordUpdateCard({
-  title = 'Change Account Password',
-  description = 'Update your credentials to maintain security across your cooperative society records.',
+  title,
+  description,
   showCardHeader = true,
   className = '',
   role = null,
 }) {
+  const { t } = useTranslation();
+  const resolvedTitle =
+    title !== undefined
+      ? title
+      : t("dashboardModule.passwordUpdate.title", "Change Account Password");
+  const resolvedDescription =
+    description !== undefined
+      ? description
+      : t("dashboardModule.passwordUpdate.description", "Update your credentials to maintain security across your cooperative society records.");
+
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -51,11 +63,15 @@ export default function PasswordUpdateCard({
 
     // Client-side validations
     if (!oldPassword.trim()) {
-      setErrorMessage('Please enter your current (old) password.');
+      setErrorMessage(
+        t("dashboardModule.passwordUpdate.enterCurrentPasswordError", "Please enter your current (old) password.")
+      );
       return;
     }
     if (!newPassword.trim()) {
-      setErrorMessage('Please enter a new password.');
+      setErrorMessage(
+        t("dashboardModule.passwordUpdate.enterNewPasswordError", "Please enter a new password.")
+      );
       return;
     }
 
@@ -63,27 +79,49 @@ export default function PasswordUpdateCard({
     if (isMember) {
       const strongCheck = validateStrongPassword(newPassword);
       if (!strongCheck.isValid) {
-        setErrorMessage(strongCheck.message);
+        let translatedStrongMessage = strongCheck.message;
+        if (!newPassword) {
+          translatedStrongMessage = t("dashboardModule.passwordUpdate.strongPasswordRequired", "Password is required.");
+        } else if (!strongCheck.hasMinLength) {
+          translatedStrongMessage = t("dashboardModule.passwordUpdate.strongPasswordMinLength", "Password must be at least 8 characters long.");
+        } else if (!strongCheck.hasUppercase) {
+          translatedStrongMessage = t("dashboardModule.passwordUpdate.strongPasswordUppercase", "Password must include at least one uppercase letter (A-Z).");
+        } else if (!strongCheck.hasLowercase) {
+          translatedStrongMessage = t("dashboardModule.passwordUpdate.strongPasswordLowercase", "Password must include at least one lowercase letter (a-z).");
+        } else if (!strongCheck.hasNumber) {
+          translatedStrongMessage = t("dashboardModule.passwordUpdate.strongPasswordNumber", "Password must include at least one number (0-9).");
+        } else if (!strongCheck.hasSpecial) {
+          translatedStrongMessage = t("dashboardModule.passwordUpdate.strongPasswordSpecial", "Password must include at least one special character (!@#$%^&*...).");
+        }
+        setErrorMessage(translatedStrongMessage);
         return;
       }
     } else {
       // Other roles retain standard minimum length
       if (newPassword.length < 6) {
-        setErrorMessage('New password must be at least 6 characters long.');
+        setErrorMessage(
+          t("dashboardModule.passwordUpdate.minLengthError", "New password must be at least 6 characters long.")
+        );
         return;
       }
     }
 
     if (oldPassword === newPassword) {
-      setErrorMessage('New password cannot be the same as your current password.');
+      setErrorMessage(
+        t("dashboardModule.passwordUpdate.sameAsOldError", "New password cannot be the same as your current password.")
+      );
       return;
     }
     if (!confirmPassword.trim()) {
-      setErrorMessage('Please confirm your new password.');
+      setErrorMessage(
+        t("dashboardModule.passwordUpdate.confirmPasswordError", "Please confirm your new password.")
+      );
       return;
     }
     if (newPassword !== confirmPassword) {
-      setErrorMessage('New password and confirmation password do not match.');
+      setErrorMessage(
+        t("dashboardModule.passwordUpdate.passwordMismatchError", "New password and confirmation password do not match.")
+      );
       return;
     }
 
@@ -98,14 +136,17 @@ export default function PasswordUpdateCard({
 
       const successTxt =
         (typeof res === 'object' && (res?.message || res?.detail)) ||
-        'Your password has been updated successfully! Your account credentials have been secured.';
+        t("dashboardModule.passwordUpdate.successDefault", "Your password has been updated successfully! Your account credentials have been secured.");
 
       setSuccessMessage(successTxt);
       setOldPassword('');
       setNewPassword('');
       setConfirmPassword('');
     } catch (err) {
-      setErrorMessage(err.message || 'Unable to update password. Please check your old password and try again.');
+      setErrorMessage(
+        err.message ||
+          t("dashboardModule.passwordUpdate.errorDefault", "Unable to update password. Please check your old password and try again.")
+      );
     } finally {
       setIsLoading(false);
     }
@@ -121,17 +162,17 @@ export default function PasswordUpdateCard({
             </div>
             <div>
               <h3 className="text-base sm:text-lg font-black text-slate-900">
-                {title}
+                {resolvedTitle}
               </h3>
               <p className="text-xs text-slate-500 font-medium">
-                {description}
+                {resolvedDescription}
               </p>
             </div>
           </div>
 
           <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-teal-50 text-[#0f766e] font-bold text-xs rounded-full border border-teal-200">
             <ShieldCheck className="w-3.5 h-3.5 text-[#00b4a7]" />
-            <span>256-Bit SSL Encrypted</span>
+            <span>{t("dashboardModule.passwordUpdate.sslEncrypted", "256-Bit SSL Encrypted")}</span>
           </span>
         </div>
       )}
@@ -142,7 +183,9 @@ export default function PasswordUpdateCard({
           <div className="mb-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-start gap-3 text-emerald-800 animate-fadeIn">
             <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
-              <p className="text-xs sm:text-sm font-bold">Password Updated</p>
+              <p className="text-xs sm:text-sm font-bold">
+                {t("dashboardModule.passwordUpdate.passwordUpdatedTitle", "Password Updated")}
+              </p>
               <p className="text-xs text-emerald-700 mt-0.5">{successMessage}</p>
             </div>
           </div>
@@ -153,7 +196,9 @@ export default function PasswordUpdateCard({
           <div className="mb-6 p-4 rounded-2xl bg-rose-50 border border-rose-200 flex items-start gap-3 text-rose-800 animate-fadeIn">
             <AlertCircle className="w-5 h-5 text-rose-600 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
-              <p className="text-xs sm:text-sm font-bold">Update Failed</p>
+              <p className="text-xs sm:text-sm font-bold">
+                {t("dashboardModule.passwordUpdate.updateFailedTitle", "Update Failed")}
+              </p>
               <p className="text-xs text-rose-700 mt-0.5">{errorMessage}</p>
             </div>
           </div>
@@ -163,7 +208,8 @@ export default function PasswordUpdateCard({
           {/* Old / Current Password */}
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
-              Current Password <span className="text-rose-500">*</span>
+              {t("dashboardModule.passwordUpdate.currentPasswordLabel", "Current Password")}{' '}
+              <span className="text-rose-500">*</span>
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
@@ -173,7 +219,7 @@ export default function PasswordUpdateCard({
                 type={showOldPassword ? 'text' : 'password'}
                 value={oldPassword}
                 onChange={(e) => setOldPassword(e.target.value)}
-                placeholder="Enter your current account password"
+                placeholder={t("dashboardModule.passwordUpdate.currentPasswordPlaceholder", "Enter your current account password")}
                 disabled={isLoading}
                 required
                 className="w-full pl-10 pr-11 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#00b4a7]/30 focus:border-[#00b4a7] transition-all disabled:opacity-50"
@@ -182,7 +228,11 @@ export default function PasswordUpdateCard({
                 type="button"
                 onClick={() => setShowOldPassword(!showOldPassword)}
                 className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer"
-                title={showOldPassword ? 'Hide password' : 'Show password'}
+                title={
+                  showOldPassword
+                    ? t("dashboardModule.passwordUpdate.hidePassword", "Hide password")
+                    : t("dashboardModule.passwordUpdate.showPassword", "Show password")
+                }
               >
                 {showOldPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -192,7 +242,8 @@ export default function PasswordUpdateCard({
           {/* New Password */}
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
-              New Password <span className="text-rose-500">*</span>
+              {t("dashboardModule.passwordUpdate.newPasswordLabel", "New Password")}{' '}
+              <span className="text-rose-500">*</span>
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
@@ -202,7 +253,7 @@ export default function PasswordUpdateCard({
                 type={showNewPassword ? 'text' : 'password'}
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="Enter your new secure password (min. 6 characters)"
+                placeholder={t("dashboardModule.passwordUpdate.newPasswordPlaceholder", "Enter your new secure password (min. 6 characters)")}
                 disabled={isLoading}
                 required
                 className="w-full pl-10 pr-11 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#00b4a7]/30 focus:border-[#00b4a7] transition-all disabled:opacity-50"
@@ -211,7 +262,11 @@ export default function PasswordUpdateCard({
                 type="button"
                 onClick={() => setShowNewPassword(!showNewPassword)}
                 className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer"
-                title={showNewPassword ? 'Hide password' : 'Show password'}
+                title={
+                  showNewPassword
+                    ? t("dashboardModule.passwordUpdate.hidePassword", "Hide password")
+                    : t("dashboardModule.passwordUpdate.showPassword", "Show password")
+                }
               >
                 {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -222,7 +277,9 @@ export default function PasswordUpdateCard({
               isMember ? (
                 <div className="mt-2.5 p-3 bg-slate-50 border border-slate-200/90 rounded-2xl space-y-2">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="font-semibold text-slate-600">Password Strength:</span>
+                    <span className="font-semibold text-slate-600">
+                      {t("dashboardModule.passwordUpdate.passwordStrength", "Password Strength:")}
+                    </span>
                     <span
                       className={`font-black uppercase tracking-wider text-[11px] ${
                         memberStrongValidation.score <= 2
@@ -232,7 +289,11 @@ export default function PasswordUpdateCard({
                           : 'text-emerald-600'
                       }`}
                     >
-                      {memberStrongValidation.strengthLabel}
+                      {memberStrongValidation.score >= 5
+                        ? t("dashboardModule.passwordUpdate.strengthStrong", "Strong")
+                        : memberStrongValidation.score >= 3
+                        ? t("dashboardModule.passwordUpdate.strengthModerate", "Moderate")
+                        : t("dashboardModule.passwordUpdate.strengthWeak", "Weak")}
                     </span>
                   </div>
 
@@ -266,7 +327,7 @@ export default function PasswordUpdateCard({
                           memberStrongValidation.hasMinLength ? 'text-emerald-600 stroke-[3]' : 'opacity-30'
                         }`}
                       />
-                      <span>8+ characters</span>
+                      <span>{t("dashboardModule.passwordUpdate.ruleMinLength8", "8+ characters")}</span>
                     </span>
 
                     <span
@@ -279,7 +340,7 @@ export default function PasswordUpdateCard({
                           memberStrongValidation.hasUppercase ? 'text-emerald-600 stroke-[3]' : 'opacity-30'
                         }`}
                       />
-                      <span>Uppercase (A-Z)</span>
+                      <span>{t("dashboardModule.passwordUpdate.ruleUppercase", "Uppercase (A-Z)")}</span>
                     </span>
 
                     <span
@@ -292,7 +353,7 @@ export default function PasswordUpdateCard({
                           memberStrongValidation.hasLowercase ? 'text-emerald-600 stroke-[3]' : 'opacity-30'
                         }`}
                       />
-                      <span>Lowercase (a-z)</span>
+                      <span>{t("dashboardModule.passwordUpdate.ruleLowercase", "Lowercase (a-z)")}</span>
                     </span>
 
                     <span
@@ -305,7 +366,7 @@ export default function PasswordUpdateCard({
                           memberStrongValidation.hasNumber ? 'text-emerald-600 stroke-[3]' : 'opacity-30'
                         }`}
                       />
-                      <span>Number (0-9)</span>
+                      <span>{t("dashboardModule.passwordUpdate.ruleNumber", "Number (0-9)")}</span>
                     </span>
 
                     <span
@@ -318,7 +379,7 @@ export default function PasswordUpdateCard({
                           memberStrongValidation.hasSpecial ? 'text-emerald-600 stroke-[3]' : 'opacity-30'
                         }`}
                       />
-                      <span>Symbol (!@#$...)</span>
+                      <span>{t("dashboardModule.passwordUpdate.ruleSymbol", "Symbol (!@#$...)")}</span>
                     </span>
 
                     {oldPassword && (
@@ -332,7 +393,7 @@ export default function PasswordUpdateCard({
                             isDifferentFromOld ? 'text-emerald-600 stroke-[3]' : 'text-rose-600'
                           }`}
                         />
-                        <span>Different from old</span>
+                        <span>{t("dashboardModule.passwordUpdate.ruleDifferentFromOldShort", "Different from old")}</span>
                       </span>
                     )}
                   </div>
@@ -347,7 +408,7 @@ export default function PasswordUpdateCard({
                     }`}
                   >
                     <Check className={`w-3 h-3 ${isMinLength ? 'text-emerald-600' : 'text-slate-400'}`} />
-                    At least 6 characters
+                    {t("dashboardModule.passwordUpdate.ruleMinLength6", "At least 6 characters")}
                   </span>
                   {oldPassword && (
                     <span
@@ -358,7 +419,7 @@ export default function PasswordUpdateCard({
                       }`}
                     >
                       <Check className={`w-3 h-3 ${isDifferentFromOld ? 'text-emerald-600' : 'text-rose-600'}`} />
-                      Different from current password
+                      {t("dashboardModule.passwordUpdate.ruleDifferentFromCurrent", "Different from current password")}
                     </span>
                   )}
                 </div>
@@ -369,7 +430,8 @@ export default function PasswordUpdateCard({
           {/* Confirm New Password */}
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
-              Confirm New Password <span className="text-rose-500">*</span>
+              {t("dashboardModule.passwordUpdate.confirmNewPasswordLabel", "Confirm New Password")}{' '}
+              <span className="text-rose-500">*</span>
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
@@ -379,7 +441,7 @@ export default function PasswordUpdateCard({
                 type={showConfirmPassword ? 'text' : 'password'}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Re-enter your new password"
+                placeholder={t("dashboardModule.passwordUpdate.confirmNewPasswordPlaceholder", "Re-enter your new password")}
                 disabled={isLoading}
                 required
                 className="w-full pl-10 pr-11 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#00b4a7]/30 focus:border-[#00b4a7] transition-all disabled:opacity-50"
@@ -388,7 +450,11 @@ export default function PasswordUpdateCard({
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer"
-                title={showConfirmPassword ? 'Hide password' : 'Show password'}
+                title={
+                  showConfirmPassword
+                    ? t("dashboardModule.passwordUpdate.hidePassword", "Hide password")
+                    : t("dashboardModule.passwordUpdate.showPassword", "Show password")
+                }
               >
                 {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -400,12 +466,12 @@ export default function PasswordUpdateCard({
                 {isMatching ? (
                   <span className="inline-flex items-center gap-1 text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-md">
                     <Check className="w-3 h-3 text-emerald-600" />
-                    Passwords match
+                    {t("dashboardModule.passwordUpdate.passwordsMatch", "Passwords match")}
                   </span>
                 ) : (
                   <span className="inline-flex items-center gap-1 text-rose-700 bg-rose-50 border border-rose-200 px-2.5 py-0.5 rounded-md">
                     <AlertCircle className="w-3 h-3 text-rose-600" />
-                    Passwords do not match
+                    {t("validation.passwordMismatch", "Passwords do not match")}
                   </span>
                 )}
               </div>
@@ -422,12 +488,12 @@ export default function PasswordUpdateCard({
               {isLoading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Updating Password...</span>
+                  <span>{t("dashboardModule.passwordUpdate.updatingPassword", "Updating Password...")}</span>
                 </>
               ) : (
                 <>
                   <KeyRound className="w-4 h-4" />
-                  <span>Update Password</span>
+                  <span>{t("dashboardModule.passwordUpdate.updatePassword", "Update Password")}</span>
                 </>
               )}
             </button>
@@ -444,7 +510,7 @@ export default function PasswordUpdateCard({
               disabled={isLoading || (!oldPassword && !newPassword && !confirmPassword)}
               className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              Clear
+              {t("dashboardModule.passwordUpdate.clear", "Clear")}
             </button>
           </div>
         </form>

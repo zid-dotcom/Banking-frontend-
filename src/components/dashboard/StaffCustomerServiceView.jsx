@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Headset,
   MessageSquare,
@@ -52,6 +53,7 @@ function formatDateTime(isoString) {
 }
 
 export default function StaffCustomerServiceView({ staffUser, showBanner = true }) {
+  const { t } = useTranslation();
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -248,7 +250,7 @@ export default function StaffCustomerServiceView({ staffUser, showBanner = true 
             <div className="inline-flex flex-wrap items-center gap-x-2 gap-y-1 px-3 sm:px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-xs text-[11px] sm:text-xs font-semibold border border-teal-200/80 shadow-2xs text-[#0f766e] mb-3">
               <span className="inline-flex items-center gap-1.5 flex-shrink-0">
                 <Headset className="w-3.5 h-3.5 text-[#00b4a7]" />
-                <span>Role: Customer Service Officer</span>
+                <span>{t("staffCustomerServiceView.roleCustomerServiceOfficer", "Role: Customer Service Officer")}</span>
               </span>
               <span className="text-teal-300 hidden sm:inline">•</span>
               <span className="text-slate-600">
@@ -257,7 +259,7 @@ export default function StaffCustomerServiceView({ staffUser, showBanner = true 
               <span className="text-teal-300 hidden sm:inline">•</span>
               <span className="inline-flex items-center gap-1 font-bold text-emerald-700">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                Live Desk
+                {t("branchManagerServiceRequests.liveDesk", "Live Desk")}
               </span>
             </div>
 
@@ -265,12 +267,12 @@ export default function StaffCustomerServiceView({ staffUser, showBanner = true 
             <div className="flex items-center gap-3">
               <span className="w-1.5 h-8 sm:h-9 bg-[#00b4a7] rounded-full flex-shrink-0" />
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0f2e2e] tracking-tight">
-                Member Service Requests
+                {t("branchManagerServiceRequests.memberServiceRequests", "Member Service Requests")}
               </h1>
             </div>
 
             <p className="text-slate-600 text-xs sm:text-sm mt-2.5 font-medium leading-relaxed max-w-xl">
-              Review member assistance tickets, provide official branch desk replies, and track resolution lifecycles for {branchName}.
+              {t("branchManagerServiceRequests.reviewMemberAssistanceTicketsProvide", "Review member assistance tickets, provide official branch desk replies, and track resolution lifecycles for")} {branchName}.
             </p>
 
             <div className="mt-4 flex items-center gap-3 flex-wrap">
@@ -281,7 +283,7 @@ export default function StaffCustomerServiceView({ staffUser, showBanner = true 
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-md shadow-teal-500/20 transition-all cursor-pointer disabled:opacity-50"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
-                <span>{refreshing ? 'Refreshing...' : 'Refresh List'}</span>
+                <span>{refreshing ? t("dashboardModule.branchOverview.refreshing", "Refreshing...") : t("branchManagerMemberPasswordUpdate.refreshList", "Refresh List")}</span>
               </button>
             </div>
           </div>
@@ -290,7 +292,7 @@ export default function StaffCustomerServiceView({ staffUser, showBanner = true 
           <div className="relative z-10 flex justify-center md:justify-end pointer-events-none -my-2 sm:-my-5 lg:-my-6 flex-shrink-0">
             <img
               src={friendlySupportIllustration}
-              alt="Member Service Requests"
+              alt={t("branchManagerServiceRequests.memberServiceRequests", "Member Service Requests")}
               className="h-36 sm:h-48 lg:h-56 w-auto object-contain drop-shadow-md select-none pointer-events-none"
             />
           </div>
@@ -305,30 +307,30 @@ export default function StaffCustomerServiceView({ staffUser, showBanner = true 
       {/* Metric Stat Cards (exact match to Branch Manager) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
-          title="TOTAL REQUESTS"
+          title={t("branchManagerServiceRequests.totalRequests", "TOTAL REQUESTS")}
           value={totalCount}
-          subtitle="All logged member tickets"
+          subtitle={t("branchManagerServiceRequests.allLoggedMemberTickets", "All logged member tickets")}
           icon={Headset}
           trend={{ text: `${totalCount} registered`, positive: true }}
         />
         <StatCard
-          title="PENDING INQUIRIES"
+          title={t("branchManagerServiceRequests.pendingInquiries", "PENDING INQUIRIES")}
           value={pendingCount}
-          subtitle="Awaiting branch review"
+          subtitle={t("branchManagerServiceRequests.awaitingBranchReview", "Awaiting branch review")}
           icon={Clock}
           trend={{ text: `${pendingCount} unhandled`, positive: pendingCount === 0 }}
         />
         <StatCard
-          title="IN PROGRESS"
+          title={t("branchManagerServiceRequests.inProgress", "IN PROGRESS")}
           value={inProgressCount}
-          subtitle="Under branch follow-up"
+          subtitle={t("branchManagerServiceRequests.underBranchFollowUp", "Under branch follow-up")}
           icon={MessageSquare}
           trend={{ text: `${inProgressCount} active`, positive: true }}
         />
         <StatCard
-          title="SOLVED"
+          title={t("branchManagerServiceRequests.solved", "SOLVED")}
           value={solvedCount}
-          subtitle="Completed member tickets"
+          subtitle={t("branchManagerServiceRequests.completedMemberTickets", "Completed member tickets")}
           icon={CheckCircle2}
           trend={{
             text: totalCount > 0 ? `${Math.round((solvedCount / totalCount) * 100)}% solved` : '100% resolution',
@@ -351,7 +353,7 @@ export default function StaffCustomerServiceView({ staffUser, showBanner = true 
                 setSearchQuery(e.target.value);
                 setCurrentPage(1);
               }}
-              placeholder="Search ticket #, subject, member name or code..."
+              placeholder={t("branchManagerServiceRequests.searchTicketSubjectMemberName", "Search ticket #, subject, member name or code...")}
               className="w-full pl-10 pr-4 py-2.5 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl font-medium focus:outline-none focus:bg-white focus:border-teal-500 transition-all"
             />
             {searchQuery && (
@@ -368,10 +370,10 @@ export default function StaffCustomerServiceView({ staffUser, showBanner = true 
           {/* Filter Tabs */}
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
             {[
-              { id: 'all', label: 'All Requests' },
-              { id: 'pending', label: 'Pending' },
-              { id: 'in_progress', label: 'In Progress' },
-              { id: 'solved', label: 'Solved' }
+              { id: 'all', label: t("branchManagerNominees.allRequests", "All Requests") },
+              { id: 'pending', label: t("common.pending", "Pending") },
+              { id: 'in_progress', label: t("dashboardModule.branchOverview.statusInProgress", "In Progress") },
+              { id: 'solved', label: t("dashboardModule.branchOverview.statusSolved", "Solved") }
             ].map((tab) => {
               const isActive = statusFilter === tab.id;
               return (
@@ -398,7 +400,7 @@ export default function StaffCustomerServiceView({ staffUser, showBanner = true 
         {loading ? (
           <div className="py-20 text-center space-y-3">
             <RefreshCw className="w-8 h-8 animate-spin text-teal-600 mx-auto" />
-            <p className="text-xs font-bold text-slate-500">Loading branch service requests...</p>
+            <p className="text-xs font-bold text-slate-500">{t("branchManagerServiceRequests.loadingBranchServiceRequests", "Loading branch service requests...")}</p>
           </div>
         ) : error ? (
           <div className="p-8 text-center space-y-3">
@@ -408,7 +410,7 @@ export default function StaffCustomerServiceView({ staffUser, showBanner = true 
               onClick={() => loadRequests()}
               className="px-4 py-2 rounded-xl bg-teal-600 text-white font-bold text-xs hover:bg-teal-700 transition-colors cursor-pointer"
             >
-              Try Again
+              {t("branchManagerServiceRequests.tryAgain", "Try Again")}
             </button>
           </div>
         ) : filteredRequests.length === 0 ? (
@@ -416,11 +418,11 @@ export default function StaffCustomerServiceView({ staffUser, showBanner = true 
             <div className="w-14 h-14 rounded-2xl bg-teal-50 text-teal-700 flex items-center justify-center mx-auto border border-teal-100">
               <Headset className="w-7 h-7" />
             </div>
-            <h3 className="text-sm font-black text-slate-800">No service requests found</h3>
+            <h3 className="text-sm font-black text-slate-800">{t("branchManagerServiceRequests.noServiceRequestsFound", "No service requests found")}</h3>
             <p className="text-xs text-slate-500 max-w-sm mx-auto font-medium">
               {searchQuery || statusFilter !== 'all'
-                ? 'No requests matched your filter criteria. Try clearing your search.'
-                : 'There are currently no active member assistance requests logged for this branch.'}
+                ? t("branchManagerServiceRequests.noRequestsMatchedYourFilter", "No requests matched your filter criteria. Try clearing your search.")
+                : t("branchManagerServiceRequests.thereAreCurrentlyNoActive", "There are currently no active member assistance requests logged for this branch.")}
             </p>
           </div>
         ) : (
@@ -428,16 +430,17 @@ export default function StaffCustomerServiceView({ staffUser, showBanner = true 
             <table className="w-full text-left text-xs sm:text-sm">
               <thead>
                 <tr className="bg-slate-50/75 border-b border-slate-100 text-[11px] font-black uppercase tracking-wider text-slate-500">
-                  <th className="py-3.5 px-4">User Code</th>
-                  <th className="py-3.5 px-4">Member Info</th>
-                  <th className="py-3.5 px-4">Subject &amp; Description</th>
-                  <th className="py-3.5 px-4">Date Logged</th>
-                  <th className="py-3.5 px-4">Status</th>
-                  <th className="py-3.5 px-4 text-right">Action</th>
+                  <th className="py-3.5 px-4">{t("branchManagerServiceRequests.userCode", "User Code")}</th>
+                  <th className="py-3.5 px-4">{t("branchManagerServiceRequests.memberInfo", "Member Info")}</th>
+                  <th className="py-3.5 px-4">{t("branchManagerServiceRequests.subjectDescription", "Subject & Description")}</th>
+                  <th className="py-3.5 px-4">{t("branchManagerServiceRequests.dateLogged", "Date Logged")}</th>
+                  <th className="py-3.5 px-4">{t("common.status", "Status")}</th>
+                  <th className="py-3.5 px-4 text-right">{t("dashboardModule.branchOverview.colAction", "Action")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-slate-700 font-medium">
                 {paginatedRequests.map((req) => {
+  const { t } = useTranslation();
                   const reqId = req.id || req.request_id || req.ticket_id;
                   const memberName =
                     req.member?.full_name ||
@@ -501,7 +504,7 @@ export default function StaffCustomerServiceView({ staffUser, showBanner = true 
                         {repliesCount > 0 && (
                           <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded mt-1 border border-emerald-100">
                             <MessageSquare className="w-2.5 h-2.5" />
-                            {repliesCount} {repliesCount === 1 ? 'reply' : 'replies'}
+                            {repliesCount} {repliesCount === 1 ? t("branchManagerServiceRequests.reply", "reply") : t("branchManagerServiceRequests.replies", "replies")}
                           </span>
                         )}
                       </td>
@@ -521,14 +524,14 @@ export default function StaffCustomerServiceView({ staffUser, showBanner = true 
                             value={normalizeStatus(req.status)}
                             onChange={(e) => handleInlineStatusChange(e, req, e.target.value)}
                             disabled={updatingStatusId === reqId}
-                            title="Click to directly update status"
+                            title={t("branchManagerServiceRequests.clickToDirectlyUpdateStatus", "Click to directly update status")}
                             className={`text-xs font-bold pl-3 pr-7 py-1 rounded-full border transition-all cursor-pointer focus:outline-none appearance-none capitalize ${getStatusBadge(
                               req.status
                             )}`}
                           >
-                            <option value="pending" className="bg-white text-rose-800 font-semibold">Pending</option>
-                            <option value="in_progress" className="bg-white text-amber-800 font-semibold">In Progress</option>
-                            <option value="solved" className="bg-white text-emerald-800 font-semibold">Solved</option>
+                            <option value="pending" className="bg-white text-rose-800 font-semibold">{t("common.pending", "Pending")}</option>
+                            <option value="in_progress" className="bg-white text-amber-800 font-semibold">{t("dashboardModule.branchOverview.statusInProgress", "In Progress")}</option>
+                            <option value="solved" className="bg-white text-emerald-800 font-semibold">{t("dashboardModule.branchOverview.statusSolved", "Solved")}</option>
                           </select>
                           <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2 text-current opacity-70">
                             {updatingStatusId === reqId ? (
@@ -548,7 +551,7 @@ export default function StaffCustomerServiceView({ staffUser, showBanner = true 
                           className="px-3 py-1.5 rounded-xl bg-teal-50 hover:bg-teal-100/80 text-teal-800 font-bold text-xs border border-teal-200/60 transition-colors flex items-center gap-1.5 ml-auto cursor-pointer"
                         >
                           <Eye className="w-3.5 h-3.5 text-teal-700" />
-                          <span>Manage &amp; Reply</span>
+                          <span>{t("branchManagerServiceRequests.manageReply", "Manage & Reply")}</span>
                         </button>
                       </td>
                     </tr>
@@ -563,9 +566,9 @@ export default function StaffCustomerServiceView({ staffUser, showBanner = true 
         {filteredRequests.length > itemsPerPage && (
           <div className="p-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between flex-wrap gap-2 text-xs font-medium text-slate-500">
             <div>
-              Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
-              {Math.min(currentPage * itemsPerPage, filteredRequests.length)} of{' '}
-              {filteredRequests.length} requests
+              {t("common.showing", "Showing")} {(currentPage - 1) * itemsPerPage + 1} {t("common.to", "to")}{' '}
+              {Math.min(currentPage * itemsPerPage, filteredRequests.length)} {t("common.of", "of")}{' '}
+              {filteredRequests.length} {t("branchManagerNominees.requests", "requests")}
             </div>
 
             <div className="flex items-center gap-1">
@@ -578,7 +581,7 @@ export default function StaffCustomerServiceView({ staffUser, showBanner = true 
                 <ChevronLeft className="w-4 h-4" />
               </button>
               <span className="px-3 py-1 text-slate-800 font-bold">
-                Page {currentPage} of {totalPages}
+                {t("branchManagerInvestmentSchemes.page", "Page")} {currentPage} {t("common.of", "of")} {totalPages}
               </span>
               <button
                 type="button"

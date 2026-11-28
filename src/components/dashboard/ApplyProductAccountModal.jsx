@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   X,
   Coins,
@@ -33,6 +34,7 @@ export default function ApplyProductAccountModal({
   productType = 'fd_mis', // 'fd_mis' | 'investment'
   onSuccess,
 }) {
+  const { t } = useTranslation();
   const [savingsAccounts, setSavingsAccounts] = useState([]);
   const [loadingAccounts, setLoadingAccounts] = useState(true);
   const [selectedAccountId, setSelectedAccountId] = useState('');
@@ -159,10 +161,10 @@ export default function ApplyProductAccountModal({
               </div>
               <div>
                 <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-teal-100 text-teal-800 border border-teal-200">
-                  {isFdMis ? 'Cooperative FD / MIS Scheme' : 'Cooperative Investment Scheme'}
+                  {isFdMis ? t("applyProductAccountModal.cooperativeFdMisScheme", "Cooperative FD / MIS Scheme") : t("applyProductAccountModal.cooperativeInvestmentScheme", "Cooperative Investment Scheme")}
                 </span>
                 <h3 className="text-lg font-serif font-bold text-slate-900 mt-0.5">
-                  Apply for Scheme
+                  {t("applyProductAccountModal.applyForScheme", "Apply for Scheme")}
                 </h3>
               </div>
             </div>
@@ -186,25 +188,25 @@ export default function ApplyProductAccountModal({
               </div>
               <div>
                 <h4 className="text-xl font-serif font-bold text-slate-900">
-                  Application Submitted!
+                  {t("applyProductAccountModal.applicationSubmitted", "Application Submitted!")}
                 </h4>
                 <p className="text-xs text-slate-600 mt-1 max-w-sm mx-auto">
-                  Your scheme application for <strong>{schemeName}</strong> has been received and forwarded to your branch administration for review.
+                  {t("applyProductAccountModal.yourSchemeApplicationFor", "Your scheme application for")} <strong>{schemeName}</strong> {t("applyProductAccountModal.hasBeenReceivedAndForwarded", "has been received and forwarded to your branch administration for review.")}
                 </p>
               </div>
 
               <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200 text-left space-y-2 text-xs">
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Application ID:</span>
+                  <span className="text-slate-500">{t("applyProductAccountModal.applicationId", "Application ID:")}</span>
                   <span className="font-mono font-bold text-slate-900">#{successData.id}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Scheme Code:</span>
+                  <span className="text-slate-500">{t("applyProductAccountModal.schemeCode", "Scheme Code:")}</span>
                   <span className="font-bold text-teal-700">{schemeCode}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500">
-                    {isFdMis ? 'Deposit Principal:' : 'Recurring Installment:'}
+                    {isFdMis ? t("applyProductAccountModal.depositPrincipal", "Deposit Principal:") : t("applyProductAccountModal.recurringInstallment", "Recurring Installment:")}
                   </span>
                   <span className="font-bold text-slate-900">
                     {isFdMis
@@ -213,9 +215,9 @@ export default function ApplyProductAccountModal({
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Status:</span>
+                  <span className="text-slate-500">{t("applyProductAccountModal.status", "Status:")}</span>
                   <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200">
-                    Pending Branch Review
+                    {t("applyProductAccountModal.pendingBranchReview", "Pending Branch Review")}
                   </span>
                 </div>
               </div>
@@ -226,7 +228,7 @@ export default function ApplyProductAccountModal({
                   onClick={onClose}
                   className="w-full py-3 px-4 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm shadow-md shadow-teal-600/20 transition-all cursor-pointer"
                 >
-                  Done
+                  {t("branchManagerMemberPasswordUpdate.done", "Done")}
                 </button>
               </div>
             </div>
@@ -252,7 +254,7 @@ export default function ApplyProductAccountModal({
                 <div className="grid grid-cols-2 gap-3 pt-2 border-t border-teal-200/60 text-xs">
                   <div>
                     <span className="text-[10px] uppercase font-bold text-slate-400 block">
-                      Annual Yield / Interest
+                      {t("applyProductAccountModal.annualYieldInterest", "Annual Yield / Interest")}
                     </span>
                     <span className="font-bold text-teal-800 text-sm">
                       {interestRate}% p.a.
@@ -260,7 +262,7 @@ export default function ApplyProductAccountModal({
                   </div>
                   <div>
                     <span className="text-[10px] uppercase font-bold text-slate-400 block">
-                      Min Requirement
+                      {t("applyProductAccountModal.minRequirement", "Min Requirement")}
                     </span>
                     <span className="font-bold text-slate-800 text-sm">
                       {formatCurrency(minRequiredPrincipal)}
@@ -274,26 +276,26 @@ export default function ApplyProductAccountModal({
                 <label className="text-xs font-bold text-slate-700 flex items-center justify-between">
                   <span className="flex items-center gap-1.5">
                     <Landmark className="w-3.5 h-3.5 text-teal-600" />
-                    <span>Debit Savings Account *</span>
+                    <span>{t("applyProductAccountModal.debitSavingsAccount", "Debit Savings Account *")}</span>
                   </span>
                   <span className="text-[10px] text-slate-400 font-medium">
-                    Funds source &amp; payout
+                    {t("applyProductAccountModal.fundsSourcePayout", "Funds source & payout")}
                   </span>
                 </label>
 
                 {loadingAccounts ? (
                   <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-400 flex items-center gap-2">
                     <Clock className="w-4 h-4 animate-spin text-teal-600" />
-                    <span>Loading your savings accounts...</span>
+                    <span>{t("applyProductAccountModal.loadingYourSavingsAccounts", "Loading your savings accounts...")}</span>
                   </div>
                 ) : savingsAccounts.length === 0 ? (
                   <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 space-y-1">
                     <div className="flex items-center gap-1.5 font-bold">
                       <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0" />
-                      <span>No Active Savings Account</span>
+                      <span>{t("applyProductAccountModal.noActiveSavingsAccount", "No Active Savings Account")}</span>
                     </div>
                     <p className="text-[11px] text-amber-700 leading-relaxed">
-                      You need an active cooperative savings deposit account to fund this scheme application. Please submit a Savings Account request first.
+                      {t("applyProductAccountModal.youNeedAnActiveCooperative", "You need an active cooperative savings deposit account to fund this scheme application. Please submit a Savings Account request first.")}
                     </p>
                   </div>
                 ) : (
@@ -305,7 +307,7 @@ export default function ApplyProductAccountModal({
                   >
                     {savingsAccounts.map((acc) => (
                       <option key={acc.id} value={acc.id}>
-                        {acc.account_number} — {acc.scheme_name || 'Savings Deposit'} (Bal:{' '}
+                        {acc.account_number} — {acc.scheme_name || 'Savings Deposit'} {t("applyProductAccountModal.bal", "(Bal:")}{' '}
                         {formatCurrency(acc.balance || 0)})
                       </option>
                     ))}
@@ -319,14 +321,14 @@ export default function ApplyProductAccountModal({
                   <div className="flex items-center justify-between">
                     <span className="text-slate-600 font-semibold flex items-center gap-1.5">
                       <IndianRupee className="w-3.5 h-3.5 text-teal-600" />
-                      <span>Recurring Contribution:</span>
+                      <span>{t("applyProductAccountModal.recurringContribution", "Recurring Contribution:")}</span>
                     </span>
                     <span className="font-bold text-teal-900 text-sm">
                       {formatCurrency(scheme?.installment_amount || minRequiredPrincipal)} / {scheme?.contribution_frequency || 'period'}
                     </span>
                   </div>
                   <p className="text-[11px] text-slate-500 leading-relaxed">
-                    Recurring investment amount is fixed by this scheme policy and will be automatically debited according to schedule upon branch approval.
+                    {t("applyProductAccountModal.recurringInvestmentAmountIsFixed", "Recurring investment amount is fixed by this scheme policy and will be automatically debited according to schedule upon branch approval.")}
                   </p>
                 </div>
               )}
@@ -337,10 +339,10 @@ export default function ApplyProductAccountModal({
                   <label className="text-xs font-bold text-slate-700 flex items-center justify-between">
                     <span className="flex items-center gap-1.5">
                       <IndianRupee className="w-3.5 h-3.5 text-teal-600" />
-                      <span>Deposit Principal Amount (₹) *</span>
+                      <span>{t("applyProductAccountModal.depositPrincipalAmount", "Deposit Principal Amount (₹) *")}</span>
                     </span>
                     <span className="text-[10px] text-slate-400 font-medium">
-                      Min: {formatCurrency(minRequiredPrincipal)}
+                      {t("memberDashboard.min", "Min:")} {formatCurrency(minRequiredPrincipal)}
                     </span>
                   </label>
                   <div className="relative">
@@ -359,7 +361,7 @@ export default function ApplyProductAccountModal({
                     />
                   </div>
                   <p className="text-[10px] text-slate-500">
-                    The selected principal amount will be deposited into this term FD/MIS folio upon approval.
+                    {t("applyProductAccountModal.theSelectedPrincipalAmountWill", "The selected principal amount will be deposited into this term FD/MIS folio upon approval.")}
                   </p>
                 </div>
               )}
@@ -380,7 +382,7 @@ export default function ApplyProductAccountModal({
                   disabled={submitting}
                   className="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-xs font-bold transition-colors cursor-pointer"
                 >
-                  Cancel
+                  {t("common.cancel", "Cancel")}
                 </button>
                 <button
                   type="submit"
@@ -390,11 +392,11 @@ export default function ApplyProductAccountModal({
                   {submitting ? (
                     <>
                       <Clock className="w-4 h-4 animate-spin" />
-                      <span>Submitting...</span>
+                      <span>{t("memberNominee.submitting", "Submitting...")}</span>
                     </>
                   ) : (
                     <>
-                      <span>Submit Scheme Application</span>
+                      <span>{t("applyProductAccountModal.submitSchemeApplication", "Submit Scheme Application")}</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </>
                   )}

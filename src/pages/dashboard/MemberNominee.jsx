@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { i18n } from '../../i18n/index.js';
+import { useTranslation } from 'react-i18next';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import StatCard from '../../components/dashboard/StatCard';
 import {
@@ -105,6 +107,7 @@ const COMMON_RELATIONSHIPS = [
 ];
 
 export default function MemberNominee() {
+  const { t } = useTranslation();
   const [nominee, setNominee] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -418,28 +421,28 @@ export default function MemberNominee() {
     const dob = formData.date_of_birth;
 
     if (!name) {
-      setFormError('Please enter the nominee full name.');
+      setFormError(i18n.t("memberNominee.pleaseEnterTheNomineeFull", "Please enter the nominee full name."));
       return;
     }
     if (!finalRel) {
-      setFormError('Please specify the relationship with the nominee.');
+      setFormError(i18n.t("memberNominee.pleaseSpecifyTheRelationshipWith", "Please specify the relationship with the nominee."));
       return;
     }
     if (!dob) {
-      setFormError('Please select the nominee date of birth.');
+      setFormError(i18n.t("memberNominee.pleaseSelectTheNomineeDate", "Please select the nominee date of birth."));
       return;
     }
     if (!formData.aadhaar_front && !nominee?.aadhaar_front_url && !nominee?.aadhaar_front) {
-      setFormError('Please upload the front side of the nominee Aadhaar card.');
+      setFormError(i18n.t("memberNominee.pleaseUploadTheFrontSide", "Please upload the front side of the nominee Aadhaar card."));
       return;
     }
     if (!formData.aadhaar_back && !nominee?.aadhaar_back_url && !nominee?.aadhaar_back) {
-      setFormError('Please upload the back side of the nominee Aadhaar card.');
+      setFormError(i18n.t("memberNominee.pleaseUploadTheBackSide", "Please upload the back side of the nominee Aadhaar card."));
       return;
     }
 
     if (isLocked) {
-      setFormError('Approved nominee records are locked. Please submit a Nominee Change Request to your branch first.');
+      setFormError(i18n.t("memberNominee.approvedNomineeRecordsAreLocked", "Approved nominee records are locked. Please submit a Nominee Change Request to your branch first."));
       return;
     }
 
@@ -505,7 +508,7 @@ export default function MemberNominee() {
             <div className="inline-flex flex-wrap items-center gap-x-2 gap-y-1 px-3 sm:px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-xs text-[11px] sm:text-xs font-semibold border border-teal-200/80 shadow-2xs text-[#0f766e] mb-3">
               <span className="inline-flex items-center gap-1.5 flex-shrink-0">
                 <HeartHandshake className="w-3.5 h-3.5 text-[#00b4a7]" />
-                <span>Family Security &amp; Beneficiary Desk</span>
+                <span>{t("memberNominee.familySecurityBeneficiaryDesk", "Family Security & Beneficiary Desk")}</span>
               </span>
               <span className="text-teal-300 hidden sm:inline">•</span>
               <span className="text-slate-600">
@@ -514,10 +517,10 @@ export default function MemberNominee() {
             </div>
 
             <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mb-2">
-              Nominee &amp; Beneficiary Details
+              {t("memberNominee.nomineeBeneficiaryDetails", "Nominee & Beneficiary Details")}
             </h1>
             <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed">
-              Designate a trusted family member or authorized nominee for society deposits, savings folios, and member insurance settlements.
+              {t("memberNominee.designateATrustedFamilyMember", "Designate a trusted family member or authorized nominee for society deposits, savings folios, and member insurance settlements.")}
             </p>
 
             <div className="flex items-center gap-3 mt-4 flex-wrap">
@@ -525,7 +528,7 @@ export default function MemberNominee() {
                 <>
                   <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-emerald-700 text-white font-bold text-xs sm:text-sm shadow-sm select-none">
                     <Lock className="w-4 h-4 text-emerald-200" />
-                    <span>Nominee Verified &amp; Locked</span>
+                    <span>{t("memberNominee.nomineeVerifiedLocked", "Nominee Verified & Locked")}</span>
                   </div>
                   <button
                     type="button"
@@ -533,7 +536,7 @@ export default function MemberNominee() {
                     className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-[#14b8a6] to-[#0f766e] hover:from-[#0d9488] hover:to-[#0f766e] text-white font-bold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all cursor-pointer"
                   >
                     <PlusCircle className="w-4 h-4" />
-                    <span>Request Nominee Change</span>
+                    <span>{t("memberNominee.requestNomineeChange", "Request Nominee Change")}</span>
                   </button>
                 </>
               ) : (
@@ -551,16 +554,16 @@ export default function MemberNominee() {
                       <Edit2 className="w-4 h-4" />
                       <span>
                         {approvedUnconsumedRequest
-                          ? 'Update Nominee (Request Approved)'
+                          ? t("memberNominee.updateNomineeRequestApproved", "Update Nominee (Request Approved)")
                           : isRejected
-                          ? 'Re-submit Nominee Details'
-                          : 'Update Nominee Details'}
+                          ? t("memberNominee.reSubmitNomineeDetails", "Re-submit Nominee Details")
+                          : t("memberNominee.updateNomineeDetails", "Update Nominee Details")}
                       </span>
                     </>
                   ) : (
                     <>
                       <PlusCircle className="w-4 h-4" />
-                      <span>Register Nominee</span>
+                      <span>{t("memberNominee.registerNominee", "Register Nominee")}</span>
                     </>
                   )}
                 </button>
@@ -576,7 +579,7 @@ export default function MemberNominee() {
                 className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-2xl bg-white/90 hover:bg-white text-slate-700 font-bold text-xs border border-teal-200 shadow-2xs transition-all cursor-pointer disabled:opacity-50"
               >
                 <RefreshCw className={`w-3.5 h-3.5 text-teal-600 ${refreshing ? 'animate-spin' : ''}`} />
-                <span>Refresh</span>
+                <span>{t("common.refresh", "Refresh")}</span>
               </button>
             </div>
           </div>
@@ -585,7 +588,7 @@ export default function MemberNominee() {
           <div className="relative z-10 flex justify-center md:justify-end pointer-events-none -my-2 sm:-my-5 lg:-my-6 flex-shrink-0 w-full md:w-auto">
             <img
               src={nomineeIllustration}
-              alt="Nominee Registration Family Security"
+              alt={t("memberNominee.nomineeRegistrationFamilySecurity", "Nominee Registration Family Security")}
               className="h-32 sm:h-44 lg:h-52 max-w-full w-auto object-contain drop-shadow-md select-none pointer-events-none transform hover:scale-102 transition-transform duration-300 mx-auto md:mx-0"
             />
           </div>
@@ -601,7 +604,7 @@ export default function MemberNominee() {
         {/* Stat Overview Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 lg:gap-5">
           <StatCard
-            title="Nominee Status"
+            title={t("memberNominee.nomineeStatus", "Nominee Status")}
             value={
               !nominee
                 ? 'Not Registered'
@@ -645,7 +648,7 @@ export default function MemberNominee() {
           />
 
           <StatCard
-            title="Nominee Name"
+            title={t("branchManagerNominees.nomineeName", "Nominee Name")}
             value={nominee?.nominee_name || nominee?.name || '—'}
             valueClassName="text-base sm:text-lg font-medium text-slate-800 tracking-normal font-sans capitalize"
             subtext={nominee?.relationship_type || nominee?.relationship || 'Family Relation'}
@@ -653,7 +656,7 @@ export default function MemberNominee() {
           />
 
           <StatCard
-            title="Relationship"
+            title={t("modal.nominee.relationship", "Relationship")}
             value={nominee?.relationship_type || nominee?.relationship || '—'}
             valueClassName="text-base sm:text-lg font-medium text-slate-800 tracking-normal font-sans"
             subtext={nomineeAge !== null ? `Age: ${nomineeAge} years` : 'Beneficiary Relation'}
@@ -672,7 +675,7 @@ export default function MemberNominee() {
               onClick={() => fetchNominee(true)}
               className="text-xs font-bold text-rose-700 hover:underline cursor-pointer flex-shrink-0"
             >
-              Retry
+              {t("common.retry", "Retry")}
             </button>
           </div>
         )}
@@ -682,15 +685,15 @@ export default function MemberNominee() {
           <div className="p-5 sm:p-6 rounded-3xl bg-red-50/90 border-2 border-red-200 shadow-sm space-y-3 animate-fadeIn">
             <div className="flex items-center gap-2.5 text-red-700 font-black text-sm sm:text-base">
               <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
-              <span>Nominee Verification Status: Rejected</span>
+              <span>{t("memberNominee.nomineeVerificationStatusRejected", "Nominee Verification Status: Rejected")}</span>
             </div>
             <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium">
-              The branch administration reviewed your nominee submission and rejected the request. Please review the reason below and submit updated details.
+              {t("memberNominee.theBranchAdministrationReviewedYour", "The branch administration reviewed your nominee submission and rejected the request. Please review the reason below and submit updated details.")}
             </p>
             {/* Rejection Reason in RED */}
             <div className="p-4 rounded-2xl bg-white border-2 border-red-300 text-red-700 shadow-2xs space-y-1">
               <p className="text-[11px] font-black uppercase tracking-wider text-red-500">
-                Reason for Rejection:
+                {t("dashboardModule.productAccounts.reasonForRejection", "Reason for Rejection:")}
               </p>
               <p className="text-sm sm:text-base font-extrabold text-red-600 leading-relaxed">
                 {nominee.rejection_reason || nominee.rejection_remarks || nominee.remarks || 'Incomplete or mismatching nominee identity records. Please re-submit valid details.'}
@@ -703,7 +706,7 @@ export default function MemberNominee() {
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs sm:text-sm transition-all shadow-md hover:shadow-lg cursor-pointer"
               >
                 <Edit2 className="w-4 h-4" />
-                <span>Re-submit Corrected Nominee Details</span>
+                <span>{t("memberNominee.reSubmitCorrectedNomineeDetails", "Re-submit Corrected Nominee Details")}</span>
               </button>
             </div>
           </div>
@@ -713,7 +716,7 @@ export default function MemberNominee() {
         {loading ? (
           <div className="py-20 text-center rounded-3xl bg-white border border-slate-100 shadow-sm space-y-3">
             <Loader2 className="w-8 h-8 animate-spin text-teal-600 mx-auto" />
-            <p className="text-xs text-slate-500 font-medium">Loading nominee information...</p>
+            <p className="text-xs text-slate-500 font-medium">{t("memberNominee.loadingNomineeInformation", "Loading nominee information...")}</p>
           </div>
         ) : nominee ? (
           <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
@@ -733,7 +736,7 @@ export default function MemberNominee() {
                     </span>
                   </div>
                   <p className="text-xs text-slate-500 font-medium mt-0.5">
-                    Official Nominee for Member Account #{memberUser.member_code || memberUser.id}
+                    {t("memberNominee.officialNomineeForMemberAccount", "Official Nominee for Member Account #")}{memberUser.member_code || memberUser.id}
                   </p>
                 </div>
               </div>
@@ -743,17 +746,17 @@ export default function MemberNominee() {
                 {isApproved ? (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-800 font-bold text-xs rounded-full border border-emerald-200 shadow-2xs">
                     <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>Approved</span>
+                    <span>{t("common.approved", "Approved")}</span>
                   </span>
                 ) : isRejected ? (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-red-100 text-red-700 font-black text-xs rounded-full border border-red-300 shadow-2xs">
                     <AlertCircle className="w-3.5 h-3.5 text-red-600" />
-                    <span>Rejected</span>
+                    <span>{t("common.rejected", "Rejected")}</span>
                   </span>
                 ) : (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-800 font-bold text-xs rounded-full border border-amber-200 shadow-2xs">
                     <Clock className="w-3.5 h-3.5 text-amber-600" />
-                    <span>Pending</span>
+                    <span>{t("common.pending", "Pending")}</span>
                   </span>
                 )}
 
@@ -762,7 +765,7 @@ export default function MemberNominee() {
                   <div className="flex items-center gap-2">
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-100 text-slate-500 font-bold text-xs rounded-full border border-slate-200 ml-1 select-none">
                       <Lock className="w-3 h-3 text-slate-400" />
-                      <span>Locked (Read Only)</span>
+                      <span>{t("memberNominee.lockedReadOnly", "Locked (Read Only)")}</span>
                     </span>
                     <button
                       type="button"
@@ -770,7 +773,7 @@ export default function MemberNominee() {
                       className="inline-flex items-center gap-1 px-3 py-1 bg-teal-50 hover:bg-teal-100 text-[#0f766e] font-bold text-xs rounded-full border border-teal-200 transition-colors shadow-2xs cursor-pointer"
                     >
                       <PlusCircle className="w-3 h-3 text-[#00b4a7]" />
-                      <span>Request Change</span>
+                      <span>{t("memberNominee.requestChange", "Request Change")}</span>
                     </button>
                   </div>
                 ) : (
@@ -780,7 +783,7 @@ export default function MemberNominee() {
                     className="inline-flex items-center gap-1 px-3 py-1 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-full border border-slate-200 transition-colors shadow-2xs cursor-pointer ml-1"
                   >
                     <Edit2 className="w-3 h-3 text-slate-500" />
-                    <span>{approvedUnconsumedRequest ? 'Update Nominee' : isRejected ? 'Re-submit' : 'Edit'}</span>
+                    <span>{approvedUnconsumedRequest ? t("memberNominee.updateNominee", "Update Nominee") : isRejected ? t("memberNominee.reSubmit", "Re-submit") : t("memberNominee.edit", "Edit")}</span>
                   </button>
                 )}
               </div>
@@ -791,14 +794,14 @@ export default function MemberNominee() {
               <div className="mx-5 sm:mx-7 mt-5 p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-between flex-wrap gap-2 text-xs font-semibold text-emerald-800">
                 <div className="flex items-center gap-2.5">
                   <Lock className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-                  <span>Verified Nominee: Information is locked and read-only to protect member accounts.</span>
+                  <span>{t("memberNominee.verifiedNomineeInformationIsLocked", "Verified Nominee: Information is locked and read-only to protect member accounts.")}</span>
                 </div>
                 <button
                   type="button"
                   onClick={handleOpenRequestModal}
                   className="font-bold text-[#0f766e] hover:underline cursor-pointer ml-auto"
                 >
-                  Need to change nominee? Submit Request &rarr;
+                  {t("memberNominee.needToChangeNomineeSubmit", "Need to change nominee? Submit Request →")}
                 </button>
               </div>
             )}
@@ -808,14 +811,14 @@ export default function MemberNominee() {
               <div className="mx-5 sm:mx-7 mt-5 p-3.5 rounded-2xl bg-emerald-50 border-2 border-emerald-300 flex items-center justify-between flex-wrap gap-2 text-xs font-bold text-emerald-900">
                 <div className="flex items-center gap-2.5">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-                  <span>Change Request #{approvedUnconsumedRequest.id} Approved: You can now update your nominee records!</span>
+                  <span>{t("memberNominee.changeRequest", "Change Request #")}{approvedUnconsumedRequest.id} {t("memberNominee.approvedYouCanNowUpdate", "Approved: You can now update your nominee records!")}</span>
                 </div>
                 <button
                   type="button"
                   onClick={handleOpenModal}
                   className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg cursor-pointer text-xs"
                 >
-                  Update Now
+                  {t("memberNominee.updateNow", "Update Now")}
                 </button>
               </div>
             )}
@@ -826,10 +829,10 @@ export default function MemberNominee() {
                 <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
                 <div className="space-y-1">
                   <p className="text-[11px] font-black uppercase tracking-wider text-red-600">
-                    Nominee Verification Status: Rejected
+                    {t("memberNominee.nomineeVerificationStatusRejected", "Nominee Verification Status: Rejected")}
                   </p>
                   <p className="text-xs sm:text-sm font-bold text-slate-800">
-                    Reason for Rejection:{' '}
+                    {t("dashboardModule.productAccounts.reasonForRejection", "Reason for Rejection:")}{' '}
                     <span className="font-black text-red-600">
                       {nominee.rejection_reason || nominee.rejection_remarks || nominee.remarks || 'Incomplete or unverified records. Please update and re-submit.'}
                     </span>
@@ -843,7 +846,7 @@ export default function MemberNominee() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="p-4 rounded-2xl bg-slate-50/70 border border-slate-100 space-y-1">
                   <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                    Nominee Full Name
+                    {t("memberNominee.nomineeFullName", "Nominee Full Name")}
                   </p>
                   <p className="text-sm font-extrabold text-slate-900">
                     {nominee.nominee_name || nominee.name || nominee.full_name || 'N/A'}
@@ -852,7 +855,7 @@ export default function MemberNominee() {
 
                 <div className="p-4 rounded-2xl bg-slate-50/70 border border-slate-100 space-y-1">
                   <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                    Relationship
+                    {t("modal.nominee.relationship", "Relationship")}
                   </p>
                   <p className="text-sm font-extrabold text-slate-900">
                     {nominee.relationship_type || nominee.relationship || 'N/A'}
@@ -861,7 +864,7 @@ export default function MemberNominee() {
 
                 <div className="p-4 rounded-2xl bg-slate-50/70 border border-slate-100 space-y-1">
                   <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                    Date of Birth
+                    {t("modal.member.dateOfBirth", "Date of Birth")}
                   </p>
                   <p className="text-sm font-extrabold text-slate-900">
                     {formatDate(nominee.date_of_birth || nominee.dob)}
@@ -870,7 +873,7 @@ export default function MemberNominee() {
 
                 <div className="p-4 rounded-2xl bg-slate-50/70 border border-slate-100 space-y-1">
                   <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                    Nominee Age
+                    {t("memberNominee.nomineeAge", "Nominee Age")}
                   </p>
                   <p className="text-sm font-extrabold text-slate-900">
                     {nomineeAge !== null ? `${nomineeAge} years` : 'N/A'}
@@ -882,12 +885,12 @@ export default function MemberNominee() {
               <div className="flex items-center justify-between flex-wrap gap-2 text-xs text-slate-500 font-medium pt-2 border-t border-slate-100">
                 <div className="flex items-center gap-1.5">
                   <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                  <span>Submitted on: {formatDateTime(nominee.created_at || nominee.submitted_at)}</span>
+                  <span>{t("memberNominee.submittedOn", "Submitted on:")} {formatDateTime(nominee.created_at || nominee.submitted_at)}</span>
                 </div>
                 {nominee.updated_at && (
                   <div className="flex items-center gap-1.5">
                     <Clock className="w-3.5 h-3.5 text-slate-400" />
-                    <span>Last updated: {formatDateTime(nominee.updated_at)}</span>
+                    <span>{t("branchManagerMembershipSettings.lastUpdated", "Last updated:")} {formatDateTime(nominee.updated_at)}</span>
                   </div>
                 )}
               </div>
@@ -897,9 +900,9 @@ export default function MemberNominee() {
                 <div className="flex items-center justify-between">
                   <h4 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
                     <FileText className="w-4 h-4 text-teal-600" />
-                    <span>Uploaded Aadhaar Verification Documents</span>
+                    <span>{t("memberNominee.uploadedAadhaarVerificationDocuments", "Uploaded Aadhaar Verification Documents")}</span>
                   </h4>
-                  <span className="text-xs text-slate-400 font-medium">2 Verified ID Folios</span>
+                  <span className="text-xs text-slate-400 font-medium">{t("memberNominee.2VerifiedIdFolios", "2 Verified ID Folios")}</span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -911,10 +914,10 @@ export default function MemberNominee() {
                       </div>
                       <div className="min-w-0">
                         <p className="text-xs font-bold text-slate-900 truncate">
-                          Aadhaar Card (Front Side)
+                          {t("memberNominee.aadhaarCardFrontSide", "Aadhaar Card (Front Side)")}
                         </p>
                         <p className="text-[11px] text-slate-500 font-medium truncate">
-                          Proof of Identity with Photo &amp; Name
+                          {t("memberNominee.proofOfIdentityWithPhoto", "Proof of Identity with Photo & Name")}
                         </p>
                       </div>
                     </div>
@@ -931,7 +934,7 @@ export default function MemberNominee() {
                         ) : (
                           <Eye className="w-3.5 h-3.5 text-teal-600" />
                         )}
-                        <span>View</span>
+                        <span>{t("common.view", "View")}</span>
                       </button>
 
                       <button
@@ -939,19 +942,19 @@ export default function MemberNominee() {
                         onClick={() =>
                           handleDownloadDocument(
                             'aadhaar_front',
-                            `nominee_${nominee?.nominee_name ? nominee.nominee_name.trim().replace(/\s+/g, '_') : 'nominee'}_aadhaar_front`
+                            `nominee_${nominee?.nominee_name ? nominee.nominee_name.trim().replace(/\s+/g, '_') : i18n.t("memberNominee.nominee", "nominee")}_aadhaar_front`
                           )
                         }
                         disabled={downloadingDoc['aadhaar_front']}
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-800 text-xs font-bold border border-teal-200/80 shadow-2xs transition-colors cursor-pointer disabled:opacity-50"
-                        title="Download Document"
+                        title={t("memberNominee.downloadDocument", "Download Document")}
                       >
                         {downloadingDoc['aadhaar_front'] ? (
                           <Loader2 className="w-3.5 h-3.5 animate-spin text-teal-600" />
                         ) : (
                           <Download className="w-3.5 h-3.5 text-teal-700" />
                         )}
-                        <span>Download</span>
+                        <span>{t("memberNominee.download", "Download")}</span>
                       </button>
                     </div>
                   </div>
@@ -964,10 +967,10 @@ export default function MemberNominee() {
                       </div>
                       <div className="min-w-0">
                         <p className="text-xs font-bold text-slate-900 truncate">
-                          Aadhaar Card (Back Side)
+                          {t("memberNominee.aadhaarCardBackSide", "Aadhaar Card (Back Side)")}
                         </p>
                         <p className="text-[11px] text-slate-500 font-medium truncate">
-                          Proof of Address &amp; Family Records
+                          {t("memberNominee.proofOfAddressFamilyRecords", "Proof of Address & Family Records")}
                         </p>
                       </div>
                     </div>
@@ -984,7 +987,7 @@ export default function MemberNominee() {
                         ) : (
                           <Eye className="w-3.5 h-3.5 text-teal-600" />
                         )}
-                        <span>View</span>
+                        <span>{t("common.view", "View")}</span>
                       </button>
 
                       <button
@@ -992,19 +995,19 @@ export default function MemberNominee() {
                         onClick={() =>
                           handleDownloadDocument(
                             'aadhaar_back',
-                            `nominee_${nominee?.nominee_name ? nominee.nominee_name.trim().replace(/\s+/g, '_') : 'nominee'}_aadhaar_back`
+                            `nominee_${nominee?.nominee_name ? nominee.nominee_name.trim().replace(/\s+/g, '_') : i18n.t("memberNominee.nominee", "nominee")}_aadhaar_back`
                           )
                         }
                         disabled={downloadingDoc['aadhaar_back']}
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-800 text-xs font-bold border border-teal-200/80 shadow-2xs transition-colors cursor-pointer disabled:opacity-50"
-                        title="Download Document"
+                        title={t("memberNominee.downloadDocument", "Download Document")}
                       >
                         {downloadingDoc['aadhaar_back'] ? (
                           <Loader2 className="w-3.5 h-3.5 animate-spin text-teal-600" />
                         ) : (
                           <Download className="w-3.5 h-3.5 text-teal-700" />
                         )}
-                        <span>Download</span>
+                        <span>{t("memberNominee.download", "Download")}</span>
                       </button>
                     </div>
                   </div>
@@ -1015,10 +1018,10 @@ export default function MemberNominee() {
               <div className="p-4 rounded-2xl bg-teal-50/60 border border-teal-200/70 text-teal-950 text-xs space-y-1">
                 <div className="flex items-center gap-1.5 font-bold text-teal-900">
                   <Info className="w-4 h-4 text-teal-700 flex-shrink-0" />
-                  <span>Important Multi-State Cooperative Society Guideline</span>
+                  <span>{t("memberNominee.importantMultiStateCooperativeSociety", "Important Multi-State Cooperative Society Guideline")}</span>
                 </div>
                 <p className="text-[11px] text-teal-800 font-medium leading-relaxed">
-                  Per cooperative bylaws, nominee verification is conducted by your mapped society branch. Only one primary beneficiary may be designated at a time. Updating your nominee requires fresh verification of Aadhaar identity records.
+                  {t("memberNominee.perCooperativeBylawsNomineeVerification", "Per cooperative bylaws, nominee verification is conducted by your mapped society branch. Only one primary beneficiary may be designated at a time. Updating your nominee requires fresh verification of Aadhaar identity records.")}
                 </p>
               </div>
             </div>
@@ -1032,10 +1035,10 @@ export default function MemberNominee() {
 
             <div className="space-y-1.5">
               <h3 className="text-lg sm:text-xl font-black text-slate-900">
-                No Nominee Linked Yet
+                {t("memberNominee.noNomineeLinkedYet", "No Nominee Linked Yet")}
               </h3>
               <p className="text-xs sm:text-sm text-slate-500 max-w-md mx-auto leading-relaxed font-medium">
-                Protect your cooperative holdings, savings accounts, and fixed deposits by appointing an authorized nominee.
+                {t("memberNominee.protectYourCooperativeHoldingsSavings", "Protect your cooperative holdings, savings accounts, and fixed deposits by appointing an authorized nominee.")}
               </p>
             </div>
 
@@ -1046,7 +1049,7 @@ export default function MemberNominee() {
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-teal-600 hover:bg-teal-700 text-white font-extrabold text-sm shadow-md hover:shadow-lg transition-all cursor-pointer"
               >
                 <PlusCircle className="w-4 h-4" />
-                <span>Register Nominee Now</span>
+                <span>{t("memberDashboard.registerNomineeNow", "Register Nominee Now")}</span>
               </button>
             </div>
           </div>
@@ -1061,11 +1064,11 @@ export default function MemberNominee() {
                   <FileText className="w-4 h-4 text-[#00b4a7]" />
                 </div>
                 <h3 className="font-serif font-bold text-slate-900 text-lg">
-                  Nominee Change Requests
+                  {t("branchManagerNominees.nomineeChangeRequests", "Nominee Change Requests")}
                 </h3>
               </div>
               <p className="text-xs text-slate-500 mt-1 font-medium">
-                Requests submitted to your branch to modify your designated beneficiary records
+                {t("memberNominee.requestsSubmittedToYourBranch", "Requests submitted to your branch to modify your designated beneficiary records")}
               </p>
             </div>
 
@@ -1076,14 +1079,14 @@ export default function MemberNominee() {
                 className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#14b8a6] to-[#0f766e] hover:from-[#0d9488] hover:to-[#0f766e] text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
               >
                 <PlusCircle className="w-3.5 h-3.5" />
-                <span>Submit Change Request</span>
+                <span>{t("memberNominee.submitChangeRequest", "Submit Change Request")}</span>
               </button>
 
               <button
                 type="button"
                 onClick={fetchChangeRequests}
                 disabled={loadingRequests}
-                title="Refresh requests"
+                title={t("branchManagerNominees.refreshRequests", "Refresh requests")}
                 className="p-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer disabled:opacity-50"
               >
                 <RefreshCw className={`w-3.5 h-3.5 text-[#00b4a7] ${loadingRequests ? 'animate-spin' : ''}`} />
@@ -1094,13 +1097,13 @@ export default function MemberNominee() {
           {loadingRequests ? (
             <div className="py-12 text-center space-y-2">
               <Loader2 className="w-6 h-6 animate-spin text-[#00b4a7] mx-auto" />
-              <p className="text-xs text-slate-500">Loading change requests...</p>
+              <p className="text-xs text-slate-500">{t("memberNominee.loadingChangeRequests", "Loading change requests...")}</p>
             </div>
           ) : changeRequests.length === 0 ? (
             <div className="p-8 text-center space-y-2 text-slate-500">
-              <p className="text-sm font-bold text-slate-700">No Nominee Change Requests Submitted</p>
+              <p className="text-sm font-bold text-slate-700">{t("memberNominee.noNomineeChangeRequestsSubmitted", "No Nominee Change Requests Submitted")}</p>
               <p className="text-xs max-w-md mx-auto text-slate-500">
-                If your nominee is approved and you need to update beneficiary details, click &quot;Submit Change Request&quot; above to notify your branch.
+                {t("memberNominee.ifYourNomineeIsApproved", "If your nominee is approved and you need to update beneficiary details, click \"Submit Change Request\" above to notify your branch.")}
               </p>
             </div>
           ) : (
@@ -1108,15 +1111,16 @@ export default function MemberNominee() {
               <table className="w-full text-left border-collapse min-w-[700px]">
                 <thead>
                   <tr className="border-b border-slate-100 bg-slate-50/75 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                    <th className="py-3.5 px-6">Request ID</th>
-                    <th className="py-3.5 px-6">Subject</th>
-                    <th className="py-3.5 px-6">Created At</th>
-                    <th className="py-3.5 px-6">Status</th>
-                    <th className="py-3.5 px-6 text-right">Actions</th>
+                    <th className="py-3.5 px-6">{t("branchManagerNominees.requestId", "Request ID")}</th>
+                    <th className="py-3.5 px-6">{t("dashboardModule.emergency.table.subject", "Subject")}</th>
+                    <th className="py-3.5 px-6">{t("dashboardModule.emergency.table.createdAt", "Created At")}</th>
+                    <th className="py-3.5 px-6">{t("common.status", "Status")}</th>
+                    <th className="py-3.5 px-6 text-right">{t("common.actions", "Actions")}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-sm">
                   {changeRequests.map((req) => {
+  const { t } = useTranslation();
                     const st = (req.status || 'pending').toLowerCase();
                     const isReqApproved = st === 'approved';
                     const isReqRejected = st === 'rejected';
@@ -1134,7 +1138,7 @@ export default function MemberNominee() {
                           </p>
                           {isReqRejected && req.rejection_reason && (
                             <p className="text-xs font-bold text-red-600 mt-1">
-                              Rejection reason: {req.rejection_reason}
+                              {t("memberNominee.rejectionReason", "Rejection reason:")} {req.rejection_reason}
                             </p>
                           )}
                         </td>
@@ -1145,17 +1149,17 @@ export default function MemberNominee() {
                           {isReqApproved ? (
                             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-800 font-bold text-xs rounded-full border border-emerald-200">
                               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                              <span>Approved</span>
+                              <span>{t("common.approved", "Approved")}</span>
                             </span>
                           ) : isReqRejected ? (
                             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-red-50 text-red-700 font-black text-xs rounded-full border border-red-200">
                               <AlertCircle className="w-3.5 h-3.5 text-red-600" />
-                              <span>Rejected</span>
+                              <span>{t("common.rejected", "Rejected")}</span>
                             </span>
                           ) : (
                             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-50 text-amber-800 font-bold text-xs rounded-full border border-amber-200">
                               <Clock className="w-3.5 h-3.5 text-amber-600" />
-                              <span>Pending Review</span>
+                              <span>{t("branchManagerMembers.pendingReview", "Pending Review")}</span>
                             </span>
                           )}
                         </td>
@@ -1166,7 +1170,7 @@ export default function MemberNominee() {
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-[#0f766e] font-bold text-xs rounded-xl border border-teal-200 transition-all cursor-pointer"
                           >
                             <Eye className="w-3.5 h-3.5" />
-                            <span>Details</span>
+                            <span>{t("dashboardModule.monthlyTargets.details", "Details")}</span>
                           </button>
                         </td>
                       </tr>
@@ -1191,10 +1195,10 @@ export default function MemberNominee() {
                 </div>
                 <div>
                   <h3 className="text-base sm:text-lg font-black text-slate-900">
-                    {nominee ? 'Update Nominee Information' : 'Register New Nominee'}
+                    {nominee ? t("memberNominee.updateNomineeInformation", "Update Nominee Information") : t("memberNominee.registerNewNominee", "Register New Nominee")}
                   </h3>
                   <p className="text-xs text-slate-500 font-medium">
-                    Submit beneficiary records &amp; Aadhaar documentation
+                    {t("memberNominee.submitBeneficiaryRecordsAadhaarDocumentation", "Submit beneficiary records & Aadhaar documentation")}
                   </p>
                 </div>
               </div>
@@ -1212,7 +1216,7 @@ export default function MemberNominee() {
               {approvedUnconsumedRequest && (
                 <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-                  <span>Branch Authorization Active (Request #{approvedUnconsumedRequest.id}): You can edit and submit updated nominee details.</span>
+                  <span>{t("memberNominee.branchAuthorizationActiveRequest", "Branch Authorization Active (Request #")}{approvedUnconsumedRequest.id}{t("memberNominee.youCanEditAndSubmit", "): You can edit and submit updated nominee details.")}</span>
                 </div>
               )}
 
@@ -1226,12 +1230,12 @@ export default function MemberNominee() {
               {/* Nominee Name */}
               <div className="space-y-1.5">
                 <label className="block text-xs font-bold text-slate-700">
-                  Nominee Full Name <span className="text-rose-500">*</span>
+                  {t("memberNominee.nomineeFullName", "Nominee Full Name")} <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Priya Sharma"
+                  placeholder={t("memberNominee.eGPriyaSharma", "e.g. Priya Sharma")}
                   value={formData.nominee_name}
                   onChange={(e) => setFormData({ ...formData, nominee_name: e.target.value })}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 font-medium text-slate-800"
@@ -1241,7 +1245,7 @@ export default function MemberNominee() {
               {/* Relationship Type */}
               <div className="space-y-1.5">
                 <label className="block text-xs font-bold text-slate-700">
-                  Relationship with Member <span className="text-rose-500">*</span>
+                  {t("memberNominee.relationshipWithMember", "Relationship with Member")} <span className="text-rose-500">*</span>
                 </label>
                 <select
                   value={formData.relationship_type}
@@ -1259,7 +1263,7 @@ export default function MemberNominee() {
                   <input
                     type="text"
                     required
-                    placeholder="Specify Relationship (e.g. Legal Guardian, Cousin)"
+                    placeholder={t("memberNominee.specifyRelationshipEGLegal", "Specify Relationship (e.g. Legal Guardian, Cousin)")}
                     value={formData.custom_relationship}
                     onChange={(e) => setFormData({ ...formData, custom_relationship: e.target.value })}
                     className="w-full mt-2 px-3.5 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 font-medium text-slate-800"
@@ -1270,7 +1274,7 @@ export default function MemberNominee() {
               {/* Date of Birth */}
               <div className="space-y-1.5">
                 <label className="block text-xs font-bold text-slate-700">
-                  Date of Birth <span className="text-rose-500">*</span>
+                  {t("modal.member.dateOfBirth", "Date of Birth")} <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="date"
@@ -1285,7 +1289,7 @@ export default function MemberNominee() {
               {/* Aadhaar Front File Upload */}
               <div className="space-y-1.5">
                 <label className="block text-xs font-bold text-slate-700">
-                  Aadhaar Card Front Side <span className="text-rose-500">*</span>
+                  {t("memberNominee.aadhaarCardFrontSide2", "Aadhaar Card Front Side")} <span className="text-rose-500">*</span>
                 </label>
                 <div className="p-3.5 rounded-2xl border-2 border-dashed border-slate-200 hover:border-teal-400 bg-slate-50/60 transition-colors text-center relative">
                   <input
@@ -1298,10 +1302,10 @@ export default function MemberNominee() {
                   <div className="flex flex-col items-center gap-1 pointer-events-none">
                     <Upload className="w-5 h-5 text-teal-600" />
                     <span className="font-bold text-xs text-slate-800">
-                      {formData.aadhaar_front ? formData.aadhaar_front.name : frontPreview ? 'Current File Attached (Click to replace)' : 'Upload Aadhaar Front'}
+                      {formData.aadhaar_front ? formData.aadhaar_front.name : frontPreview ? t("memberNominee.currentFileAttachedClickTo", "Current File Attached (Click to replace)") : t("memberNominee.uploadAadhaarFront", "Upload Aadhaar Front")}
                     </span>
                     <span className="text-[10px] text-slate-400">
-                      Supports JPG, PNG or PDF (Max 5MB)
+                      {t("memberNominee.supportsJpgPngOrPdf", "Supports JPG, PNG or PDF (Max 5MB)")}
                     </span>
                   </div>
                 </div>
@@ -1310,7 +1314,7 @@ export default function MemberNominee() {
               {/* Aadhaar Back File Upload */}
               <div className="space-y-1.5">
                 <label className="block text-xs font-bold text-slate-700">
-                  Aadhaar Card Back Side <span className="text-rose-500">*</span>
+                  {t("memberNominee.aadhaarCardBackSide2", "Aadhaar Card Back Side")} <span className="text-rose-500">*</span>
                 </label>
                 <div className="p-3.5 rounded-2xl border-2 border-dashed border-slate-200 hover:border-teal-400 bg-slate-50/60 transition-colors text-center relative">
                   <input
@@ -1323,10 +1327,10 @@ export default function MemberNominee() {
                   <div className="flex flex-col items-center gap-1 pointer-events-none">
                     <Upload className="w-5 h-5 text-teal-600" />
                     <span className="font-bold text-xs text-slate-800">
-                      {formData.aadhaar_back ? formData.aadhaar_back.name : backPreview ? 'Current File Attached (Click to replace)' : 'Upload Aadhaar Back'}
+                      {formData.aadhaar_back ? formData.aadhaar_back.name : backPreview ? t("memberNominee.currentFileAttachedClickTo", "Current File Attached (Click to replace)") : t("memberNominee.uploadAadhaarBack", "Upload Aadhaar Back")}
                     </span>
                     <span className="text-[10px] text-slate-400">
-                      Supports JPG, PNG or PDF (Max 5MB)
+                      {t("memberNominee.supportsJpgPngOrPdf", "Supports JPG, PNG or PDF (Max 5MB)")}
                     </span>
                   </div>
                 </div>
@@ -1340,7 +1344,7 @@ export default function MemberNominee() {
                   disabled={submitting}
                   className="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold text-xs hover:bg-slate-50 transition-colors cursor-pointer"
                 >
-                  Cancel
+                  {t("common.cancel", "Cancel")}
                 </button>
                 <button
                   type="submit"
@@ -1350,12 +1354,12 @@ export default function MemberNominee() {
                   {submitting ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Submitting...</span>
+                      <span>{t("memberNominee.submitting", "Submitting...")}</span>
                     </>
                   ) : (
                     <>
                       <Check className="w-4 h-4" />
-                      <span>{nominee ? 'Save Changes' : 'Submit Nominee'}</span>
+                      <span>{nominee ? t("memberNominee.saveChanges", "Save Changes") : t("memberNominee.submitNominee", "Submit Nominee")}</span>
                     </>
                   )}
                 </button>
@@ -1382,12 +1386,12 @@ export default function MemberNominee() {
                   onClick={() =>
                     handleDownloadDocument(
                       viewDoc.docType || 'aadhaar_front',
-                      `nominee_${nominee?.nominee_name ? nominee.nominee_name.trim().replace(/\s+/g, '_') : 'nominee'}_${viewDoc.docType || 'doc'}`
+                      `nominee_${nominee?.nominee_name ? nominee.nominee_name.trim().replace(/\s+/g, '_') : i18n.t("memberNominee.nominee", "nominee")}_${viewDoc.docType || 'doc'}`
                     )
                   }
                   disabled={downloadingDoc[viewDoc.docType || 'aadhaar_front']}
                   className="p-1.5 rounded-lg text-slate-500 hover:text-teal-700 hover:bg-slate-100 transition-colors cursor-pointer"
-                  title="Download Document"
+                  title={t("memberNominee.downloadDocument", "Download Document")}
                 >
                   <Download className="w-4 h-4" />
                 </button>
@@ -1397,7 +1401,7 @@ export default function MemberNominee() {
                     target="_blank"
                     rel="noreferrer"
                     className="p-1.5 rounded-lg text-slate-400 hover:text-teal-700 hover:bg-slate-100 transition-colors"
-                    title="Open in new window"
+                    title={t("memberNominee.openInNewWindow", "Open in new window")}
                   >
                     <ExternalLink className="w-4 h-4" />
                   </a>
@@ -1434,7 +1438,7 @@ export default function MemberNominee() {
                     />
                     <div style={{ display: 'none' }} className="doc-fallback flex flex-col items-center justify-center p-8 text-center text-slate-500 gap-2">
                       <AlertCircle className="w-8 h-8 text-amber-500 mx-auto" />
-                      <p className="text-sm font-semibold">Image preview could not be displayed directly.</p>
+                      <p className="text-sm font-semibold">{t("memberNominee.imagePreviewCouldNotBe", "Image preview could not be displayed directly.")}</p>
                       <a
                         href={viewDoc.url}
                         target="_blank"
@@ -1442,13 +1446,13 @@ export default function MemberNominee() {
                         className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-teal-600 text-white text-xs font-bold hover:bg-teal-700 transition-colors mt-2"
                       >
                         <ExternalLink className="w-4 h-4" />
-                        <span>Open / Download Document</span>
+                        <span>{t("memberNominee.openDownloadDocument", "Open / Download Document")}</span>
                       </a>
                     </div>
                   </div>
                 )
               ) : (
-                <p className="text-xs text-slate-400">Document preview unavailable.</p>
+                <p className="text-xs text-slate-400">{t("memberNominee.documentPreviewUnavailable", "Document preview unavailable.")}</p>
               )}
             </div>
           </div>
@@ -1466,10 +1470,10 @@ export default function MemberNominee() {
                 </div>
                 <div>
                   <h3 className="text-base sm:text-lg font-black text-slate-900">
-                    Submit Nominee Change Request
+                    {t("memberNominee.submitNomineeChangeRequest", "Submit Nominee Change Request")}
                   </h3>
                   <p className="text-xs text-slate-500 font-medium">
-                    Request authorization from your branch to update nominee records
+                    {t("memberNominee.requestAuthorizationFromYourBranch", "Request authorization from your branch to update nominee records")}
                   </p>
                 </div>
               </div>
@@ -1491,14 +1495,14 @@ export default function MemberNominee() {
 
               <div className="space-y-1.5">
                 <label className="block text-xs font-bold text-slate-700">
-                  Subject / Summary <span className="text-rose-500">*</span>
+                  {t("memberNominee.subjectSummary", "Subject / Summary")} <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
                   required
                   maxLength={150}
                   minLength={2}
-                  placeholder="e.g. Request to change nominee to spouse"
+                  placeholder={t("memberNominee.eGRequestToChange", "e.g. Request to change nominee to spouse")}
                   value={requestForm.subject}
                   onChange={(e) => setRequestForm({ ...requestForm, subject: e.target.value })}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-[#14b8a6] font-medium text-slate-800 text-sm"
@@ -1507,14 +1511,14 @@ export default function MemberNominee() {
 
               <div className="space-y-1.5">
                 <label className="block text-xs font-bold text-slate-700">
-                  Reason for Change &amp; Nominee Details <span className="text-rose-500">*</span>
+                  {t("memberNominee.reasonForChangeNomineeDetails", "Reason for Change & Nominee Details")} <span className="text-rose-500">*</span>
                 </label>
                 <textarea
                   rows={4}
                   required
                   maxLength={5000}
                   minLength={1}
-                  placeholder="Explain why you are requesting this nominee update, who the new beneficiary is, and any relevant details for branch approval..."
+                  placeholder={t("memberNominee.explainWhyYouAreRequesting", "Explain why you are requesting this nominee update, who the new beneficiary is, and any relevant details for branch approval...")}
                   value={requestForm.message}
                   onChange={(e) => setRequestForm({ ...requestForm, message: e.target.value })}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-[#14b8a6] font-medium text-slate-800 text-sm resize-none"
@@ -1522,7 +1526,7 @@ export default function MemberNominee() {
               </div>
 
               <div className="p-3 bg-teal-50/60 rounded-xl border border-teal-100 text-[11px] text-teal-800 leading-relaxed">
-                Once submitted, your branch manager will review and approve your request. After approval, you will be able to submit updated Aadhaar documents and nominee records.
+                {t("memberNominee.onceSubmittedYourBranchManager", "Once submitted, your branch manager will review and approve your request. After approval, you will be able to submit updated Aadhaar documents and nominee records.")}
               </div>
 
               <div className="pt-2 flex items-center justify-end gap-2.5">
@@ -1531,7 +1535,7 @@ export default function MemberNominee() {
                   onClick={() => setRequestModalOpen(false)}
                   className="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 font-bold text-xs hover:bg-slate-50 transition-colors cursor-pointer"
                 >
-                  Cancel
+                  {t("common.cancel", "Cancel")}
                 </button>
                 <button
                   type="submit"
@@ -1539,7 +1543,7 @@ export default function MemberNominee() {
                   className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#14b8a6] to-[#0f766e] hover:from-[#0d9488] hover:to-[#0f766e] text-white font-bold text-xs shadow-md shadow-teal-500/20 transition-all disabled:opacity-50 cursor-pointer"
                 >
                   {submittingRequest ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                  <span>{submittingRequest ? 'Submitting...' : 'Submit Change Request'}</span>
+                  <span>{submittingRequest ? t("memberNominee.submitting", "Submitting...") : t("memberNominee.submitChangeRequest", "Submit Change Request")}</span>
                 </button>
               </div>
             </form>
@@ -1559,7 +1563,7 @@ export default function MemberNominee() {
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-black text-[#0f766e]">
-                      Request #{viewRequestModal.request.id}
+                      {t("branchManagerNominees.request", "Request #")}{viewRequestModal.request.id}
                     </span>
                     <span
                       className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
@@ -1570,7 +1574,7 @@ export default function MemberNominee() {
                           : 'bg-amber-100 text-amber-800'
                       }`}
                     >
-                      {viewRequestModal.request.status ? viewRequestModal.request.status.toUpperCase() : 'PENDING'}
+                      {viewRequestModal.request.status ? viewRequestModal.request.status.toUpperCase() : t("memberNominee.pending", "PENDING")}
                     </span>
                   </div>
                   <h3 className="text-base font-black text-slate-900 mt-0.5">
@@ -1590,7 +1594,7 @@ export default function MemberNominee() {
             <div className="p-5 sm:p-6 space-y-4">
               <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-1">
                 <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                  Request Message
+                  {t("memberNominee.requestMessage", "Request Message")}
                 </p>
                 <p className="text-xs sm:text-sm text-slate-800 leading-relaxed font-medium whitespace-pre-wrap">
                   {viewRequestModal.request.message}
@@ -1600,7 +1604,7 @@ export default function MemberNominee() {
               {viewRequestModal.request.status === 'rejected' && viewRequestModal.request.rejection_reason && (
                 <div className="p-4 bg-red-50 border-2 border-red-200 rounded-2xl space-y-1">
                   <p className="text-[11px] font-black text-red-600 uppercase tracking-wider">
-                    Rejection Reason
+                    {t("branchManagerMembershipSettings.rejectionReason", "Rejection Reason")}
                   </p>
                   <p className="text-xs sm:text-sm font-bold text-red-600">
                     {viewRequestModal.request.rejection_reason}
@@ -1610,11 +1614,11 @@ export default function MemberNominee() {
 
               <div className="grid grid-cols-2 gap-3 text-xs">
                 <div className="p-3 bg-slate-50 rounded-xl">
-                  <span className="text-slate-400 block text-[10px] uppercase font-bold">Submitted At</span>
+                  <span className="text-slate-400 block text-[10px] uppercase font-bold">{t("dashboardModule.branchOverview.colSubmittedAt", "Submitted At")}</span>
                   <span className="font-semibold text-slate-700">{formatDateTime(viewRequestModal.request.created_at)}</span>
                 </div>
                 <div className="p-3 bg-slate-50 rounded-xl">
-                  <span className="text-slate-400 block text-[10px] uppercase font-bold">Reviewed At</span>
+                  <span className="text-slate-400 block text-[10px] uppercase font-bold">{t("modal.nominee.reviewedAt", "Reviewed At")}</span>
                   <span className="font-semibold text-slate-700">{formatDateTime(viewRequestModal.request.reviewed_at)}</span>
                 </div>
               </div>
@@ -1625,7 +1629,7 @@ export default function MemberNominee() {
                   onClick={() => setViewRequestModal({ isOpen: false, request: null, loading: false })}
                   className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors cursor-pointer"
                 >
-                  Close
+                  {t("common.close", "Close")}
                 </button>
               </div>
             </div>

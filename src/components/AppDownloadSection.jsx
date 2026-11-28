@@ -1,6 +1,9 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
+
 
 export default function AppDownloadSection() {
+  const { t } = useTranslation();
   return (
     <section className="relative py-20 lg:py-28 bg-[#f5f7fa] overflow-hidden select-none">
       
@@ -68,14 +71,12 @@ export default function AppDownloadSection() {
             
             {/* Sub-label matching reference */}
             <span className="text-sm sm:text-base text-slate-400 font-normal tracking-wide block mb-3">
-              Checking your rates in 3 minutes!
+              {t("appDownload.subtitle", "Download our mobile app to track passbooks, make payments, and view schemes.")}
             </span>
 
             {/* Main Bold Serif Heading - Guaranteed exact 3 lines */}
             <h2 className="text-3xl sm:text-4xl md:text-[42px] lg:text-[45px] xl:text-[52px] font-serif font-bold text-slate-800 leading-[1.12] tracking-tight mb-8 sm:mb-10 max-w-xl">
-              <span className="block sm:whitespace-nowrap">Use our app to see</span>
-              <span className="block sm:whitespace-nowrap">your personalised</span>
-              <span className="block sm:whitespace-nowrap">loan rates</span>
+              {t("appDownload.title", "Manage your cooperative finances anywhere")}
             </h2>
 
             {/* Download Buttons matching exact yellow theme & layout */}
@@ -92,10 +93,10 @@ export default function AppDownloadSection() {
                 </svg>
                 <div className="text-left flex flex-col">
                   <span className="text-[10px] text-white/90 font-medium uppercase tracking-wider leading-none">
-                    Download on the
+                    {t("appDownloadSection.downloadOnThe", "Download on the")}
                   </span>
                   <span className="text-[15px] sm:text-[16px] text-white font-bold tracking-tight leading-tight mt-1">
-                    Apple Store
+                    {t("appDownloadSection.appleStore", "Apple Store")}
                   </span>
                 </div>
               </a>
@@ -111,10 +112,10 @@ export default function AppDownloadSection() {
                 </svg>
                 <div className="text-left flex flex-col">
                   <span className="text-[10px] text-white/90 font-medium uppercase tracking-wider leading-none">
-                    Download on the
+                    {t("appDownloadSection.downloadOnThe", "Download on the")}
                   </span>
                   <span className="text-[15px] sm:text-[16px] text-white font-bold tracking-tight leading-tight mt-1">
-                    Google Play
+                    {t("appDownloadSection.googlePlay", "Google Play")}
                   </span>
                 </div>
               </a>
@@ -201,20 +202,20 @@ export default function AppDownloadSection() {
                   <div className="space-y-3 mt-3">
                     <div>
                       <label className="text-[9px] uppercase tracking-wider text-slate-400 font-semibold block mb-1">
-                        Input Email Address
+                        {t("appDownloadSection.inputEmailAddress", "Input Email Address")}
                       </label>
                       <div className="text-[11px] text-slate-600 bg-white border border-slate-200/80 rounded px-2.5 py-1.5 font-normal">
-                        name@aurumfx.com
+                        {t("appDownloadSection.nameAurumfxCom", "name@aurumfx.com")}
                       </div>
                     </div>
 
                     <div>
                       <div className="flex justify-between items-center mb-1">
                         <span className="text-[9px] uppercase tracking-wider text-slate-400 font-semibold">
-                          Password
+                          {t("login.branchAdmin.passwordLabel", "Password")}
                         </span>
                         <span className="text-[9px] text-[#00b4a7] font-semibold cursor-pointer">
-                          Password
+                          {t("login.branchAdmin.passwordLabel", "Password")}
                         </span>
                       </div>
                       <div className="text-[11px] text-slate-400 bg-white border border-slate-200/80 rounded px-2.5 py-1.5 font-normal">
@@ -224,11 +225,11 @@ export default function AppDownloadSection() {
 
                     {/* Sign In Button */}
                     <button className="w-full bg-[#00b4a7] text-white py-2.5 rounded font-semibold text-xs shadow-xs hover:bg-[#009c90] transition-colors mt-2">
-                      Sign In
+                      {t("common.signIn", "Sign In")}
                     </button>
 
                     <p className="text-[9px] text-slate-400 text-center mt-2 font-normal">
-                      Don't have an AurumFX Account?
+                      {t("appDownloadSection.donTHaveAnAurumfx", "Don't have an AurumFX Account?")}
                     </p>
                   </div>
 
@@ -262,16 +263,16 @@ export default function AppDownloadSection() {
                     
                     {/* Status bar */}
                     <div className="flex justify-between items-center text-[9px] text-white/85 font-medium mb-2 px-1">
-                      <span>●●● Netcom</span>
-                      <span>9:41 AM</span>
+                      <span>{t("appDownloadSection.netcom", "●●● Netcom")}</span>
+                      <span>{t("appDownloadSection.941Am", "9:41 AM")}</span>
                       <span>100% 🔋</span>
                     </div>
 
                     <h4 className="text-sm font-semibold tracking-wide text-white">
-                      Student loan
+                      {t("appDownloadSection.studentLoan", "Student loan")}
                     </h4>
                     <span className="text-[10px] text-white/80 font-normal block mt-0.5">
-                      current balance
+                      {t("appDownloadSection.currentBalance", "current balance")}
                     </span>
                     <div className="text-2xl sm:text-[28px] font-serif font-bold text-white tracking-tight my-1.5">
                       $125,000
@@ -280,12 +281,12 @@ export default function AppDownloadSection() {
                     {/* Bottom Split Row */}
                     <div className="grid grid-cols-2 gap-2 pt-2 border-t border-white/20 mt-2 text-[10px]">
                       <div>
-                        <span className="text-white/70 block text-[9px]">loan amount</span>
+                        <span className="text-white/70 block text-[9px]">{t("appDownloadSection.loanAmount", "loan amount")}</span>
                         <span className="font-semibold text-white">$125,000</span>
                       </div>
                       <div>
-                        <span className="text-white/70 block text-[9px]">remaining terms</span>
-                        <span className="font-semibold text-white">12 yr.</span>
+                        <span className="text-white/70 block text-[9px]">{t("appDownloadSection.remainingTerms", "remaining terms")}</span>
+                        <span className="font-semibold text-white">{t("appDownloadSection.12Yr", "12 yr.")}</span>
                       </div>
                     </div>
 
@@ -298,10 +299,10 @@ export default function AppDownloadSection() {
                       {/* Tabs */}
                       <div className="flex gap-4 border-b border-slate-100 pb-1.5 text-xs">
                         <span className="text-[#00b4a7] font-semibold border-b-2 border-[#00b4a7] pb-1 cursor-pointer">
-                          upcoming
+                          {t("appDownloadSection.upcoming", "upcoming")}
                         </span>
                         <span className="text-slate-400 font-normal cursor-pointer">
-                          history
+                          {t("appDownloadSection.history", "history")}
                         </span>
                       </div>
 
@@ -310,7 +311,7 @@ export default function AppDownloadSection() {
                         <div className="flex justify-between items-center text-[11px] py-1 border-b border-slate-50">
                           <div>
                             <span className="font-semibold text-slate-800 block text-[11px]">
-                              Auto payment
+                              {t("appDownloadSection.autoPayment", "Auto payment")}
                             </span>
                             <span className="text-[9px] text-slate-400">10/12/2026</span>
                           </div>
@@ -320,7 +321,7 @@ export default function AppDownloadSection() {
                         <div className="flex justify-between items-center text-[11px] py-1 border-b border-slate-50">
                           <div>
                             <span className="font-semibold text-slate-800 block text-[11px]">
-                              Auto payment
+                              {t("appDownloadSection.autoPayment", "Auto payment")}
                             </span>
                             <span className="text-[9px] text-slate-400">10/12/2026</span>
                           </div>
@@ -331,7 +332,7 @@ export default function AppDownloadSection() {
 
                     {/* Teal Button */}
                     <button className="w-full bg-[#00b4a7] hover:bg-[#009c90] text-white py-2.5 rounded font-semibold text-xs shadow-xs transition-colors mt-2">
-                      Payment options
+                      {t("appDownloadSection.paymentOptions", "Payment options")}
                     </button>
 
                   </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import StatCard from '../../components/dashboard/StatCard';
 import { AnnouncementDetailModal } from '../../components/dashboard/AnnouncementModals';
@@ -40,6 +41,7 @@ function formatDateTime(isoString) {
 }
 
 export default function MemberAnnouncements() {
+  const { t } = useTranslation();
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -187,12 +189,12 @@ export default function MemberAnnouncements() {
             <div className="inline-flex flex-wrap items-center gap-x-2 gap-y-1 px-3 sm:px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-xs text-[11px] sm:text-xs font-semibold border border-teal-200/80 shadow-2xs text-[#0f766e] mb-3">
               <span className="inline-flex items-center gap-1.5 flex-shrink-0">
                 <Megaphone className="w-3.5 h-3.5 text-[#00b4a7]" />
-                <span>Official Society Notices &amp; Broadcasts</span>
+                <span>{t("memberAnnouncements.officialSocietyNoticesBroadcasts", "Official Society Notices & Broadcasts")}</span>
               </span>
               <span className="text-teal-300 hidden sm:inline">•</span>
               <span className="inline-flex items-center gap-1 font-bold text-emerald-700">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                Live Bulletin
+                {t("memberAnnouncements.liveBulletin", "Live Bulletin")}
               </span>
             </div>
 
@@ -200,12 +202,12 @@ export default function MemberAnnouncements() {
             <div className="flex items-center gap-3">
               <span className="w-1.5 h-8 sm:h-9 bg-[#00b4a7] rounded-full flex-shrink-0" />
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0f2e2e] tracking-tight">
-                Society Announcements
+                {t("dashboardModule.announcements.title", "Society Announcements")}
               </h1>
             </div>
 
             <p className="text-slate-600 text-xs sm:text-sm mt-2.5 font-medium leading-relaxed max-w-xl">
-              Stay up-to-date with official cooperative circulars, annual general meetings (AGM), dividend distributions, festival loan drives, and policy revisions.
+              {t("memberAnnouncements.stayUpToDateWith", "Stay up-to-date with official cooperative circulars, annual general meetings (AGM), dividend distributions, festival loan drives, and policy revisions.")}
             </p>
           </div>
 
@@ -213,7 +215,7 @@ export default function MemberAnnouncements() {
           <div className="relative z-10 flex justify-center md:justify-end pointer-events-none -my-2 sm:-my-5 lg:-my-6 flex-shrink-0">
             <img
               src={noticeIllustration}
-              alt="Society Announcements Notice Collection"
+              alt={t("dashboardModule.announcements.bannerAlt", "Society Announcements Notice Collection")}
               className="h-36 sm:h-48 lg:h-56 w-auto object-contain drop-shadow-md select-none pointer-events-none"
             />
           </div>
@@ -227,24 +229,24 @@ export default function MemberAnnouncements() {
         {/* 3 Summary Stat Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
           <StatCard
-            title="Total Notices"
+            title={t("dashboardModule.announcements.totalNotices", "Total Notices")}
             value={totalCount}
-            subtitle="Published by Cooperative Board"
+            subtitle={t("memberAnnouncements.publishedByCooperativeBoard", "Published by Cooperative Board")}
             icon={Megaphone}
             trend={`${activeCount} active`}
             trendType="up"
           />
           <StatCard
-            title="Active Notices"
+            title={t("dashboardModule.announcements.activeNotices", "Active Notices")}
             value={activeCount}
-            subtitle="Current In-Effect Notices"
+            subtitle={t("memberAnnouncements.currentInEffectNotices", "Current In-Effect Notices")}
             icon={CheckCircle2}
             badge="Verified Circulars"
           />
           <StatCard
-            title="Notification Channel"
+            title={t("memberAnnouncements.notificationChannel", "Notification Channel")}
             value="Official"
-            subtitle="Direct Member Feed"
+            subtitle={t("memberAnnouncements.directMemberFeed", "Direct Member Feed")}
             icon={Bell}
             trend="Instant Updates"
             trendType="up"
@@ -261,11 +263,11 @@ export default function MemberAnnouncements() {
                   <Megaphone className="w-4 h-4 text-[#00b4a7]" />
                 </div>
                 <h3 className="font-serif font-bold text-slate-900 text-lg">
-                  Notice Board &amp; Official Circulars
+                  {t("memberAnnouncements.noticeBoardOfficialCirculars", "Notice Board & Official Circulars")}
                 </h3>
               </div>
               <p className="text-xs text-slate-500 font-medium mt-0.5">
-                Browse announcements published by apex society management
+                {t("memberAnnouncements.browseAnnouncementsPublishedByApex", "Browse announcements published by apex society management")}
               </p>
             </div>
 
@@ -275,7 +277,7 @@ export default function MemberAnnouncements() {
                 <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
                   type="text"
-                  placeholder="Search announcements..."
+                  placeholder={t("memberAnnouncements.searchAnnouncements", "Search announcements...")}
                   value={searchQuery}
                   onChange={(e) => {
                     setSearchQuery(e.target.value);
@@ -299,7 +301,7 @@ export default function MemberAnnouncements() {
               <button
                 onClick={() => fetchAnnouncements(true)}
                 disabled={refreshing}
-                title="Refresh announcements"
+                title={t("dashboardModule.announcements.refreshTooltip", "Refresh announcements")}
                 className="p-2 border border-slate-200 rounded-xl hover:bg-slate-50 text-slate-600 transition-colors disabled:opacity-50 cursor-pointer"
               >
                 <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin text-teal-600' : ''}`} />
@@ -313,7 +315,7 @@ export default function MemberAnnouncements() {
               <div className="flex items-start gap-2.5">
                 <AlertCircle className="w-5 h-5 flex-shrink-0 text-red-600 mt-0.5" />
                 <div>
-                  <p className="text-sm font-bold text-red-900">Failed to load announcements</p>
+                  <p className="text-sm font-bold text-red-900">{t("memberAnnouncements.failedToLoadAnnouncements", "Failed to load announcements")}</p>
                   <p className="text-xs text-red-700 mt-0.5">{error}</p>
                 </div>
               </div>
@@ -321,7 +323,7 @@ export default function MemberAnnouncements() {
                 onClick={() => fetchAnnouncements()}
                 className="text-xs font-bold text-red-700 hover:text-red-900 underline cursor-pointer flex-shrink-0"
               >
-                Retry
+                {t("common.retry", "Retry")}
               </button>
             </div>
           )}
@@ -331,7 +333,7 @@ export default function MemberAnnouncements() {
             {loading ? (
               <div className="py-20 text-center space-y-3">
                 <div className="w-10 h-10 border-3 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto" />
-                <p className="text-sm text-slate-500 font-medium">Loading society notices...</p>
+                <p className="text-sm text-slate-500 font-medium">{t("memberAnnouncements.loadingSocietyNotices", "Loading society notices...")}</p>
               </div>
             ) : filteredAnnouncements.length === 0 ? (
               <div className="py-20 text-center space-y-4 max-w-sm mx-auto p-4">
@@ -340,12 +342,12 @@ export default function MemberAnnouncements() {
                 </div>
                 <div>
                   <p className="text-base font-bold text-slate-800">
-                    {searchQuery ? 'No matching announcements found' : 'No announcements published yet'}
+                    {searchQuery ? t("dashboardModule.announcements.noMatchingTitle", "No matching announcements found") : t("dashboardModule.announcements.emptyTitle", "No announcements published yet")}
                   </p>
                   <p className="text-xs text-slate-500 mt-1 font-medium leading-relaxed">
                     {searchQuery
-                      ? 'Try adjusting your search keywords.'
-                      : 'Society broadcasts and circulars will be displayed here once posted.'}
+                      ? t("memberAnnouncements.tryAdjustingYourSearchKeywords", "Try adjusting your search keywords.")
+                      : t("memberAnnouncements.societyBroadcastsAndCircularsWill", "Society broadcasts and circulars will be displayed here once posted.")}
                   </p>
                 </div>
               </div>
@@ -353,15 +355,16 @@ export default function MemberAnnouncements() {
               <table className="w-full text-left border-collapse min-w-[750px]">
                 <thead>
                   <tr className="border-b border-slate-100 bg-slate-50/75 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                    <th className="py-3.5 px-6">Notice ID</th>
-                    <th className="py-3.5 px-6">Announcement Title &amp; Details</th>
-                    <th className="py-3.5 px-6">Published Date</th>
-                    <th className="py-3.5 px-6 text-center">Status</th>
-                    <th className="py-3.5 px-6 text-right">Actions</th>
+                    <th className="py-3.5 px-6">{t("dashboardModule.announcements.colNoticeId", "Notice ID")}</th>
+                    <th className="py-3.5 px-6">{t("dashboardModule.announcements.colTitleDetails", "Announcement Title & Details")}</th>
+                    <th className="py-3.5 px-6">{t("dashboardModule.announcements.colPublishedDate", "Published Date")}</th>
+                    <th className="py-3.5 px-6 text-center">{t("common.status", "Status")}</th>
+                    <th className="py-3.5 px-6 text-right">{t("common.actions", "Actions")}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-sm">
                   {paginatedAnnouncements.map((item) => {
+  const { t } = useTranslation();
                     const noticeId = item.id || item.announcement_id || 'ANN-01';
                     const isActive = item.is_active !== false;
 
@@ -408,7 +411,7 @@ export default function MemberAnnouncements() {
                                 isActive ? 'bg-emerald-500' : 'bg-slate-400'
                               }`}
                             />
-                            {isActive ? 'Published' : 'Archived'}
+                            {isActive ? t("dashboardModule.announcements.statusPublished", "Published") : t("dashboardModule.announcements.statusArchived", "Archived")}
                           </span>
                         </td>
 
@@ -417,10 +420,10 @@ export default function MemberAnnouncements() {
                           <button
                             onClick={() => setDetailModal({ isOpen: true, announcement: item })}
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-800 font-bold text-xs rounded-xl transition-colors cursor-pointer border border-teal-200/60 shadow-2xs"
-                            title="Read complete announcement"
+                            title={t("dashboardModule.announcements.readCompleteTooltip", "Read complete announcement")}
                           >
                             <Eye className="w-3.5 h-3.5 text-[#00b4a7]" />
-                            <span>Read Notice</span>
+                            <span>{t("dashboardModule.announcements.readNotice", "Read Notice")}</span>
                           </button>
                         </td>
                       </tr>
@@ -435,15 +438,15 @@ export default function MemberAnnouncements() {
           {filteredAnnouncements.length > itemsPerPage && (
             <div className="p-4 sm:p-5 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-medium">
               <div>
-                Showing{' '}
+                {t("common.showing", "Showing")}{' '}
                 <span className="font-bold text-slate-800">
                   {(currentPage - 1) * itemsPerPage + 1}
                 </span>{' '}
-                to{' '}
+                {t("common.to", "to")}{' '}
                 <span className="font-bold text-slate-800">
                   {Math.min(currentPage * itemsPerPage, filteredAnnouncements.length)}
                 </span>{' '}
-                of <span className="font-bold text-slate-800">{filteredAnnouncements.length}</span> notices
+                {t("common.of", "of")} <span className="font-bold text-slate-800">{filteredAnnouncements.length}</span> {t("dashboardModule.announcements.noticesUnit", "notices")}
               </div>
 
               <div className="flex items-center gap-1">

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import MemberDetailModal from '../../components/dashboard/MemberDetailModal';
 import {
@@ -25,6 +26,7 @@ import { getSuperAdminSavingsAccounts } from '../../services/savingsAccountServi
 import MemberCashTransactionsModal from '../../components/dashboard/MemberCashTransactionsModal';
 
 export default function SuperAdminMembers({ embedded = false, branchId = null }) {
+  const { t } = useTranslation();
   const [branches, setBranches] = useState([]);
   const [selectedBranchId, setSelectedBranchId] = useState(branchId || 'all');
 
@@ -257,21 +259,21 @@ export default function SuperAdminMembers({ embedded = false, branchId = null })
             {/* Role Badge */}
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/90 backdrop-blur-xs text-xs font-semibold mb-3 border border-teal-200/60 shadow-2xs text-[#0f766e]">
               <Users className="w-3.5 h-3.5 text-[#00b4a7]" />
-              <span>Role: Super Admin &bull; Multi-State Member Registry &amp; Verification</span>
+              <span>{t("superAdminMembers.roleSuperAdminMultiState", "Role: Super Admin • Multi-State Member Registry & Verification")}</span>
             </div>
 
             {/* Headline with Vertical Teal Accent Bar */}
             <div className="flex items-center gap-3 mt-1">
               <span className="w-1.5 h-8 sm:h-9 bg-[#00b4a7] rounded-full flex-shrink-0" />
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
-                <span>Society Registered Members</span>
+                <span>{t("superAdminMembers.societyRegisteredMembers", "Society Registered Members")}</span>
                 <Users className="w-6 h-6 sm:w-7 sm:h-7 text-[#6366f1] stroke-[2.2]" />
               </h1>
             </div>
 
             {/* Subtitle */}
             <p className="text-slate-600 text-xs sm:text-sm mt-2 font-medium leading-relaxed max-w-xl">
-              Live central oversight of all registered cooperative society shareholders across branches, complete with full KYC records, Aadhaar verification, and document auditing.
+              {t("superAdminMembers.liveCentralOversightOfAll", "Live central oversight of all registered cooperative society shareholders across branches, complete with full KYC records, Aadhaar verification, and document auditing.")}
             </p>
 
             {/* Dynamic Metric Pills */}
@@ -284,7 +286,7 @@ export default function SuperAdminMembers({ embedded = false, branchId = null })
                   <p className="text-xs font-bold text-slate-900 leading-tight">
                     {loading ? '...' : `${totalCount} Members`}
                   </p>
-                  <p className="text-[10px] text-slate-500 leading-tight">Total Central Records</p>
+                  <p className="text-[10px] text-slate-500 leading-tight">{t("superAdminMembers.totalCentralRecords", "Total Central Records")}</p>
                 </div>
               </div>
 
@@ -298,7 +300,7 @@ export default function SuperAdminMembers({ embedded = false, branchId = null })
                   <p className="text-xs font-bold text-slate-900 leading-tight">
                     {loading ? '...' : `${verifiedPercentage}% Verified`}
                   </p>
-                  <p className="text-[10px] text-slate-500 leading-tight">KYC Approved Status</p>
+                  <p className="text-[10px] text-slate-500 leading-tight">{t("staffMembers.kycApprovedStatus", "KYC Approved Status")}</p>
                 </div>
               </div>
 
@@ -312,7 +314,7 @@ export default function SuperAdminMembers({ embedded = false, branchId = null })
                   <p className="text-xs font-bold text-slate-900 leading-tight">
                     {loading ? '...' : `${activeCount} Active`}
                   </p>
-                  <p className="text-[10px] text-slate-500 leading-tight">Operational Members</p>
+                  <p className="text-[10px] text-slate-500 leading-tight">{t("staffMembers.operationalMembers", "Operational Members")}</p>
                 </div>
               </div>
             </div>
@@ -322,7 +324,7 @@ export default function SuperAdminMembers({ embedded = false, branchId = null })
           <div className="relative z-10 flex-shrink-0 flex items-center justify-center">
             <img
               src={memberRegistryScene}
-              alt="AurumFX Member Management and Registration"
+              alt={t("staffMembers.aurumfxMemberManagementAndRegistration", "AurumFX Member Management and Registration")}
               className="h-40 sm:h-48 md:h-52 lg:h-56 w-auto object-contain drop-shadow-md select-none pointer-events-none transform hover:scale-102 transition-transform duration-300"
             />
           </div>
@@ -334,7 +336,7 @@ export default function SuperAdminMembers({ embedded = false, branchId = null })
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Members</span>
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t("dashboard.totalMembers", "Total Members")}</span>
               <div className="w-9 h-9 rounded-xl bg-teal-50 text-[#00b4a7] flex items-center justify-center">
                 <Users className="w-4 h-4" />
               </div>
@@ -342,12 +344,12 @@ export default function SuperAdminMembers({ embedded = false, branchId = null })
             <h3 className="text-2xl sm:text-3xl font-black text-slate-900 mt-2">
               {loading ? '...' : totalCount}
             </h3>
-            <p className="text-xs text-slate-500 mt-1">Across all branches in system</p>
+            <p className="text-xs text-slate-500 mt-1">{t("superAdminMembers.acrossAllBranchesInSystem", "Across all branches in system")}</p>
           </div>
 
           <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-emerald-600 uppercase tracking-wider">Active Members</span>
+              <span className="text-xs font-bold text-emerald-600 uppercase tracking-wider">{t("staffMembers.activeMembers", "Active Members")}</span>
               <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
                 <CheckCircle2 className="w-4 h-4" />
               </div>
@@ -355,12 +357,12 @@ export default function SuperAdminMembers({ embedded = false, branchId = null })
             <h3 className="text-2xl sm:text-3xl font-black text-emerald-700 mt-2">
               {loading ? '...' : activeCount}
             </h3>
-            <p className="text-xs text-slate-500 mt-1">Active status enabled</p>
+            <p className="text-xs text-slate-500 mt-1">{t("staffMembers.activeStatusEnabled", "Active status enabled")}</p>
           </div>
 
           <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-teal-600 uppercase tracking-wider">KYC Approved</span>
+              <span className="text-xs font-bold text-teal-600 uppercase tracking-wider">{t("staffMembers.kycApproved", "KYC Approved")}</span>
               <div className="w-9 h-9 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center">
                 <ShieldCheck className="w-4 h-4" />
               </div>
@@ -368,12 +370,12 @@ export default function SuperAdminMembers({ embedded = false, branchId = null })
             <h3 className="text-2xl sm:text-3xl font-black text-teal-800 mt-2">
               {loading ? '...' : approvedCount}
             </h3>
-            <p className="text-xs text-slate-500 mt-1">Verified documentation</p>
+            <p className="text-xs text-slate-500 mt-1">{t("staffMembers.verifiedDocumentation", "Verified documentation")}</p>
           </div>
 
           <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-amber-600 uppercase tracking-wider">Pending Review</span>
+              <span className="text-xs font-bold text-amber-600 uppercase tracking-wider">{t("branchManagerMembers.pendingReview", "Pending Review")}</span>
               <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
                 <Clock className="w-4 h-4" />
               </div>
@@ -381,7 +383,7 @@ export default function SuperAdminMembers({ embedded = false, branchId = null })
             <h3 className="text-2xl sm:text-3xl font-black text-amber-700 mt-2">
               {loading ? '...' : pendingCount}
             </h3>
-            <p className="text-xs text-slate-500 mt-1">Awaiting KYC appraisal</p>
+            <p className="text-xs text-slate-500 mt-1">{t("staffMembers.awaitingKycAppraisal", "Awaiting KYC appraisal")}</p>
           </div>
         </div>
 
@@ -391,9 +393,9 @@ export default function SuperAdminMembers({ embedded = false, branchId = null })
           {/* Header Controls */}
           <div className="p-4 sm:p-5 border-b border-slate-100 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
             <div>
-              <h3 className="text-base font-bold text-slate-900">Branch Member Directory</h3>
+              <h3 className="text-base font-bold text-slate-900">{t("staffMembers.branchMemberDirectory", "Branch Member Directory")}</h3>
               <p className="text-xs text-slate-500 mt-0.5">
-                Centralized shareholder database across operating branches
+                {t("staffMembers.centralizedShareholderDatabaseAcrossOperating", "Centralized shareholder database across operating branches")}
               </p>
             </div>
 
@@ -401,13 +403,13 @@ export default function SuperAdminMembers({ embedded = false, branchId = null })
               {/* Branch Selector Dropdown */}
               <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 shadow-2xs flex-1 sm:flex-initial min-w-0">
                 <Building2 className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
-                <span className="text-xs font-bold text-slate-500 flex-shrink-0">Branch:</span>
+                <span className="text-xs font-bold text-slate-500 flex-shrink-0">{t("branchManagerCashReconciliation.branch", "Branch:")}</span>
                 <select
                   value={selectedBranchId}
                   onChange={(e) => handleBranchChange(e.target.value)}
                   className="bg-transparent text-xs font-bold text-slate-800 focus:outline-none cursor-pointer w-full truncate max-w-full sm:max-w-[210px]"
                 >
-                  <option value="all">All Operating Branches ({branches.length})</option>
+                  <option value="all">{t("superAdminMembers.allOperatingBranches", "All Operating Branches (")}{branches.length})</option>
                   {branches.map(b => (
                     <option key={b.id} value={b.id}>
                       {b.name || `Branch #${b.branch_code || b.id}`} ({b.city || 'Kerala'})
@@ -424,10 +426,10 @@ export default function SuperAdminMembers({ embedded = false, branchId = null })
                   onChange={(e) => setStatusFilter(e.target.value)}
                   className="bg-transparent text-xs font-bold text-slate-800 focus:outline-none cursor-pointer w-full"
                 >
-                  <option value="all">All KYC Statuses</option>
-                  <option value="approved">Approved</option>
-                  <option value="pending">Pending</option>
-                  <option value="rejected">Rejected</option>
+                  <option value="all">{t("staffMembers.allKycStatuses", "All KYC Statuses")}</option>
+                  <option value="approved">{t("common.approved", "Approved")}</option>
+                  <option value="pending">{t("common.pending", "Pending")}</option>
+                  <option value="rejected">{t("common.rejected", "Rejected")}</option>
                 </select>
               </div>
 
@@ -437,7 +439,7 @@ export default function SuperAdminMembers({ embedded = false, branchId = null })
                   <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
-                    placeholder="Search name, code, phone, savings A/C..."
+                    placeholder={t("branchManagerMembers.searchNameCodePhoneSavings", "Search name, code, phone, savings A/C...")}
                     value={memberSearch}
                     onChange={(e) => setMemberSearch(e.target.value)}
                     className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 focus:outline-none focus:border-[#2dd4bf] shadow-2xs"
@@ -449,7 +451,7 @@ export default function SuperAdminMembers({ embedded = false, branchId = null })
                   onClick={handleRefresh}
                   disabled={loading || refreshing}
                   className="p-2.5 border border-slate-200 hover:border-teal-400 text-slate-600 hover:text-[#0f766e] bg-white hover:bg-teal-50/50 rounded-xl transition-all cursor-pointer shadow-2xs flex-shrink-0"
-                  title="Refresh Member Data"
+                  title={t("branchManagerMembers.refreshMemberData", "Refresh Member Data")}
                 >
                   <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin text-[#00b4a7]' : ''}`} />
                 </button>
@@ -468,7 +470,7 @@ export default function SuperAdminMembers({ embedded = false, branchId = null })
                 onClick={handleRefresh}
                 className="px-3 py-1 bg-rose-600 text-white rounded-lg font-bold hover:bg-rose-700 transition-colors"
               >
-                Retry
+                {t("common.retry", "Retry")}
               </button>
             </div>
           )}
@@ -478,15 +480,15 @@ export default function SuperAdminMembers({ embedded = false, branchId = null })
             <table className="w-full text-left text-sm">
               <thead className="bg-slate-50 text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">
                 <tr>
-                  <th className="py-3.5 px-5">Member Code</th>
-                  <th className="py-3.5 px-5">Member Name</th>
-                  <th className="py-3.5 px-5">Email Address</th>
-                  <th className="py-3.5 px-5">Contact Number</th>
-                  <th className="py-3.5 px-5">Branch / Location</th>
-                  <th className="py-3.5 px-5">KYC Status</th>
-                  <th className="py-3.5 px-5">Active Status</th>
-                  <th className="py-3.5 px-5">Registered At</th>
-                  <th className="py-3.5 px-5 text-right">Action</th>
+                  <th className="py-3.5 px-5">{t("modal.member.memberCode", "Member Code")}</th>
+                  <th className="py-3.5 px-5">{t("dashboardModule.productAccounts.memberName", "Member Name")}</th>
+                  <th className="py-3.5 px-5">{t("modal.member.emailAddress", "Email Address")}</th>
+                  <th className="py-3.5 px-5">{t("modal.branchAdmin.contactNumberLabel", "Contact Number")}</th>
+                  <th className="py-3.5 px-5">{t("staffMembers.branchLocation", "Branch / Location")}</th>
+                  <th className="py-3.5 px-5">{t("branchManagerMembers.kycStatus", "KYC Status")}</th>
+                  <th className="py-3.5 px-5">{t("staffMembers.activeStatus", "Active Status")}</th>
+                  <th className="py-3.5 px-5">{t("branchManagerMembers.registeredAt", "Registered At")}</th>
+                  <th className="py-3.5 px-5 text-right">{t("dashboardModule.branchOverview.colAction", "Action")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-slate-700 text-xs sm:text-sm">
@@ -495,7 +497,7 @@ export default function SuperAdminMembers({ embedded = false, branchId = null })
                     <td colSpan={9} className="py-12 text-center text-slate-400">
                       <div className="inline-flex items-center gap-2 font-medium">
                         <RefreshCw className="w-4 h-4 animate-spin text-[#00b4a7]" />
-                        <span>Synchronizing members from branch registry...</span>
+                        <span>{t("superAdminMembers.synchronizingMembersFromBranchRegistry", "Synchronizing members from branch registry...")}</span>
                       </div>
                     </td>
                   </tr>
@@ -504,17 +506,18 @@ export default function SuperAdminMembers({ embedded = false, branchId = null })
                     <td colSpan={9} className="py-12 text-center text-slate-400">
                       <div className="max-w-xs mx-auto space-y-1">
                         <Users className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-                        <p className="font-bold text-slate-700">No Members Found</p>
+                        <p className="font-bold text-slate-700">{t("branchManagerMembers.noMembersFound", "No Members Found")}</p>
                         <p className="text-xs text-slate-400">
                           {memberSearch || statusFilter !== 'all'
-                            ? 'Try clearing your search or status filters.'
-                            : 'No members registered under the selected branch yet.'}
+                            ? t("branchManagerMembers.tryClearingYourSearchOr", "Try clearing your search or status filters.")
+                            : t("superAdminMembers.noMembersRegisteredUnderThe", "No members registered under the selected branch yet.")}
                         </p>
                       </div>
                     </td>
                   </tr>
                 ) : (
                   filteredMembers.map((m) => {
+  const { t } = useTranslation();
                     const statusUpper = (m.status || 'PENDING').toUpperCase();
                     const isActive = m.is_active !== false;
 
@@ -593,7 +596,7 @@ export default function SuperAdminMembers({ embedded = false, branchId = null })
                             }`}
                           >
                             <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-[#00b4a7]' : 'bg-slate-400'}`} />
-                            {isActive ? 'Active' : 'Inactive'}
+                            {isActive ? t("common.active", "Active") : t("common.inactive", "Inactive")}
                           </span>
                         </td>
 
@@ -619,19 +622,19 @@ export default function SuperAdminMembers({ embedded = false, branchId = null })
                             <button
                               onClick={() => handleInspect(m)}
                               className="px-3.5 py-1.5 bg-gradient-to-r from-teal-50 to-emerald-50 hover:from-teal-100 hover:to-emerald-100 text-[#0f766e] font-bold text-xs rounded-xl border border-teal-200/80 shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
-                              title="View full certified member details & documents"
+                              title={t("superAdminMembers.viewFullCertifiedMemberDetails", "View full certified member details & documents")}
                             >
                               <Eye className="w-3.5 h-3.5" />
-                              <span>View Details</span>
+                              <span>{t("branchManagerFdMisSchemes.viewDetails", "View Details")}</span>
                             </button>
 
                             <button
                               onClick={() => handleViewTransactions(m)}
                               className="px-3.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs rounded-xl border border-emerald-200/80 shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
-                              title="View member counter cash transactions history"
+                              title={t("branchManagerMembers.viewMemberCounterCashTransactions", "View member counter cash transactions history")}
                             >
                               <Receipt className="w-3.5 h-3.5 text-emerald-700" />
-                              <span>View Transactions</span>
+                              <span>{t("branchManagerMembers.viewTransactions", "View Transactions")}</span>
                             </button>
                           </div>
                         </td>
@@ -646,7 +649,7 @@ export default function SuperAdminMembers({ embedded = false, branchId = null })
           {/* Table Footer */}
           <div className="p-4 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
             <span>
-              Showing {filteredMembers.length} of {members.length} members
+              {t("common.showing", "Showing")} {filteredMembers.length} {t("common.of", "of")} {members.length} {t("superAdminMembers.members", "members")}
               {selectedBranchId !== 'all' ? ` for selected branch` : ` across all branches`}
             </span>
           </div>

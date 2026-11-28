@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { i18n } from '../../i18n/index.js';
+import { useTranslation } from 'react-i18next';
 import { useSearchParams, Navigate, useNavigate } from 'react-router-dom';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import StatCard from '../../components/dashboard/StatCard';
@@ -19,6 +21,7 @@ import {
 import { SOCIETY_INFO } from '../../data/societyData';
 import bankTechScene from '../../assets/AurumFX Cooperative Bank Technology Scene.png';
 
+
 function formatDateTime(isoString) {
   if (!isoString) return 'N/A';
   try {
@@ -38,6 +41,7 @@ function formatDateTime(isoString) {
 }
 
 export default function SuperAdminDashboard() {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const tab = searchParams.get('tab');
@@ -101,7 +105,7 @@ export default function SuperAdminDashboard() {
   const societyLedger = [
     {
       id: 'sl-1',
-      description: 'Central Statutory Reserve Transfer (25% Net Surplus)',
+      description: t("superAdminDashboard.centralStatutoryReserveTransfer25", "Central Statutory Reserve Transfer (25% Net Surplus)"),
       refNo: 'APX-RES-202601',
       category: 'Statutory Allocation',
       date: 'Today, 08:30 AM',
@@ -111,7 +115,7 @@ export default function SuperAdminDashboard() {
     },
     {
       id: 'sl-2',
-      description: 'Apex Liquidity Injection to Wayanad High-Range Branch',
+      description: t("superAdminDashboard.apexLiquidityInjectionToWayanad", "Apex Liquidity Injection to Wayanad High-Range Branch"),
       refNo: 'APX-LIQ-99120',
       category: 'Branch Refinance',
       date: 'Yesterday',
@@ -121,7 +125,7 @@ export default function SuperAdminDashboard() {
     },
     {
       id: 'sl-3',
-      description: 'NABARD Agro Allied Refinance Facility Tranche #3',
+      description: t("superAdminDashboard.nabardAgroAlliedRefinanceFacility", "NABARD Agro Allied Refinance Facility Tranche #3"),
       refNo: 'APX-NAB-44102',
       category: 'Institutional Credit',
       date: '08 Nov 2026',
@@ -135,12 +139,12 @@ export default function SuperAdminDashboard() {
     if (type === 'audit_report') {
       setModalConfig({
         isOpen: true,
-        title: 'Generate Statutory Audit Pack',
-        description: 'Export cooperative department compliance data and auditor ledger files.',
+        title: i18n.t("superAdminDashboard.generateStatutoryAuditPack", "Generate Statutory Audit Pack"),
+        description: i18n.t("superAdminDashboard.exportCooperativeDepartmentComplianceData", "Export cooperative department compliance data and auditor ledger files."),
         actionLabel: 'Generate & Sign Report',
         fields: [
-          { name: 'financialYear', label: 'Financial Period', type: 'select', options: ['FY 2026-27 (Q3 Ongoing)', 'FY 2025-26 (Audited Annual)', 'FY 2024-25 (Historical Archive)'] },
-          { name: 'auditStandard', label: 'Filing Framework', type: 'select', options: ['Multi-State Co-Operative Societies Act 2002', 'State Registrar Statutory Returns', 'Internal Chartered Committee Audit'] }
+          { name: 'financialYear', label: i18n.t("superAdminDashboard.financialPeriod", "Financial Period"), type: 'select', options: ['FY 2026-27 (Q3 Ongoing)', 'FY 2025-26 (Audited Annual)', 'FY 2024-25 (Historical Archive)'] },
+          { name: 'auditStandard', label: i18n.t("superAdminDashboard.filingFramework", "Filing Framework"), type: 'select', options: ['Multi-State Co-Operative Societies Act 2002', 'State Registrar Statutory Returns', 'Internal Chartered Committee Audit'] }
         ]
       });
     }
@@ -158,20 +162,20 @@ export default function SuperAdminDashboard() {
           <div className="relative z-10 flex-1 max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/90 backdrop-blur-xs text-xs font-semibold mb-3 border border-teal-200/60 shadow-2xs text-[#0f766e]">
               <Crown className="w-3.5 h-3.5 text-[#00b4a7]" />
-              <span>Role: Super Admin &bull; Multi-State Apex Central Authority</span>
+              <span>{t("superAdminDashboard.roleSuperAdminMultiState", "Role: Super Admin • Multi-State Apex Central Authority")}</span>
             </div>
 
             <div className="flex items-center gap-3 mt-1">
               <span className="w-1.5 h-8 sm:h-9 bg-[#00b4a7] rounded-full flex-shrink-0" />
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
-                <span>Welcome, Super Admin</span>
+                <span>{t("common.welcomeBack", "Welcome back")}{t("superAdminDashboard.superAdmin", ", Super Admin")}</span>
                 <span className="inline-block text-2xl sm:text-3xl">👋</span>
               </h1>
             </div>
 
             <p className="text-slate-600 text-xs sm:text-sm mt-2 font-medium leading-relaxed max-w-xl">
-              You are managing the Aurumfx Multi State Agro Co-operative Society Limited<br className="hidden sm:inline" />
-              (Head Office &ndash; Antony Master Square, Thrissur)
+              {t("superAdminDashboard.youAreManagingTheAurumfx", "You are managing the Aurumfx Multi State Agro Co-operative Society Limited")}<br className="hidden sm:inline" />
+              {t("superAdminDashboard.headOfficeAntonyMasterSquare", "(Head Office – Antony Master Square, Thrissur)")}
             </p>
 
             <div className="mt-5 inline-flex flex-wrap items-center gap-3 sm:gap-6 bg-white/80 backdrop-blur-xs border border-teal-100/90 rounded-2xl p-2.5 px-4 shadow-2xs">
@@ -180,8 +184,8 @@ export default function SuperAdminDashboard() {
                   <ShieldCheck className="w-4 h-4 stroke-[2.2]" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-slate-900 leading-tight">Central Oversight</p>
-                  <p className="text-[10px] text-slate-500 leading-tight">All Branches</p>
+                  <p className="text-xs font-bold text-slate-900 leading-tight">{t("superAdminDashboard.centralOversight", "Central Oversight")}</p>
+                  <p className="text-[10px] text-slate-500 leading-tight">{t("superAdminDashboard.allBranches", "All Branches")}</p>
                 </div>
               </div>
 
@@ -192,8 +196,8 @@ export default function SuperAdminDashboard() {
                   <Landmark className="w-4 h-4 stroke-[2.2]" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-slate-900 leading-tight">Apex Administration</p>
-                  <p className="text-[10px] text-slate-500 leading-tight">Board &amp; Society Level</p>
+                  <p className="text-xs font-bold text-slate-900 leading-tight">{t("superAdminDashboard.apexAdministration", "Apex Administration")}</p>
+                  <p className="text-[10px] text-slate-500 leading-tight">{t("superAdminDashboard.boardSocietyLevel", "Board & Society Level")}</p>
                 </div>
               </div>
 
@@ -204,8 +208,8 @@ export default function SuperAdminDashboard() {
                   <CheckCircle2 className="w-4 h-4 stroke-[2.2]" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-slate-900 leading-tight">Statutory Compliant</p>
-                  <p className="text-[10px] text-slate-500 leading-tight">MSCS Act 2002</p>
+                  <p className="text-xs font-bold text-slate-900 leading-tight">{t("superAdminDashboard.statutoryCompliant", "Statutory Compliant")}</p>
+                  <p className="text-[10px] text-slate-500 leading-tight">{t("superAdminDashboard.mscsAct2002", "MSCS Act 2002")}</p>
                 </div>
               </div>
             </div>
@@ -214,7 +218,7 @@ export default function SuperAdminDashboard() {
           <div className="relative z-10 flex-shrink-0 flex items-center justify-center">
             <img
               src={bankTechScene}
-              alt="AurumFX Apex Central Authority"
+              alt={t("superAdminDashboard.aurumfxApexCentralAuthority", "AurumFX Apex Central Authority")}
               className="h-44 sm:h-52 md:h-56 lg:h-60 w-auto object-contain drop-shadow-md select-none pointer-events-none transform hover:scale-102 transition-transform duration-300"
             />
           </div>
@@ -225,44 +229,44 @@ export default function SuperAdminDashboard() {
         {/* 4 Apex Key Stat Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <StatCard
-            title="Total Active Capital"
+            title={t("superAdminDashboard.totalActiveCapital", "Total Active Capital")}
             value="₹142.85 Cr"
             change="+14.2% YoY growth"
             isPositive={true}
             icon={Landmark}
-            description="Consolidated member equity and central statutory reserve pool"
+            description={t("superAdminDashboard.consolidatedMemberEquityAndCentral", "Consolidated member equity and central statutory reserve pool")}
           />
           <StatCard
-            title="Statutory Reserve Ratio"
+            title={t("superAdminDashboard.statutoryReserveRatio", "Statutory Reserve Ratio")}
             value="28.4%"
             change="+2.1% buffer"
             isPositive={true}
             icon={ShieldCheck}
-            description="Exceeds MSCS Act 25% statutory liquid asset requirement"
+            description={t("superAdminDashboard.exceedsMscsAct25Statutory", "Exceeds MSCS Act 25% statutory liquid asset requirement")}
           />
           <StatCard
-            title="Operating Branches"
+            title={t("superAdminDashboard.operatingBranches", "Operating Branches")}
             value={isLoadingBranches ? '...' : `${branches.length} Hubs`}
             change="100% Operational"
             isPositive={true}
             icon={Building2}
-            description="Active branches across Kerala, Tamil Nadu, and Karnataka"
+            description={t("superAdminDashboard.activeBranchesAcrossKeralaTamil", "Active branches across Kerala, Tamil Nadu, and Karnataka")}
           />
           <StatCard
-            title="Registered Member Base"
+            title={t("superAdminDashboard.registeredMemberBase", "Registered Member Base")}
             value="14,280"
             change="+420 this month"
             isPositive={true}
             icon={Users}
-            description="Active shareholding members across all branches"
+            description={t("superAdminDashboard.activeShareholdingMembersAcrossAll", "Active shareholding members across all branches")}
           />
         </div>
 
         {/* Central Society Quick Actions Bar */}
         <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h3 className="text-base font-bold text-slate-900">Apex Administrative Commands</h3>
-            <p className="text-xs text-slate-500">Perform central statutory filings and manage branch administrative access</p>
+            <h3 className="text-base font-bold text-slate-900">{t("superAdminDashboard.apexAdministrativeCommands", "Apex Administrative Commands")}</h3>
+            <p className="text-xs text-slate-500">{t("superAdminDashboard.performCentralStatutoryFilingsAnd", "Perform central statutory filings and manage branch administrative access")}</p>
           </div>
           <div className="flex flex-wrap items-center gap-2.5">
             <button
@@ -270,29 +274,29 @@ export default function SuperAdminDashboard() {
               className="px-4 py-2 bg-gradient-to-r from-[#14b8a6] to-[#2dd4bf] hover:from-[#0d9488] hover:to-[#14b8a6] text-white font-bold text-xs sm:text-sm rounded-xl shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
             >
               <Building2 className="w-4 h-4" />
-              <span>Manage Branches</span>
+              <span>{t("superAdminDashboard.manageBranches", "Manage Branches")}</span>
             </button>
             <button
               onClick={() => navigate('/super-admin/branch-admins')}
               className="px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs sm:text-sm rounded-xl border border-slate-200 transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
             >
               <Users className="w-4 h-4 text-[#00b4a7]" />
-              <span>Branch Admins</span>
+              <span>{t("sidebar.branchAdmins", "Branch Admins")}</span>
             </button>
             <button
               onClick={() => handleOpenAction('audit_report')}
               className="px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs sm:text-sm rounded-xl border border-slate-200 transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
             >
               <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
-              <span>Statutory Audit Pack</span>
+              <span>{t("superAdminDashboard.statutoryAuditPack", "Statutory Audit Pack")}</span>
             </button>
           </div>
         </div>
 
         {/* Central Society Ledger & Recent Transactions */}
         <RecentTransactionsTable
-          title="Apex Central Society Ledger &amp; Inter-Branch Clearing"
-          subtitle="Statutory allocations, apex refinance facilities, and reserve balances"
+          title={t("superAdminDashboard.apexCentralSocietyLedgerInter", "Apex Central Society Ledger & Inter-Branch Clearing")}
+          subtitle={t("superAdminDashboard.statutoryAllocationsApexRefinanceFacilities", "Statutory allocations, apex refinance facilities, and reserve balances")}
           transactions={societyLedger}
           onViewAll={() => {}}
         />
@@ -301,14 +305,14 @@ export default function SuperAdminDashboard() {
         <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
           <div className="p-5 border-b border-slate-100 flex items-center justify-between">
             <div>
-              <h3 className="text-base font-bold text-slate-900">Branch Network Snapshot</h3>
-              <p className="text-xs text-slate-500 mt-0.5">Live operating status across multi-state jurisdiction</p>
+              <h3 className="text-base font-bold text-slate-900">{t("superAdminDashboard.branchNetworkSnapshot", "Branch Network Snapshot")}</h3>
+              <p className="text-xs text-slate-500 mt-0.5">{t("superAdminDashboard.liveOperatingStatusAcrossMulti", "Live operating status across multi-state jurisdiction")}</p>
             </div>
             <button
               onClick={() => navigate('/super-admin/branches')}
               className="text-xs font-bold text-[#00b4a7] hover:underline flex items-center gap-1"
             >
-              <span>View All Branches</span>
+              <span>{t("dashboardModule.branchOverview.viewAllBranches", "View All Branches")}</span>
               <ArrowUpRight className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -316,11 +320,11 @@ export default function SuperAdminDashboard() {
             <table className="w-full text-left text-sm">
               <thead className="bg-slate-50 text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">
                 <tr>
-                  <th className="py-3.5 px-5">Branch Name</th>
-                  <th className="py-3.5 px-5">City &amp; State</th>
-                  <th className="py-3.5 px-5">Contact</th>
-                  <th className="py-3.5 px-5">Created At</th>
-                  <th className="py-3.5 px-5">Status</th>
+                  <th className="py-3.5 px-5">{t("dashboardModule.accountTransactions.colBranchName", "Branch Name")}</th>
+                  <th className="py-3.5 px-5">{t("superAdminDashboard.cityState", "City & State")}</th>
+                  <th className="py-3.5 px-5">{t("superAdminDashboard.contact", "Contact")}</th>
+                  <th className="py-3.5 px-5">{t("dashboardModule.emergency.table.createdAt", "Created At")}</th>
+                  <th className="py-3.5 px-5">{t("common.status", "Status")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-slate-700 text-xs sm:text-sm">
@@ -335,7 +339,7 @@ export default function SuperAdminDashboard() {
                         b.is_active !== false ? 'text-emerald-700 bg-emerald-50' : 'text-slate-600 bg-slate-100'
                       }`}>
                         <CheckCircle2 className="w-3 h-3" />
-                        {b.is_active !== false ? 'Active' : 'Inactive'}
+                        {b.is_active !== false ? t("common.active", "Active") : t("common.inactive", "Inactive")}
                       </span>
                     </td>
                   </tr>

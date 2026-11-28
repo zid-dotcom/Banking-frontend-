@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { i18n } from '../i18n/index.js';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import {
   CheckCircle2,
@@ -16,6 +18,7 @@ import {
 } from 'lucide-react';
 import PageBanner from '../components/PageBanner';
 import { SERVICES, SOCIETY_INFO } from '../data/societyData';
+
 
 /* -------------------------------------------------------------------------
    Helpers
@@ -121,25 +124,25 @@ function pickImage(item, index) {
 const steps = [
   {
     step: '01',
-    title: 'Submit Society Membership Application',
+    title: i18n.t("features.submitSocietyMembershipApplication", "Submit Society Membership Application"),
     desc: 'Fill out the standard member entry folio with identity verification and basic applicant details.',
     image: u('photo-1450101499163-c8848c66ca85', 700)
   },
   {
     step: '02',
-    title: 'Scheme Selection & Counseling',
+    title: i18n.t("features.schemeSelectionCounseling", "Scheme Selection & Counseling"),
     desc: 'Consult with society counter officers to select the agricultural or enterprise scheme matching your need.',
     image: u('photo-1521791136064-7986c2920216', 700)
   },
   {
     step: '03',
-    title: 'Prompt Committee Review',
+    title: i18n.t("features.promptCommitteeReview", "Prompt Committee Review"),
     desc: 'Transparent scrutiny conducted under society bye-laws ensuring democratic, non-discriminatory approval.',
     image: u('photo-1552664730-d307ca884978', 700)
   },
   {
     step: '04',
-    title: 'Direct Disbursal & Account Credit',
+    title: i18n.t("features.directDisbursalAccountCredit", "Direct Disbursal & Account Credit"),
     desc: 'Funds disbursed swiftly into member accounts with clear, flexible repayment schedules.',
     image: u('photo-1579621970563-ebec7560ff3e', 700)
   }
@@ -148,44 +151,45 @@ const steps = [
 const comparison = [
   {
     icon: Target,
-    label: 'Primary Objective',
+    label: i18n.t("features.primaryObjective", "Primary Objective"),
     coop: 'Member Welfare & Growth',
     other: 'Corporate Shareholder Profit'
   },
   {
     icon: Percent,
-    label: 'Prepayment Penalty',
+    label: i18n.t("features.prepaymentPenalty", "Prepayment Penalty"),
     coop: 'Zero Penalty on Foreclosure',
     other: 'Often 2% – 5% Foreclosure Fees'
   },
   {
     icon: CalendarClock,
-    label: 'Harvest Cycle Flexibility',
+    label: i18n.t("features.harvestCycleFlexibility", "Harvest Cycle Flexibility"),
     coop: 'Custom Seasonal Schedules',
     other: 'Rigid Fixed Monthly EMIs'
   },
   {
     icon: FileText,
-    label: 'Hidden / Extra Charges',
+    label: i18n.t("features.hiddenExtraCharges", "Hidden / Extra Charges"),
     coop: 'Transparent Statutory Bye-laws',
     other: 'Processing, Admin & Penal Add-ons'
   },
   {
     icon: Vote,
-    label: 'Voting & Voice',
+    label: i18n.t("features.votingVoice", "Voting & Voice"),
     coop: 'One Member, One Vote',
     other: 'No Say in Institutional Policy'
   }
 ];
 
 export default function Features({ onOpenEnquiry }) {
+  const { t } = useTranslation();
   return (
     <div className="bg-white">
       {/* Page Banner */}
       <PageBanner
-        title="Features & Cooperative Services"
-        subtitle="Comprehensive financial instruments engineered for agricultural modernization, member security, and rural prosperity."
-        breadcrumbs={[{ name: 'Features' }]}
+        title={t("features.bannerTitle", "Features & Modern Banking ERP")}
+        subtitle={t("features.bannerDesc", "Comprehensive digital banking infrastructure tailored for multi-state agro cooperatives.")}
+        breadcrumbs={[{ name: t("nav.features", "Features") }]}
         image="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1920&q=80"
       />
 
@@ -195,15 +199,14 @@ export default function Features({ onOpenEnquiry }) {
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <Reveal className="mx-auto mb-16 max-w-3xl text-center">
             <span className="mb-2 block text-xs font-bold uppercase tracking-widest text-[#00b4a7]">
-              Cooperative Excellence
+              {t("features.coreOfferings", "Core Offerings")}
             </span>
             <h2 className="font-serif text-3xl font-bold leading-tight text-slate-900 sm:text-4xl lg:text-5xl">
-              Designed Around Member Prosperity
+              {t("home.aboutTitle", "Committed to Empowering Rural & Semi-Urban Growth")}
             </h2>
             <p className="mt-4 text-base text-slate-600 sm:text-lg">
-              Explore the distinguishing features that make{' '}
-              <strong>{SOCIETY_INFO.shortName}</strong> a trusted partner for
-              farmers, families, and agro-enterprises.
+              {t("features.exploreTheDistinguishingFeaturesThat", "Explore the distinguishing features that make")}{' '}
+              <strong>{SOCIETY_INFO.shortName}</strong> {t("features.aTrustedPartnerForFarmers", "a trusted partner for farmers, families, and agro-enterprises.")}
             </p>
           </Reveal>
 
@@ -251,7 +254,7 @@ export default function Features({ onOpenEnquiry }) {
                         onClick={() => onOpenEnquiry(item)}
                         className="flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-[#00b4a7] px-4 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-[#008f85] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00b4a7]"
                       >
-                        <span>Request Scheme Information</span>
+                        <span>{t("features.requestSchemeInformation", "Request Scheme Information")}</span>
                         <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
                       </button>
                     </div>
@@ -268,10 +271,10 @@ export default function Features({ onOpenEnquiry }) {
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <Reveal className="mx-auto mb-12 max-w-2xl text-center">
             <p className="mb-2 text-sm font-semibold text-[#00b4a7]">
-              Why cooperatives stand apart
+              {t("features.whyCooperativesStandApart", "Why cooperatives stand apart")}
             </p>
             <h2 className="font-serif text-3xl font-bold leading-tight text-slate-900 sm:text-4xl">
-              Cooperative Membership vs. Commercial Lending
+              {t("features.cooperativeMembershipVsCommercialLending", "Cooperative Membership vs. Commercial Lending")}
             </h2>
           </Reveal>
 
@@ -282,18 +285,18 @@ export default function Features({ onOpenEnquiry }) {
                   <thead>
                     <tr>
                       <th scope="col" className="w-[32%] px-6 py-5 text-sm font-semibold text-slate-500">
-                        Service dimension
+                        {t("features.serviceDimension", "Service dimension")}
                       </th>
                       <th scope="col" className="w-[36%] bg-[#00b4a7] px-6 py-5 text-sm font-semibold text-white">
                         <span className="flex items-center gap-2.5">
                           <Landmark className="h-4 w-4" />
-                          Aurumfx Cooperative
+                          {t("features.aurumfxCooperative", "Aurumfx Cooperative")}
                         </span>
                       </th>
                       <th scope="col" className="w-[32%] bg-slate-100 px-6 py-5 text-sm font-semibold text-slate-500">
                         <span className="flex items-center gap-2.5">
                           <Building2 className="h-4 w-4" />
-                          Traditional Lenders
+                          {t("features.traditionalLenders", "Traditional Lenders")}
                         </span>
                       </th>
                     </tr>
@@ -351,14 +354,13 @@ export default function Features({ onOpenEnquiry }) {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <Reveal className="mx-auto mb-16 max-w-2xl text-center">
             <span className="mb-2 block text-xs font-bold uppercase tracking-widest text-[#00b4a7]">
-              Simple & Transparent
+              {t("features.simpleTransparent", "Simple & Transparent")}
             </span>
             <h2 className="font-serif text-3xl font-bold text-slate-900 sm:text-4xl">
-              How to Avail Cooperative Facilities
+              {t("features.howToAvailCooperativeFacilities", "How to Avail Cooperative Facilities")}
             </h2>
             <p className="mt-3 text-sm text-slate-600 sm:text-base">
-              We have streamlined the application and member onboarding journey
-              for maximum speed and simplicity.
+              {t("features.weHaveStreamlinedTheApplication", "We have streamlined the application and member onboarding journey for maximum speed and simplicity.")}
             </p>
           </Reveal>
 
@@ -402,24 +404,23 @@ export default function Features({ onOpenEnquiry }) {
         <div className="relative mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
           <Reveal>
             <h3 className="mb-3 font-serif text-2xl font-bold text-white sm:text-3xl">
-              Ready to explore our member-first facilities?
+              {t("features.readyToExploreOurMember", "Ready to explore our member-first facilities?")}
             </h3>
             <p className="mx-auto mb-7 max-w-xl text-sm text-teal-50 sm:text-base">
-              Submit an enquiry or drop by our registered office at Antony Master
-              Square, Kunnathangadi, Veluthur P.O., Thrissur.
+              {t("features.submitAnEnquiryOrDrop", "Submit an enquiry or drop by our registered office at Antony Master Square, Kunnathangadi, Veluthur P.O., Thrissur.")}
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <button
-                onClick={() => onOpenEnquiry({ title: 'Feature Enquiry' })}
+                onClick={() => onOpenEnquiry({ title: i18n.t("features.featureEnquiry", "Feature Enquiry") })}
                 className="cursor-pointer rounded-lg bg-white px-7 py-3 text-sm font-bold text-[#008f85] shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
               >
-                Contact Member Desk
+                {t("features.contactMemberDesk", "Contact Member Desk")}
               </button>
               <Link
                 to="/loans"
                 className="rounded-lg border-2 border-white px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-white hover:text-[#008f85]"
               >
-                Browse Loan Schemes
+                {t("features.browseLoanSchemes", "Browse Loan Schemes")}
               </Link>
             </div>
           </Reveal>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   X,
   Receipt,
@@ -58,6 +59,7 @@ export default function MemberCashTransactionsModal({
   portal = 'branch_admin', // 'branch_admin' | 'super_admin'
   branchId = null
 }) {
+  const { t } = useTranslation();
   const [transactions, setTransactions] = useState([]);
   const [memberDetails, setMemberDetails] = useState(member || null);
   const [loading, setLoading] = useState(false);
@@ -260,17 +262,17 @@ export default function MemberCashTransactionsModal({
             <div>
               <div className="flex items-center gap-2 flex-wrap">
                 <h3 className="text-base sm:text-lg font-black tracking-tight">
-                  Member Cash Transactions
+                  {t("memberCashTransactionsModal.memberCashTransactions", "Member Cash Transactions")}
                 </h3>
                 <span className="font-mono text-xs font-bold text-teal-900 bg-white/90 px-2.5 py-0.5 rounded-md shadow-2xs">
                   {memberCode}
                 </span>
                 <span className="text-[11px] font-semibold bg-teal-400/30 text-white px-2 py-0.5 rounded-full border border-teal-300/40">
-                  {portal === 'super_admin' ? 'Super Admin Audit' : portal === 'accountant' ? 'Accountant Audit' : 'Branch Manager Audit'}
+                  {portal === 'super_admin' ? t("memberCashTransactionsModal.superAdminAudit", "Super Admin Audit") : portal === 'accountant' ? t("branchManagerCashReconciliation.accountantAudit", "Accountant Audit") : t("memberCashTransactionsModal.branchManagerAudit", "Branch Manager Audit")}
                 </span>
               </div>
               <p className="text-xs text-teal-100 font-medium mt-0.5">
-                Official counter cash deposits &amp; teller withdrawals ledger for <span className="font-bold text-white capitalize">{memberName}</span> ({branchName})
+                {t("memberCashTransactionsModal.officialCounterCashDepositsTeller", "Official counter cash deposits & teller withdrawals ledger for")} <span className="font-bold text-white capitalize">{memberName}</span> ({branchName})
               </p>
             </div>
           </div>
@@ -278,7 +280,7 @@ export default function MemberCashTransactionsModal({
             type="button"
             onClick={onClose}
             className="p-2 rounded-xl text-teal-100 hover:text-white hover:bg-white/10 transition-colors cursor-pointer flex-shrink-0"
-            title="Close modal"
+            title={t("modal.member.closeModal", "Close modal")}
           >
             <X className="w-5 h-5" />
           </button>
@@ -292,7 +294,7 @@ export default function MemberCashTransactionsModal({
             {/* Total Inflow / Deposits */}
             <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200/80">
               <div className="flex items-center justify-between text-emerald-800 mb-1">
-                <span className="text-[11px] font-bold uppercase tracking-wider">Total Deposits</span>
+                <span className="text-[11px] font-bold uppercase tracking-wider">{t("dashboard.totalDeposits", "Total Deposits")}</span>
                 <div className="w-7 h-7 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
                   <ArrowDownLeft className="w-4 h-4 stroke-[2.2]" />
                 </div>
@@ -301,14 +303,14 @@ export default function MemberCashTransactionsModal({
                 {formatCurrency(metrics.depositTotal)}
               </h4>
               <p className="text-[11px] text-emerald-700 mt-0.5 font-medium">
-                {metrics.depositCount} deposit transactions
+                {metrics.depositCount} {t("memberCashTransactionsModal.depositTransactions", "deposit transactions")}
               </p>
             </div>
 
             {/* Total Outflow / Withdrawals */}
             <div className="p-4 rounded-2xl bg-rose-50/70 border border-rose-200/80">
               <div className="flex items-center justify-between text-rose-800 mb-1">
-                <span className="text-[11px] font-bold uppercase tracking-wider">Total Withdrawals</span>
+                <span className="text-[11px] font-bold uppercase tracking-wider">{t("memberCashTransactionsModal.totalWithdrawals", "Total Withdrawals")}</span>
                 <div className="w-7 h-7 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center">
                   <ArrowUpRight className="w-4 h-4 stroke-[2.2]" />
                 </div>
@@ -317,14 +319,14 @@ export default function MemberCashTransactionsModal({
                 {formatCurrency(metrics.withdrawalTotal)}
               </h4>
               <p className="text-[11px] text-rose-700 mt-0.5 font-medium">
-                {metrics.withdrawalCount} withdrawal transactions
+                {metrics.withdrawalCount} {t("memberCashTransactionsModal.withdrawalTransactions", "withdrawal transactions")}
               </p>
             </div>
 
             {/* Current Balance */}
             <div className="p-4 rounded-2xl bg-teal-50/70 border border-teal-200/80">
               <div className="flex items-center justify-between text-teal-800 mb-1">
-                <span className="text-[11px] font-bold uppercase tracking-wider">Current Balance</span>
+                <span className="text-[11px] font-bold uppercase tracking-wider">{t("dashboardModule.productAccounts.currentBalance", "Current Balance")}</span>
                 <div className="w-7 h-7 rounded-xl bg-teal-100 text-teal-700 flex items-center justify-center">
                   <Landmark className="w-4 h-4 stroke-[2.2]" />
                 </div>
@@ -334,7 +336,7 @@ export default function MemberCashTransactionsModal({
               </h4>
               <div
                 className="text-[11px] text-teal-700 mt-0.5 font-medium truncate flex items-center gap-1.5"
-                title={schemeName ? `${schemeName} (${schemeCode})` : 'Savings Deposit'}
+                title={schemeName ? `${schemeName} (${schemeCode})` : t("memberCashTransactionsModal.savingsDeposit", "Savings Deposit")}
               >
                 {schemeName ? (
                   <>
@@ -346,7 +348,7 @@ export default function MemberCashTransactionsModal({
                     )}
                   </>
                 ) : (
-                  <span>Savings Deposit Account</span>
+                  <span>{t("memberCashTransactionsModal.savingsDepositAccount", "Savings Deposit Account")}</span>
                 )}
               </div>
             </div>
@@ -354,7 +356,7 @@ export default function MemberCashTransactionsModal({
             {/* Total Records */}
             <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
               <div className="flex items-center justify-between text-slate-600 mb-1">
-                <span className="text-[11px] font-bold uppercase tracking-wider">Ledger Entries</span>
+                <span className="text-[11px] font-bold uppercase tracking-wider">{t("memberCashTransactionsModal.ledgerEntries", "Ledger Entries")}</span>
                 <div className="w-7 h-7 rounded-xl bg-slate-200/80 text-slate-700 flex items-center justify-center">
                   <FileText className="w-4 h-4" />
                 </div>
@@ -363,7 +365,7 @@ export default function MemberCashTransactionsModal({
                 {metrics.totalCount}
               </h4>
               <p className="text-[11px] text-slate-500 mt-0.5 font-medium truncate">
-                {fromDate || toDate ? 'Filtered date range' : 'All lifetime entries'}
+                {fromDate || toDate ? t("memberCashTransactionsModal.filteredDateRange", "Filtered date range") : t("memberCashTransactionsModal.allLifetimeEntries", "All lifetime entries")}
               </p>
             </div>
           </div>
@@ -374,9 +376,9 @@ export default function MemberCashTransactionsModal({
             {/* Left: Type Filter Buttons */}
             <div className="flex items-center gap-1.5 overflow-x-auto">
               {[
-                { id: 'all', label: 'All Transactions', count: transactions.length },
-                { id: 'deposit', label: 'Deposits', count: metrics.depositCount },
-                { id: 'withdrawal', label: 'Withdrawals', count: metrics.withdrawalCount }
+                { id: 'all', label: t("memberCashTransactionsModal.allTransactions", "All Transactions"), count: transactions.length },
+                { id: 'deposit', label: t("dashboardModule.accountTransactions.filterDeposits", "Deposits"), count: metrics.depositCount },
+                { id: 'withdrawal', label: t("dashboardModule.accountTransactions.filterWithdrawals", "Withdrawals"), count: metrics.withdrawalCount }
               ].map((tab) => {
                 const isActive = typeFilter === tab.id;
                 return (
@@ -413,7 +415,7 @@ export default function MemberCashTransactionsModal({
               {/* Date Filters */}
               <div className="flex items-center gap-1.5 bg-white p-1 rounded-xl border border-slate-200 shadow-2xs">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider pl-1.5">
-                  From:
+                  {t("memberCashTransactionsModal.from", "From:")}
                 </span>
                 <input
                   type="date"
@@ -426,7 +428,7 @@ export default function MemberCashTransactionsModal({
                 />
                 <span className="text-slate-300">•</span>
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                  To:
+                  {t("memberCashTransactionsModal.to", "To:")}
                 </span>
                 <input
                   type="date"
@@ -445,7 +447,7 @@ export default function MemberCashTransactionsModal({
                       setToDate('');
                     }}
                     className="p-1 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100 transition-colors"
-                    title="Clear date range"
+                    title={t("memberCashTransactionsModal.clearDateRange", "Clear date range")}
                   >
                     <X className="w-3.5 h-3.5" />
                   </button>
@@ -462,7 +464,7 @@ export default function MemberCashTransactionsModal({
                     setSearchQuery(e.target.value);
                     setCurrentPage(1);
                   }}
-                  placeholder="Receipt, cashier, amt..."
+                  placeholder={t("memberCashTransactionsModal.receiptCashierAmt", "Receipt, cashier, amt...")}
                   className="w-full pl-8 pr-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#00b4a7] focus:ring-2 focus:ring-teal-100 shadow-2xs transition-all"
                 />
               </div>
@@ -473,7 +475,7 @@ export default function MemberCashTransactionsModal({
                 onClick={fetchTransactions}
                 disabled={loading}
                 className="p-2 rounded-xl bg-white border border-slate-200 hover:bg-teal-50 text-slate-700 hover:text-teal-900 shadow-2xs transition-all cursor-pointer disabled:opacity-50"
-                title="Refresh transactions"
+                title={t("memberCashTransactionsModal.refreshTransactions", "Refresh transactions")}
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-teal-600' : ''}`} />
               </button>
@@ -492,7 +494,7 @@ export default function MemberCashTransactionsModal({
                 onClick={fetchTransactions}
                 className="font-bold underline text-amber-900 hover:text-amber-700 cursor-pointer"
               >
-                Retry
+                {t("common.retry", "Retry")}
               </button>
             </div>
           )}
@@ -503,15 +505,15 @@ export default function MemberCashTransactionsModal({
               <table className="w-full text-left border-collapse text-xs whitespace-nowrap">
                 <thead>
                   <tr className="bg-slate-50 border-b border-slate-200/80 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                    <th className="py-3 px-4">Receipt No.</th>
-                    <th className="py-3 px-4">Account No.</th>
-                    <th className="py-3 px-4">Type</th>
-                    <th className="py-3 px-4">Amount</th>
-                    <th className="py-3 px-4">Before Balance</th>
-                    <th className="py-3 px-4">After Balance</th>
-                    <th className="py-3 px-4">Cashier</th>
-                    <th className="py-3 px-4">Date &amp; Time</th>
-                    <th className="py-3 px-4">Notes</th>
+                    <th className="py-3 px-4">{t("memberCashTransactionsModal.receiptNo", "Receipt No.")}</th>
+                    <th className="py-3 px-4">{t("memberCashTransactionsModal.accountNo", "Account No.")}</th>
+                    <th className="py-3 px-4">{t("dashboardModule.productAccounts.type", "Type")}</th>
+                    <th className="py-3 px-4">{t("dashboardModule.accountTransactions.colAmount", "Amount")}</th>
+                    <th className="py-3 px-4">{t("memberCashTransactionsModal.beforeBalance", "Before Balance")}</th>
+                    <th className="py-3 px-4">{t("memberCashTransactionsModal.afterBalance", "After Balance")}</th>
+                    <th className="py-3 px-4">{t("branchManagerCashReconciliation.cashier", "Cashier")}</th>
+                    <th className="py-3 px-4">{t("dashboardModule.accountTransactions.colDateTime", "Date & Time")}</th>
+                    <th className="py-3 px-4">{t("dashboardModule.accountTransactions.colNotes", "Notes")}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -519,7 +521,7 @@ export default function MemberCashTransactionsModal({
                     <tr>
                       <td colSpan={9} className="py-14 text-center text-slate-400">
                         <Loader2 className="w-7 h-7 mx-auto animate-spin text-teal-600 mb-2" />
-                        <p className="font-semibold text-xs">Loading member cash transactions...</p>
+                        <p className="font-semibold text-xs">{t("memberCashTransactionsModal.loadingMemberCashTransactions", "Loading member cash transactions...")}</p>
                       </td>
                     </tr>
                   ) : filteredTransactions.length === 0 ? (
@@ -528,16 +530,17 @@ export default function MemberCashTransactionsModal({
                         <div className="w-12 h-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center mx-auto mb-2">
                           <Receipt className="w-6 h-6 stroke-[1.8]" />
                         </div>
-                        <h4 className="font-bold text-slate-800 text-sm">No Cash Transactions Found</h4>
+                        <h4 className="font-bold text-slate-800 text-sm">{t("memberCashTransactionsModal.noCashTransactionsFound", "No Cash Transactions Found")}</h4>
                         <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto font-medium">
                           {fromDate || toDate || searchQuery || typeFilter !== 'all'
-                            ? 'No transactions matched the active date or search filters. Try clearing filters.'
-                            : 'This member has not made any counter cash deposits or withdrawals yet.'}
+                            ? t("memberCashTransactionsModal.noTransactionsMatchedTheActive", "No transactions matched the active date or search filters. Try clearing filters.")
+                            : t("memberCashTransactionsModal.thisMemberHasNotMade", "This member has not made any counter cash deposits or withdrawals yet.")}
                         </p>
                       </td>
                     </tr>
                   ) : (
                     paginatedList.map((tx) => {
+  const { t } = useTranslation();
                       const isDeposit = String(tx.transaction_type || '').toLowerCase().includes('deposit');
                       const amt = Math.abs(Number(tx.amount) || 0);
 
@@ -563,12 +566,12 @@ export default function MemberCashTransactionsModal({
                             {isDeposit ? (
                               <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200/80 shadow-2xs">
                                 <ArrowDownLeft className="w-3 h-3 stroke-[2.2]" />
-                                <span>Deposit</span>
+                                <span>{t("dashboardModule.accountTransactions.deposit", "Deposit")}</span>
                               </span>
                             ) : (
                               <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-50 text-rose-800 border border-rose-200/80 shadow-2xs">
                                 <ArrowUpRight className="w-3 h-3 stroke-[2.2]" />
-                                <span>Withdrawal</span>
+                                <span>{t("dashboardModule.accountTransactions.withdrawal", "Withdrawal")}</span>
                               </span>
                             )}
                           </td>
@@ -628,9 +631,9 @@ export default function MemberCashTransactionsModal({
             {filteredTransactions.length > itemsPerPage && (
               <div className="p-3.5 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between text-xs text-slate-500 font-medium">
                 <div>
-                  Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
-                  {Math.min(currentPage * itemsPerPage, filteredTransactions.length)} of{' '}
-                  {filteredTransactions.length} transactions
+                  {t("common.showing", "Showing")} {(currentPage - 1) * itemsPerPage + 1} {t("common.to", "to")}{' '}
+                  {Math.min(currentPage * itemsPerPage, filteredTransactions.length)} {t("common.of", "of")}{' '}
+                  {filteredTransactions.length} {t("branchManagerCashTransactions.transactions", "transactions")}
                 </div>
                 <div className="flex items-center gap-2">
                   <button
@@ -639,7 +642,7 @@ export default function MemberCashTransactionsModal({
                     onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
                     className="px-2.5 py-1 rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer font-bold"
                   >
-                    Prev
+                    {t("superAdminStaff.prev", "Prev")}
                   </button>
                   <span className="font-bold font-mono px-1">
                     {currentPage} / {totalPages}
@@ -650,7 +653,7 @@ export default function MemberCashTransactionsModal({
                     onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
                     className="px-2.5 py-1 rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer font-bold"
                   >
-                    Next
+                    {t("branchManagerFdMisSchemes.next", "Next")}
                   </button>
                 </div>
               </div>
@@ -661,14 +664,14 @@ export default function MemberCashTransactionsModal({
         {/* Modal Footer */}
         <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between flex-shrink-0">
           <span className="text-xs text-slate-500 font-medium">
-            Official Member Counter Cash History
+            {t("memberCashTransactionsModal.officialMemberCounterCashHistory", "Official Member Counter Cash History")}
           </span>
           <button
             type="button"
             onClick={onClose}
             className="px-5 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs transition-colors cursor-pointer"
           >
-            Close
+            {t("common.close", "Close")}
           </button>
         </div>
       </div>

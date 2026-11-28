@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import StatCard from '../../components/dashboard/StatCard';
@@ -57,6 +58,7 @@ export default function SuperAdminCashTransactions({
   fromDate: propFromDate = '',
   toDate: propToDate = ''
 }) {
+  const { t } = useTranslation();
   const [branches, setBranches] = useState([]);
   const [selectedBranchId, setSelectedBranchId] = useState(branchId || 'all');
 
@@ -239,36 +241,36 @@ export default function SuperAdminCashTransactions({
             <div className="flex flex-wrap items-center gap-2 mb-3.5">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur-xs text-xs font-semibold border border-teal-200/80 shadow-2xs text-[#0f766e]">
                 <Landmark className="w-3.5 h-3.5 text-[#00b4a7]" />
-                <span>Role: Super Admin</span>
+                <span>{t("superAdminCashReconciliation.roleSuperAdmin", "Role: Super Admin")}</span>
               </div>
 
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur-xs text-xs font-semibold border border-teal-200/80 shadow-2xs text-slate-700">
                 <Building2 className="w-3.5 h-3.5 text-teal-600" />
-                <span>Apex Central Administration</span>
+                <span>{t("superAdminCashReconciliation.apexCentralAdministration", "Apex Central Administration")}</span>
               </div>
 
               <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50/95 backdrop-blur-xs text-xs font-semibold border border-emerald-200 shadow-2xs text-emerald-700">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span>Active Oversight</span>
+                <span>{t("superAdminCashTransactions.activeOversight", "Active Oversight")}</span>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
               <span className="w-1.5 h-8 sm:h-9 bg-[#00b4a7] rounded-full flex-shrink-0" />
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold text-slate-900 tracking-tight flex items-center gap-2.5">
-                <span>Central Cash Transactions</span>
+                <span>{t("superAdminCashReconciliation.centralCashTransactions", "Central Cash Transactions")}</span>
               </h1>
             </div>
 
             <p className="text-slate-600 text-xs sm:text-sm mt-2 sm:mt-2.5 font-medium leading-relaxed max-w-xl">
-              Society-wide cashier cash transactions audit, liquidity oversight, and real-time branch counter monitoring.
+              {t("superAdminCashTransactions.societyWideCashierCashTransactions", "Society-wide cashier cash transactions audit, liquidity oversight, and real-time branch counter monitoring.")}
             </p>
           </div>
 
           <div className="relative z-10 flex justify-center md:justify-end pointer-events-none -my-2 sm:-my-5 lg:-my-6 flex-shrink-0 w-full md:w-auto">
             <img
               src={modernTealBankIllustration}
-              alt="Central Cash Oversight"
+              alt={t("superAdminCashTransactions.centralCashOversight", "Central Cash Oversight")}
               className="h-32 sm:h-44 lg:h-52 max-w-full w-auto object-contain drop-shadow-md select-none pointer-events-none mx-auto md:mx-0"
             />
           </div>
@@ -285,45 +287,45 @@ export default function SuperAdminCashTransactions({
             className="px-4 py-2 rounded-xl text-xs font-bold bg-[#00b4a7] text-white shadow-sm flex items-center gap-2"
           >
             <Coins className="w-4 h-4" />
-            <span>Central Cash Transactions</span>
+            <span>{t("superAdminCashReconciliation.centralCashTransactions", "Central Cash Transactions")}</span>
           </button>
           <Link
             to="/super-admin/cash-reconciliation"
             className="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all flex items-center gap-2"
           >
             <Scale className="w-4 h-4 text-slate-400" />
-            <span>Cash Reconciliation Audit Desk</span>
+            <span>{t("branchManagerCashReconciliation.cashReconciliationAuditDesk", "Cash Reconciliation Audit Desk")}</span>
           </Link>
         </div>
 
         {/* 4 Summary Stat Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <StatCard
-            title="Central Cash Deposits"
+            title={t("superAdminCashTransactions.centralCashDeposits", "Central Cash Deposits")}
             value={formatCurrency(totalDeposits)}
-            subtitle={hasDateFilter ? 'Filtered branch inflows' : "Today's branch inflows"}
+            subtitle={hasDateFilter ? t("superAdminCashTransactions.filteredBranchInflows", "Filtered branch inflows") : t("superAdminCashTransactions.todaySBranchInflows", "Today's branch inflows")}
             icon={ArrowDownLeft}
             trendType="up"
           />
           <StatCard
-            title="Central Cash Withdrawals"
+            title={t("superAdminCashTransactions.centralCashWithdrawals", "Central Cash Withdrawals")}
             value={formatCurrency(totalWithdrawals)}
-            subtitle={hasDateFilter ? 'Filtered disbursements' : "Today's disbursements"}
+            subtitle={hasDateFilter ? t("superAdminCashTransactions.filteredDisbursements", "Filtered disbursements") : t("superAdminCashTransactions.todaySDisbursements", "Today's disbursements")}
             icon={ArrowUpRight}
             trendType="down"
           />
           <StatCard
-            title="Monitored Branches"
+            title={t("superAdminCashTransactions.monitoredBranches", "Monitored Branches")}
             value={branches.length.toString()}
-            subtitle="Society branches operating"
+            subtitle={t("superAdminCashTransactions.societyBranchesOperating", "Society branches operating")}
             icon={Building2}
             trend="Apex Network"
             trendType="up"
           />
           <StatCard
-            title="Total Cash Operations"
+            title={t("superAdminCashTransactions.totalCashOperations", "Total Cash Operations")}
             value={cardTxCount.toString()}
-            subtitle={hasDateFilter ? 'Filtered society counters' : "Today's society counters"}
+            subtitle={hasDateFilter ? t("superAdminCashTransactions.filteredSocietyCounters", "Filtered society counters") : t("superAdminCashTransactions.todaySSocietyCounters", "Today's society counters")}
             icon={Coins}
             trend="Real-time Audit"
             trendType="up"
@@ -340,11 +342,11 @@ export default function SuperAdminCashTransactions({
                   <Coins className="w-4 h-4 text-[#00b4a7]" />
                 </div>
                 <h3 className="font-serif font-bold text-slate-900 text-lg sm:text-xl">
-                  Central Cash Transactions Ledger
+                  {t("superAdminCashTransactions.centralCashTransactionsLedger", "Central Cash Transactions Ledger")}
                 </h3>
               </div>
               <p className="text-xs text-slate-500 font-medium mt-1">
-                Society-wide cashier cash transactions audit with branch filter.
+                {t("superAdminCashTransactions.societyWideCashierCashTransactions2", "Society-wide cashier cash transactions audit with branch filter.")}
               </p>
             </div>
 
@@ -355,10 +357,10 @@ export default function SuperAdminCashTransactions({
                 onClick={fetchCashTransactions}
                 disabled={loadingCashTransactions}
                 className="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 shadow-2xs text-xs font-bold text-slate-700 hover:text-slate-900 transition-all cursor-pointer disabled:opacity-50 flex items-center gap-2 active:scale-95"
-                title="Refresh Central Transactions Ledger"
+                title={t("superAdminCashTransactions.refreshCentralTransactionsLedger", "Refresh Central Transactions Ledger")}
               >
                 <RefreshCw className={`w-3.5 h-3.5 text-[#00b4a7] ${loadingCashTransactions ? 'animate-spin' : ''}`} />
-                <span>{loadingCashTransactions ? 'Refreshing...' : 'Refresh'}</span>
+                <span>{loadingCashTransactions ? t("dashboardModule.branchOverview.refreshing", "Refreshing...") : t("common.refresh", "Refresh")}</span>
               </button>
             </div>
           </div>
@@ -373,10 +375,10 @@ export default function SuperAdminCashTransactions({
                 <select
                   value={selectedBranchId}
                   onChange={(e) => setSelectedBranchId(e.target.value)}
-                  aria-label="Filter cash transactions by branch"
+                  aria-label={t("superAdminCashTransactions.filterCashTransactionsByBranch", "Filter cash transactions by branch")}
                   className="bg-transparent text-xs font-bold text-slate-800 focus:outline-none cursor-pointer max-w-[190px] sm:max-w-[220px]"
                 >
-                  <option value="all">All Branches (Apex Oversight)</option>
+                  <option value="all">{t("superAdminCashTransactions.allBranchesApexOversight", "All Branches (Apex Oversight)")}</option>
                   {branches.map((b) => (
                     <option key={b.id} value={b.id}>
                       {b.branch_name || b.name} ({b.branch_code || `BRA-${b.id}`})
@@ -396,7 +398,7 @@ export default function SuperAdminCashTransactions({
                       : 'text-slate-500 hover:text-slate-800'
                   }`}
                 >
-                  All
+                  {t("dashboardModule.accountTransactions.filterAll", "All")}
                 </button>
                 <button
                   type="button"
@@ -407,7 +409,7 @@ export default function SuperAdminCashTransactions({
                       : 'text-slate-500 hover:text-slate-800'
                   }`}
                 >
-                  Deposits
+                  {t("dashboardModule.accountTransactions.filterDeposits", "Deposits")}
                 </button>
                 <button
                   type="button"
@@ -418,7 +420,7 @@ export default function SuperAdminCashTransactions({
                       : 'text-slate-500 hover:text-slate-800'
                   }`}
                 >
-                  Withdrawals
+                  {t("dashboardModule.accountTransactions.filterWithdrawals", "Withdrawals")}
                 </button>
               </div>
             </div>
@@ -430,28 +432,28 @@ export default function SuperAdminCashTransactions({
                 {/* FROM Box */}
                 <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-slate-200 shadow-2xs hover:border-teal-400 focus-within:border-teal-500 focus-within:ring-2 focus-within:ring-teal-100 transition-all">
                   <span className="text-[10px] font-black uppercase tracking-wider text-teal-800 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-200 select-none">
-                    From
+                    {t("dashboardModule.accountTransactions.from", "From")}
                   </span>
                   <input
                     type="date"
                     value={fromDate}
                     onChange={(e) => setFromDate(e.target.value)}
                     className="text-xs text-slate-800 font-bold focus:outline-none bg-transparent cursor-pointer"
-                    title="Filter transactions starting from this date"
+                    title={t("dashboardModule.accountTransactions.fromDateTitle", "Filter transactions starting from this date")}
                   />
                 </div>
 
                 {/* TO Box */}
                 <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-slate-200 shadow-2xs hover:border-teal-400 focus-within:border-teal-500 focus-within:ring-2 focus-within:ring-teal-100 transition-all">
                   <span className="text-[10px] font-black uppercase tracking-wider text-teal-800 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-200 select-none">
-                    To
+                    {t("dashboardModule.accountTransactions.to", "To")}
                   </span>
                   <input
                     type="date"
                     value={toDate}
                     onChange={(e) => setToDate(e.target.value)}
                     className="text-xs text-slate-800 font-bold focus:outline-none bg-transparent cursor-pointer"
-                    title="Filter transactions up to this date"
+                    title={t("dashboardModule.accountTransactions.toDateTitle", "Filter transactions up to this date")}
                   />
                 </div>
 
@@ -464,10 +466,10 @@ export default function SuperAdminCashTransactions({
                       setToDate('');
                     }}
                     className="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 text-xs font-bold transition-all cursor-pointer flex items-center gap-1 shadow-2xs border border-slate-200"
-                    title="Clear Date Filter"
+                    title={t("branchManagerCashReconciliation.clearDateFilter", "Clear Date Filter")}
                   >
                     <X className="w-3.5 h-3.5 text-slate-500" />
-                    <span className="text-[11px]">Clear</span>
+                    <span className="text-[11px]">{t("dashboardModule.emergency.clear", "Clear")}</span>
                   </button>
                 )}
               </div>
@@ -479,7 +481,7 @@ export default function SuperAdminCashTransactions({
                   type="text"
                   value={cashTxSearch}
                   onChange={(e) => setCashTxSearch(e.target.value)}
-                  placeholder="Search account, ref, branch..."
+                  placeholder={t("superAdminCashTransactions.searchAccountRefBranch", "Search account, ref, branch...")}
                   className="w-full sm:w-52 pl-8 pr-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#00b4a7] focus:ring-2 focus:ring-teal-100 shadow-2xs transition-all"
                 />
               </div>
@@ -497,7 +499,7 @@ export default function SuperAdminCashTransactions({
                 onClick={fetchCashTransactions}
                 className="font-bold underline text-amber-900 hover:text-amber-700 cursor-pointer"
               >
-                Retry
+                {t("common.retry", "Retry")}
               </button>
             </div>
           )}
@@ -507,20 +509,20 @@ export default function SuperAdminCashTransactions({
             <table className="w-full text-left border-collapse text-xs whitespace-nowrap">
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                  <th className="py-3.5 px-4 sm:px-6">Receipt Number</th>
-                  <th className="py-3.5 px-4">Account Number</th>
-                  <th className="py-3.5 px-4">Member Name</th>
-                  <th className="py-3.5 px-4">Transaction Type</th>
-                  <th className="py-3.5 px-4">Amount</th>
-                  <th className="py-3.5 px-4">Balance Before</th>
-                  <th className="py-3.5 px-4">Balance After</th>
-                  <th className="py-3.5 px-4">Branch Name</th>
-                  <th className="py-3.5 px-4">Branch Code</th>
-                  <th className="py-3.5 px-4">IFSC Code</th>
-                  <th className="py-3.5 px-4">Cashier Code</th>
-                  <th className="py-3.5 px-4">Cashier Name</th>
-                  <th className="py-3.5 px-4">Date &amp; Time</th>
-                  <th className="py-3.5 px-4 sm:px-6">Notes</th>
+                  <th className="py-3.5 px-4 sm:px-6">{t("dashboardModule.accountTransactions.colReceiptNumber", "Receipt Number")}</th>
+                  <th className="py-3.5 px-4">{t("dashboard.accountNumber", "Account Number")}</th>
+                  <th className="py-3.5 px-4">{t("dashboardModule.productAccounts.memberName", "Member Name")}</th>
+                  <th className="py-3.5 px-4">{t("dashboardModule.accountTransactions.colTransactionType", "Transaction Type")}</th>
+                  <th className="py-3.5 px-4">{t("dashboardModule.accountTransactions.colAmount", "Amount")}</th>
+                  <th className="py-3.5 px-4">{t("dashboardModule.accountTransactions.colBalanceBefore", "Balance Before")}</th>
+                  <th className="py-3.5 px-4">{t("dashboardModule.accountTransactions.colBalanceAfter", "Balance After")}</th>
+                  <th className="py-3.5 px-4">{t("dashboardModule.accountTransactions.colBranchName", "Branch Name")}</th>
+                  <th className="py-3.5 px-4">{t("dashboardModule.accountTransactions.colBranchCode", "Branch Code")}</th>
+                  <th className="py-3.5 px-4">{t("dashboardModule.accountTransactions.colIfscCode", "IFSC Code")}</th>
+                  <th className="py-3.5 px-4">{t("dashboardModule.accountTransactions.colCashierCode", "Cashier Code")}</th>
+                  <th className="py-3.5 px-4">{t("dashboardModule.accountTransactions.colCashierName", "Cashier Name")}</th>
+                  <th className="py-3.5 px-4">{t("dashboardModule.accountTransactions.colDateTime", "Date & Time")}</th>
+                  <th className="py-3.5 px-4 sm:px-6">{t("dashboardModule.accountTransactions.colNotes", "Notes")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -528,23 +530,24 @@ export default function SuperAdminCashTransactions({
                   <tr>
                     <td colSpan={14} className="py-12 text-center text-slate-400">
                       <Loader2 className="w-6 h-6 animate-spin text-[#00b4a7] mx-auto mb-2" />
-                      <span>Loading central cash transactions ledger...</span>
+                      <span>{t("superAdminCashTransactions.loadingCentralCashTransactionsLedger", "Loading central cash transactions ledger...")}</span>
                     </td>
                   </tr>
                 ) : filteredTransactions.length === 0 ? (
                   <tr>
                     <td colSpan={14} className="py-12 text-center text-slate-400">
                       <Coins className="w-8 h-8 mx-auto mb-2 text-slate-300" />
-                      <p className="font-semibold text-slate-600">No cash transactions found</p>
+                      <p className="font-semibold text-slate-600">{t("superAdminCashTransactions.noCashTransactionsFound", "No cash transactions found")}</p>
                       <p className="text-[11px] mt-0.5">
                         {cashTxSearch || selectedBranchId !== 'all' || cashTxFilter !== 'all'
-                          ? 'No transactions match the current filter or search criteria.'
-                          : 'Transactions across branch cashiers will show here.'}
+                          ? t("superAdminCashTransactions.noTransactionsMatchTheCurrent", "No transactions match the current filter or search criteria.")
+                          : t("superAdminCashTransactions.transactionsAcrossBranchCashiersWill", "Transactions across branch cashiers will show here.")}
                       </p>
                     </td>
                   </tr>
                 ) : (
                   filteredTransactions.map((tx, idx) => {
+  const { t } = useTranslation();
                     const isDeposit =
                       String(tx.transaction_type || tx.type || '').toLowerCase().includes('deposit') ||
                       String(tx.transaction_type || tx.type || '').toLowerCase().includes('credit');
@@ -559,7 +562,7 @@ export default function SuperAdminCashTransactions({
                         <td className="py-3.5 px-4 font-semibold text-slate-900">
                           <div>{tx.member_name || '—'}</div>
                           {tx.member_code && (
-                            <div className="text-[10px] font-mono text-slate-400 font-normal">Code: {tx.member_code}</div>
+                            <div className="text-[10px] font-mono text-slate-400 font-normal">{t("dashboardModule.productAccounts.codeLabel", "Code:")} {tx.member_code}</div>
                           )}
                         </td>
                         <td className="py-3.5 px-4">
@@ -575,7 +578,7 @@ export default function SuperAdminCashTransactions({
                             ) : (
                               <ArrowUpRight className="w-3 h-3 text-rose-600" />
                             )}
-                            <span>{isDeposit ? 'Deposit' : 'Withdrawal'}</span>
+                            <span>{isDeposit ? t("dashboardModule.accountTransactions.deposit", "Deposit") : t("dashboardModule.accountTransactions.withdrawal", "Withdrawal")}</span>
                           </span>
                         </td>
                         <td className="py-3.5 px-4 font-bold text-slate-900 text-sm">
@@ -626,8 +629,8 @@ export default function SuperAdminCashTransactions({
           {!loadingCashTransactions && filteredTransactions.length > 0 && (
             <div className="px-6 py-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-medium bg-slate-50/50">
               <span>
-                Showing <strong className="text-slate-700">{filteredTransactions.length}</strong> of{' '}
-                <strong className="text-slate-700">{cashTransactions.length}</strong> transactions
+                {t("common.showing", "Showing")} <strong className="text-slate-700">{filteredTransactions.length}</strong> {t("common.of", "of")}{' '}
+                <strong className="text-slate-700">{cashTransactions.length}</strong> {t("branchManagerCashTransactions.transactions", "transactions")}
               </span>
             </div>
           )}

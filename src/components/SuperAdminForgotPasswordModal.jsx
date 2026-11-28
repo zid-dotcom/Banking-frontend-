@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   X,
   Mail,
@@ -22,6 +23,7 @@ export default function SuperAdminForgotPasswordModal({
   onClose,
   onResetSuccess,
 }) {
+  const { t } = useTranslation();
   // Step 1: Request OTP
   // Step 2: Verify OTP
   // Step 3: Set New Password
@@ -185,7 +187,7 @@ export default function SuperAdminForgotPasswordModal({
           type="button"
           onClick={onClose}
           disabled={isLoading}
-          aria-label="Close"
+          aria-label={t("common.close", "Close")}
           className="absolute top-4 sm:top-5 right-4 sm:right-5 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center transition-colors cursor-pointer disabled:opacity-50 z-20"
         >
           <X className="w-4 h-4" />
@@ -202,16 +204,16 @@ export default function SuperAdminForgotPasswordModal({
               </div>
               <div className="min-w-0 flex-1">
                 <h3 className="text-base sm:text-lg font-bold text-slate-900 font-sans leading-snug">
-                  Reset Admin Password
+                  {t("superAdminForgotPasswordModal.resetAdminPassword", "Reset Admin Password")}
                 </h3>
                 <span className="inline-block mt-0.5 text-[11px] font-semibold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md border border-purple-100">
-                  Step 1 of 3: Request OTP
+                  {t("memberForgotPasswordModal.step1Of3Request", "Step 1 of 3: Request OTP")}
                 </span>
               </div>
             </div>
 
             <p className="text-xs sm:text-sm text-slate-500 mb-4 leading-relaxed">
-              Enter your registered administrator email address to receive an authorization code.
+              {t("superAdminForgotPasswordModal.enterYourRegisteredAdministratorEmail", "Enter your registered administrator email address to receive an authorization code.")}
             </p>
 
             {errorMsg && (
@@ -224,7 +226,7 @@ export default function SuperAdminForgotPasswordModal({
             <form onSubmit={handleRequestOtp} className="space-y-4">
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
-                  Admin Email Address <span className="text-rose-500">*</span>
+                  {t("superAdminForgotPasswordModal.adminEmailAddress", "Admin Email Address")} <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
@@ -233,7 +235,7 @@ export default function SuperAdminForgotPasswordModal({
                   <input
                     type="email"
                     required
-                    placeholder="admin@aurumfx.com"
+                    placeholder={t("superAdminForgotPasswordModal.adminAurumfxCom", "admin@aurumfx.com")}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     disabled={isLoading}
@@ -249,7 +251,7 @@ export default function SuperAdminForgotPasswordModal({
                   disabled={isLoading}
                   className="px-4 py-2.5 text-xs font-bold text-slate-600 hover:text-slate-800 transition-colors cursor-pointer disabled:opacity-50"
                 >
-                  Cancel
+                  {t("common.cancel", "Cancel")}
                 </button>
                 <button
                   type="submit"
@@ -259,11 +261,11 @@ export default function SuperAdminForgotPasswordModal({
                   {isLoading ? (
                     <>
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      <span>Sending OTP...</span>
+                      <span>{t("memberForgotPasswordModal.sendingOtp", "Sending OTP...")}</span>
                     </>
                   ) : (
                     <>
-                      <span>Send OTP</span>
+                      <span>{t("memberForgotPasswordModal.sendOtp", "Send OTP")}</span>
                       <KeyRound className="w-3.5 h-3.5" />
                     </>
                   )}
@@ -286,16 +288,16 @@ export default function SuperAdminForgotPasswordModal({
                   setErrorMsg(null);
                 }}
                 className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors cursor-pointer flex-shrink-0 mt-0.5"
-                title="Change Email"
+                title={t("superAdminForgotPasswordModal.changeEmail", "Change Email")}
               >
                 <ArrowLeft className="w-4 h-4" />
               </button>
               <div className="min-w-0 flex-1">
                 <h3 className="text-base sm:text-lg font-bold text-slate-900 font-sans leading-snug">
-                  Verify OTP
+                  {t("memberForgotPasswordModal.verifyOtp", "Verify OTP")}
                 </h3>
                 <span className="inline-block mt-0.5 text-[11px] font-semibold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md border border-purple-100">
-                  Step 2 of 3: Enter Authorization Code
+                  {t("superAdminForgotPasswordModal.step2Of3Enter", "Step 2 of 3: Enter Authorization Code")}
                 </span>
               </div>
             </div>
@@ -318,7 +320,7 @@ export default function SuperAdminForgotPasswordModal({
               {/* Target Email Card with Change option */}
               <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/80">
                 <div className="flex items-center justify-between text-xs mb-1">
-                  <span className="font-semibold uppercase tracking-wider text-[10px] text-slate-500">Authorized Email</span>
+                  <span className="font-semibold uppercase tracking-wider text-[10px] text-slate-500">{t("superAdminForgotPasswordModal.authorizedEmail", "Authorized Email")}</span>
                   <button
                     type="button"
                     onClick={() => {
@@ -327,7 +329,7 @@ export default function SuperAdminForgotPasswordModal({
                     }}
                     className="text-[#6f46ed] hover:underline font-bold text-[11px] cursor-pointer"
                   >
-                    Change
+                    {t("memberForgotPasswordModal.change", "Change")}
                   </button>
                 </div>
                 <div className="text-xs font-bold text-slate-800 truncate">
@@ -338,7 +340,7 @@ export default function SuperAdminForgotPasswordModal({
               {/* OTP Input Field */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
-                  Authorization OTP <span className="text-rose-500">*</span>
+                  {t("superAdminForgotPasswordModal.authorizationOtp", "Authorization OTP")} <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
@@ -348,7 +350,7 @@ export default function SuperAdminForgotPasswordModal({
                     type="text"
                     required
                     autoFocus
-                    placeholder="Enter authorization OTP"
+                    placeholder={t("superAdminForgotPasswordModal.enterAuthorizationOtp", "Enter authorization OTP")}
                     value={otp}
                     onChange={(e) => setOtp(e.target.value)}
                     disabled={isLoading}
@@ -356,7 +358,7 @@ export default function SuperAdminForgotPasswordModal({
                   />
                 </div>
                 <p className="text-[11px] text-slate-400 mt-1">
-                  Enter the one-time code sent to your registered email.
+                  {t("superAdminForgotPasswordModal.enterTheOneTimeCode", "Enter the one-time code sent to your registered email.")}
                 </p>
               </div>
 
@@ -369,7 +371,7 @@ export default function SuperAdminForgotPasswordModal({
                   className="text-xs font-bold text-[#6f46ed] hover:text-[#5c35cc] inline-flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
                 >
                   <RotateCcw className={`w-3.5 h-3.5 ${isResending ? 'animate-spin' : ''}`} />
-                  <span>{isResending ? 'Resending...' : 'Resend OTP'}</span>
+                  <span>{isResending ? t("memberForgotPasswordModal.resending", "Resending...") : t("memberForgotPasswordModal.resendOtp", "Resend OTP")}</span>
                 </button>
 
                 <button
@@ -377,7 +379,7 @@ export default function SuperAdminForgotPasswordModal({
                   disabled={!otp.trim()}
                   className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#6f46ed] to-[#5c35cc] hover:from-[#5c35cc] hover:to-[#4e2bb5] text-white text-xs font-bold rounded-xl shadow-sm hover:shadow transition-all cursor-pointer disabled:opacity-50 active:scale-95"
                 >
-                  <span>Verify OTP</span>
+                  <span>{t("memberForgotPasswordModal.verifyOtp", "Verify OTP")}</span>
                   <Check className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -398,16 +400,16 @@ export default function SuperAdminForgotPasswordModal({
                   setErrorMsg(null);
                 }}
                 className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors cursor-pointer flex-shrink-0 mt-0.5"
-                title="Back to OTP"
+                title={t("memberForgotPasswordModal.backToOtp", "Back to OTP")}
               >
                 <ArrowLeft className="w-4 h-4" />
               </button>
               <div className="min-w-0 flex-1">
                 <h3 className="text-base sm:text-lg font-bold text-slate-900 font-sans leading-snug">
-                  Set New Password
+                  {t("memberForgotPasswordModal.setNewPassword", "Set New Password")}
                 </h3>
                 <span className="inline-block mt-0.5 text-[11px] font-semibold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md border border-purple-100">
-                  Step 3 of 3: New Credentials
+                  {t("memberForgotPasswordModal.step3Of3New", "Step 3 of 3: New Credentials")}
                 </span>
               </div>
             </div>
@@ -416,14 +418,14 @@ export default function SuperAdminForgotPasswordModal({
             <div className="mb-4 p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between text-xs">
               <div className="flex items-center gap-2 text-emerald-800 font-medium truncate">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-                <span className="truncate">OTP entered for <b>{email}</b></span>
+                <span className="truncate">{t("memberForgotPasswordModal.otpEnteredFor", "OTP entered for")} <b>{email}</b></span>
               </div>
               <button
                 type="button"
                 onClick={() => setStep(2)}
                 className="text-[#6f46ed] font-bold hover:underline text-[11px] cursor-pointer ml-2 flex-shrink-0"
               >
-                Change OTP
+                {t("memberForgotPasswordModal.changeOtp", "Change OTP")}
               </button>
             </div>
 
@@ -438,7 +440,7 @@ export default function SuperAdminForgotPasswordModal({
                       onClick={() => setStep(2)}
                       className="mt-1.5 text-xs font-bold text-rose-900 underline hover:no-underline cursor-pointer block"
                     >
-                      Click here to re-enter your OTP code
+                      {t("memberForgotPasswordModal.clickHereToReEnter", "Click here to re-enter your OTP code")}
                     </button>
                   )}
                 </div>
@@ -449,7 +451,7 @@ export default function SuperAdminForgotPasswordModal({
               {/* New Password */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">
-                  New Admin Password <span className="text-rose-500">*</span>
+                  {t("superAdminForgotPasswordModal.newAdminPassword", "New Admin Password")} <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
@@ -459,7 +461,7 @@ export default function SuperAdminForgotPasswordModal({
                     type={showNewPassword ? 'text' : 'password'}
                     required
                     autoFocus
-                    placeholder="Minimum 6 characters"
+                    placeholder={t("memberForgotPasswordModal.minimum6Characters", "Minimum 6 characters")}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     disabled={isLoading}
@@ -478,7 +480,7 @@ export default function SuperAdminForgotPasswordModal({
               {/* Confirm New Password */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">
-                  Confirm Admin Password <span className="text-rose-500">*</span>
+                  {t("superAdminForgotPasswordModal.confirmAdminPassword", "Confirm Admin Password")} <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
@@ -487,7 +489,7 @@ export default function SuperAdminForgotPasswordModal({
                   <input
                     type={showConfirmPassword ? 'text' : 'password'}
                     required
-                    placeholder="Re-enter new admin password"
+                    placeholder={t("superAdminForgotPasswordModal.reEnterNewAdminPassword", "Re-enter new admin password")}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     disabled={isLoading}
@@ -511,7 +513,7 @@ export default function SuperAdminForgotPasswordModal({
                   disabled={isLoading}
                   className="text-xs font-bold text-slate-600 hover:text-slate-800 transition-colors cursor-pointer"
                 >
-                  Back to OTP
+                  {t("memberForgotPasswordModal.backToOtp", "Back to OTP")}
                 </button>
 
                 <button
@@ -522,11 +524,11 @@ export default function SuperAdminForgotPasswordModal({
                   {isLoading ? (
                     <>
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      <span>Updating...</span>
+                      <span>{t("branchManagerMemberPasswordUpdate.updating", "Updating...")}</span>
                     </>
                   ) : (
                     <>
-                      <span>Reset Password</span>
+                      <span>{t("branchManagerMemberPasswordUpdate.resetPassword", "Reset Password")}</span>
                       <ShieldCheck className="w-3.5 h-3.5" />
                     </>
                   )}
@@ -547,10 +549,10 @@ export default function SuperAdminForgotPasswordModal({
 
             <div className="space-y-1">
               <h3 className="text-xl font-bold text-slate-900 font-sans">
-                Admin Password Updated!
+                {t("superAdminForgotPasswordModal.adminPasswordUpdated", "Admin Password Updated!")}
               </h3>
               <p className="text-xs sm:text-sm text-slate-600 max-w-xs mx-auto leading-relaxed">
-                Your super administrator password has been updated. You can now log in using your new password.
+                {t("superAdminForgotPasswordModal.yourSuperAdministratorPasswordHas", "Your super administrator password has been updated. You can now log in using your new password.")}
               </p>
             </div>
 
@@ -560,7 +562,7 @@ export default function SuperAdminForgotPasswordModal({
                 onClick={handleFinish}
                 className="w-full py-3 bg-gradient-to-r from-[#6f46ed] to-[#5c35cc] hover:from-[#5c35cc] hover:to-[#4e2bb5] text-white font-bold text-sm rounded-xl shadow-md shadow-purple-500/20 transition-all cursor-pointer active:scale-95"
               >
-                Log In to Apex Console
+                {t("superAdminForgotPasswordModal.logInToApexConsole", "Log In to Apex Console")}
               </button>
             </div>
           </div>

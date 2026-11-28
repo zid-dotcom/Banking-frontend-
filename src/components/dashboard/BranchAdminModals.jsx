@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   X,
   UserCheck,
@@ -12,6 +13,7 @@ import {
   Loader2,
   CheckCircle2
 } from 'lucide-react';
+
 
 /**
  * Modal for Creating (POST) or Updating (PUT) a Branch Admin
@@ -33,6 +35,8 @@ export function BranchAdminFormModal({
   onSubmit,
   isSubmitting = false
 }) {
+  const { t } = useTranslation();
+
   const [formData, setFormData] = useState({
     full_name: '',
     email: '',
@@ -79,36 +83,36 @@ export function BranchAdminFormModal({
 
     if (!formData.full_name.trim()) {
       setErrorPopup({
-        title: 'Validation Error',
-        message: 'Full name is required.'
+        title: t("modal.branchAdmin.validationError", "Validation Error"),
+        message: t("modal.branchAdmin.fullNameRequired", "Full name is required.")
       });
       return;
     }
     if (!formData.email.trim()) {
       setErrorPopup({
-        title: 'Validation Error',
-        message: 'Email address is required.'
+        title: t("modal.branchAdmin.validationError", "Validation Error"),
+        message: t("modal.branchAdmin.emailRequired", "Email address is required.")
       });
       return;
     }
     if (mode === 'create' && !formData.password.trim()) {
       setErrorPopup({
-        title: 'Validation Error',
-        message: 'Password is required for new branch manager.'
+        title: t("modal.branchAdmin.validationError", "Validation Error"),
+        message: t("modal.branchAdmin.passwordRequired", "Password is required for new branch manager.")
       });
       return;
     }
     if (!formData.contact_number.trim()) {
       setErrorPopup({
-        title: 'Validation Error',
-        message: 'Contact number is required.'
+        title: t("modal.branchAdmin.validationError", "Validation Error"),
+        message: t("modal.branchAdmin.contactNumberRequired", "Contact number is required.")
       });
       return;
     }
     if (!formData.branch_id) {
       setErrorPopup({
-        title: 'Validation Error',
-        message: 'Please select an operational branch.'
+        title: t("modal.branchAdmin.validationError", "Validation Error"),
+        message: t("modal.branchAdmin.branchRequired", "Please select an operational branch.")
       });
       return;
     }
@@ -127,10 +131,12 @@ export function BranchAdminFormModal({
 
       await onSubmit(payload);
     } catch (err) {
-      setError(err.message || 'Operation failed. Please verify API response.');
+      setError(err.message || t("modal.branchAdmin.operationFailed", "Operation failed. Please verify API response."));
       setErrorPopup({
-        title: mode === 'create' ? 'Branch Manager Creation Failed' : 'Branch Manager Update Failed',
-        message: err.message || 'Operation failed. Please verify API response.'
+        title: mode === 'create'
+          ? t("modal.branchAdmin.creationFailed", "Branch Manager Creation Failed")
+          : t("modal.branchAdmin.updateFailed", "Branch Manager Update Failed"),
+        message: err.message || t("modal.branchAdmin.operationFailed", "Operation failed. Please verify API response.")
       });
     }
   };
@@ -150,12 +156,16 @@ export function BranchAdminFormModal({
             </div>
             <div>
               <h3 className="text-lg font-bold text-slate-900">
-                {isEdit ? 'Update Branch Manager' : 'Add Branch Manager'}
+                {isEdit
+                  ? t("modal.branchAdmin.updateTitle", "Update Branch Manager")
+                  : t("modal.branchAdmin.addTitle", "Add Branch Manager")}
               </h3>
               <p className="text-xs text-slate-500 mt-0.5">
                 {isEdit
-                  ? `Editing credentials for ${initialData?.full_name || initialData?.name || 'Manager'}`
-                  : 'Assign operational manager to operational branch unit'}
+                  ? t("modal.branchAdmin.editingSubtitle", "Editing credentials for {name}", {
+                      name: initialData?.full_name || initialData?.name || t("modal.branchAdmin.defaultManagerName", "Manager")
+                    })
+                  : t("modal.branchAdmin.addSubtitle", "Assign operational manager to operational branch unit")}
               </p>
             </div>
           </div>
@@ -182,7 +192,7 @@ export function BranchAdminFormModal({
           {/* 1. Full Name */}
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">
-              Full Administrator Name <span className="text-rose-500">*</span>
+              {t("modal.branchAdmin.fullNameLabel", "Full Administrator Name")} <span className="text-rose-500">*</span>
             </label>
             <input
               type="text"
@@ -190,7 +200,7 @@ export function BranchAdminFormModal({
               required
               value={formData.full_name}
               onChange={handleChange}
-              placeholder="e.g. Anand Sharma"
+              placeholder={t("modal.branchAdmin.fullNamePlaceholder", "e.g. Anand Sharma")}
               className="w-full h-10 px-3.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#2dd4bf] focus:bg-white transition-all"
             />
           </div>
@@ -198,7 +208,7 @@ export function BranchAdminFormModal({
           {/* 2. Email Address */}
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">
-              Official Email Address <span className="text-rose-500">*</span>
+              {t("modal.branchAdmin.emailLabel", "Official Email Address")} <span className="text-rose-500">*</span>
             </label>
             <input
               type="email"
@@ -206,7 +216,7 @@ export function BranchAdminFormModal({
               required
               value={formData.email}
               onChange={handleChange}
-              placeholder="e.g. anand.sharma@aurumfx.coop"
+              placeholder={t("modal.branchAdmin.emailPlaceholder", "e.g. anand.sharma@aurumfx.coop")}
               className="w-full h-10 px-3.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#2dd4bf] focus:bg-white transition-all"
             />
           </div>
@@ -214,7 +224,7 @@ export function BranchAdminFormModal({
           {/* 3. Assigned Branch Dropdown */}
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">
-              Assigned Operational Branch <span className="text-rose-500">*</span>
+              {t("modal.branchAdmin.assignedBranchLabel", "Assigned Operational Branch")} <span className="text-rose-500">*</span>
             </label>
             <select
               name="branch_id"
@@ -223,20 +233,20 @@ export function BranchAdminFormModal({
               onChange={handleChange}
               className="w-full h-10 px-3.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-[#2dd4bf] focus:bg-white transition-all cursor-pointer"
             >
-              <option value="" disabled>Select branch unit</option>
+              <option value="" disabled>{t("modal.branchAdmin.selectBranchUnit", "Select branch unit")}</option>
               {branches.map((b) => {
                 const bId = b.rawId || b.id;
                 const ifsc = b.ifsc_code || b.ifsc;
                 return (
                   <option key={b.id || bId} value={bId}>
-                    {b.name} {b.city ? `(${b.city}, ${b.state})` : ''} - #{b.branch_code || bId} {ifsc ? `[IFSC: ${ifsc}]` : ''}
+                    {b.name} {b.city ? `(${b.city}, ${b.state})` : ''} - #{b.branch_code || bId} {ifsc ? `[${t("modal.branchAdmin.ifscLabel", "IFSC")}: ${ifsc}]` : ''}
                   </option>
                 );
               })}
             </select>
             {branches.length === 0 && (
               <p className="text-[11px] text-amber-600 mt-1">
-                No branches registered yet. Please create a branch first in the Branches section.
+                {t("modal.branchAdmin.noBranchesHint", "No branches registered yet. Please create a branch first in the Branches section.")}
               </p>
             )}
           </div>
@@ -244,7 +254,7 @@ export function BranchAdminFormModal({
           {/* 4. Contact Number */}
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">
-              Contact Number <span className="text-rose-500">*</span>
+              {t("modal.branchAdmin.contactNumberLabel", "Contact Number")} <span className="text-rose-500">*</span>
             </label>
             <input
               type="text"
@@ -252,18 +262,20 @@ export function BranchAdminFormModal({
               required
               value={formData.contact_number}
               onChange={handleChange}
-              placeholder="e.g. +919495234500"
+              placeholder={t("modal.branchAdmin.contactNumberPlaceholder", "e.g. +919495234500")}
               className="w-full h-10 px-3.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#2dd4bf] focus:bg-white transition-all"
             />
             <p className="text-[11px] text-slate-400 mt-1">
-              10 to 14 digits, optional + at start (without spaces)
+              {t("modal.branchAdmin.contactNumberHint", "10 to 14 digits, optional + at start (without spaces)")}
             </p>
           </div>
 
           {/* 5. Password */}
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">
-              {isEdit ? 'New Password (Optional)' : 'Admin Login Password'} {!isEdit && <span className="text-rose-500">*</span>}
+              {isEdit
+                ? t("modal.branchAdmin.newPasswordLabel", "New Password (Optional)")
+                : t("modal.branchAdmin.passwordLabel", "Admin Login Password")} {!isEdit && <span className="text-rose-500">*</span>}
             </label>
             <div className="relative">
               <input
@@ -272,7 +284,9 @@ export function BranchAdminFormModal({
                 required={!isEdit}
                 value={formData.password}
                 onChange={handleChange}
-                placeholder={isEdit ? 'Leave blank to retain existing password' : 'Enter secure admin password'}
+                placeholder={isEdit
+                  ? t("modal.branchAdmin.newPasswordPlaceholder", "Leave blank to retain existing password")
+                  : t("modal.branchAdmin.passwordPlaceholder", "Enter secure admin password")}
                 className="w-full h-10 pl-3.5 pr-10 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#2dd4bf] focus:bg-white transition-all"
               />
               <button
@@ -285,7 +299,7 @@ export function BranchAdminFormModal({
             </div>
             {isEdit && (
               <p className="text-[11px] text-slate-400 mt-1">
-                Only fill this in if you want to reset this branch manager's password.
+                {t("modal.branchAdmin.newPasswordHint", "Only fill this in if you want to reset this branch manager's password.")}
               </p>
             )}
           </div>
@@ -298,7 +312,7 @@ export function BranchAdminFormModal({
               disabled={isSubmitting}
               className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm rounded-xl transition-colors cursor-pointer disabled:opacity-50"
             >
-              Cancel
+              {t("common.cancel", "Cancel")}
             </button>
             <button
               type="submit"
@@ -306,7 +320,11 @@ export function BranchAdminFormModal({
               className="px-5 py-2 bg-gradient-to-r from-[#14b8a6] to-[#2dd4bf] hover:from-[#0d9488] hover:to-[#14b8a6] text-white font-bold text-xs sm:text-sm rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
             >
               {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
-              <span>{isEdit ? 'Update Manager' : 'Create Branch Manager'}</span>
+              <span>
+                {isEdit
+                  ? t("modal.branchAdmin.updateButton", "Update Manager")
+                  : t("modal.branchAdmin.createButton", "Create Branch Manager")}
+              </span>
             </button>
           </div>
         </form>
@@ -322,7 +340,9 @@ export function BranchAdminFormModal({
 
             <div>
               <h3 className="text-xl font-black text-slate-900 tracking-tight">
-                {typeof errorPopup === 'object' ? (errorPopup.title || 'Validation Error') : 'Submission Error'}
+                {typeof errorPopup === 'object'
+                  ? (errorPopup.title || t("modal.branchAdmin.validationError", "Validation Error"))
+                  : t("modal.branchAdmin.submissionError", "Submission Error")}
               </h3>
               <p className="text-xs sm:text-sm text-rose-900 mt-2.5 leading-relaxed bg-rose-50/70 p-4 rounded-2xl border border-rose-200/80 font-medium break-words text-left">
                 {typeof errorPopup === 'object' ? (errorPopup.message || JSON.stringify(errorPopup)) : String(errorPopup)}
@@ -335,7 +355,7 @@ export function BranchAdminFormModal({
                 onClick={() => setErrorPopup(null)}
                 className="w-full h-11 px-5 bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 text-white font-bold text-sm rounded-xl shadow-md transition-all cursor-pointer"
               >
-                Okay, Got It
+                {t("modal.branchAdmin.okayGotIt", "Okay, Got It")}
               </button>
             </div>
           </div>

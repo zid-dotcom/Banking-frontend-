@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { i18n } from '../i18n/index.js';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import {
   CheckCircle2,
@@ -14,6 +16,7 @@ import {
 } from 'lucide-react';
 import { SOCIETY_INFO } from '../data/societyData';
 import ramjithImg from '../assets/ramjith2.png';
+
 
 /* -------------------------------------------------------------------------
    Small helpers
@@ -95,32 +98,32 @@ const u = (id, w = 900) =>
 
 const services = [
   {
-    title: 'Thrift deposits',
+    title: i18n.t("about.thriftDeposits", "Thrift deposits"),
     text: 'Save a little every month and earn better returns than a regular bank.',
     image: u('photo-1579621970563-ebec7560ff3e')
   },
   {
-    title: 'Agri loans',
+    title: i18n.t("about.agriLoans", "Agri loans"),
     text: 'Seasonal finance for seed, equipment and harvest, repaid when your crop sells.',
     image: u('photo-1625246333195-78d9c38ad449')
   },
   {
-    title: 'Business loans',
+    title: i18n.t("about.businessLoans", "Business loans"),
     text: 'Working capital for small traders and shop owners in our community.',
     image: u('photo-1554224155-6726b3ff858f')
   },
   {
-    title: 'Self-help group credit',
+    title: i18n.t("about.selfHelpGroupCredit", "Self-help group credit"),
     text: 'Group lending that helps women and farmer collectives grow together.',
     image: u('photo-1521791136064-7986c2920216')
   },
   {
-    title: 'Home & personal loans',
+    title: i18n.t("about.homePersonalLoans", "Home & personal loans"),
     text: 'Clear terms and affordable instalments for the big moments in life.',
     image: u('photo-1560520653-9e0e4c89eb11')
   },
   {
-    title: 'Easy digital payments',
+    title: i18n.t("about.easyDigitalPayments", "Easy digital payments"),
     text: 'Pay instalments and check balances without a trip to the office.',
     image: u('photo-1563013544-824ae1b704d3')
   }
@@ -129,22 +132,22 @@ const services = [
 const ideals = [
   {
     icon: TrendingUp,
-    title: 'Ladders',
+    title: i18n.t("about.ladders", "Ladders"),
     text: 'We give members an actionable path to move up and earn access to more capital at lower cooperative rates.'
   },
   {
     icon: Sprout,
-    title: 'Not chutes',
+    title: i18n.t("about.notChutes", "Not chutes"),
     text: 'Our model works only when members succeed: repaying seasonal farm loans on time and building lasting agricultural equity.'
   },
   {
     icon: Eye,
-    title: 'Transparency',
+    title: i18n.t("about.transparency", "Transparency"),
     text: 'You set the exact terms you want before applying. No fine-print traps.'
   },
   {
     icon: Landmark,
-    title: 'Building credit matters',
+    title: i18n.t("about.buildingCreditMatters", "Building credit matters"),
     text: 'We reward the actions that raise credit scores and strengthen thrift savings over time.'
   }
 ];
@@ -165,27 +168,27 @@ const steps = [
 // NOTE: placeholder stock photos. Replace with real pictures from your society.
 const gallery = [
   {
-    title: 'Farmers\' meet',
+    title: i18n.t("about.farmersMeet", "Farmers' meet"),
     image: u('photo-1592982537447-7440770cbfc9', 900)
   },
   {
-    title: 'Loan counselling',
+    title: i18n.t("about.loanCounselling", "Loan counselling"),
     image: u('photo-1573164713714-d95e436ab8d6', 900)
   },
   {
-    title: 'Harvest season support',
+    title: i18n.t("about.harvestSeasonSupport", "Harvest season support"),
     image: u('photo-1464226184884-fa280b87c399', 900)
   },
   {
-    title: 'Self-help group sessions',
+    title: i18n.t("about.selfHelpGroupSessions", "Self-help group sessions"),
     image: u('photo-1552664730-d307ca884978', 900)
   },
   {
-    title: 'Thrift collection',
+    title: i18n.t("about.thriftCollection", "Thrift collection"),
     image: u('photo-1579621970563-ebec7560ff3e', 900)
   },
   {
-    title: 'Member awareness camps',
+    title: i18n.t("about.memberAwarenessCamps", "Member awareness camps"),
     image: u('photo-1531482615713-2afd69097998', 900)
   }
 ];
@@ -220,6 +223,7 @@ const teamMembers = [
    ------------------------------------------------------------------------- */
 
 export default function About({ onOpenEnquiry }) {
+  const { t } = useTranslation();
   return (
     <div className="bg-white text-slate-900">
       {/* Keyframes for the few always-on motions (hero badges) */}
@@ -234,7 +238,7 @@ export default function About({ onOpenEnquiry }) {
       <section className="relative overflow-hidden bg-slate-800 pt-36 pb-20 md:pt-44 md:pb-28">
         <img
           src={u('photo-1556761175-5973dc0f32e7', 1920)}
-          alt="About Us AurumFX"
+          alt={t("about.aboutUsAurumfx", "About Us AurumFX")}
           className="absolute inset-0 h-full w-full object-cover object-[center_35%]"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-slate-950/70 via-slate-900/35 to-transparent" />
@@ -244,16 +248,16 @@ export default function About({ onOpenEnquiry }) {
         <div className={`relative z-10 w-full ${GUTTER}`}>
           <Reveal>
             <h1 className="mb-3 font-serif text-4xl font-bold leading-tight tracking-tight text-white drop-shadow-md sm:text-5xl lg:text-[56px]">
-              About Us
+              {t("nav.about", "About")}
             </h1>
           </Reveal>
           <Reveal delay={120}>
             <nav className="flex items-center gap-2 text-sm font-medium text-white/90 drop-shadow-sm">
               <Link to="/" className="transition-colors hover:text-white">
-                Home
+                {t("nav.home", "Home")}
               </Link>
               <ChevronRight className="h-3.5 w-3.5 text-white/70" />
-              <span className="font-semibold text-[#ffc107]">About Us</span>
+              <span className="font-semibold text-[#ffc107]">{t("nav.about", "About")}</span>
             </nav>
           </Reveal>
         </div>
@@ -264,24 +268,19 @@ export default function About({ onOpenEnquiry }) {
         <div className="mx-auto grid max-w-7xl items-center gap-14 px-4 sm:px-6 lg:grid-cols-12 lg:gap-20 lg:px-8">
           <div className="lg:col-span-6">
             <Reveal>
-              <p className="mb-3 text-sm font-semibold text-[#00a89a]">About AurumFX</p>
+              <p className="mb-3 text-sm font-semibold text-[#00a89a]">{t("about.bannerTitle", "About Our Cooperative Society")}</p>
               <h2 className="font-serif text-3xl font-bold leading-[1.15] sm:text-4xl lg:text-[44px]">
-                We believe access to quality credit is a right for everyone
+                {t("about.visionDesc", "To be India's premier multi-state agro cooperative, driving sustainable rural wealth and equitable financial dignity.")}
               </h2>
             </Reveal>
 
             <Reveal delay={120}>
               <p className="mt-6 text-base leading-[1.75] text-slate-600">
                 <strong className="text-slate-900">{SOCIETY_INFO.fullName}</strong>{' '}
-                was established under the Multi-State Co-Operative Societies
-                statutory framework with the vision of democratizing financial
-                facilities for rural and semi-urban agricultural communities.
+                {t("about.wasEstablishedUnderTheMulti", "was established under the Multi-State Co-Operative Societies statutory framework with the vision of democratizing financial facilities for rural and semi-urban agricultural communities.")}
               </p>
               <p className="mt-4 text-base leading-[1.75] text-slate-600">
-                Unlike profit-seeking commercial lenders, we operate on
-                cooperative, member-first principles. We return surpluses to our
-                registered members through lower borrowing rates, higher thrift
-                returns and community agro-development programs.
+                {t("about.unlikeProfitSeekingCommercialLenders", "Unlike profit-seeking commercial lenders, we operate on cooperative, member-first principles. We return surpluses to our registered members through lower borrowing rates, higher thrift returns and community agro-development programs.")}
               </p>
             </Reveal>
 
@@ -293,7 +292,7 @@ export default function About({ onOpenEnquiry }) {
                     {SOCIETY_INFO.employer}
                   </p>
                   <p className="text-sm text-slate-500">
-                    Authorized Representative / Leadership
+                    {t("about.authorizedRepresentativeLeadership", "Authorized Representative / Leadership")}
                   </p>
                 </div>
               </div>
@@ -313,7 +312,7 @@ export default function About({ onOpenEnquiry }) {
                 <p className="font-serif text-lg font-bold leading-tight">
                   {SOCIETY_INFO.employer}
                 </p>
-                <p className="text-xs text-[#00877b]">Leading the society</p>
+                <p className="text-xs text-[#00877b]">{t("about.leadingTheSociety", "Leading the society")}</p>
               </div>
             </div>
           </Reveal>
@@ -325,10 +324,10 @@ export default function About({ onOpenEnquiry }) {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <Reveal className="mx-auto max-w-2xl text-center">
             <h2 className="font-serif text-3xl font-bold sm:text-4xl lg:text-[44px]">
-              Everything you need from a bank, owned by you
+              {t("about.everythingYouNeedFromA", "Everything you need from a bank, owned by you")}
             </h2>
             <p className="mt-3 text-slate-500">
-              Simple products with honest terms.
+              {t("about.simpleProductsWithHonestTerms", "Simple products with honest terms.")}
             </p>
           </Reveal>
 
@@ -352,7 +351,7 @@ export default function About({ onOpenEnquiry }) {
                       onClick={onOpenEnquiry}
                       className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[#00877b] transition-colors hover:text-[#00a89a]"
                     >
-                      Enquire now
+                      {t("about.enquireNow", "Enquire now")}
                       <ArrowUpRight className="h-4 w-4" />
                     </button>
                   </div>
@@ -368,9 +367,9 @@ export default function About({ onOpenEnquiry }) {
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <Reveal className="text-center">
             <h2 className="font-serif text-3xl font-bold sm:text-4xl lg:text-[44px]">
-              Quality credit creates opportunities
+              {t("about.qualityCreditCreatesOpportunities", "Quality credit creates opportunities")}
             </h2>
-            <p className="mt-3 text-slate-500">Our products reflect four ideals</p>
+            <p className="mt-3 text-slate-500">{t("about.ourProductsReflectFourIdeals", "Our products reflect four ideals")}</p>
           </Reveal>
 
           <div className="mt-14 grid gap-6 md:grid-cols-2">
@@ -409,9 +408,9 @@ export default function About({ onOpenEnquiry }) {
         <div className="relative z-10 mx-auto max-w-7xl px-6 sm:px-10 lg:px-14 xl:px-16">
           <div className="grid items-center gap-10 lg:grid-cols-12 lg:gap-14">
             <Reveal className="lg:col-span-5">
-              <p className="mb-3 text-base font-semibold text-[#ffc83b]">Joining is simple</p>
+              <p className="mb-3 text-base font-semibold text-[#ffc83b]">{t("about.joiningIsSimple", "Joining is simple")}</p>
               <h2 className="font-serif text-3xl font-bold leading-[1.15] text-white sm:text-4xl lg:text-5xl">
-                From first visit to first loan in four steps
+                {t("about.fromFirstVisitToFirst", "From first visit to first loan in four steps")}
               </h2>
             </Reveal>
 
@@ -436,10 +435,10 @@ export default function About({ onOpenEnquiry }) {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <Reveal className="mx-auto max-w-2xl text-center">
             <h2 className="font-serif text-3xl font-bold sm:text-4xl lg:text-[44px]">
-              Our community at work
+              {t("about.ourCommunityAtWork", "Our community at work")}
             </h2>
             <p className="mt-3 text-slate-500">
-              Moments from the fields, the office and the villages we serve.
+              {t("about.momentsFromTheFieldsThe", "Moments from the fields, the office and the villages we serve.")}
             </p>
           </Reveal>
 
@@ -481,10 +480,10 @@ export default function About({ onOpenEnquiry }) {
           <div className="grid items-center gap-10 lg:grid-cols-12 lg:gap-14">
             <Reveal className="lg:col-span-5">
               <span className="mb-2 block text-sm font-semibold uppercase tracking-wider text-[#ffc83b]">
-                Our benefits
+                {t("about.ourBenefits", "Our benefits")}
               </span>
               <h2 className="font-serif text-3xl font-bold leading-tight text-white sm:text-4xl lg:text-5xl">
-                Why choose aurumfx
+                {t("about.whyChooseAurumfx", "Why choose aurumfx")}
               </h2>
             </Reveal>
 
@@ -507,9 +506,9 @@ export default function About({ onOpenEnquiry }) {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <Reveal className="mb-14 text-center">
             <h2 className="font-serif text-3xl font-bold sm:text-4xl lg:text-[44px]">
-              Meet the team
+              {t("about.meetTheTeam", "Meet the team")}
             </h2>
-            <p className="mt-3 text-slate-500">The people who look after your money</p>
+            <p className="mt-3 text-slate-500">{t("about.thePeopleWhoLookAfter", "The people who look after your money")}</p>
           </Reveal>
 
           <div className="grid gap-8 md:grid-cols-3">
@@ -546,16 +545,16 @@ export default function About({ onOpenEnquiry }) {
             />
             <div className="relative max-w-xl">
               <h2 className="font-serif text-3xl font-bold leading-tight text-white sm:text-4xl">
-                Ready to become a member?
+                {t("about.readyToBecomeAMember", "Ready to become a member?")}
               </h2>
               <p className="mt-3 text-teal-50">
-                Tell us a little about yourself and our team will get back to you.
+                {t("about.tellUsALittleAbout", "Tell us a little about yourself and our team will get back to you.")}
               </p>
               <button
                 onClick={onOpenEnquiry}
                 className="mt-7 inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-[#007f74] shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
               >
-                Send an enquiry
+                {t("about.sendAnEnquiry", "Send an enquiry")}
                 <ArrowUpRight className="h-4 w-4" />
               </button>
             </div>
@@ -567,7 +566,7 @@ export default function About({ onOpenEnquiry }) {
       <section className="grid bg-[#00a89a] lg:grid-cols-2">
         <div className="flex flex-col justify-center p-10 text-white sm:p-14 lg:p-16 xl:p-20">
           <Reveal>
-            <h2 className="font-serif text-3xl font-bold sm:text-4xl">Visit or call us</h2>
+            <h2 className="font-serif text-3xl font-bold sm:text-4xl">{t("about.visitOrCallUs", "Visit or call us")}</h2>
           </Reveal>
 
           <div className="mt-9 space-y-6">
@@ -577,7 +576,7 @@ export default function About({ onOpenEnquiry }) {
                   <MapPin className="h-5 w-5" />
                 </span>
                 <div>
-                  <h3 className="font-serif text-lg font-bold">Address</h3>
+                  <h3 className="font-serif text-lg font-bold">{t("about.address", "Address")}</h3>
                   <p className="mt-1 max-w-md text-sm leading-relaxed text-teal-50">
                     {SOCIETY_INFO.address.full}
                   </p>
@@ -591,7 +590,7 @@ export default function About({ onOpenEnquiry }) {
                   <Phone className="h-5 w-5" />
                 </span>
                 <div>
-                  <h3 className="font-serif text-lg font-bold">Phone</h3>
+                  <h3 className="font-serif text-lg font-bold">{t("about.phone", "Phone")}</h3>
                   <a
                     href={`tel:${SOCIETY_INFO.phoneRaw}`}
                     className="mt-1 inline-block text-base font-medium text-teal-50 hover:underline"
@@ -608,7 +607,7 @@ export default function About({ onOpenEnquiry }) {
                   <Clock className="h-5 w-5" />
                 </span>
                 <div>
-                  <h3 className="font-serif text-lg font-bold">Hours</h3>
+                  <h3 className="font-serif text-lg font-bold">{t("about.hours", "Hours")}</h3>
                   <p className="mt-1 text-sm leading-relaxed text-teal-50">
                     {SOCIETY_INFO.officeHours}
                   </p>
@@ -620,7 +619,7 @@ export default function About({ onOpenEnquiry }) {
 
         <div className="relative min-h-[380px] w-full bg-slate-200 lg:min-h-[480px]">
           <iframe
-            title="AurumFX society office map"
+            title={t("about.aurumfxSocietyOfficeMap", "AurumFX society office map")}
             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15694.025983777508!2d76.1601007!3d10.5284852!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ba7ee09e487d7cb%3A0x7d018d45129b0e27!2sKunnathangadi%2C%20Kerala!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin"
             className="absolute inset-0 h-full w-full border-0"
             allowFullScreen=""

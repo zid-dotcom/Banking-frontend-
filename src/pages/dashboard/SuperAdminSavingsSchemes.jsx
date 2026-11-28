@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { i18n } from '../../i18n/index.js';
+import { useTranslation } from 'react-i18next';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import StatCard from '../../components/dashboard/StatCard';
 import {
@@ -84,7 +86,7 @@ function renderAccountStatusBadge(status) {
     return (
       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-        <span>Account Opened</span>
+        <span>{i18n.t("branchManagerSavingsSchemes.accountOpened", "Account Opened")}</span>
       </span>
     );
   }
@@ -115,6 +117,7 @@ function renderAccountStatusBadge(status) {
 }
 
 export default function SuperAdminSavingsSchemes() {
+  const { t } = useTranslation();
   const [schemes, setSchemes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -199,7 +202,7 @@ export default function SuperAdminSavingsSchemes() {
         const res = await savingsSchemeService.createSavingsScheme(formData);
         setFormModal({ isOpen: false, mode: 'create', data: null, isSubmitting: false });
         setSuccessPopup({
-          title: 'Savings Scheme Created',
+          title: i18n.t("superAdminSavingsSchemes.savingsSchemeCreated", "Savings Scheme Created"),
           message: `Scheme "${res?.scheme_name || formData.scheme_name}" (${res?.scheme_code || formData.scheme_code}) was successfully created and registered.`
         });
       } else {
@@ -207,7 +210,7 @@ export default function SuperAdminSavingsSchemes() {
         const res = await savingsSchemeService.updateSavingsScheme(schemeId, formData);
         setFormModal({ isOpen: false, mode: 'edit', data: null, isSubmitting: false });
         setSuccessPopup({
-          title: 'Savings Scheme Updated',
+          title: i18n.t("superAdminSavingsSchemes.savingsSchemeUpdated", "Savings Scheme Updated"),
           message: `Scheme "${res?.scheme_name || formData.scheme_name}" has been updated.`
         });
       }
@@ -228,7 +231,7 @@ export default function SuperAdminSavingsSchemes() {
       await savingsSchemeService.deleteSavingsScheme(scheme.id);
       setDeleteModal({ isOpen: false, scheme: null, isDeleting: false });
       setSuccessPopup({
-        title: 'Scheme Deleted',
+        title: i18n.t("superAdminFdMisSchemes.schemeDeleted", "Scheme Deleted"),
         message: `Savings scheme "${scheme.scheme_name}" (${scheme.scheme_code}) was permanently deleted.`
       });
       await fetchSchemes(true);
@@ -236,7 +239,7 @@ export default function SuperAdminSavingsSchemes() {
       console.error('Delete savings scheme error:', err);
       setDeleteModal({ isOpen: false, scheme: null, isDeleting: false });
       setErrorPopup({
-        title: 'Deletion Failed',
+        title: i18n.t("superAdminAnnouncements.deletionFailed", "Deletion Failed"),
         message: err.message || `Could not delete scheme "${scheme.scheme_name}". Accounts may be linked.`
       });
     }
@@ -251,13 +254,13 @@ export default function SuperAdminSavingsSchemes() {
         prev.map((s) => (s.id === scheme.id ? { ...s, is_active: newStatus } : s))
       );
       setSuccessPopup({
-        title: 'Status Updated',
+        title: i18n.t("branchManagerMembers.statusUpdated", "Status Updated"),
         message: `Scheme "${scheme.scheme_name}" is now ${newStatus ? 'ACTIVE (Open for member deposits)' : 'INACTIVE (Hidden from new accounts)'}.`
       });
     } catch (err) {
       console.error('Toggle scheme status error:', err);
       setErrorPopup({
-        title: 'Status Update Failed',
+        title: i18n.t("branchManagerMembers.statusUpdateFailed", "Status Update Failed"),
         message: err.message || 'Could not update scheme status.'
       });
       await fetchSchemes(true);
@@ -318,33 +321,33 @@ export default function SuperAdminSavingsSchemes() {
             <div className="inline-flex flex-wrap items-center gap-x-2 gap-y-1 px-3 sm:px-3.5 py-1.5 rounded-2xl sm:rounded-full bg-white/95 backdrop-blur-xs text-[11px] sm:text-xs font-semibold border border-teal-200/80 shadow-2xs text-[#0f766e] mb-3 max-w-full">
               <span className="inline-flex items-center gap-1.5 flex-shrink-0">
                 <Landmark className="w-3.5 h-3.5 text-[#00b4a7]" />
-                <span>Role: <strong className="font-bold text-teal-950">Super Admin</strong></span>
+                <span>{t("dashboardModule.monthlyTargets.roleLabel", "Role:")} <strong className="font-bold text-teal-950">{t("login.superAdmin.portalTitleLine1", "Super Admin")}</strong></span>
               </span>
               <span className="text-teal-300 hidden sm:inline">•</span>
-              <span className="text-slate-600 sm:text-[#0f766e]">Deposit Portfolio &amp; Schemes Policy</span>
+              <span className="text-slate-600 sm:text-[#0f766e]">{t("superAdminSavingsSchemes.depositPortfolioSchemesPolicy", "Deposit Portfolio & Schemes Policy")}</span>
               <span className="text-teal-300 hidden sm:inline">•</span>
               <span className="inline-flex items-center gap-1.5 font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full text-[10px] sm:text-xs flex-shrink-0">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                Active
+                {t("common.active", "Active")}
               </span>
             </div>
 
             <div className="flex items-center gap-2.5 sm:gap-3">
               <span className="w-1.5 h-7 sm:h-9 bg-[#00b4a7] rounded-full flex-shrink-0" />
               <h1 className="text-xl sm:text-3xl lg:text-4xl font-serif font-bold text-slate-900 tracking-tight">
-                Cooperative Savings Schemes
+                {t("memberSavingsSchemes.cooperativeSavingsSchemes", "Cooperative Savings Schemes")}
               </h1>
             </div>
 
             <p className="text-slate-600 text-xs sm:text-sm mt-2 sm:mt-2.5 font-medium leading-relaxed max-w-xl">
-              Manage member savings deposit schemes, annual interest yields, senior citizen add-on benefits, and minimum average balance requirements.
+              {t("superAdminSavingsSchemes.manageMemberSavingsDepositSchemes", "Manage member savings deposit schemes, annual interest yields, senior citizen add-on benefits, and minimum average balance requirements.")}
             </p>
           </div>
 
           <div className="relative z-10 flex justify-center md:justify-end pointer-events-none -my-2 sm:-my-5 lg:-my-6 flex-shrink-0 w-full md:w-auto">
             <img
               src={savingsGrowthIllustration}
-              alt="Cooperative Savings Schemes Illustration"
+              alt={t("memberSavingsSchemes.cooperativeSavingsSchemesIllustration", "Cooperative Savings Schemes Illustration")}
               className="h-32 sm:h-44 lg:h-52 max-w-full w-auto object-contain drop-shadow-md select-none pointer-events-none transform hover:scale-102 transition-transform duration-300 mx-auto md:mx-0"
             />
           </div>
@@ -361,31 +364,31 @@ export default function SuperAdminSavingsSchemes() {
         {/* 4 Summary Metric Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <StatCard
-            title="Total Savings Schemes"
+            title={t("branchManagerSavingsSchemes.totalSavingsSchemes", "Total Savings Schemes")}
             value={totalCount.toString()}
-            subtitle="Registered Products"
+            subtitle={t("branchManagerLoanSchemes.registeredProducts", "Registered Products")}
             icon={PiggyBank}
             trend={`${activeCount} active`}
             trendType="up"
           />
           <StatCard
-            title="Active Deposit Schemes"
+            title={t("branchManagerFdMisSchemes.activeDepositSchemes", "Active Deposit Schemes")}
             value={activeCount.toString()}
-            subtitle="Ready for Members"
+            subtitle={t("branchManagerFdMisSchemes.readyForMembers", "Ready for Members")}
             icon={CheckCircle2}
             trend={totalCount > 0 ? `${Math.round((activeCount / totalCount) * 100)}% active` : '100%'}
             trendType="up"
           />
           <StatCard
-            title="Max Annual Yield"
+            title={t("branchManagerFdMisSchemes.maxAnnualYield", "Max Annual Yield")}
             value={`${maxInterest}%`}
-            subtitle="Top Annual Rate"
+            subtitle={t("branchManagerSavingsSchemes.topAnnualRate", "Top Annual Rate")}
             icon={Percent}
           />
           <StatCard
-            title="Min Opening Deposit"
+            title={t("branchManagerSavingsSchemes.minOpeningDeposit", "Min Opening Deposit")}
             value={formatCurrency(lowestOpeningBal)}
-            subtitle="Starting Requirement"
+            subtitle={t("branchManagerSavingsSchemes.startingRequirement", "Starting Requirement")}
             icon={Coins}
           />
         </div>
@@ -402,7 +405,7 @@ export default function SuperAdminSavingsSchemes() {
                 <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
                   type="text"
-                  placeholder="Search savings scheme by name or code..."
+                  placeholder={t("branchManagerSavingsSchemes.searchSavingsSchemeByName", "Search savings scheme by name or code...")}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-10 pr-9 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-sm focus:outline-none focus:ring-2 focus:ring-teal-100 focus:border-teal-500 font-medium transition-all"
@@ -424,9 +427,9 @@ export default function SuperAdminSavingsSchemes() {
                   onChange={(e) => setStatusFilter(e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-sm text-slate-700 font-semibold focus:outline-none focus:ring-2 focus:ring-teal-100 focus:border-teal-500 transition-all cursor-pointer"
                 >
-                  <option value="all">All Statuses</option>
-                  <option value="active">Active Only</option>
-                  <option value="inactive">Inactive Only</option>
+                  <option value="all">{t("branchManagerFdMisSchemes.allStatuses", "All Statuses")}</option>
+                  <option value="active">{t("branchManagerFdMisSchemes.activeOnly", "Active Only")}</option>
+                  <option value="inactive">{t("branchManagerFdMisSchemes.inactiveOnly", "Inactive Only")}</option>
                 </select>
               </div>
             </div>
@@ -436,7 +439,7 @@ export default function SuperAdminSavingsSchemes() {
               <button
                 onClick={() => fetchSchemes(true)}
                 disabled={refreshing}
-                title="Refresh savings schemes"
+                title={t("branchManagerSavingsSchemes.refreshSavingsSchemes", "Refresh savings schemes")}
                 className="p-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-800 transition-colors cursor-pointer disabled:opacity-50"
               >
                 <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin text-teal-600' : ''}`} />
@@ -447,7 +450,7 @@ export default function SuperAdminSavingsSchemes() {
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#00b4a7] to-[#0f766e] text-white text-sm font-bold shadow-md shadow-teal-500/20 hover:from-[#00a296] hover:to-[#0c625c] transition-all cursor-pointer"
               >
                 <PlusCircle className="w-4 h-4" />
-                <span>Create Savings Scheme</span>
+                <span>{t("superAdminSavingsSchemes.createSavingsScheme", "Create Savings Scheme")}</span>
               </button>
             </div>
           </div>
@@ -458,7 +461,7 @@ export default function SuperAdminSavingsSchemes() {
               <div className="flex items-start gap-2.5">
                 <AlertCircle className="w-5 h-5 flex-shrink-0 text-red-600 mt-0.5" />
                 <div>
-                  <p className="text-sm font-bold text-red-900">Failed to load savings schemes</p>
+                  <p className="text-sm font-bold text-red-900">{t("branchManagerSavingsSchemes.failedToLoadSavingsSchemes", "Failed to load savings schemes")}</p>
                   <p className="text-xs text-red-700 mt-0.5">{error}</p>
                 </div>
               </div>
@@ -466,7 +469,7 @@ export default function SuperAdminSavingsSchemes() {
                 onClick={() => fetchSchemes()}
                 className="text-xs font-bold text-red-700 hover:text-red-900 underline cursor-pointer flex-shrink-0"
               >
-                Retry
+                {t("common.retry", "Retry")}
               </button>
             </div>
           )}
@@ -476,7 +479,7 @@ export default function SuperAdminSavingsSchemes() {
             {loading ? (
               <div className="py-20 text-center space-y-3">
                 <div className="w-10 h-10 border-3 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto" />
-                <p className="text-sm text-slate-500 font-medium">Loading savings schemes...</p>
+                <p className="text-sm text-slate-500 font-medium">{t("superAdminSavingsSchemes.loadingSavingsSchemes", "Loading savings schemes...")}</p>
               </div>
             ) : filteredSchemes.length === 0 ? (
               <div className="py-20 text-center space-y-4 max-w-sm mx-auto p-4">
@@ -485,12 +488,12 @@ export default function SuperAdminSavingsSchemes() {
                 </div>
                 <div>
                   <p className="text-base font-bold text-slate-800">
-                    {searchQuery ? 'No matching schemes found' : 'No savings schemes configured yet'}
+                    {searchQuery ? t("branchManagerFdMisSchemes.noMatchingSchemesFound", "No matching schemes found") : t("superAdminSavingsSchemes.noSavingsSchemesConfiguredYet", "No savings schemes configured yet")}
                   </p>
                   <p className="text-xs text-slate-500 mt-1 font-medium leading-relaxed">
                     {searchQuery
-                      ? 'Try adjusting your search query or clear the filter.'
-                      : 'Define deposit products with annual interest formulas, minimum balances, and periodic charges.'}
+                      ? t("branchManagerFdMisSchemes.tryAdjustingYourSearchQuery", "Try adjusting your search query or clear the filter.")
+                      : t("superAdminSavingsSchemes.defineDepositProductsWithAnnual", "Define deposit products with annual interest formulas, minimum balances, and periodic charges.")}
                   </p>
                 </div>
                 {!searchQuery && (
@@ -499,7 +502,7 @@ export default function SuperAdminSavingsSchemes() {
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold transition-colors cursor-pointer shadow-sm"
                   >
                     <PlusCircle className="w-4 h-4" />
-                    Create First Savings Scheme
+                    {t("superAdminSavingsSchemes.createFirstSavingsScheme", "Create First Savings Scheme")}
                   </button>
                 )}
               </div>
@@ -507,17 +510,17 @@ export default function SuperAdminSavingsSchemes() {
               <table className="w-full text-left border-collapse min-w-[1150px]">
                 <thead>
                   <tr className="border-b border-slate-100 bg-slate-50/75 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                    <th className="py-3.5 px-6">Scheme Name</th>
-                    <th className="py-3.5 px-6">Scheme Code</th>
-                    <th className="py-3.5 px-6">Annual Yield</th>
-                    <th className="py-3.5 px-6">Min Opening</th>
-                    <th className="py-3.5 px-6">Monthly MAB</th>
-                    <th className="py-3.5 px-6">Payout</th>
-                    <th className="py-3.5 px-6">Service Charges</th>
-                    <th className="py-3.5 px-6">SMS Charges</th>
-                    <th className="py-3.5 px-6">Created At</th>
-                    <th className="py-3.5 px-6 text-center">Status</th>
-                    <th className="py-3.5 px-6 text-right">Actions</th>
+                    <th className="py-3.5 px-6">{t("dashboardModule.productAccounts.schemeName", "Scheme Name")}</th>
+                    <th className="py-3.5 px-6">{t("dashboardModule.productAccounts.schemeCode", "Scheme Code")}</th>
+                    <th className="py-3.5 px-6">{t("branchManagerFdMisSchemes.annualYield", "Annual Yield")}</th>
+                    <th className="py-3.5 px-6">{t("branchManagerSavingsSchemes.minOpening", "Min Opening")}</th>
+                    <th className="py-3.5 px-6">{t("branchManagerSavingsSchemes.monthlyMab", "Monthly MAB")}</th>
+                    <th className="py-3.5 px-6">{t("branchManagerSavingsSchemes.payout", "Payout")}</th>
+                    <th className="py-3.5 px-6">{t("branchManagerSavingsSchemes.serviceCharges", "Service Charges")}</th>
+                    <th className="py-3.5 px-6">{t("branchManagerSavingsSchemes.smsCharges", "SMS Charges")}</th>
+                    <th className="py-3.5 px-6">{t("dashboardModule.emergency.table.createdAt", "Created At")}</th>
+                    <th className="py-3.5 px-6 text-center">{t("common.status", "Status")}</th>
+                    <th className="py-3.5 px-6 text-right">{t("common.actions", "Actions")}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-sm">
@@ -608,7 +611,7 @@ export default function SuperAdminSavingsSchemes() {
                           className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
                             scheme.is_active ? 'bg-emerald-500' : 'bg-slate-300'
                           } ${actionLoadingId === scheme.id ? 'opacity-50 cursor-wait' : ''}`}
-                          title={`Click to ${scheme.is_active ? 'deactivate' : 'activate'} this scheme`}
+                          title={`Click to ${scheme.is_active ? t("branchManagerMembers.deactivate", "deactivate") : t("branchManagerMembers.activate", "activate")} this scheme`}
                         >
                           <span
                             aria-hidden="true"
@@ -619,9 +622,9 @@ export default function SuperAdminSavingsSchemes() {
                         </button>
                         <div className="text-[10px] font-bold mt-1">
                           {scheme.is_active ? (
-                            <span className="text-emerald-700">Active</span>
+                            <span className="text-emerald-700">{t("common.active", "Active")}</span>
                           ) : (
-                            <span className="text-slate-400">Inactive</span>
+                            <span className="text-slate-400">{t("common.inactive", "Inactive")}</span>
                           )}
                         </div>
                       </td>
@@ -631,21 +634,21 @@ export default function SuperAdminSavingsSchemes() {
                         <div className="flex items-center justify-end gap-1.5">
                           <button
                             onClick={() => setDetailModal({ isOpen: true, scheme })}
-                            title="View Scheme Details"
+                            title={t("branchManagerFdMisSchemes.viewSchemeDetails", "View Scheme Details")}
                             className="p-2 rounded-lg text-slate-400 hover:text-teal-700 hover:bg-teal-50 transition-colors cursor-pointer"
                           >
                             <Eye className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleEditOpen(scheme)}
-                            title="Edit Savings Scheme"
+                            title={t("superAdminSavingsSchemes.editSavingsScheme", "Edit Savings Scheme")}
                             className="p-2 rounded-lg text-slate-400 hover:text-teal-700 hover:bg-teal-50 transition-colors cursor-pointer"
                           >
                             <Pencil className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => setDeleteModal({ isOpen: true, scheme, isDeleting: false })}
-                            title="Delete Savings Scheme"
+                            title={t("superAdminSavingsSchemes.deleteSavingsScheme", "Delete Savings Scheme")}
                             className="p-2 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -663,8 +666,8 @@ export default function SuperAdminSavingsSchemes() {
           {!loading && filteredSchemes.length > 0 && (
             <div className="px-6 py-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-medium bg-slate-50/50">
               <span>
-                Showing <strong className="text-slate-700">{filteredSchemes.length}</strong> of{' '}
-                <strong className="text-slate-700">{schemes.length}</strong> savings schemes
+                {t("common.showing", "Showing")} <strong className="text-slate-700">{filteredSchemes.length}</strong> {t("common.of", "of")}{' '}
+                <strong className="text-slate-700">{schemes.length}</strong> {t("superAdminSavingsSchemes.savingsSchemes", "savings schemes")}
               </span>
             </div>
           )}
@@ -718,7 +721,7 @@ export default function SuperAdminSavingsSchemes() {
               onClick={() => setSuccessPopup(null)}
               className="w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 text-white font-bold text-sm shadow-md shadow-emerald-600/20 hover:from-emerald-500 hover:to-teal-600 transition-all cursor-pointer"
             >
-              Okay, Great
+              {t("superAdminSavingsSchemes.okayGreat", "Okay, Great")}
             </button>
           </div>
         </div>
@@ -741,7 +744,7 @@ export default function SuperAdminSavingsSchemes() {
               onClick={() => setErrorPopup(null)}
               className="w-full py-2.5 rounded-xl bg-slate-900 text-white font-bold text-sm hover:bg-slate-800 transition-all cursor-pointer"
             >
-              Dismiss
+              {t("branchManagerMemberPasswordUpdate.dismiss", "Dismiss")}
             </button>
           </div>
         </div>

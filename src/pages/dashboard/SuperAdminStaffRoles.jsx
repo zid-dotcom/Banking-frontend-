@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { i18n } from '../../i18n/index.js';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import StatCard from '../../components/dashboard/StatCard';
@@ -45,6 +47,7 @@ function formatDateTime(isoString) {
 }
 
 export default function SuperAdminStaffRoles() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -108,14 +111,14 @@ export default function SuperAdminStaffRoles() {
       const newRole = await staffRoleService.createStaffRole(formData);
       setCreateModalOpen(false);
       setSuccessPopup({
-        title: 'Staff Role Created',
+        title: i18n.t("superAdminStaffRoles.staffRoleCreated", "Staff Role Created"),
         message: `Successfully created role "${newRole?.name || formData.name}" (ID #${newRole?.id || ''}).`
       });
       await fetchStaffRoles(true);
     } catch (err) {
       console.error('Create staff role error:', err);
       setErrorPopup({
-        title: 'Failed to Create Role',
+        title: i18n.t("superAdminStaffRoles.failedToCreateRole", "Failed to Create Role"),
         message: err.message || 'Could not create staff role. Please check input requirements.'
       });
     } finally {
@@ -129,7 +132,7 @@ export default function SuperAdminStaffRoles() {
       await staffRoleService.deleteStaffRole(role.id);
       setDeleteModal({ isOpen: false, role: null, isDeleting: false });
       setSuccessPopup({
-        title: 'Role Deleted',
+        title: i18n.t("superAdminStaffRoles.roleDeleted", "Role Deleted"),
         message: `Staff role "${role.name}" (ID #${role.id}) was permanently deleted.`
       });
       await fetchStaffRoles(true);
@@ -137,7 +140,7 @@ export default function SuperAdminStaffRoles() {
       console.error('Delete staff role error:', err);
       setDeleteModal({ isOpen: false, role: null, isDeleting: false });
       setErrorPopup({
-        title: 'Deletion Failed',
+        title: i18n.t("superAdminAnnouncements.deletionFailed", "Deletion Failed"),
         message: err.message || `Could not delete role "${role.name}". It may have assigned staff.`
       });
     }
@@ -185,18 +188,18 @@ export default function SuperAdminStaffRoles() {
             {/* Pill Badge */}
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-xs text-xs font-semibold border border-teal-200/80 shadow-2xs text-[#0f766e] mb-3">
               <Users className="w-4 h-4 text-[#00b4a7]" />
-              <span className="font-bold text-[#00b4a7]">Staff Management</span>
+              <span className="font-bold text-[#00b4a7]">{t("superAdminStaffRoles.staffManagement", "Staff Management")}</span>
             </div>
 
             <div className="flex items-center gap-3">
               <span className="w-1.5 h-8 sm:h-9 bg-[#00b4a7] rounded-full flex-shrink-0" />
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0f2e2e] tracking-tight">
-                Staff Roles &amp; Designations
+                {t("superAdminStaffRoles.staffRolesDesignations", "Staff Roles & Designations")}
               </h1>
             </div>
 
             <p className="text-slate-600 text-xs sm:text-sm mt-2.5 font-medium leading-relaxed max-w-xl">
-              Manage and oversee staff roles, job titles, and organizational structure.
+              {t("superAdminStaffRoles.manageAndOverseeStaffRoles", "Manage and oversee staff roles, job titles, and organizational structure.")}
             </p>
 
             {/* Navigation Tabs Pill (Staff Roles vs Staff Members) */}
@@ -205,14 +208,14 @@ export default function SuperAdminStaffRoles() {
                 type="button"
                 className="px-4 py-1.5 rounded-xl text-xs font-bold bg-[#00b4a7] text-white shadow-xs transition-all"
               >
-                Staff Roles ({roles.length})
+                {t("superAdminStaff.staffRoles", "Staff Roles (")}{roles.length})
               </button>
               <button
                 type="button"
                 onClick={() => navigate('/super-admin/staff')}
                 className="px-4 py-1.5 rounded-xl text-xs font-bold text-slate-600 hover:text-teal-800 hover:bg-teal-50/70 transition-all cursor-pointer"
               >
-                Staff Members Registry
+                {t("superAdminStaffRoles.staffMembersRegistry", "Staff Members Registry")}
               </button>
             </div>
           </div>
@@ -220,7 +223,7 @@ export default function SuperAdminStaffRoles() {
           <div className="relative z-10 flex justify-end pointer-events-none -my-3 sm:-my-5 lg:-my-6 flex-shrink-0">
             <img
               src={hrTeamIllustration}
-              alt="Staff Roles & Designations"
+              alt={t("superAdminStaffRoles.staffRolesDesignations", "Staff Roles & Designations")}
               className="h-36 sm:h-44 lg:h-52 w-auto object-contain drop-shadow-md select-none pointer-events-none transform hover:scale-102 transition-transform duration-300"
             />
           </div>
@@ -236,43 +239,43 @@ export default function SuperAdminStaffRoles() {
         {/* 4 Summary Metric Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <StatCard
-            title="Active Roles"
+            title={t("superAdminStaffRoles.activeRoles", "Active Roles")}
             value={roles.length.toString()}
-            subtitle="Configured Roles"
+            subtitle={t("superAdminStaffRoles.configuredRoles", "Configured Roles")}
             icon={ShieldCheck}
             trend="Active in System"
             trendType="up"
           />
           <StatCard
-            title="Staff Roles"
+            title={t("sidebar.staffRoles", "Staff Roles")}
             value={
               <div className="flex flex-col">
                 <span className="text-2xl sm:text-3xl font-bold font-sans text-slate-900 leading-tight">
                   {roles.length}
                 </span>
                 <span className="text-base sm:text-lg font-bold font-sans text-slate-800 -mt-0.5">
-                  Total Roles
+                  {t("superAdminStaffRoles.totalRoles", "Total Roles")}
                 </span>
               </div>
             }
             subtitle={
               <span className="inline-flex items-center gap-1.5 text-slate-600 font-semibold">
                 <CheckCircle2 className="w-3.5 h-3.5 text-teal-600" />
-                Configured Roles
+                {t("superAdminStaffRoles.configuredRoles", "Configured Roles")}
               </span>
             }
             icon={Briefcase}
           />
           <StatCard
-            title="Central Governance"
+            title={t("superAdminStaffRoles.centralGovernance", "Central Governance")}
             value="Super Admin"
-            subtitle="Apex Role Authority"
+            subtitle={t("superAdminStaffRoles.apexRoleAuthority", "Apex Role Authority")}
             icon={Lock}
           />
           <StatCard
-            title="Society Branches"
+            title={t("superAdminStaffRoles.societyBranches", "Society Branches")}
             value="Multi-Branch"
-            subtitle="Shared Organization Model"
+            subtitle={t("superAdminStaffRoles.sharedOrganizationModel", "Shared Organization Model")}
             icon={Layers}
           />
         </div>
@@ -288,7 +291,7 @@ export default function SuperAdminStaffRoles() {
               <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="text"
-                placeholder="Search staff role by name, description, or ID..."
+                placeholder={t("superAdminStaffRoles.searchStaffRoleByName", "Search staff role by name, description, or ID...")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-9 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-sm focus:outline-none focus:ring-2 focus:ring-teal-100 focus:border-teal-500 font-medium transition-all"
@@ -308,7 +311,7 @@ export default function SuperAdminStaffRoles() {
               <button
                 onClick={() => fetchStaffRoles(true)}
                 disabled={refreshing}
-                title="Refresh roles list"
+                title={t("superAdminStaffRoles.refreshRolesList", "Refresh roles list")}
                 className="p-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-800 transition-colors cursor-pointer disabled:opacity-50"
               >
                 <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin text-teal-600' : ''}`} />
@@ -319,7 +322,7 @@ export default function SuperAdminStaffRoles() {
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#00b4a7] to-[#0f766e] text-white text-sm font-bold shadow-md shadow-teal-500/20 hover:from-[#00a296] hover:to-[#0c625c] transition-all cursor-pointer"
               >
                 <PlusCircle className="w-4 h-4" />
-                <span>Create Staff Role</span>
+                <span>{t("superAdminStaffRoles.createStaffRole", "Create Staff Role")}</span>
               </button>
             </div>
           </div>
@@ -330,7 +333,7 @@ export default function SuperAdminStaffRoles() {
               <div className="flex items-start gap-2.5">
                 <AlertCircle className="w-5 h-5 flex-shrink-0 text-red-600 mt-0.5" />
                 <div>
-                  <p className="text-sm font-bold text-red-900">Failed to load staff roles</p>
+                  <p className="text-sm font-bold text-red-900">{t("superAdminStaffRoles.failedToLoadStaffRoles", "Failed to load staff roles")}</p>
                   <p className="text-xs text-red-700 mt-0.5">{error}</p>
                 </div>
               </div>
@@ -338,7 +341,7 @@ export default function SuperAdminStaffRoles() {
                 onClick={() => fetchStaffRoles()}
                 className="text-xs font-bold text-red-700 hover:text-red-900 underline cursor-pointer flex-shrink-0"
               >
-                Retry
+                {t("common.retry", "Retry")}
               </button>
             </div>
           )}
@@ -348,7 +351,7 @@ export default function SuperAdminStaffRoles() {
             {loading ? (
               <div className="py-20 text-center space-y-3">
                 <div className="w-10 h-10 border-3 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto" />
-                <p className="text-sm text-slate-500 font-medium">Loading staff roles...</p>
+                <p className="text-sm text-slate-500 font-medium">{t("superAdminStaffRoles.loadingStaffRoles", "Loading staff roles...")}</p>
               </div>
             ) : filteredRoles.length === 0 ? (
               <div className="py-20 text-center space-y-4 max-w-sm mx-auto p-4">
@@ -357,12 +360,12 @@ export default function SuperAdminStaffRoles() {
                 </div>
                 <div>
                   <p className="text-base font-bold text-slate-800">
-                    {searchQuery ? 'No matching roles found' : 'No staff roles defined yet'}
+                    {searchQuery ? t("superAdminStaffRoles.noMatchingRolesFound", "No matching roles found") : t("superAdminStaffRoles.noStaffRolesDefinedYet", "No staff roles defined yet")}
                   </p>
                   <p className="text-xs text-slate-500 mt-1 font-medium leading-relaxed">
                     {searchQuery
-                      ? 'Try adjusting your search query or clear the filter.'
-                      : 'Create designations like Branch Cashier, Loan Officer, or Field Agent.'}
+                      ? t("branchManagerFdMisSchemes.tryAdjustingYourSearchQuery", "Try adjusting your search query or clear the filter.")
+                      : t("superAdminStaffRoles.createDesignationsLikeBranchCashier", "Create designations like Branch Cashier, Loan Officer, or Field Agent.")}
                   </p>
                 </div>
                 {!searchQuery && (
@@ -371,7 +374,7 @@ export default function SuperAdminStaffRoles() {
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold transition-colors cursor-pointer shadow-sm"
                   >
                     <PlusCircle className="w-4 h-4" />
-                    Create First Staff Role
+                    {t("superAdminStaffRoles.createFirstStaffRole", "Create First Staff Role")}
                   </button>
                 )}
               </div>
@@ -379,11 +382,11 @@ export default function SuperAdminStaffRoles() {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="border-b border-slate-100 bg-slate-50/75 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                    <th className="py-3.5 px-6">ID</th>
-                    <th className="py-3.5 px-6">Role Name &amp; Title</th>
-                    <th className="py-3.5 px-6">Description / Scope</th>
-                    <th className="py-3.5 px-6">Created At</th>
-                    <th className="py-3.5 px-6 text-right">Actions</th>
+                    <th className="py-3.5 px-6">{t("superAdminStaffRoles.id", "ID")}</th>
+                    <th className="py-3.5 px-6">{t("superAdminStaffRoles.roleNameTitle", "Role Name & Title")}</th>
+                    <th className="py-3.5 px-6">{t("superAdminStaffRoles.descriptionScope", "Description / Scope")}</th>
+                    <th className="py-3.5 px-6">{t("dashboardModule.emergency.table.createdAt", "Created At")}</th>
+                    <th className="py-3.5 px-6 text-right">{t("common.actions", "Actions")}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-sm">
@@ -408,7 +411,7 @@ export default function SuperAdminStaffRoles() {
                               {role.name}
                             </div>
                             <span className="text-[11px] font-medium text-slate-400">
-                              Designated Role
+                              {t("superAdminStaffRoles.designatedRole", "Designated Role")}
                             </span>
                           </div>
                         </div>
@@ -418,7 +421,7 @@ export default function SuperAdminStaffRoles() {
                       <td className="py-4 px-6 max-w-md">
                         <p className="text-xs text-slate-600 font-medium line-clamp-2 leading-relaxed">
                           {role.description || (
-                            <span className="italic text-slate-400">No description provided</span>
+                            <span className="italic text-slate-400">{t("superAdminStaffRoles.noDescriptionProvided", "No description provided")}</span>
                           )}
                         </p>
                       </td>
@@ -436,14 +439,14 @@ export default function SuperAdminStaffRoles() {
                         <div className="flex items-center justify-end gap-1.5">
                           <button
                             onClick={() => setDetailModal({ isOpen: true, role })}
-                            title="View Role Details"
+                            title={t("superAdminStaffRoles.viewRoleDetails", "View Role Details")}
                             className="p-2 rounded-lg text-slate-400 hover:text-teal-700 hover:bg-teal-50 transition-colors cursor-pointer"
                           >
                             <Eye className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => setDeleteModal({ isOpen: true, role, isDeleting: false })}
-                            title="Delete Staff Role"
+                            title={t("superAdminStaffRoles.deleteStaffRole", "Delete Staff Role")}
                             className="p-2 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -461,8 +464,8 @@ export default function SuperAdminStaffRoles() {
           {!loading && filteredRoles.length > 0 && (
             <div className="px-6 py-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-medium bg-slate-50/50">
               <span>
-                Showing <strong className="text-slate-700">{filteredRoles.length}</strong> of{' '}
-                <strong className="text-slate-700">{roles.length}</strong> staff roles
+                {t("common.showing", "Showing")} <strong className="text-slate-700">{filteredRoles.length}</strong> {t("common.of", "of")}{' '}
+                <strong className="text-slate-700">{roles.length}</strong> {t("superAdminStaffRoles.staffRoles", "staff roles")}
               </span>
             </div>
           )}
@@ -509,7 +512,7 @@ export default function SuperAdminStaffRoles() {
               onClick={() => setSuccessPopup(null)}
               className="w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 text-white font-bold text-sm shadow-md shadow-emerald-600/20 hover:from-emerald-500 hover:to-teal-600 transition-all cursor-pointer"
             >
-              Okay, Great
+              {t("superAdminSavingsSchemes.okayGreat", "Okay, Great")}
             </button>
           </div>
         </div>
@@ -532,7 +535,7 @@ export default function SuperAdminStaffRoles() {
               onClick={() => setErrorPopup(null)}
               className="w-full py-2.5 rounded-xl bg-slate-900 text-white font-bold text-sm hover:bg-slate-800 transition-all cursor-pointer"
             >
-              Dismiss
+              {t("branchManagerMemberPasswordUpdate.dismiss", "Dismiss")}
             </button>
           </div>
         </div>

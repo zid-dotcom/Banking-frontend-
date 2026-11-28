@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   X,
   Target,
@@ -73,6 +74,7 @@ export function CreateMonthlyTargetModal({
   isSubmitting = false,
   initialMonth = '',
 }) {
+  const { t } = useTranslation();
   const [branchAdmins, setBranchAdmins] = useState([]);
   const [branches, setBranches] = useState([]);
   const [loadingAdmins, setLoadingAdmins] = useState(false);
@@ -210,10 +212,10 @@ export function CreateMonthlyTargetModal({
             </div>
             <div>
               <h2 className="text-lg font-serif font-black text-slate-900">
-                Set Branch Target Directive
+                {t("monthlyTargetModals.setBranchTargetDirective", "Set Branch Target Directive")}
               </h2>
               <p className="text-xs text-slate-500 font-medium mt-0.5">
-                Select Branch Managers from registry and define their monthly target quota &amp; tiered incentive rates.
+                {t("monthlyTargetModals.selectBranchManagersFromRegistry", "Select Branch Managers from registry and define their monthly target quota & tiered incentive rates.")}
               </p>
             </div>
           </div>
@@ -233,12 +235,12 @@ export function CreateMonthlyTargetModal({
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
               <Building2 className="w-3.5 h-3.5 text-teal-600" />
-              <span>Target Branch Manager *</span>
+              <span>{t("monthlyTargetModals.targetBranchManager", "Target Branch Manager *")}</span>
             </label>
             {loadingAdmins ? (
               <div className="flex items-center gap-2 p-3 bg-slate-50 rounded-xl text-xs text-slate-500">
                 <Loader2 className="w-4 h-4 animate-spin text-teal-600" />
-                <span>Loading branch managers &amp; branches...</span>
+                <span>{t("monthlyTargetModals.loadingBranchManagersBranches", "Loading branch managers & branches...")}</span>
               </div>
             ) : (
               <select
@@ -257,7 +259,7 @@ export function CreateMonthlyTargetModal({
                   errors.admin ? 'border-rose-300 bg-rose-50/30' : 'border-slate-200 bg-slate-50'
                 } text-xs font-bold text-slate-800 focus:outline-none focus:border-teal-500 transition-all cursor-pointer`}
               >
-                <option value="">Select a Branch Manager</option>
+                <option value="">{t("monthlyTargetModals.selectABranchManager", "Select a Branch Manager")}</option>
                 {branchAdmins.map((admin) => {
                   const branchName = getBranchLabel(admin.branch_id);
                   const code = admin.user_code || `BM-${admin.id}`;
@@ -277,7 +279,7 @@ export function CreateMonthlyTargetModal({
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
                 <Calendar className="w-3.5 h-3.5 text-teal-600" />
-                <span>Target Month *</span>
+                <span>{t("monthlyTargetModals.targetMonth", "Target Month *")}</span>
               </label>
               <input
                 type="month"
@@ -288,14 +290,14 @@ export function CreateMonthlyTargetModal({
                 } text-xs font-bold text-slate-800 focus:outline-none focus:border-teal-500 transition-all cursor-pointer`}
               />
               <span className="text-[10px] text-slate-400 font-medium">
-                Directive month: {formatMonthDisplay(formData.target_month)}
+                {t("monthlyTargetModals.directiveMonth", "Directive month:")} {formatMonthDisplay(formData.target_month)}
               </span>
             </div>
 
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
                 <Coins className="w-3.5 h-3.5 text-teal-600" />
-                <span>Target Amount (₹) *</span>
+                <span>{t("monthlyTargetModals.targetAmount", "Target Amount (₹) *")}</span>
               </label>
               <input
                 type="number"
@@ -328,15 +330,15 @@ export function CreateMonthlyTargetModal({
               </div>
               <div>
                 <span className="text-xs font-bold text-slate-800 block">
-                  Partial Threshold
+                  {t("dashboardModule.monthlyTargets.partialThreshold", "Partial Threshold")}
                 </span>
                 <span className="text-[11px] text-slate-500 font-medium">
-                  Standard eligibility benchmark for partial incentive qualification
+                  {t("monthlyTargetModals.standardEligibilityBenchmarkForPartial", "Standard eligibility benchmark for partial incentive qualification")}
                 </span>
               </div>
             </div>
             <span className="px-3.5 py-1.5 rounded-xl bg-teal-100/90 text-teal-900 font-black text-xs border border-teal-200 shadow-2xs">
-              80% Target
+              {t("monthlyTargetModals.80Target", "80% Target")}
             </span>
           </div>
 
@@ -345,7 +347,7 @@ export function CreateMonthlyTargetModal({
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
                 <Award className="w-4 h-4 text-teal-600" />
-                <span>Tiered Incentive Rates (%)</span>
+                <span>{t("monthlyTargetModals.tieredIncentiveRates", "Tiered Incentive Rates (%)")}</span>
               </label>
             </div>
 
@@ -355,10 +357,10 @@ export function CreateMonthlyTargetModal({
               <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2">
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-xs font-bold text-slate-800">
-                    Below Target Incentive (%)
+                    {t("monthlyTargetModals.belowTargetIncentive", "Below Target Incentive (%)")}
                   </span>
                   <span className="text-[10px] font-bold text-slate-600 bg-slate-200/70 px-2.5 py-0.5 rounded-md whitespace-nowrap">
-                    &lt;80% Target
+                    {t("monthlyTargetModals.80Target2", "<80% Target")}
                   </span>
                 </div>
                 <div className="relative">
@@ -383,10 +385,10 @@ export function CreateMonthlyTargetModal({
               <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200/80 space-y-2">
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-xs font-bold text-amber-950">
-                    Partially Achieved Incentive (%)
+                    {t("monthlyTargetModals.partiallyAchievedIncentive", "Partially Achieved Incentive (%)")}
                   </span>
                   <span className="text-[10px] font-bold text-amber-800 bg-amber-100 px-2.5 py-0.5 rounded-md whitespace-nowrap">
-                    80%–99% Target
+                    {t("monthlyTargetModals.8099Target", "80%–99% Target")}
                   </span>
                 </div>
                 <div className="relative">
@@ -411,10 +413,10 @@ export function CreateMonthlyTargetModal({
               <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 space-y-2">
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-xs font-bold text-emerald-950">
-                    Target Achieved Incentive (%)
+                    {t("monthlyTargetModals.targetAchievedIncentive", "Target Achieved Incentive (%)")}
                   </span>
                   <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-md whitespace-nowrap">
-                    100% Target
+                    {t("monthlyTargetModals.100Target", "100% Target")}
                   </span>
                 </div>
                 <div className="relative">
@@ -439,10 +441,10 @@ export function CreateMonthlyTargetModal({
               <div className="p-4 rounded-2xl bg-purple-50/70 border border-purple-200/80 space-y-2">
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-xs font-bold text-purple-950">
-                    Exceeded Target Incentive (%)
+                    {t("monthlyTargetModals.exceededTargetIncentive", "Exceeded Target Incentive (%)")}
                   </span>
                   <span className="text-[10px] font-bold text-purple-800 bg-purple-100 px-2.5 py-0.5 rounded-md whitespace-nowrap">
-                    &gt; 100% Target
+                    {t("monthlyTargetModals.100Target2", "> 100% Target")}
                   </span>
                 </div>
                 <div className="relative">
@@ -473,7 +475,7 @@ export function CreateMonthlyTargetModal({
               disabled={isSubmitting}
               className="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-100 text-xs font-bold transition-all cursor-pointer disabled:opacity-50"
             >
-              Cancel
+              {t("common.cancel", "Cancel")}
             </button>
             <button
               type="submit"
@@ -481,7 +483,7 @@ export function CreateMonthlyTargetModal({
               className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white text-xs font-bold shadow-md shadow-teal-600/20 flex items-center gap-2 transition-all cursor-pointer disabled:opacity-50"
             >
               {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
-              <span>Save &amp; Assign Branch Target</span>
+              <span>{t("monthlyTargetModals.saveAssignBranchTarget", "Save & Assign Branch Target")}</span>
             </button>
           </div>
         </form>
@@ -501,6 +503,7 @@ export function CreateBranchStaffTargetModal({
   isSubmitting = false,
   initialMonth = '',
 }) {
+  const { t } = useTranslation();
   const [staffList, setStaffList] = useState([]);
   const [loadingStaff, setLoadingStaff] = useState(false);
   const [selectedStaffId, setSelectedStaffId] = useState('');
@@ -609,10 +612,10 @@ export function CreateBranchStaffTargetModal({
             </div>
             <div>
               <h2 className="text-lg font-serif font-black text-slate-900">
-                Assign Staff Monthly Target
+                {t("monthlyTargetModals.assignStaffMonthlyTarget", "Assign Staff Monthly Target")}
               </h2>
               <p className="text-xs text-slate-500 font-medium mt-0.5">
-                Select a collection agent or field staff member and assign their personal monthly target quota.
+                {t("monthlyTargetModals.selectACollectionAgentOr", "Select a collection agent or field staff member and assign their personal monthly target quota.")}
               </p>
             </div>
           </div>
@@ -632,12 +635,12 @@ export function CreateBranchStaffTargetModal({
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
               <Users className="w-3.5 h-3.5 text-teal-600" />
-              <span>Select Staff Member (Collection Agent) *</span>
+              <span>{t("monthlyTargetModals.selectStaffMemberCollectionAgent", "Select Staff Member (Collection Agent) *")}</span>
             </label>
             {loadingStaff ? (
               <div className="flex items-center gap-2 p-3 bg-slate-50 rounded-xl text-xs text-slate-500">
                 <Loader2 className="w-4 h-4 animate-spin text-teal-600" />
-                <span>Loading branch staff list...</span>
+                <span>{t("monthlyTargetModals.loadingBranchStaffList", "Loading branch staff list...")}</span>
               </div>
             ) : (
               <select
@@ -656,7 +659,7 @@ export function CreateBranchStaffTargetModal({
                   errors.staff ? 'border-rose-300 bg-rose-50/30' : 'border-slate-200 bg-slate-50'
                 } text-xs font-bold text-slate-800 focus:outline-none focus:border-teal-500 transition-all cursor-pointer`}
               >
-                <option value="">Select a Staff Member</option>
+                <option value="">{t("monthlyTargetModals.selectAStaffMember", "Select a Staff Member")}</option>
                 {staffList.map((staff) => (
                   <option key={staff.id} value={staff.id}>
                     {staff.full_name} ({staff.staff_code || `ID #${staff.id}`} — {staff.staff_role_name || 'Staff'})
@@ -672,7 +675,7 @@ export function CreateBranchStaffTargetModal({
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
                 <Calendar className="w-3.5 h-3.5 text-teal-600" />
-                <span>Target Month *</span>
+                <span>{t("monthlyTargetModals.targetMonth", "Target Month *")}</span>
               </label>
               <input
                 type="month"
@@ -683,14 +686,14 @@ export function CreateBranchStaffTargetModal({
                 } text-xs font-bold text-slate-800 focus:outline-none focus:border-teal-500 transition-all cursor-pointer`}
               />
               <span className="text-[10px] text-slate-400 font-medium">
-                Directive month: {formatMonthDisplay(formData.target_month)}
+                {t("monthlyTargetModals.directiveMonth", "Directive month:")} {formatMonthDisplay(formData.target_month)}
               </span>
             </div>
 
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
                 <Coins className="w-3.5 h-3.5 text-teal-600" />
-                <span>Target Amount (₹) *</span>
+                <span>{t("monthlyTargetModals.targetAmount", "Target Amount (₹) *")}</span>
               </label>
               <input
                 type="number"
@@ -723,15 +726,15 @@ export function CreateBranchStaffTargetModal({
               </div>
               <div>
                 <span className="text-xs font-bold text-slate-800 block">
-                  Partial Threshold
+                  {t("dashboardModule.monthlyTargets.partialThreshold", "Partial Threshold")}
                 </span>
                 <span className="text-[11px] text-slate-500 font-medium">
-                  Standard eligibility benchmark for partial incentive qualification
+                  {t("monthlyTargetModals.standardEligibilityBenchmarkForPartial", "Standard eligibility benchmark for partial incentive qualification")}
                 </span>
               </div>
             </div>
             <span className="px-3.5 py-1.5 rounded-xl bg-teal-100/90 text-teal-900 font-black text-xs border border-teal-200 shadow-2xs">
-              80% Target
+              {t("monthlyTargetModals.80Target", "80% Target")}
             </span>
           </div>
 
@@ -740,7 +743,7 @@ export function CreateBranchStaffTargetModal({
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
                 <Award className="w-4 h-4 text-teal-600" />
-                <span>Tiered Incentive Rates (%)</span>
+                <span>{t("monthlyTargetModals.tieredIncentiveRates", "Tiered Incentive Rates (%)")}</span>
               </label>
             </div>
 
@@ -750,10 +753,10 @@ export function CreateBranchStaffTargetModal({
               <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2">
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-xs font-bold text-slate-800">
-                    Below Target Incentive (%)
+                    {t("monthlyTargetModals.belowTargetIncentive", "Below Target Incentive (%)")}
                   </span>
                   <span className="text-[10px] font-bold text-slate-600 bg-slate-200/70 px-2.5 py-0.5 rounded-md whitespace-nowrap">
-                    &lt;80% Target
+                    {t("monthlyTargetModals.80Target2", "<80% Target")}
                   </span>
                 </div>
                 <div className="relative">
@@ -778,10 +781,10 @@ export function CreateBranchStaffTargetModal({
               <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200/80 space-y-2">
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-xs font-bold text-amber-950">
-                    Partially Achieved Incentive (%)
+                    {t("monthlyTargetModals.partiallyAchievedIncentive", "Partially Achieved Incentive (%)")}
                   </span>
                   <span className="text-[10px] font-bold text-amber-800 bg-amber-100 px-2.5 py-0.5 rounded-md whitespace-nowrap">
-                    80%–99% Target
+                    {t("monthlyTargetModals.8099Target", "80%–99% Target")}
                   </span>
                 </div>
                 <div className="relative">
@@ -806,10 +809,10 @@ export function CreateBranchStaffTargetModal({
               <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 space-y-2">
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-xs font-bold text-emerald-950">
-                    Target Achieved Incentive (%)
+                    {t("monthlyTargetModals.targetAchievedIncentive", "Target Achieved Incentive (%)")}
                   </span>
                   <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-md whitespace-nowrap">
-                    100% Target
+                    {t("monthlyTargetModals.100Target", "100% Target")}
                   </span>
                 </div>
                 <div className="relative">
@@ -834,10 +837,10 @@ export function CreateBranchStaffTargetModal({
               <div className="p-4 rounded-2xl bg-purple-50/70 border border-purple-200/80 space-y-2">
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-xs font-bold text-purple-950">
-                    Exceeded Target Incentive (%)
+                    {t("monthlyTargetModals.exceededTargetIncentive", "Exceeded Target Incentive (%)")}
                   </span>
                   <span className="text-[10px] font-bold text-purple-800 bg-purple-100 px-2.5 py-0.5 rounded-md whitespace-nowrap">
-                    &gt; 100% Target
+                    {t("monthlyTargetModals.100Target2", "> 100% Target")}
                   </span>
                 </div>
                 <div className="relative">
@@ -868,7 +871,7 @@ export function CreateBranchStaffTargetModal({
               disabled={isSubmitting}
               className="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-100 text-xs font-bold transition-all cursor-pointer disabled:opacity-50"
             >
-              Cancel
+              {t("common.cancel", "Cancel")}
             </button>
             <button
               type="submit"
@@ -876,7 +879,7 @@ export function CreateBranchStaffTargetModal({
               className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white text-xs font-bold shadow-md shadow-teal-600/20 flex items-center gap-2 transition-all cursor-pointer disabled:opacity-50"
             >
               {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
-              <span>Save &amp; Assign Staff Target</span>
+              <span>{t("monthlyTargetModals.saveAssignStaffTarget", "Save & Assign Staff Target")}</span>
             </button>
           </div>
         </form>
@@ -889,6 +892,7 @@ export function CreateBranchStaffTargetModal({
  * Modal for Viewing Monthly Target Details
  */
 export function MonthlyTargetDetailModal({ isOpen, target, onClose }) {
+  const { t } = useTranslation();
   if (!isOpen || !target) return null;
 
   const targetTitle =
@@ -916,7 +920,7 @@ export function MonthlyTargetDetailModal({ isOpen, target, onClose }) {
               </div>
               <p className="text-xs text-slate-500 font-medium mt-0.5">
                 {target.branch_name ? `Branch: ${target.branch_name} • ` : ''}
-                Target Period: {formatMonthDisplay(target.target_month)}
+                {t("monthlyTargetModals.targetPeriod", "Target Period:")} {formatMonthDisplay(target.target_month)}
               </p>
             </div>
           </div>
@@ -934,7 +938,7 @@ export function MonthlyTargetDetailModal({ isOpen, target, onClose }) {
           <div className="grid grid-cols-2 gap-3">
             <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
-                Target Amount
+                {t("dashboardModule.monthlyTargets.colTargetAmount", "Target Amount")}
               </span>
               <span className="text-base font-black text-slate-900">
                 {formatCurrency(target.target_amount)}
@@ -943,7 +947,7 @@ export function MonthlyTargetDetailModal({ isOpen, target, onClose }) {
 
             <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
-                Partial Threshold
+                {t("dashboardModule.monthlyTargets.partialThreshold", "Partial Threshold")}
               </span>
               <span className="text-base font-black text-teal-700">
                 {target.partial_threshold_percent || 80}%
@@ -954,23 +958,23 @@ export function MonthlyTargetDetailModal({ isOpen, target, onClose }) {
           {/* Incentive Ladder */}
           <div>
             <span className="text-xs font-bold text-slate-700 uppercase tracking-wider block mb-2">
-              Performance Incentive Ladder
+              {t("monthlyTargetModals.performanceIncentiveLadder", "Performance Incentive Ladder")}
             </span>
             <div className="space-y-2">
               <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between text-xs">
-                <span className="text-slate-600 font-medium">Below Target (&lt;{target.partial_threshold_percent || 80}%)</span>
+                <span className="text-slate-600 font-medium">{t("staffMonthlyTargets.belowTarget", "Below Target (<")}{target.partial_threshold_percent || 80}%)</span>
                 <span className="font-bold text-slate-900">{formatPercentValue(target.below_target_incentive_percent)}</span>
               </div>
               <div className="p-3 rounded-xl bg-amber-50/70 border border-amber-100 flex items-center justify-between text-xs">
-                <span className="text-amber-800 font-medium">Partially Achieved ({target.partial_threshold_percent || 80}% - 99%)</span>
+                <span className="text-amber-800 font-medium">{t("staffMonthlyTargets.partiallyAchieved", "Partially Achieved (")}{target.partial_threshold_percent || 80}% - 99%)</span>
                 <span className="font-bold text-amber-900">{formatPercentValue(target.partially_achieved_incentive_percent)}</span>
               </div>
               <div className="p-3 rounded-xl bg-emerald-50/70 border border-emerald-100 flex items-center justify-between text-xs">
-                <span className="text-emerald-800 font-bold">Target Achieved (100%)</span>
+                <span className="text-emerald-800 font-bold">{t("staffMonthlyTargets.targetAchieved100", "Target Achieved (100%)")}</span>
                 <span className="font-black text-emerald-900">{formatPercentValue(target.target_achieved_incentive_percent)}</span>
               </div>
               <div className="p-3 rounded-xl bg-purple-50/70 border border-purple-100 flex items-center justify-between text-xs">
-                <span className="text-purple-800 font-bold">Exceeded Target (&gt;100%)</span>
+                <span className="text-purple-800 font-bold">{t("staffMonthlyTargets.exceededTarget100", "Exceeded Target (>100%)")}</span>
                 <span className="font-black text-purple-900">{formatPercentValue(target.exceeded_target_incentive_percent)}</span>
               </div>
             </div>
@@ -984,7 +988,7 @@ export function MonthlyTargetDetailModal({ isOpen, target, onClose }) {
             onClick={onClose}
             className="px-5 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-all cursor-pointer"
           >
-            Close
+            {t("common.close", "Close")}
           </button>
         </div>
       </div>

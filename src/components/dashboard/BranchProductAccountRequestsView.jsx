@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Clock,
   CheckCircle2,
@@ -55,6 +56,7 @@ export default function BranchProductAccountRequestsView({
   productType = null, // null (all) | 'fd_mis' | 'investment'
   title = 'Scheme Applications & Requests',
 }) {
+  const { t } = useTranslation();
   const isInvestment = productType === 'investment';
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -199,46 +201,46 @@ export default function BranchProductAccountRequestsView({
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
         <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-2xs">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Total Received</span>
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{t("branchProductAccountRequestsView.totalReceived", "Total Received")}</span>
             <div className="w-7 h-7 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center">
               <FileText className="w-3.5 h-3.5" />
             </div>
           </div>
           <h4 className="text-xl font-black text-slate-900 mt-1">{scopedRequests.length}</h4>
-          <p className="text-[10px] text-slate-400 mt-0.5">Submitted scheme folios</p>
+          <p className="text-[10px] text-slate-400 mt-0.5">{t("dashboardModule.productAccounts.submittedSchemeFolios", "Submitted scheme folios")}</p>
         </div>
 
         <div className="bg-white rounded-2xl p-4 border border-amber-200/80 shadow-2xs bg-amber-50/20">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold text-amber-700 uppercase tracking-wider">Pending Action</span>
+            <span className="text-[10px] font-bold text-amber-700 uppercase tracking-wider">{t("branchProductAccountRequestsView.pendingAction", "Pending Action")}</span>
             <div className="w-7 h-7 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center">
               <Clock className="w-3.5 h-3.5" />
             </div>
           </div>
           <h4 className="text-xl font-black text-amber-900 mt-1">{pendingCount}</h4>
-          <p className="text-[10px] text-amber-600 mt-0.5">Awaiting branch review</p>
+          <p className="text-[10px] text-amber-600 mt-0.5">{t("branchManagerServiceRequests.awaitingBranchReview", "Awaiting branch review")}</p>
         </div>
 
         <div className="bg-white rounded-2xl p-4 border border-emerald-200/80 shadow-2xs bg-emerald-50/20">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider">Approved</span>
+            <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider">{t("common.approved", "Approved")}</span>
             <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
               <CheckCircle2 className="w-3.5 h-3.5" />
             </div>
           </div>
           <h4 className="text-xl font-black text-emerald-900 mt-1">{approvedCount}</h4>
-          <p className="text-[10px] text-emerald-600 mt-0.5">Folios active in branch</p>
+          <p className="text-[10px] text-emerald-600 mt-0.5">{t("branchProductAccountRequestsView.foliosActiveInBranch", "Folios active in branch")}</p>
         </div>
 
         <div className="bg-white rounded-2xl p-4 border border-rose-200/80 shadow-2xs bg-rose-50/20">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold text-rose-700 uppercase tracking-wider">Rejected</span>
+            <span className="text-[10px] font-bold text-rose-700 uppercase tracking-wider">{t("common.rejected", "Rejected")}</span>
             <div className="w-7 h-7 rounded-lg bg-rose-100 text-rose-700 flex items-center justify-center">
               <XCircle className="w-3.5 h-3.5" />
             </div>
           </div>
           <h4 className="text-xl font-black text-rose-900 mt-1">{rejectedCount}</h4>
-          <p className="text-[10px] text-rose-600 mt-0.5">Declined applications</p>
+          <p className="text-[10px] text-rose-600 mt-0.5">{t("dashboardModule.productAccounts.declinedApplications", "Declined applications")}</p>
         </div>
       </div>
 
@@ -249,7 +251,7 @@ export default function BranchProductAccountRequestsView({
           <div>
             <h3 className="text-base font-serif font-bold text-slate-900">{title}</h3>
             <p className="text-xs text-slate-500 mt-0.5">
-              Review and audit member scheme applications submitted under your branch
+              {t("branchProductAccountRequestsView.reviewAndAuditMemberScheme", "Review and audit member scheme applications submitted under your branch")}
             </p>
           </div>
 
@@ -279,7 +281,7 @@ export default function BranchProductAccountRequestsView({
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search member, scheme, folio..."
+                placeholder={t("branchProductAccountRequestsView.searchMemberSchemeFolio", "Search member, scheme, folio...")}
                 className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-teal-500 shadow-2xs"
               />
             </div>
@@ -290,7 +292,7 @@ export default function BranchProductAccountRequestsView({
               onClick={() => fetchRequests(true)}
               disabled={loading || refreshing}
               className="p-2.5 border border-slate-200 hover:border-teal-400 text-slate-600 hover:text-teal-700 bg-white hover:bg-teal-50/50 rounded-xl transition-all cursor-pointer shadow-2xs"
-              title="Refresh requests"
+              title={t("branchManagerNominees.refreshRequests", "Refresh requests")}
             >
               <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin text-teal-600' : ''}`} />
             </button>
@@ -301,7 +303,7 @@ export default function BranchProductAccountRequestsView({
         {loading ? (
           <div className="py-16 text-center text-slate-400">
             <RefreshCw className="w-8 h-8 animate-spin mx-auto text-teal-600 mb-3" />
-            <p className="text-xs sm:text-sm font-semibold text-slate-600">Loading branch applications...</p>
+            <p className="text-xs sm:text-sm font-semibold text-slate-600">{t("branchProductAccountRequestsView.loadingBranchApplications", "Loading branch applications...")}</p>
           </div>
         ) : error ? (
           <div className="py-12 text-center text-rose-500 px-4">
@@ -311,7 +313,7 @@ export default function BranchProductAccountRequestsView({
               onClick={() => fetchRequests()}
               className="mt-3 px-4 py-2 bg-slate-900 text-white text-xs font-bold rounded-xl cursor-pointer"
             >
-              Retry
+              {t("common.retry", "Retry")}
             </button>
           </div>
         ) : filteredRequests.length === 0 ? (
@@ -319,11 +321,11 @@ export default function BranchProductAccountRequestsView({
             <div className="w-12 h-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center mx-auto mb-3">
               <FileText className="w-6 h-6" />
             </div>
-            <p className="text-sm font-bold text-slate-700 mb-1">No Applications Found</p>
+            <p className="text-sm font-bold text-slate-700 mb-1">{t("dashboardModule.productAccounts.noApplicationsFound", "No Applications Found")}</p>
             <p className="text-xs text-slate-500 max-w-sm mx-auto">
               {searchQuery || statusFilter !== 'all'
-                ? 'Try clearing your search query or status filter.'
-                : 'No member scheme applications have been submitted for your branch yet.'}
+                ? t("dashboardModule.productAccounts.clearFilterHint", "Try clearing your search query or status filter.")
+                : t("branchProductAccountRequestsView.noMemberSchemeApplicationsHave", "No member scheme applications have been submitted for your branch yet.")}
             </p>
           </div>
         ) : (
@@ -332,26 +334,27 @@ export default function BranchProductAccountRequestsView({
               <thead>
                 <tr className="border-b border-slate-100 bg-slate-50/75 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                   <th className="py-3.5 px-4 text-center w-12">#</th>
-                  <th className="py-3.5 px-4">Member Code</th>
-                  <th className="py-3.5 px-4">Member Name</th>
-                  <th className="py-3.5 px-4">Email Address</th>
-                  <th className="py-3.5 px-4">Phone Number</th>
-                  <th className="py-3.5 px-4">Scheme Code</th>
-                  <th className="py-3.5 px-4">Scheme Name</th>
-                  <th className="py-3.5 px-4">Account Number</th>
+                  <th className="py-3.5 px-4">{t("modal.member.memberCode", "Member Code")}</th>
+                  <th className="py-3.5 px-4">{t("dashboardModule.productAccounts.memberName", "Member Name")}</th>
+                  <th className="py-3.5 px-4">{t("modal.member.emailAddress", "Email Address")}</th>
+                  <th className="py-3.5 px-4">{t("contact.phoneNumber", "Phone Number")}</th>
+                  <th className="py-3.5 px-4">{t("dashboardModule.productAccounts.schemeCode", "Scheme Code")}</th>
+                  <th className="py-3.5 px-4">{t("dashboardModule.productAccounts.schemeName", "Scheme Name")}</th>
+                  <th className="py-3.5 px-4">{t("dashboard.accountNumber", "Account Number")}</th>
                   {!isInvestment && (
                     <>
-                      <th className="py-3.5 px-4">Type</th>
-                      <th className="py-3.5 px-4">Principal Amount</th>
+                      <th className="py-3.5 px-4">{t("dashboardModule.productAccounts.type", "Type")}</th>
+                      <th className="py-3.5 px-4">{t("dashboardModule.productAccounts.principalAmount", "Principal Amount")}</th>
                     </>
                   )}
-                  <th className="py-3.5 px-4">Submitted Date</th>
-                  <th className="py-3.5 px-4 text-center">Status</th>
-                  <th className="py-3.5 px-4 text-right">Actions</th>
+                  <th className="py-3.5 px-4">{t("dashboardModule.productAccounts.submittedDate", "Submitted Date")}</th>
+                  <th className="py-3.5 px-4 text-center">{t("common.status", "Status")}</th>
+                  <th className="py-3.5 px-4 text-right">{t("common.actions", "Actions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-xs">
                 {filteredRequests.map((req, idx) => {
+  const { t } = useTranslation();
                   const status = (req.status || 'pending').toLowerCase();
                   const isPending = status === 'pending';
                   const isApproved = status === 'approved';
@@ -428,7 +431,7 @@ export default function BranchProductAccountRequestsView({
                           {/* Type */}
                           <td className="py-4 px-4 whitespace-nowrap">
                             <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-700 inline-block">
-                              {isFd ? 'FD / MIS Term' : 'Recurring Investment'}
+                              {isFd ? t("dashboardModule.productAccounts.fdMisTerm", "FD / MIS Term") : t("modal.member.recurringInvestment", "Recurring Investment")}
                             </span>
                           </td>
 
@@ -462,7 +465,7 @@ export default function BranchProductAccountRequestsView({
                               isPending ? 'bg-amber-500 animate-pulse' : isApproved ? 'bg-emerald-500' : 'bg-rose-500'
                             }`}
                           />
-                          {isPending ? 'Pending' : isApproved ? 'Approved' : 'Rejected'}
+                          {isPending ? t("common.pending", "Pending") : isApproved ? t("common.approved", "Approved") : t("common.rejected", "Rejected")}
                         </span>
                       </td>
 
@@ -476,10 +479,10 @@ export default function BranchProductAccountRequestsView({
                                 onClick={() => handleApprove(req)}
                                 disabled={actionLoadingId === req.id}
                                 className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs inline-flex items-center gap-1 shadow-xs shadow-emerald-600/20 transition-all cursor-pointer disabled:opacity-50"
-                                title="Approve scheme application"
+                                title={t("branchProductAccountRequestsView.approveSchemeApplication", "Approve scheme application")}
                               >
                                 <Check className="w-3.5 h-3.5" />
-                                <span>Approve</span>
+                                <span>{t("branchManagerMembers.approve", "Approve")}</span>
                               </button>
 
                               <button
@@ -487,10 +490,10 @@ export default function BranchProductAccountRequestsView({
                                 onClick={() => setRejectModal({ isOpen: true, request: req, reason: '' })}
                                 disabled={actionLoadingId === req.id}
                                 className="px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs inline-flex items-center gap-1 transition-colors cursor-pointer"
-                                title="Reject scheme application"
+                                title={t("branchProductAccountRequestsView.rejectSchemeApplication", "Reject scheme application")}
                               >
                                 <X className="w-3.5 h-3.5" />
-                                <span>Reject</span>
+                                <span>{t("modal.nominee.reject", "Reject")}</span>
                               </button>
                             </>
                           )}
@@ -499,7 +502,7 @@ export default function BranchProductAccountRequestsView({
                             type="button"
                             onClick={() => setDetailModal({ isOpen: true, request: req })}
                             className="p-1.5 rounded-xl border border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer"
-                            title="View details"
+                            title={t("branchProductAccountRequestsView.viewDetails", "View details")}
                           >
                             <Eye className="w-3.5 h-3.5" />
                           </button>
@@ -524,7 +527,7 @@ export default function BranchProductAccountRequestsView({
                   <XCircle className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-slate-900 text-base">Reject Application</h4>
+                  <h4 className="font-bold text-slate-900 text-base">{t("branchManagerMembershipSettings.rejectApplication", "Reject Application")}</h4>
                   <p className="text-xs text-slate-500 font-mono">#{rejectModal.request?.id}</p>
                 </div>
               </div>
@@ -538,11 +541,11 @@ export default function BranchProductAccountRequestsView({
 
             <form onSubmit={handleRejectSubmit} className="space-y-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700">Rejection Reason</label>
+                <label className="text-xs font-bold text-slate-700">{t("branchManagerMembershipSettings.rejectionReason", "Rejection Reason")}</label>
                 <textarea
                   value={rejectModal.reason}
                   onChange={(e) => setRejectModal({ ...rejectModal, reason: e.target.value })}
-                  placeholder="Explain why this scheme application is rejected..."
+                  placeholder={t("branchProductAccountRequestsView.explainWhyThisSchemeApplication", "Explain why this scheme application is rejected...")}
                   rows={3}
                   className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-rose-500 shadow-2xs"
                 />
@@ -554,14 +557,14 @@ export default function BranchProductAccountRequestsView({
                   onClick={() => setRejectModal({ isOpen: false, request: null, reason: '' })}
                   className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50 cursor-pointer"
                 >
-                  Cancel
+                  {t("common.cancel", "Cancel")}
                 </button>
                 <button
                   type="submit"
                   disabled={actionLoadingId === rejectModal.request?.id}
                   className="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md shadow-rose-600/20 cursor-pointer disabled:opacity-50"
                 >
-                  Confirm Rejection
+                  {t("modal.nominee.confirmRejection", "Confirm Rejection")}
                 </button>
               </div>
             </form>
@@ -576,7 +579,7 @@ export default function BranchProductAccountRequestsView({
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full">
-                  Application Details
+                  {t("branchProductAccountRequestsView.applicationDetails", "Application Details")}
                 </span>
                 <h4 className="font-serif font-bold text-slate-900 text-lg mt-1">
                   #{detailModal.request.id} • {detailModal.request.scheme_name}
@@ -593,12 +596,12 @@ export default function BranchProductAccountRequestsView({
             <div className="space-y-3 text-xs">
               <div className="grid grid-cols-2 gap-3 bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
                 <div>
-                  <span className="text-slate-400 block text-[10px] uppercase font-bold">Applicant</span>
+                  <span className="text-slate-400 block text-[10px] uppercase font-bold">{t("branchManagerMembershipSettings.applicant", "Applicant")}</span>
                   <span className="font-bold text-slate-900">{detailModal.request.member_name}</span>
                   <span className="text-[10px] text-slate-500 block font-mono">{detailModal.request.member_code}</span>
                 </div>
                 <div>
-                  <span className="text-slate-400 block text-[10px] uppercase font-bold">Contact</span>
+                  <span className="text-slate-400 block text-[10px] uppercase font-bold">{t("superAdminDashboard.contact", "Contact")}</span>
                   <span className="text-slate-700 block">{detailModal.request.member_email || '—'}</span>
                   <span className="text-slate-700 block">{detailModal.request.member_mobile || '—'}</span>
                 </div>
@@ -606,32 +609,32 @@ export default function BranchProductAccountRequestsView({
 
               <div className="grid grid-cols-2 gap-3 bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
                 <div>
-                  <span className="text-slate-400 block text-[10px] uppercase font-bold">Scheme Code</span>
+                  <span className="text-slate-400 block text-[10px] uppercase font-bold">{t("dashboardModule.productAccounts.schemeCode", "Scheme Code")}</span>
                   <span className="font-bold text-teal-800 font-mono">{detailModal.request.scheme_code}</span>
                 </div>
                 <div>
-                  <span className="text-slate-400 block text-[10px] uppercase font-bold">Product Type</span>
+                  <span className="text-slate-400 block text-[10px] uppercase font-bold">{t("branchProductAccountRequestsView.productType", "Product Type")}</span>
                   <span className="font-bold text-slate-800 uppercase">
                     {detailModal.request.product_type}
                   </span>
                 </div>
                 <div>
-                  <span className="text-slate-400 block text-[10px] uppercase font-bold">Linked Savings A/C</span>
+                  <span className="text-slate-400 block text-[10px] uppercase font-bold">{t("modal.member.linkedSavingsAc", "Linked Savings A/C")}</span>
                   <span className="font-bold text-slate-900 font-mono">#{detailModal.request.savings_account_id}</span>
                 </div>
                 <div>
-                  <span className="text-slate-400 block text-[10px] uppercase font-bold">Requested Principal</span>
+                  <span className="text-slate-400 block text-[10px] uppercase font-bold">{t("branchProductAccountRequestsView.requestedPrincipal", "Requested Principal")}</span>
                   <span className="font-bold text-slate-900">
                     {detailModal.request.requested_principal
                       ? formatCurrency(Number(detailModal.request.requested_principal))
-                      : 'Scheduled Policy'}
+                      : t("branchProductAccountRequestsView.scheduledPolicy", "Scheduled Policy")}
                   </span>
                 </div>
               </div>
 
               {detailModal.request.rejection_reason && (
                 <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-800">
-                  <span className="font-bold block text-[10px] uppercase">Rejection Reason:</span>
+                  <span className="font-bold block text-[10px] uppercase">{t("branchProductAccountRequestsView.rejectionReason", "Rejection Reason:")}</span>
                   <p className="mt-0.5">{detailModal.request.rejection_reason}</p>
                 </div>
               )}
@@ -642,7 +645,7 @@ export default function BranchProductAccountRequestsView({
                 onClick={() => setDetailModal({ isOpen: false, request: null })}
                 className="px-5 py-2.5 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800"
               >
-                Close
+                {t("common.close", "Close")}
               </button>
             </div>
           </div>

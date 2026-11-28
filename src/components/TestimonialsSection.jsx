@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+
 
 const TESTIMONIALS = [
   {
@@ -28,6 +30,7 @@ const TESTIMONIALS = [
 ];
 
 export default function TestimonialsSection() {
+  const { t } = useTranslation();
   const [activeDot, setActiveDot] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
@@ -57,10 +60,10 @@ export default function TestimonialsSection() {
         {/* Section Header matching reference */}
         <div className="text-center mb-18 sm:mb-22">
           <h2 className="text-4xl sm:text-5xl lg:text-[56px] font-serif font-bold text-slate-900 leading-[1.12] tracking-tight">
-            98% of our customers left satisfied
+            {t("testimonials.title", "What our members say about us")}
           </h2>
           <p className="text-base sm:text-lg text-slate-400 mt-2 sm:mt-3 font-normal">
-            You're in good company
+            {t("testimonials.subtitle", "Real feedback from our agricultural, business and thrift members across branches.")}
           </p>
         </div>
 

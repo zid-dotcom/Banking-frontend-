@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   X,
   UserPlus,
@@ -51,6 +52,7 @@ export default function MemberRegistrationModal({
   initialMemberCode = '',
   onRegistrationSuccess
 }) {
+  const { t } = useTranslation();
   const [mode, setMode] = useState(initialMode); // 'register' | 'reapply'
   const [branches, setBranches] = useState([]);
   const [branchesLoading, setBranchesLoading] = useState(true);
@@ -380,12 +382,12 @@ export default function MemberRegistrationModal({
               </div>
               <div className="min-w-0">
                 <h3 className="text-base sm:text-xl font-black text-slate-900 leading-tight truncate">
-                  {mode === 'register' ? 'Member Registration' : 'Reapply Membership'}
+                  {mode === 'register' ? t("memberRegistrationModal.memberRegistration", "Member Registration") : t("memberRegistrationModal.reapplyMembership", "Reapply Membership")}
                 </h3>
                 <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5 truncate">
                   {mode === 'register'
-                    ? 'AurumFX Multi State Agro Co-operative Society Limited'
-                    : 'Update and resubmit your rejected membership application'}
+                    ? t("memberRegistrationModal.aurumfxMultiStateAgroCo", "AurumFX Multi State Agro Co-operative Society Limited")
+                    : t("memberRegistrationModal.updateAndResubmitYourRejected", "Update and resubmit your rejected membership application")}
                 </p>
               </div>
             </div>
@@ -394,7 +396,7 @@ export default function MemberRegistrationModal({
             <button
               onClick={onClose}
               className="w-9 h-9 rounded-xl hover:bg-slate-200/70 text-slate-400 hover:text-slate-700 flex items-center justify-center transition-colors cursor-pointer flex-shrink-0"
-              aria-label="Close modal"
+              aria-label={t("modal.member.closeModal", "Close modal")}
             >
               <X className="w-5 h-5" />
             </button>
@@ -412,7 +414,7 @@ export default function MemberRegistrationModal({
 
               <div>
                 <h3 className="text-xl sm:text-2xl font-black text-slate-900">
-                  {mode === 'register' ? 'Registration Submitted!' : 'Reapplication Submitted!'}
+                  {mode === 'register' ? t("memberRegistrationModal.registrationSubmitted", "Registration Submitted!") : t("memberRegistrationModal.reapplicationSubmitted", "Reapplication Submitted!")}
                 </h3>
                 <p className="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
                   {successResult.message || 'Your membership form has been submitted for branch review and approval.'}
@@ -421,12 +423,12 @@ export default function MemberRegistrationModal({
 
               {successResult.member_code && (
                 <div className="bg-teal-50 border border-teal-200/80 rounded-2xl p-4 sm:p-5">
-                  <p className="text-xs font-bold text-teal-800 uppercase tracking-wider">Your Assigned Member Code</p>
+                  <p className="text-xs font-bold text-teal-800 uppercase tracking-wider">{t("memberRegistrationModal.yourAssignedMemberCode", "Your Assigned Member Code")}</p>
                   <p className="text-xl sm:text-2xl font-mono font-black text-teal-900 mt-1 select-all">
                     {successResult.member_code}
                   </p>
                   <p className="text-xs text-slate-600 mt-1 font-semibold">
-                    Status: <span className="font-extrabold text-rose-600 uppercase tracking-wide">{successResult.status || 'pending'}</span>
+                    {t("applyProductAccountModal.status", "Status:")} <span className="font-extrabold text-rose-600 uppercase tracking-wide">{successResult.status || 'pending'}</span>
                   </p>
                 </div>
               )}
@@ -434,12 +436,12 @@ export default function MemberRegistrationModal({
               {/* Red Notice Banner */}
               <div className="bg-rose-50 border border-rose-200 rounded-2xl p-3.5 text-center">
                 <p className="text-xs sm:text-sm font-bold text-rose-600 leading-snug">
-                  Please Note: Member portal login will be activated once your application is approved by the branch.
+                  {t("memberRegistrationModal.pleaseNoteMemberPortalLogin", "Please Note: Member portal login will be activated once your application is approved by the branch.")}
                 </p>
               </div>
 
               <p className="text-xs text-slate-500">
-                Please save your Member Code. You can use it along with your password to log into your Member Portal once verified.
+                {t("memberRegistrationModal.pleaseSaveYourMemberCode", "Please save your Member Code. You can use it along with your password to log into your Member Portal once verified.")}
               </p>
 
               <button
@@ -447,7 +449,7 @@ export default function MemberRegistrationModal({
                 onClick={handleFinishSuccess}
                 className="w-full h-12 bg-[#008579] hover:bg-[#007469] text-white font-bold rounded-2xl shadow-md transition-colors cursor-pointer"
               >
-                Sign In with Member Code
+                {t("memberRegistrationModal.signInWithMemberCode", "Sign In with Member Code")}
               </button>
             </div>
           ) : (
@@ -466,20 +468,20 @@ export default function MemberRegistrationModal({
               <div className="space-y-3.5">
                 <div className="flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-900 border-b border-slate-100 pb-2">
                   <UserPlus className="w-4 h-4 text-[#008f85] flex-shrink-0" />
-                  <span>1. Applicant &amp; Home Branch</span>
+                  <span>{t("memberRegistrationModal.1ApplicantHomeBranch", "1. Applicant & Home Branch")}</span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   {/* Full Name */}
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      Full Legal Name <span className="text-rose-500">*</span>
+                      {t("memberProfile.fullLegalName", "Full Legal Name")} <span className="text-rose-500">*</span>
                     </label>
                     <input
                       type="text"
                       name="full_name"
                       required
-                      placeholder="e.g. Sreejith K. Nair"
+                      placeholder={t("memberRegistrationModal.eGSreejithKNair", "e.g. Sreejith K. Nair")}
                       value={formData.full_name}
                       onChange={handleInputChange}
                       className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-[#008f85] focus:bg-white transition-all"
@@ -489,7 +491,7 @@ export default function MemberRegistrationModal({
                   {/* Branch Selection */}
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      Home Society Branch <span className="text-rose-500">*</span>
+                      {t("memberRegistrationModal.homeSocietyBranch", "Home Society Branch")} <span className="text-rose-500">*</span>
                     </label>
                     <select
                       name="branch_id"
@@ -499,7 +501,7 @@ export default function MemberRegistrationModal({
                       className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-[#008f85] focus:bg-white transition-all cursor-pointer font-medium"
                     >
                       <option value="">
-                        {branchesLoading ? 'Loading branches...' : 'Please select a branch'}
+                        {branchesLoading ? t("memberRegistrationModal.loadingBranches", "Loading branches...") : t("memberRegistrationModal.pleaseSelectABranch", "Please select a branch")}
                       </option>
                       {branches.map((b) => (
                         <option key={b.id} value={b.id}>
@@ -515,7 +517,7 @@ export default function MemberRegistrationModal({
                       {settingsLoading ? (
                         <div className="p-3.5 rounded-2xl bg-teal-50/50 border border-teal-100 flex items-center justify-center gap-2 text-xs text-teal-700 font-semibold">
                           <Loader2 className="w-4 h-4 animate-spin text-teal-600" />
-                          <span>Checking branch membership fee &amp; payment QR code...</span>
+                          <span>{t("memberRegistrationModal.checkingBranchMembershipFeePayment", "Checking branch membership fee & payment QR code...")}</span>
                         </div>
                       ) : branchSettings && branchSettings.configured ? (
                         <div className="bg-gradient-to-br from-teal-50/80 via-emerald-50/40 to-white rounded-2xl p-4 sm:p-5 border border-teal-200 shadow-2xs space-y-3">
@@ -526,7 +528,7 @@ export default function MemberRegistrationModal({
                               </div>
                               <div>
                                 <span className="text-[10px] uppercase font-bold text-teal-800 tracking-wider">
-                                  Branch Membership Enrollment Fee
+                                  {t("memberRegistrationModal.branchMembershipEnrollmentFee", "Branch Membership Enrollment Fee")}
                                 </span>
                                 <h4 className="text-lg font-black text-slate-900 leading-tight">
                                   {formatCurrency(branchSettings.membership_fee)}
@@ -535,7 +537,7 @@ export default function MemberRegistrationModal({
                             </div>
                             <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-teal-100 text-teal-800">
                               <CheckCircle2 className="w-3 h-3 text-teal-600" />
-                              <span>Mandatory Fee</span>
+                              <span>{t("memberRegistrationModal.mandatoryFee", "Mandatory Fee")}</span>
                             </span>
                           </div>
 
@@ -543,7 +545,7 @@ export default function MemberRegistrationModal({
                             {branchSettings.qr_code_url ? (
                               <img
                                 src={branchSettings.qr_code_url}
-                                alt="Branch UPI QR Code"
+                                alt={t("memberRegistrationModal.branchUpiQrCode", "Branch UPI QR Code")}
                                 className="w-32 h-32 object-contain rounded-xl border border-slate-200 p-1.5 shadow-2xs bg-white flex-shrink-0"
                                 onError={async (e) => {
                                   if (!e.target.dataset.tried) {
@@ -561,15 +563,15 @@ export default function MemberRegistrationModal({
 
                             <div className="space-y-1.5 text-xs text-slate-600 text-center sm:text-left">
                               <p className="font-bold text-slate-900">
-                                Scan &amp; Pay via UPI (GPay, PhonePe, Paytm, BHIM)
+                                {t("memberRegistrationModal.scanPayViaUpiGpay", "Scan & Pay via UPI (GPay, PhonePe, Paytm, BHIM)")}
                               </p>
                               <p className="text-[11px] leading-relaxed text-slate-500">
-                                1. Scan the QR code with any UPI app to pay the enrollment fee of{' '}
+                                {t("memberRegistrationModal.1ScanTheQrCode", "1. Scan the QR code with any UPI app to pay the enrollment fee of")}{' '}
                                 <strong className="text-teal-800 font-bold">
                                   {formatCurrency(branchSettings.membership_fee)}
                                 </strong>.<br />
-                                2. Save the transaction receipt or take a screenshot.<br />
-                                3. Upload the screenshot in <strong className="text-slate-800 font-bold">Section 5 (Required Verification Documents)</strong> below.
+                                {t("memberRegistrationModal.2SaveTheTransactionReceipt", "2. Save the transaction receipt or take a screenshot.")}<br />
+                                {t("memberRegistrationModal.3UploadTheScreenshotIn", "3. Upload the screenshot in")} <strong className="text-slate-800 font-bold">{t("memberRegistrationModal.section5RequiredVerificationDocuments", "Section 5 (Required Verification Documents)")}</strong> below.
                               </p>
                             </div>
                           </div>
@@ -578,7 +580,7 @@ export default function MemberRegistrationModal({
                         <div className="p-3 rounded-xl bg-amber-50/70 border border-amber-200/80 text-amber-800 text-xs flex items-center gap-2">
                           <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0" />
                           <span>
-                            Note: This branch has not set a mandatory enrollment fee. You can proceed with registration.
+                            {t("memberRegistrationModal.noteThisBranchHasNot", "Note: This branch has not set a mandatory enrollment fee. You can proceed with registration.")}
                           </span>
                         </div>
                       )}
@@ -589,13 +591,13 @@ export default function MemberRegistrationModal({
                   {mode === 'register' ? (
                     <div>
                       <label className="block text-xs font-semibold text-slate-700 mb-1">
-                        Email Address <span className="text-rose-500">*</span>
+                        {t("modal.member.emailAddress", "Email Address")} <span className="text-rose-500">*</span>
                       </label>
                       <input
                         type="email"
                         name="email"
                         required
-                        placeholder="member@example.com"
+                        placeholder={t("memberRegistrationModal.memberExampleCom", "member@example.com")}
                         value={formData.email}
                         onChange={handleInputChange}
                         className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-[#008f85] focus:bg-white transition-all"
@@ -604,13 +606,13 @@ export default function MemberRegistrationModal({
                   ) : (
                     <div>
                       <label className="block text-xs font-semibold text-slate-700 mb-1">
-                        Existing Member Code <span className="text-rose-500">*</span>
+                        {t("memberRegistrationModal.existingMemberCode", "Existing Member Code")} <span className="text-rose-500">*</span>
                       </label>
                       <input
                         type="text"
                         name="member_code"
                         required
-                        placeholder="e.g. 2026-MEM-001"
+                        placeholder={t("memberRegistrationModal.eG2026Mem001", "e.g. 2026-MEM-001")}
                         value={formData.member_code}
                         onChange={handleInputChange}
                         className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-[#008f85] focus:bg-white transition-all font-mono"
@@ -621,13 +623,13 @@ export default function MemberRegistrationModal({
                   {/* Mobile Number */}
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      Mobile Contact Number <span className="text-rose-500">*</span>
+                      {t("memberRegistrationModal.mobileContactNumber", "Mobile Contact Number")} <span className="text-rose-500">*</span>
                     </label>
                     <input
                       type="tel"
                       name="mobile"
                       required
-                      placeholder="+91 98460 XXXXX"
+                      placeholder={t("memberRegistrationModal.9198460Xxxxx", "+91 98460 XXXXX")}
                       value={formData.mobile}
                       onChange={handleInputChange}
                       className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-[#008f85] focus:bg-white transition-all"
@@ -637,7 +639,7 @@ export default function MemberRegistrationModal({
                   {/* Date of Birth */}
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      Date of Birth <span className="text-rose-500">*</span>
+                      {t("modal.member.dateOfBirth", "Date of Birth")} <span className="text-rose-500">*</span>
                     </label>
                     <input
                       type="date"
@@ -652,7 +654,7 @@ export default function MemberRegistrationModal({
                   {/* Gender */}
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      Gender <span className="text-rose-500">*</span>
+                      {t("modal.member.gender", "Gender")} <span className="text-rose-500">*</span>
                     </label>
                     <select
                       name="gender"
@@ -661,10 +663,10 @@ export default function MemberRegistrationModal({
                       onChange={handleInputChange}
                       className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-[#008f85] focus:bg-white transition-all cursor-pointer"
                     >
-                      <option value="">Select Gender</option>
-                      <option value="Male">Male</option>
-                      <option value="Female">Female</option>
-                      <option value="Other">Other</option>
+                      <option value="">{t("memberRegistrationModal.selectGender", "Select Gender")}</option>
+                      <option value="Male">{t("memberRegistrationModal.male", "Male")}</option>
+                      <option value="Female">{t("memberRegistrationModal.female", "Female")}</option>
+                      <option value="Other">{t("memberRegistrationModal.other", "Other")}</option>
                     </select>
                   </div>
                 </div>
@@ -674,14 +676,14 @@ export default function MemberRegistrationModal({
               <div className="space-y-3.5">
                 <div className="flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-900 border-b border-slate-100 pb-2">
                   <Lock className="w-4 h-4 text-[#008f85] flex-shrink-0" />
-                  <span>2. Portal Login Security</span>
+                  <span>{t("memberRegistrationModal.2PortalLoginSecurity", "2. Portal Login Security")}</span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   {/* Set Password */}
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      Set Password <span className="text-rose-500">*</span>
+                      {t("memberRegistrationModal.setPassword", "Set Password")} <span className="text-rose-500">*</span>
                     </label>
                     <div className="relative">
                       <input
@@ -697,7 +699,7 @@ export default function MemberRegistrationModal({
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
-                        aria-label={showPassword ? 'Hide password' : 'Show password'}
+                        aria-label={showPassword ? t("login.branchAdmin.hidePassword", "Hide password") : t("login.branchAdmin.showPassword", "Show password")}
                       >
                         {showPassword ? (
                           <Eye className="w-4 h-4 text-[#008f85]" />
@@ -712,7 +714,7 @@ export default function MemberRegistrationModal({
                   {mode === 'register' && (
                     <div>
                       <label className="block text-xs font-semibold text-slate-700 mb-1">
-                        Confirm Password <span className="text-rose-500">*</span>
+                        {t("branchManagerMemberPasswordUpdate.confirmPassword", "Confirm Password")} <span className="text-rose-500">*</span>
                       </label>
                       <div className="relative">
                         <input
@@ -728,7 +730,7 @@ export default function MemberRegistrationModal({
                           type="button"
                           onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                           className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
-                          aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                          aria-label={showConfirmPassword ? t("login.branchAdmin.hidePassword", "Hide password") : t("login.branchAdmin.showPassword", "Show password")}
                         >
                           {showConfirmPassword ? (
                             <Eye className="w-4 h-4 text-[#008f85]" />
@@ -742,11 +744,12 @@ export default function MemberRegistrationModal({
 
                   {/* Strong Password Live Guidance (Member Side) */}
                   {Boolean(formData.password) && (() => {
+  const { t } = useTranslation();
                     const validation = validateStrongPassword(formData.password);
                     return (
                       <div className="sm:col-span-2 p-3 bg-slate-50 border border-slate-200/90 rounded-2xl space-y-2">
                         <div className="flex items-center justify-between text-xs">
-                          <span className="font-semibold text-slate-600">Password Strength:</span>
+                          <span className="font-semibold text-slate-600">{t("dashboardModule.passwordUpdate.passwordStrength", "Password Strength:")}</span>
                           <span
                             className={`font-black uppercase tracking-wider text-[11px] ${
                               validation.score <= 2
@@ -790,7 +793,7 @@ export default function MemberRegistrationModal({
                                 validation.hasMinLength ? 'text-emerald-600 stroke-[3]' : 'opacity-30'
                               }`}
                             />
-                            <span>At least 8 chars</span>
+                            <span>{t("memberRegistrationModal.atLeast8Chars", "At least 8 chars")}</span>
                           </span>
 
                           <span
@@ -803,7 +806,7 @@ export default function MemberRegistrationModal({
                                 validation.hasUppercase ? 'text-emerald-600 stroke-[3]' : 'opacity-30'
                               }`}
                             />
-                            <span>Uppercase (A-Z)</span>
+                            <span>{t("dashboardModule.passwordUpdate.ruleUppercase", "Uppercase (A-Z)")}</span>
                           </span>
 
                           <span
@@ -816,7 +819,7 @@ export default function MemberRegistrationModal({
                                 validation.hasLowercase ? 'text-emerald-600 stroke-[3]' : 'opacity-30'
                               }`}
                             />
-                            <span>Lowercase (a-z)</span>
+                            <span>{t("dashboardModule.passwordUpdate.ruleLowercase", "Lowercase (a-z)")}</span>
                           </span>
 
                           <span
@@ -829,7 +832,7 @@ export default function MemberRegistrationModal({
                                 validation.hasNumber ? 'text-emerald-600 stroke-[3]' : 'opacity-30'
                               }`}
                             />
-                            <span>Number (0-9)</span>
+                            <span>{t("dashboardModule.passwordUpdate.ruleNumber", "Number (0-9)")}</span>
                           </span>
 
                           <span
@@ -842,7 +845,7 @@ export default function MemberRegistrationModal({
                                 validation.hasSpecial ? 'text-emerald-600 stroke-[3]' : 'opacity-30'
                               }`}
                             />
-                            <span>Symbol (!@#$...)</span>
+                            <span>{t("dashboardModule.passwordUpdate.ruleSymbol", "Symbol (!@#$...)")}</span>
                           </span>
                         </div>
                       </div>
@@ -855,13 +858,13 @@ export default function MemberRegistrationModal({
               <div className="space-y-3.5">
                 <div className="flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-900 border-b border-slate-100 pb-2">
                   <MapPin className="w-4 h-4 text-[#008f85] flex-shrink-0" />
-                  <span>3. Residential Address</span>
+                  <span>{t("memberRegistrationModal.3ResidentialAddress", "3. Residential Address")}</span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      Building / House No <span className="text-rose-500">*</span>
+                      {t("memberProfile.buildingHouseNo", "Building / House No")} <span className="text-rose-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -876,13 +879,13 @@ export default function MemberRegistrationModal({
 
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      Street / Locality <span className="text-rose-500">*</span>
+                      {t("memberRegistrationModal.streetLocality", "Street / Locality")} <span className="text-rose-500">*</span>
                     </label>
                     <input
                       type="text"
                       name="street"
                       required
-                      placeholder="e.g. Temple Road"
+                      placeholder={t("memberRegistrationModal.eGTempleRoad", "e.g. Temple Road")}
                       value={formData.street}
                       onChange={handleInputChange}
                       className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-[#008f85] focus:bg-white transition-all"
@@ -891,13 +894,13 @@ export default function MemberRegistrationModal({
 
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      City / Village <span className="text-rose-500">*</span>
+                      {t("memberRegistrationModal.cityVillage", "City / Village")} <span className="text-rose-500">*</span>
                     </label>
                     <input
                       type="text"
                       name="city"
                       required
-                      placeholder="e.g. Kozhikode"
+                      placeholder={t("branchModals.eGKozhikode", "e.g. Kozhikode")}
                       value={formData.city}
                       onChange={handleInputChange}
                       className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-[#008f85] focus:bg-white transition-all"
@@ -906,13 +909,13 @@ export default function MemberRegistrationModal({
 
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      District <span className="text-rose-500">*</span>
+                      {t("memberProfile.district", "District")} <span className="text-rose-500">*</span>
                     </label>
                     <input
                       type="text"
                       name="district"
                       required
-                      placeholder="e.g. Kozhikode"
+                      placeholder={t("branchModals.eGKozhikode", "e.g. Kozhikode")}
                       value={formData.district}
                       onChange={handleInputChange}
                       className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-[#008f85] focus:bg-white transition-all"
@@ -921,7 +924,7 @@ export default function MemberRegistrationModal({
 
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      State <span className="text-rose-500">*</span>
+                      {t("memberProfile.state", "State")} <span className="text-rose-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -935,7 +938,7 @@ export default function MemberRegistrationModal({
 
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      PIN Code <span className="text-rose-500">*</span>
+                      {t("memberRegistrationModal.pinCode", "PIN Code")} <span className="text-rose-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -950,13 +953,13 @@ export default function MemberRegistrationModal({
 
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      Country <span className="text-rose-500">*</span>
+                      {t("memberProfile.country", "Country")} <span className="text-rose-500">*</span>
                     </label>
                     <input
                       type="text"
                       name="country"
                       required
-                      placeholder="e.g. India"
+                      placeholder={t("memberRegistrationModal.eGIndia", "e.g. India")}
                       value={formData.country}
                       onChange={handleInputChange}
                       className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-[#008f85] focus:bg-white transition-all"
@@ -969,20 +972,20 @@ export default function MemberRegistrationModal({
               <div className="space-y-3.5">
                 <div className="flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-900 border-b border-slate-100 pb-2">
                   <CreditCard className="w-4 h-4 text-[#008f85] flex-shrink-0" />
-                  <span>4. Identity (KYC) &amp; Bank Account</span>
+                  <span>{t("memberRegistrationModal.4IdentityKycBankAccount", "4. Identity (KYC) & Bank Account")}</span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      Aadhaar Card Number <span className="text-rose-500">*</span>
+                      {t("modal.member.aadhaarNumber", "Aadhaar Card Number")} <span className="text-rose-500">*</span>
                     </label>
                     <input
                       type="text"
                       name="aadhaar_number"
                       required
                       maxLength={14}
-                      placeholder="12 digit Aadhaar number"
+                      placeholder={t("memberRegistrationModal.12DigitAadhaarNumber", "12 digit Aadhaar number")}
                       value={formData.aadhaar_number}
                       onChange={handleInputChange}
                       className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-[#008f85] focus:bg-white transition-all font-mono"
@@ -991,13 +994,13 @@ export default function MemberRegistrationModal({
 
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      PAN Card Number <span className="text-slate-400 font-normal">(Optional)</span>
+                      {t("memberRegistrationModal.panCardNumber", "PAN Card Number")} <span className="text-slate-400 font-normal">{t("accountantCashReconciliationView.optional", "(Optional)")}</span>
                     </label>
                     <input
                       type="text"
                       name="pan_number"
                       maxLength={10}
-                      placeholder="10 digit PAN (optional)"
+                      placeholder={t("memberRegistrationModal.10DigitPanOptional", "10 digit PAN (optional)")}
                       value={formData.pan_number}
                       onChange={(e) => setFormData(prev => ({ ...prev, pan_number: e.target.value.toUpperCase() }))}
                       className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-[#008f85] focus:bg-white transition-all font-mono uppercase"
@@ -1006,13 +1009,13 @@ export default function MemberRegistrationModal({
 
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      Assisting Agent Referral Code <span className="text-slate-400 font-normal">(Optional)</span>
+                      {t("memberRegistrationModal.assistingAgentReferralCode", "Assisting Agent Referral Code")} <span className="text-slate-400 font-normal">{t("accountantCashReconciliationView.optional", "(Optional)")}</span>
                     </label>
                     <div className="relative">
                       <input
                         type="text"
                         name="agent_code"
-                        placeholder="e.g. MAP001 (if assisted)"
+                        placeholder={t("memberRegistrationModal.eGMap001IfAssisted", "e.g. MAP001 (if assisted)")}
                         value={formData.agent_code}
                         onChange={(e) => setFormData(prev => ({ ...prev, agent_code: e.target.value.toUpperCase() }))}
                         className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-[#008f85] focus:bg-white transition-all font-mono uppercase"
@@ -1026,7 +1029,7 @@ export default function MemberRegistrationModal({
                     {agentLookup.name && (
                       <p className="text-xs font-bold text-emerald-600 mt-1.5 flex items-center gap-1.5 animate-fadeIn">
                         <Check className="w-3.5 h-3.5 stroke-[3] text-emerald-600" />
-                        <span>Enroller: {agentLookup.name}</span>
+                        <span>{t("memberRegistrationModal.enroller", "Enroller:")} {agentLookup.name}</span>
                       </p>
                     )}
                     {agentLookup.error && (
@@ -1038,13 +1041,13 @@ export default function MemberRegistrationModal({
 
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      Bank Account Holder Name <span className="text-rose-500">*</span>
+                      {t("memberProfile.bankAccountHolderName", "Bank Account Holder Name")} <span className="text-rose-500">*</span>
                     </label>
                     <input
                       type="text"
                       name="bank_holder_name"
                       required
-                      placeholder="As per bank passbook"
+                      placeholder={t("memberRegistrationModal.asPerBankPassbook", "As per bank passbook")}
                       value={formData.bank_holder_name}
                       onChange={handleInputChange}
                       className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-[#008f85] focus:bg-white transition-all"
@@ -1053,13 +1056,13 @@ export default function MemberRegistrationModal({
 
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      Bank Account Number <span className="text-rose-500">*</span>
+                      {t("modal.member.bankAccountNumber", "Bank Account Number")} <span className="text-rose-500">*</span>
                     </label>
                     <input
                       type="text"
                       name="bank_account_number"
                       required
-                      placeholder="Enter account number"
+                      placeholder={t("memberRegistrationModal.enterAccountNumber", "Enter account number")}
                       value={formData.bank_account_number}
                       onChange={handleInputChange}
                       className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-[#008f85] focus:bg-white transition-all font-mono"
@@ -1068,13 +1071,13 @@ export default function MemberRegistrationModal({
 
                   <div className="sm:col-span-2">
                     <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      Bank IFSC Code <span className="text-rose-500">*</span>
+                      {t("memberProfile.bankIfscCode", "Bank IFSC Code")} <span className="text-rose-500">*</span>
                     </label>
                     <input
                       type="text"
                       name="ifsc_code"
                       required
-                      placeholder="e.g. SBIN0001234"
+                      placeholder={t("memberRegistrationModal.eGSbin0001234", "e.g. SBIN0001234")}
                       value={formData.ifsc_code}
                       onChange={(e) => setFormData(prev => ({ ...prev, ifsc_code: e.target.value.toUpperCase() }))}
                       className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-[#008f85] focus:bg-white transition-all font-mono uppercase"
@@ -1087,43 +1090,44 @@ export default function MemberRegistrationModal({
               <div className="space-y-3.5">
                 <div className="flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-900 border-b border-slate-100 pb-2">
                   <Upload className="w-4 h-4 text-[#008f85] flex-shrink-0" />
-                  <span>5. Upload Verification Documents &amp; Payment Screenshot</span>
+                  <span>{t("memberRegistrationModal.5UploadVerificationDocumentsPayment", "5. Upload Verification Documents & Payment Screenshot")}</span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   {[
                     {
                       key: 'payment_screenshot',
-                      label: 'Membership Fee Payment Screenshot / UPI Receipt',
+                      label: t("memberRegistrationModal.membershipFeePaymentScreenshotUpi", "Membership Fee Payment Screenshot / UPI Receipt"),
                       desc: 'Screenshot of UPI / Bank transfer to the branch QR code',
                       required: mode === 'register',
                       highlight: true,
                     },
                     {
                       key: 'aadhaar_front',
-                      label: 'Aadhaar Card (Front Side)',
+                      label: t("memberNominee.aadhaarCardFrontSide", "Aadhaar Card (Front Side)"),
                       desc: 'Clear photo or PDF',
                       required: true,
                     },
                     {
                       key: 'aadhaar_back',
-                      label: 'Aadhaar Card (Back Side)',
+                      label: t("memberNominee.aadhaarCardBackSide", "Aadhaar Card (Back Side)"),
                       desc: 'Address side photo or PDF',
                       required: true,
                     },
                     {
                       key: 'passbook_image',
-                      label: 'Bank Passbook / Cheque',
+                      label: t("modal.member.docPassbook", "Bank Passbook / Cheque"),
                       desc: 'Validates bank account details',
                       required: true,
                     },
                     {
                       key: 'pan_image',
-                      label: 'PAN Card Copy (Optional)',
+                      label: t("memberRegistrationModal.panCardCopyOptional", "PAN Card Copy (Optional)"),
                       desc: 'Front identity side',
                       required: false,
                     },
                   ].map((doc) => {
+  const { t } = useTranslation();
                     const selected = files[doc.key];
                     return (
                       <div
@@ -1140,11 +1144,11 @@ export default function MemberRegistrationModal({
                       >
                         <div className="flex items-center justify-between mb-1.5">
                           <label className="text-xs font-bold text-slate-800">
-                            {doc.label} {doc.required ? <span className="text-rose-500">*</span> : <span className="text-slate-400 font-normal text-[10px]">(Optional)</span>}
+                            {doc.label} {doc.required ? <span className="text-rose-500">*</span> : <span className="text-slate-400 font-normal text-[10px]">{t("accountantCashReconciliationView.optional", "(Optional)")}</span>}
                           </label>
                           {selected && (
                             <span className="text-[10px] text-emerald-700 font-bold flex items-center gap-1">
-                              <CheckCircle2 className="w-3 h-3" /> Selected
+                              <CheckCircle2 className="w-3 h-3" /> {t("dashboardModule.productAccounts.selected", "Selected")}
                             </span>
                           )}
                         </div>
@@ -1153,7 +1157,7 @@ export default function MemberRegistrationModal({
                         <label className="flex items-center justify-center gap-2 w-full py-2 px-3 bg-white border border-slate-200 hover:border-[#008f85] rounded-xl text-xs font-bold text-slate-700 cursor-pointer transition-colors shadow-2xs">
                           <Upload className="w-3.5 h-3.5 text-[#008f85] flex-shrink-0" />
                           <span className="truncate max-w-[240px] sm:max-w-[340px]">
-                            {selected ? selected.name : 'Choose File'}
+                            {selected ? selected.name : t("memberRegistrationModal.chooseFile", "Choose File")}
                           </span>
                           <input
                             type="file"
@@ -1176,7 +1180,7 @@ export default function MemberRegistrationModal({
                   onClick={onClose}
                   className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 text-xs sm:text-sm font-semibold transition-colors cursor-pointer text-center"
                 >
-                  Cancel
+                  {t("common.cancel", "Cancel")}
                 </button>
                 <button
                   type="submit"
@@ -1186,11 +1190,11 @@ export default function MemberRegistrationModal({
                   {isSubmitting ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Submitting Application...</span>
+                      <span>{t("memberRegistrationModal.submittingApplication", "Submitting Application...")}</span>
                     </>
                   ) : (
                     <span>
-                      {mode === 'register' ? 'Submit Registration' : 'Submit Reapplication'}
+                      {mode === 'register' ? t("memberRegistrationModal.submitRegistration", "Submit Registration") : t("memberRegistrationModal.submitReapplication", "Submit Reapplication")}
                     </span>
                   )}
                 </button>
@@ -1212,7 +1216,7 @@ export default function MemberRegistrationModal({
 
             <div>
               <h3 className="text-xl font-black text-slate-900 tracking-tight">
-                Submission Error
+                {t("modal.branchAdmin.submissionError", "Submission Error")}
               </h3>
               <p className="text-xs sm:text-sm text-rose-900 mt-2.5 leading-relaxed bg-rose-50/70 p-4 rounded-2xl border border-rose-200/80 font-medium break-words text-left">
                 {errorPopup}
@@ -1225,7 +1229,7 @@ export default function MemberRegistrationModal({
                 onClick={() => setErrorPopup(null)}
                 className="w-full h-11 px-5 bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 text-white font-bold text-sm rounded-xl shadow-md transition-all cursor-pointer"
               >
-                Okay, Got It
+                {t("modal.branchAdmin.okayGotIt", "Okay, Got It")}
               </button>
             </div>
           </div>
@@ -1242,7 +1246,7 @@ export default function MemberRegistrationModal({
 
             <div>
               <h3 className="text-xl sm:text-2xl font-black text-slate-900">
-                {mode === 'register' ? 'Registration Successful!' : 'Reapplication Successful!'}
+                {mode === 'register' ? t("memberRegistrationModal.registrationSuccessful", "Registration Successful!") : t("memberRegistrationModal.reapplicationSuccessful", "Reapplication Successful!")}
               </h3>
               <p className="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
                 {successPopup.message || 'Your membership application has been submitted successfully for verification.'}
@@ -1251,7 +1255,7 @@ export default function MemberRegistrationModal({
 
             {successPopup.member_code && (
               <div className="bg-gradient-to-br from-teal-50 to-emerald-50 border border-teal-200/80 rounded-2xl p-4 sm:p-5">
-                <p className="text-[11px] font-bold text-teal-800 uppercase tracking-wider">Your Assigned Member Code</p>
+                <p className="text-[11px] font-bold text-teal-800 uppercase tracking-wider">{t("memberRegistrationModal.yourAssignedMemberCode", "Your Assigned Member Code")}</p>
                 <div className="mt-1.5 flex items-center justify-center gap-2">
                   <span className="text-2xl sm:text-3xl font-mono font-black text-teal-950 select-all tracking-tight">
                     {successPopup.member_code}
@@ -1260,24 +1264,24 @@ export default function MemberRegistrationModal({
                     type="button"
                     onClick={() => handleCopyCode(successPopup.member_code)}
                     className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-white hover:bg-teal-50 text-teal-700 hover:text-teal-900 border border-teal-200 shadow-2xs hover:shadow-xs transition-all cursor-pointer active:scale-95 text-xs font-bold"
-                    title={copiedCode ? 'Copied to clipboard!' : 'Copy Member Code'}
-                    aria-label="Copy Member Code"
+                    title={copiedCode ? t("memberRegistrationModal.copiedToClipboard", "Copied to clipboard!") : t("memberRegistrationModal.copyMemberCode", "Copy Member Code")}
+                    aria-label={t("memberRegistrationModal.copyMemberCode", "Copy Member Code")}
                   >
                     {copiedCode ? (
                       <>
                         <Check className="w-3.5 h-3.5 text-emerald-600 stroke-[2.5]" />
-                        <span className="text-emerald-700 text-[11px]">Copied!</span>
+                        <span className="text-emerald-700 text-[11px]">{t("memberRegistrationModal.copied", "Copied!")}</span>
                       </>
                     ) : (
                       <>
                         <Copy className="w-3.5 h-3.5 text-teal-700 stroke-[2]" />
-                        <span className="text-teal-800 text-[11px]">Copy</span>
+                        <span className="text-teal-800 text-[11px]">{t("memberRegistrationModal.copy", "Copy")}</span>
                       </>
                     )}
                   </button>
                 </div>
                 <p className="text-xs text-slate-600 mt-1.5 font-semibold">
-                  Status: <span className="font-extrabold text-rose-600 uppercase tracking-wide">{successPopup.status || 'pending'}</span>
+                  {t("applyProductAccountModal.status", "Status:")} <span className="font-extrabold text-rose-600 uppercase tracking-wide">{successPopup.status || 'pending'}</span>
                 </p>
               </div>
             )}
@@ -1288,7 +1292,7 @@ export default function MemberRegistrationModal({
               <div className="bg-amber-50/80 border border-amber-200/80 rounded-2xl p-3 sm:p-3.5 flex items-start gap-2.5">
                 <AlertCircle className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
                 <p className="text-xs font-medium text-amber-900 leading-relaxed">
-                  <span className="font-bold text-amber-950">Account Activation:</span> Member portal access will be enabled once your application is formally verified and approved by the branch administration.
+                  <span className="font-bold text-amber-950">{t("memberRegistrationModal.accountActivation", "Account Activation:")}</span> {t("memberRegistrationModal.memberPortalAccessWillBe", "Member portal access will be enabled once your application is formally verified and approved by the branch administration.")}
                 </p>
               </div>
 
@@ -1296,13 +1300,13 @@ export default function MemberRegistrationModal({
               <div className="bg-sky-50/80 border border-sky-200/80 rounded-2xl p-3 sm:p-3.5 flex items-start gap-2.5">
                 <Mail className="w-4 h-4 text-sky-600 mt-0.5 flex-shrink-0" />
                 <p className="text-xs font-medium text-sky-900 leading-relaxed">
-                  <span className="font-bold text-sky-950">Email Notification:</span> You will receive an official notification regarding your application status (approved or rejected) directly at your registered email address once reviewed.
+                  <span className="font-bold text-sky-950">{t("memberRegistrationModal.emailNotification", "Email Notification:")}</span> {t("memberRegistrationModal.youWillReceiveAnOfficial", "You will receive an official notification regarding your application status (approved or rejected) directly at your registered email address once reviewed.")}
                 </p>
               </div>
             </div>
 
             <p className="text-xs text-slate-500 leading-snug">
-              Please save your Member Code. You can use it to log into your Member Portal once verified by the society.
+              {t("memberRegistrationModal.pleaseSaveYourMemberCode2", "Please save your Member Code. You can use it to log into your Member Portal once verified by the society.")}
             </p>
 
             <div className="pt-2">
@@ -1314,7 +1318,7 @@ export default function MemberRegistrationModal({
                 }}
                 className="w-full h-12 bg-gradient-to-r from-[#008f85] to-[#007469] hover:from-[#007b72] hover:to-[#006057] text-white font-bold text-sm sm:text-base rounded-2xl shadow-md transition-all cursor-pointer"
               >
-                Proceed to Sign In
+                {t("memberRegistrationModal.proceedToSignIn", "Proceed to Sign In")}
               </button>
             </div>
           </div>

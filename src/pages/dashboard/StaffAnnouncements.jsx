@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import StatCard from '../../components/dashboard/StatCard';
 import { AnnouncementDetailModal } from '../../components/dashboard/AnnouncementModals';
@@ -41,6 +42,7 @@ function formatDateTime(isoString) {
 }
 
 export default function StaffAnnouncements() {
+  const { t } = useTranslation();
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -136,7 +138,7 @@ export default function StaffAnnouncements() {
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/80 border border-teal-200/60 shadow-2xs text-xs font-semibold text-teal-800 mb-3 flex-wrap">
               <span className="flex items-center gap-1.5 text-teal-900 font-bold">
                 <Users className="w-3.5 h-3.5 text-[#00b4a7]" />
-                Role: {staffRoleTitle}
+                {t("dashboardModule.monthlyTargets.roleLabel", "Role:")} {staffRoleTitle}
               </span>
               <span className="text-teal-300 hidden sm:inline">•</span>
               <span className="text-slate-600">
@@ -145,7 +147,7 @@ export default function StaffAnnouncements() {
               <span className="text-teal-300 hidden sm:inline">•</span>
               <span className="inline-flex items-center gap-1 font-bold text-emerald-700">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                Live Desk Feed
+                {t("staffAnnouncements.liveDeskFeed", "Live Desk Feed")}
               </span>
             </div>
 
@@ -153,12 +155,12 @@ export default function StaffAnnouncements() {
             <div className="flex items-center gap-3">
               <span className="w-1.5 h-8 sm:h-9 bg-[#00b4a7] rounded-full flex-shrink-0" />
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0f2e2e] tracking-tight">
-                Staff Circulars & Notices
+                {t("staffAnnouncements.staffCircularsNotices", "Staff Circulars & Notices")}
               </h1>
             </div>
 
             <p className="text-slate-600 text-xs sm:text-sm mt-2.5 font-medium leading-relaxed max-w-xl">
-              Official operational guidelines, regulatory circulars, and departmental directives targeted to your assigned staff role across all branch desks.
+              {t("staffAnnouncements.officialOperationalGuidelinesRegulatoryCirculars", "Official operational guidelines, regulatory circulars, and departmental directives targeted to your assigned staff role across all branch desks.")}
             </p>
           </div>
 
@@ -166,7 +168,7 @@ export default function StaffAnnouncements() {
           <div className="relative z-10 flex justify-center md:justify-end pointer-events-none -my-2 sm:-my-5 lg:-my-6 flex-shrink-0">
             <img
               src={noticeIllustration}
-              alt="Notice Collection"
+              alt={t("staffAnnouncements.noticeCollection", "Notice Collection")}
               className="h-36 sm:h-48 lg:h-56 w-auto object-contain drop-shadow-md select-none pointer-events-none"
             />
           </div>
@@ -180,7 +182,7 @@ export default function StaffAnnouncements() {
         {/* 3 Summary Stat Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
           <StatCard
-            title="Total Role Notices"
+            title={t("staffAnnouncements.totalRoleNotices", "Total Role Notices")}
             value={totalCount}
             subtitle={`Targeted to ${staffRoleTitle}`}
             icon={Megaphone}
@@ -188,16 +190,16 @@ export default function StaffAnnouncements() {
             trendType="up"
           />
           <StatCard
-            title="Active Directives"
+            title={t("dashboardModule.monthlyTargets.activeDirectives", "Active Directives")}
             value={activeCount}
-            subtitle="Currently In Effect"
+            subtitle={t("staffAnnouncements.currentlyInEffect", "Currently In Effect")}
             icon={CheckCircle2}
             badge="Verified Directives"
           />
           <StatCard
-            title="Broadcast Channel"
+            title={t("staffAnnouncements.broadcastChannel", "Broadcast Channel")}
             value="Super Admin Feed"
-            subtitle="Central Apex Authority"
+            subtitle={t("staffAnnouncements.centralApexAuthority", "Central Apex Authority")}
             icon={Bell}
             trend="Instant Updates"
             trendType="up"
@@ -214,11 +216,11 @@ export default function StaffAnnouncements() {
                   <Megaphone className="w-4 h-4 text-[#00b4a7]" />
                 </div>
                 <h3 className="font-serif font-bold text-slate-900 text-lg">
-                  Staff Role Noticeboard
+                  {t("staffAnnouncements.staffRoleNoticeboard", "Staff Role Noticeboard")}
                 </h3>
               </div>
               <p className="text-xs text-slate-500 font-medium mt-0.5">
-                Notices broadcasted to your department &amp; assigned role
+                {t("staffAnnouncements.noticesBroadcastedToYourDepartment", "Notices broadcasted to your department & assigned role")}
               </p>
             </div>
 
@@ -228,7 +230,7 @@ export default function StaffAnnouncements() {
                 <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
                   type="text"
-                  placeholder="Search notices by title or content..."
+                  placeholder={t("dashboardModule.announcements.searchPlaceholder", "Search notices by title or content...")}
                   value={searchQuery}
                   onChange={(e) => {
                     setSearchQuery(e.target.value);
@@ -252,7 +254,7 @@ export default function StaffAnnouncements() {
               <button
                 onClick={() => fetchAnnouncements(true)}
                 disabled={refreshing}
-                title="Refresh announcements"
+                title={t("dashboardModule.announcements.refreshTooltip", "Refresh announcements")}
                 className="p-2 border border-slate-200 rounded-xl hover:bg-slate-50 text-slate-600 transition-colors disabled:opacity-50 cursor-pointer"
               >
                 <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin text-teal-600' : ''}`} />
@@ -266,7 +268,7 @@ export default function StaffAnnouncements() {
               <div className="flex items-start gap-2.5">
                 <AlertCircle className="w-5 h-5 flex-shrink-0 text-red-600 mt-0.5" />
                 <div>
-                  <p className="text-sm font-bold text-red-900">Failed to load staff announcements</p>
+                  <p className="text-sm font-bold text-red-900">{t("staffAnnouncements.failedToLoadStaffAnnouncements", "Failed to load staff announcements")}</p>
                   <p className="text-xs text-red-700 mt-0.5">{error}</p>
                 </div>
               </div>
@@ -274,7 +276,7 @@ export default function StaffAnnouncements() {
                 onClick={() => fetchAnnouncements()}
                 className="text-xs font-bold text-red-700 hover:text-red-900 underline cursor-pointer flex-shrink-0"
               >
-                Retry
+                {t("common.retry", "Retry")}
               </button>
             </div>
           )}
@@ -284,7 +286,7 @@ export default function StaffAnnouncements() {
             {loading ? (
               <div className="py-20 text-center space-y-3">
                 <div className="w-10 h-10 border-3 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto" />
-                <p className="text-sm text-slate-500 font-medium">Checking notice registry for your staff role...</p>
+                <p className="text-sm text-slate-500 font-medium">{t("staffAnnouncements.checkingNoticeRegistryForYour", "Checking notice registry for your staff role...")}</p>
               </div>
             ) : filteredAnnouncements.length === 0 ? (
               <div className="py-20 text-center space-y-4 max-w-sm mx-auto p-4">
@@ -293,11 +295,11 @@ export default function StaffAnnouncements() {
                 </div>
                 <div>
                   <p className="text-base font-bold text-slate-800">
-                    {searchQuery ? 'No matching announcements found' : 'No announcements logged for your role'}
+                    {searchQuery ? t("dashboardModule.announcements.noMatchingTitle", "No matching announcements found") : t("staffAnnouncements.noAnnouncementsLoggedForYour", "No announcements logged for your role")}
                   </p>
                   <p className="text-xs text-slate-500 mt-1 font-medium leading-relaxed">
                     {searchQuery
-                      ? 'Try modifying your search term or clear the filter.'
+                      ? t("staffAnnouncements.tryModifyingYourSearchTerm", "Try modifying your search term or clear the filter.")
                       : `When Superadmin issues notices targeted to ${staffRoleTitle}, they will immediately appear on this desk.`}
                   </p>
                 </div>
@@ -306,15 +308,16 @@ export default function StaffAnnouncements() {
               <table className="w-full text-left border-collapse min-w-[700px]">
                 <thead>
                   <tr className="border-b border-slate-100 bg-slate-50/75 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                    <th className="py-3.5 px-6">Notice Title</th>
-                    <th className="py-3.5 px-6">Circular Preview</th>
-                    <th className="py-3.5 px-6">Published At</th>
-                    <th className="py-3.5 px-6 text-center">Status</th>
-                    <th className="py-3.5 px-6 text-right">Action</th>
+                    <th className="py-3.5 px-6">{t("staffAnnouncements.noticeTitle", "Notice Title")}</th>
+                    <th className="py-3.5 px-6">{t("staffAnnouncements.circularPreview", "Circular Preview")}</th>
+                    <th className="py-3.5 px-6">{t("staffAnnouncements.publishedAt", "Published At")}</th>
+                    <th className="py-3.5 px-6 text-center">{t("common.status", "Status")}</th>
+                    <th className="py-3.5 px-6 text-right">{t("dashboardModule.branchOverview.colAction", "Action")}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-sm">
                   {paginatedAnnouncements.map((item) => {
+  const { t } = useTranslation();
                     const isActive = item.is_active !== false;
 
                     return (
@@ -367,7 +370,7 @@ export default function StaffAnnouncements() {
                                 isActive ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'
                               }`}
                             />
-                            {isActive ? 'Active' : 'Archived'}
+                            {isActive ? t("common.active", "Active") : t("dashboardModule.announcements.statusArchived", "Archived")}
                           </span>
                         </td>
 
@@ -378,7 +381,7 @@ export default function StaffAnnouncements() {
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200/80 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-2xs hover:shadow-xs active:scale-95"
                           >
                             <Eye className="w-3.5 h-3.5 text-teal-600" />
-                            <span>Read Notice</span>
+                            <span>{t("dashboardModule.announcements.readNotice", "Read Notice")}</span>
                           </button>
                         </td>
                       </tr>
@@ -392,8 +395,8 @@ export default function StaffAnnouncements() {
             {!loading && filteredAnnouncements.length > itemsPerPage && (
               <div className="px-6 py-4 border-t border-slate-100 flex items-center justify-between">
                 <span className="text-xs text-slate-500 font-medium">
-                  Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
-                  {Math.min(currentPage * itemsPerPage, filteredAnnouncements.length)} of {filteredAnnouncements.length} notices
+                  {t("common.showing", "Showing")} {(currentPage - 1) * itemsPerPage + 1} {t("common.to", "to")}{' '}
+                  {Math.min(currentPage * itemsPerPage, filteredAnnouncements.length)} {t("common.of", "of")} {filteredAnnouncements.length} {t("dashboardModule.announcements.noticesUnit", "notices")}
                 </span>
                 <div className="flex items-center gap-2">
                   <button
@@ -401,7 +404,7 @@ export default function StaffAnnouncements() {
                     disabled={currentPage === 1}
                     className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed font-semibold text-xs text-slate-700 transition-colors cursor-pointer"
                   >
-                    Previous
+                    {t("branchManagerFdMisSchemes.previous", "Previous")}
                   </button>
                   <span className="text-xs font-bold text-slate-700 px-2">
                     {currentPage} / {totalPages}
@@ -411,7 +414,7 @@ export default function StaffAnnouncements() {
                     disabled={currentPage === totalPages}
                     className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed font-semibold text-xs text-slate-700 transition-colors cursor-pointer"
                   >
-                    Next
+                    {t("branchManagerFdMisSchemes.next", "Next")}
                   </button>
                 </div>
               </div>

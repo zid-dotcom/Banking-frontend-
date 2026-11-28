@@ -1,4 +1,5 @@
 import React, { useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Receipt,
   X,
@@ -63,6 +64,7 @@ export default function ReconciliationReceiptsModal({
   singleTransaction,
   onClose
 }) {
+  const { t } = useTranslation();
   const printRef = useRef(null);
 
   if (!report && !singleTransaction) return null;
@@ -88,10 +90,10 @@ export default function ReconciliationReceiptsModal({
               </div>
               <div>
                 <h3 className="font-serif font-black text-slate-900 text-lg">
-                  Counter Cash Receipt Voucher
+                  {t("reconciliationReceiptsModal.counterCashReceiptVoucher", "Counter Cash Receipt Voucher")}
                 </h3>
                 <p className="text-xs text-slate-500 font-medium">
-                  Verified Society Counter Cash Transaction
+                  {t("reconciliationReceiptsModal.verifiedSocietyCounterCashTransaction", "Verified Society Counter Cash Transaction")}
                 </p>
               </div>
             </div>
@@ -109,13 +111,13 @@ export default function ReconciliationReceiptsModal({
             {/* Receipt Number & Date */}
             <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between">
               <div>
-                <span className="text-[10px] uppercase font-bold text-slate-400 block">Receipt Number</span>
+                <span className="text-[10px] uppercase font-bold text-slate-400 block">{t("dashboardModule.accountTransactions.colReceiptNumber", "Receipt Number")}</span>
                 <span className="font-mono font-black text-teal-900 text-sm">
                   {tx.receipt_number || tx.reference_number || `#TX-${tx.id || '001'}`}
                 </span>
               </div>
               <div className="text-right">
-                <span className="text-[10px] uppercase font-bold text-slate-400 block">Date &amp; Time</span>
+                <span className="text-[10px] uppercase font-bold text-slate-400 block">{t("dashboardModule.accountTransactions.colDateTime", "Date & Time")}</span>
                 <span className="font-bold text-slate-800">
                   {formatDateTime(tx.created_at || tx.timestamp || tx.date)}
                 </span>
@@ -134,7 +136,7 @@ export default function ReconciliationReceiptsModal({
                 }`}
               >
                 {isDep ? <ArrowDownLeft className="w-3.5 h-3.5" /> : <ArrowUpRight className="w-3.5 h-3.5" />}
-                <span>{isDep ? 'Cash Deposit Verified' : 'Cash Withdrawal Verified'}</span>
+                <span>{isDep ? t("reconciliationReceiptsModal.cashDepositVerified", "Cash Deposit Verified") : t("reconciliationReceiptsModal.cashWithdrawalVerified", "Cash Withdrawal Verified")}</span>
               </span>
               <div
                 className={`text-2xl sm:text-3xl font-black font-mono mt-1 ${
@@ -148,21 +150,21 @@ export default function ReconciliationReceiptsModal({
             {/* Member & Account Details */}
             <div className="divide-y divide-slate-100 rounded-2xl border border-slate-200 overflow-hidden bg-white">
               <div className="p-3 flex items-center justify-between">
-                <span className="text-slate-400 font-medium">Account Number</span>
+                <span className="text-slate-400 font-medium">{t("dashboard.accountNumber", "Account Number")}</span>
                 <span className="font-mono font-bold text-slate-900">{tx.account_number || '—'}</span>
               </div>
               <div className="p-3 flex items-center justify-between">
-                <span className="text-slate-400 font-medium">Member Name</span>
+                <span className="text-slate-400 font-medium">{t("dashboardModule.productAccounts.memberName", "Member Name")}</span>
                 <span className="font-bold text-slate-900 capitalize">{tx.member_name || 'Member'}</span>
               </div>
               <div className="p-3 flex items-center justify-between">
-                <span className="text-slate-400 font-medium">Balance Before</span>
+                <span className="text-slate-400 font-medium">{t("dashboardModule.accountTransactions.colBalanceBefore", "Balance Before")}</span>
                 <span className="font-mono font-semibold text-slate-600">
                   {tx.balance_before !== undefined && tx.balance_before !== null ? formatCurrency(tx.balance_before) : '—'}
                 </span>
               </div>
               <div className="p-3 flex items-center justify-between bg-teal-50/30">
-                <span className="text-teal-900 font-bold">Balance After Transaction</span>
+                <span className="text-teal-900 font-bold">{t("reconciliationReceiptsModal.balanceAfterTransaction", "Balance After Transaction")}</span>
                 <span className="font-mono font-black text-teal-900 text-sm">
                   {tx.balance_after !== undefined && tx.balance_after !== null
                     ? formatCurrency(tx.balance_after)
@@ -170,20 +172,20 @@ export default function ReconciliationReceiptsModal({
                 </span>
               </div>
               <div className="p-3 flex items-center justify-between">
-                <span className="text-slate-400 font-medium">Cashier Desk</span>
+                <span className="text-slate-400 font-medium">{t("reconciliationReceiptsModal.cashierDesk", "Cashier Desk")}</span>
                 <span className="font-semibold text-slate-800 capitalize">
                   {tx.cashier_name || 'Cashier'} {tx.cashier_code ? `(#${tx.cashier_code})` : ''}
                 </span>
               </div>
               <div className="p-3 flex items-center justify-between">
-                <span className="text-slate-400 font-medium">Branch</span>
+                <span className="text-slate-400 font-medium">{t("dashboard.branch", "Branch")}</span>
                 <span className="font-semibold text-slate-800">
                   {tx.branch_name || 'Society Branch'} {tx.ifsc_code ? `(IFSC: ${tx.ifsc_code})` : ''}
                 </span>
               </div>
               {tx.notes && (
                 <div className="p-3 flex items-center justify-between">
-                  <span className="text-slate-400 font-medium">Transaction Notes</span>
+                  <span className="text-slate-400 font-medium">{t("reconciliationReceiptsModal.transactionNotes", "Transaction Notes")}</span>
                   <span className="font-medium text-slate-700 max-w-[200px] truncate">{tx.notes}</span>
                 </div>
               )}
@@ -197,7 +199,7 @@ export default function ReconciliationReceiptsModal({
               onClick={onClose}
               className="px-4 py-2 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-all cursor-pointer shadow-2xs"
             >
-              Close
+              {t("common.close", "Close")}
             </button>
             <button
               type="button"
@@ -205,7 +207,7 @@ export default function ReconciliationReceiptsModal({
               className="px-4 py-2 rounded-xl bg-[#00b4a7] hover:bg-teal-700 text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
             >
               <Printer className="w-3.5 h-3.5" />
-              <span>Print Receipt Voucher</span>
+              <span>{t("reconciliationReceiptsModal.printReceiptVoucher", "Print Receipt Voucher")}</span>
             </button>
           </div>
         </div>
@@ -228,10 +230,10 @@ export default function ReconciliationReceiptsModal({
             </div>
             <div>
               <h3 className="font-serif font-black text-slate-900 text-lg sm:text-xl">
-                Reconciliation Receipts Audit: #REC-{r.id || '1'}
+                {t("accountantCashReconciliationView.reconciliationReceiptsAuditRec", "Reconciliation Receipts Audit: #REC-")}{r.id || '1'}
               </h3>
               <p className="text-xs text-slate-500 font-medium">
-                Verified counter cash vouchers, receipts, and member balance before/after logs.
+                {t("branchManagerCashReconciliation.verifiedCounterCashVouchersReceipts", "Verified counter cash vouchers, receipts, and member balance before/after logs.")}
               </p>
             </div>
           </div>
@@ -249,41 +251,41 @@ export default function ReconciliationReceiptsModal({
           {/* 7 Summary Cards matching Image 1 */}
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5">
             <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200/80">
-              <div className="text-[10px] uppercase font-bold text-slate-400">BUSINESS DATE</div>
+              <div className="text-[10px] uppercase font-bold text-slate-400">{t("reconciliationReceiptsModal.businessDate", "BUSINESS DATE")}</div>
               <div className="font-bold text-slate-800 text-sm mt-0.5">{formatDate(r.business_date)}</div>
             </div>
             <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200/80">
-              <div className="text-[10px] uppercase font-bold text-slate-400">CASHIER</div>
+              <div className="text-[10px] uppercase font-bold text-slate-400">{t("reconciliationReceiptsModal.cashier", "CASHIER")}</div>
               <div className="font-bold text-slate-800 text-sm mt-0.5 truncate capitalize">
                 {r.cashier_name || 'Cashier'}
               </div>
             </div>
             <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200/80">
-              <div className="text-[10px] uppercase font-bold text-slate-400">OPENING FLOAT</div>
+              <div className="text-[10px] uppercase font-bold text-slate-400">{t("reconciliationReceiptsModal.openingFloat", "OPENING FLOAT")}</div>
               <div className="font-mono font-bold text-slate-800 text-sm mt-0.5">
                 {formatCurrency(r.opening_cash)}
               </div>
             </div>
             <div className="bg-emerald-50/70 p-3 rounded-2xl border border-emerald-200/80">
-              <div className="text-[10px] uppercase font-bold text-emerald-800">DEPOSITS</div>
+              <div className="text-[10px] uppercase font-bold text-emerald-800">{t("reconciliationReceiptsModal.deposits", "DEPOSITS")}</div>
               <div className="font-mono font-bold text-emerald-700 text-sm mt-0.5">
                 +{formatCurrency(r.deposit_total)}
               </div>
             </div>
             <div className="bg-rose-50/70 p-3 rounded-2xl border border-rose-200/80">
-              <div className="text-[10px] uppercase font-bold text-rose-800">WITHDRAWALS</div>
+              <div className="text-[10px] uppercase font-bold text-rose-800">{t("reconciliationReceiptsModal.withdrawals", "WITHDRAWALS")}</div>
               <div className="font-mono font-bold text-rose-700 text-sm mt-0.5">
                 -{formatCurrency(r.withdrawal_total)}
               </div>
             </div>
             <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200/80">
-              <div className="text-[10px] uppercase font-bold text-slate-400">EXPECTED CLOSING</div>
+              <div className="text-[10px] uppercase font-bold text-slate-400">{t("reconciliationReceiptsModal.expectedClosing", "EXPECTED CLOSING")}</div>
               <div className="font-mono font-bold text-slate-800 text-sm mt-0.5">
                 {formatCurrency(r.expected_closing_cash)}
               </div>
             </div>
             <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200/80">
-              <div className="text-[10px] uppercase font-bold text-slate-400">PHYSICAL CLOSING</div>
+              <div className="text-[10px] uppercase font-bold text-slate-400">{t("reconciliationReceiptsModal.physicalClosing", "PHYSICAL CLOSING")}</div>
               <div className="font-mono font-bold text-slate-900 text-sm mt-0.5">
                 {r.closing_cash !== null && r.closing_cash !== undefined ? formatCurrency(r.closing_cash) : '—'}
               </div>
@@ -295,7 +297,7 @@ export default function ReconciliationReceiptsModal({
             <div className="flex items-center justify-between mb-2.5">
               <h4 className="font-serif font-bold text-slate-900 text-sm flex items-center gap-2">
                 <FileText className="w-4 h-4 text-[#00b4a7]" />
-                <span>Counter Transactions &amp; Receipts ({transactions.length})</span>
+                <span>{t("branchManagerCashReconciliation.counterTransactionsReceipts", "Counter Transactions & Receipts (")}{transactions.length})</span>
               </h4>
             </div>
 
@@ -304,24 +306,25 @@ export default function ReconciliationReceiptsModal({
                 <table className="w-full text-left border-collapse text-xs min-w-[720px]">
                   <thead>
                     <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                      <th className="py-2.5 pl-4 pr-2">RECEIPT NUMBER</th>
-                      <th className="py-2.5 px-2">TYPE</th>
-                      <th className="py-2.5 px-2">AMOUNT</th>
-                      <th className="py-2.5 px-2">BALANCE BEFORE</th>
-                      <th className="py-2.5 px-2">BALANCE AFTER</th>
-                      <th className="py-2.5 px-2">DATE &amp; TIME</th>
-                      <th className="py-2.5 pl-2 pr-4">NOTES</th>
+                      <th className="py-2.5 pl-4 pr-2">{t("reconciliationReceiptsModal.receiptNumber", "RECEIPT NUMBER")}</th>
+                      <th className="py-2.5 px-2">{t("reconciliationReceiptsModal.type", "TYPE")}</th>
+                      <th className="py-2.5 px-2">{t("reconciliationReceiptsModal.amount", "AMOUNT")}</th>
+                      <th className="py-2.5 px-2">{t("reconciliationReceiptsModal.balanceBefore", "BALANCE BEFORE")}</th>
+                      <th className="py-2.5 px-2">{t("reconciliationReceiptsModal.balanceAfter", "BALANCE AFTER")}</th>
+                      <th className="py-2.5 px-2">{t("reconciliationReceiptsModal.dateTime", "DATE & TIME")}</th>
+                      <th className="py-2.5 pl-2 pr-4">{t("reconciliationReceiptsModal.notes", "NOTES")}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 font-medium">
                     {transactions.length === 0 ? (
                       <tr>
                         <td colSpan={7} className="py-8 text-center text-slate-400">
-                          No transactions recorded for this reconciliation shift.
+                          {t("reconciliationReceiptsModal.noTransactionsRecordedForThis", "No transactions recorded for this reconciliation shift.")}
                         </td>
                       </tr>
                     ) : (
                       transactions.map((tx, idx) => {
+  const { t } = useTranslation();
                         const isDep = String(tx.transaction_type || tx.type || '').toLowerCase().includes('deposit') ||
                                       String(tx.transaction_type || tx.type || '').toLowerCase().includes('credit');
                         return (
@@ -336,7 +339,7 @@ export default function ReconciliationReceiptsModal({
                                 }`}
                               >
                                 {isDep ? <ArrowDownLeft className="w-3 h-3 text-emerald-600" /> : <ArrowUpRight className="w-3 h-3 text-rose-600" />}
-                                <span>{isDep ? 'Deposit' : 'Withdrawal'}</span>
+                                <span>{isDep ? t("dashboardModule.accountTransactions.deposit", "Deposit") : t("dashboardModule.accountTransactions.withdrawal", "Withdrawal")}</span>
                               </span>
                             </td>
                             <td className={`py-2.5 px-2 font-mono font-bold ${isDep ? 'text-emerald-700' : 'text-rose-700'}`}>
@@ -372,7 +375,7 @@ export default function ReconciliationReceiptsModal({
             onClick={onClose}
             className="px-4 py-2 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-all cursor-pointer shadow-2xs"
           >
-            Close
+            {t("common.close", "Close")}
           </button>
           <button
             type="button"
@@ -380,7 +383,7 @@ export default function ReconciliationReceiptsModal({
             className="px-4 py-2 rounded-xl bg-[#00b4a7] hover:bg-teal-700 text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
           >
             <Printer className="w-3.5 h-3.5" />
-            <span>Print Audit Ledger</span>
+            <span>{t("reconciliationReceiptsModal.printAuditLedger", "Print Audit Ledger")}</span>
           </button>
         </div>
       </div>

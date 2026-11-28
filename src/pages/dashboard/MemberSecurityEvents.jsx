@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import StatCard from '../../components/dashboard/StatCard';
 import SecurityEventDetailModal from '../../components/dashboard/SecurityEventDetailModal';
@@ -45,6 +46,7 @@ function formatDateTime(isoString) {
 }
 
 export default function MemberSecurityEvents() {
+  const { t } = useTranslation();
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -137,20 +139,20 @@ export default function MemberSecurityEvents() {
             <div className="inline-flex flex-wrap items-center gap-x-2 gap-y-1 px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-xs text-[11px] sm:text-xs font-semibold border border-teal-200/80 shadow-2xs text-[#0f766e] mb-3">
               <span className="inline-flex items-center gap-1.5 flex-shrink-0">
                 <ShieldCheck className="w-4 h-4 text-[#00b4a7]" />
-                <span>Account Protection &amp; Access Log</span>
+                <span>{t("memberSecurityEvents.accountProtectionAccessLog", "Account Protection & Access Log")}</span>
               </span>
               <span className="text-teal-300 hidden sm:inline">•</span>
-              <span className="text-slate-600">Member Security Ledger</span>
+              <span className="text-slate-600">{t("memberSecurityEvents.memberSecurityLedger", "Member Security Ledger")}</span>
             </div>
 
             <div className="flex items-center gap-2.5 sm:gap-3">
               <span className="w-1.5 h-7 sm:h-9 bg-[#00b4a7] rounded-full flex-shrink-0" />
               <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-                Account Security &amp; Activity History
+                {t("memberSecurityEvents.accountSecurityActivityHistory", "Account Security & Activity History")}
               </h1>
             </div>
             <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed mt-2">
-              Review your sign-in history, recognized devices, IP addresses, and account authentication records. Promptly notify your branch if you observe unfamiliar activity.
+              {t("memberSecurityEvents.reviewYourSignInHistory", "Review your sign-in history, recognized devices, IP addresses, and account authentication records. Promptly notify your branch if you observe unfamiliar activity.")}
             </p>
 
             <div className="flex items-center gap-3 mt-4 flex-wrap">
@@ -161,7 +163,7 @@ export default function MemberSecurityEvents() {
                 className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-2xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs border border-slate-200 shadow-2xs transition-all cursor-pointer disabled:opacity-50"
               >
                 <RefreshCw className={`w-3.5 h-3.5 text-[#00b4a7] ${refreshing ? 'animate-spin' : ''}`} />
-                <span>Refresh Activity</span>
+                <span>{t("memberSecurityEvents.refreshActivity", "Refresh Activity")}</span>
               </button>
             </div>
           </div>
@@ -177,7 +179,7 @@ export default function MemberSecurityEvents() {
         {/* 4 Stat Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
           <StatCard
-            title="Total Security Events"
+            title={t("branchManagerSecurityEvents.totalSecurityEvents", "Total Security Events")}
             value={totalCount}
             valueClassName="text-xl sm:text-2xl font-bold text-slate-900 tracking-normal font-sans"
             subtext="Audit history entries"
@@ -185,7 +187,7 @@ export default function MemberSecurityEvents() {
           />
 
           <StatCard
-            title="Verified Access"
+            title={t("memberSecurityEvents.verifiedAccess", "Verified Access")}
             value={succeededCount}
             valueClassName="text-xl sm:text-2xl font-bold text-emerald-600 tracking-normal font-sans"
             subtext="Successful sign-ins & updates"
@@ -193,7 +195,7 @@ export default function MemberSecurityEvents() {
           />
 
           <StatCard
-            title="Suspicious Flags"
+            title={t("branchManagerSecurityEvents.suspiciousFlags", "Suspicious Flags")}
             value={suspiciousCount}
             valueClassName={
               suspiciousCount > 0
@@ -205,7 +207,7 @@ export default function MemberSecurityEvents() {
           />
 
           <StatCard
-            title="Last Sign-in IP"
+            title={t("memberSecurityEvents.lastSignInIp", "Last Sign-in IP")}
             value={lastEvent?.ip_address || '—'}
             valueClassName="text-sm sm:text-base font-mono font-bold text-slate-900 tracking-normal font-sans truncate"
             subtext={lastEvent ? formatDateTime(lastEvent.created_at) : 'No recent login'}
@@ -218,7 +220,7 @@ export default function MemberSecurityEvents() {
           <div className="p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-xs sm:text-sm font-semibold flex items-center justify-between">
             <span>{error}</span>
             <button onClick={() => fetchMemberEvents(true)} className="underline cursor-pointer">
-              Retry
+              {t("common.retry", "Retry")}
             </button>
           </div>
         )}
@@ -230,10 +232,10 @@ export default function MemberSecurityEvents() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <h3 className="text-base sm:text-lg font-black text-slate-900">
-                  Authentication &amp; Access Log
+                  {t("memberSecurityEvents.authenticationAccessLog", "Authentication & Access Log")}
                 </h3>
                 <p className="text-xs text-slate-500 font-medium">
-                  Showing {events.length} security events recorded for your member folio
+                  {t("common.showing", "Showing")} {events.length} {t("memberSecurityEvents.securityEventsRecordedForYour", "security events recorded for your member folio")}
                 </p>
               </div>
 
@@ -244,9 +246,9 @@ export default function MemberSecurityEvents() {
                   onChange={(e) => setSelectedSucceeded(e.target.value)}
                   className="px-3 py-1.5 rounded-xl border border-slate-200 font-semibold text-slate-700 bg-white focus:outline-none focus:border-[#14b8a6]"
                 >
-                  <option value="all">All Outcomes</option>
-                  <option value="true">Succeeded Only</option>
-                  <option value="false">Failed Only</option>
+                  <option value="all">{t("memberSecurityEvents.allOutcomes", "All Outcomes")}</option>
+                  <option value="true">{t("memberSecurityEvents.succeededOnly", "Succeeded Only")}</option>
+                  <option value="false">{t("memberSecurityEvents.failedOnly", "Failed Only")}</option>
                 </select>
               </div>
             </div>
@@ -256,14 +258,14 @@ export default function MemberSecurityEvents() {
           {loading ? (
             <div className="p-16 text-center">
               <Loader2 className="w-8 h-8 animate-spin text-[#0f766e] mx-auto mb-2" />
-              <p className="text-xs text-slate-500 font-medium">Loading your security activity log...</p>
+              <p className="text-xs text-slate-500 font-medium">{t("memberSecurityEvents.loadingYourSecurityActivityLog", "Loading your security activity log...")}</p>
             </div>
           ) : events.length === 0 ? (
             <div className="p-16 text-center space-y-2">
               <ShieldCheck className="w-12 h-12 text-slate-300 mx-auto" />
-              <p className="text-sm font-bold text-slate-700">No security events found</p>
+              <p className="text-sm font-bold text-slate-700">{t("memberSecurityEvents.noSecurityEventsFound", "No security events found")}</p>
               <p className="text-xs text-slate-400">
-                Your sign-in activities and authentication records will be shown here.
+                {t("memberSecurityEvents.yourSignInActivitiesAnd", "Your sign-in activities and authentication records will be shown here.")}
               </p>
             </div>
           ) : (
@@ -271,17 +273,18 @@ export default function MemberSecurityEvents() {
               <table className="w-full text-left border-collapse min-w-[750px]">
                 <thead>
                   <tr className="border-b border-slate-100 bg-slate-50/75 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                    <th className="py-3.5 px-6">Event ID</th>
-                    <th className="py-3.5 px-6">Timestamp</th>
-                    <th className="py-3.5 px-6">Activity Type</th>
-                    <th className="py-3.5 px-6 text-center">Outcome</th>
-                    <th className="py-3.5 px-6 text-center">Security Status</th>
-                    <th className="py-3.5 px-6">IP Address</th>
-                    <th className="py-3.5 px-6 text-right">Details</th>
+                    <th className="py-3.5 px-6">{t("branchManagerSecurityEvents.eventId", "Event ID")}</th>
+                    <th className="py-3.5 px-6">{t("branchManagerSecurityEvents.timestamp", "Timestamp")}</th>
+                    <th className="py-3.5 px-6">{t("memberSecurityEvents.activityType", "Activity Type")}</th>
+                    <th className="py-3.5 px-6 text-center">{t("branchManagerSecurityEvents.outcome", "Outcome")}</th>
+                    <th className="py-3.5 px-6 text-center">{t("memberSecurityEvents.securityStatus", "Security Status")}</th>
+                    <th className="py-3.5 px-6">{t("memberSecurityEvents.ipAddress", "IP Address")}</th>
+                    <th className="py-3.5 px-6 text-right">{t("dashboardModule.monthlyTargets.details", "Details")}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-sm">
                   {events.map((ev) => {
+  const { t } = useTranslation();
                     const badge = getSecurityEventTypeBadge(ev.event_type);
                     return (
                       <tr key={ev.id} className="hover:bg-teal-50/25 transition-colors group">
@@ -303,12 +306,12 @@ export default function MemberSecurityEvents() {
                           {ev.succeeded ? (
                             <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
                               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                              <span>Success</span>
+                              <span>{t("branchManagerSecurityEvents.success", "Success")}</span>
                             </span>
                           ) : (
                             <span className="inline-flex items-center gap-1 text-xs font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200">
                               <XCircle className="w-3.5 h-3.5 text-rose-600" />
-                              <span>Failed</span>
+                              <span>{t("branchManagerSecurityEvents.failed", "Failed")}</span>
                             </span>
                           )}
                         </td>
@@ -316,11 +319,11 @@ export default function MemberSecurityEvents() {
                           {ev.is_suspicious ? (
                             <span className="inline-flex items-center gap-1 text-xs font-extrabold text-amber-800 bg-amber-100 px-2.5 py-0.5 rounded-full border border-amber-300 animate-pulse">
                               <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
-                              <span>Suspicious</span>
+                              <span>{t("branchManagerSecurityEvents.suspicious", "Suspicious")}</span>
                             </span>
                           ) : (
                             <span className="text-xs text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                              Normal
+                              {t("branchManagerSecurityEvents.normal", "Normal")}
                             </span>
                           )}
                         </td>
@@ -334,7 +337,7 @@ export default function MemberSecurityEvents() {
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-[#0f766e] font-bold text-xs rounded-xl border border-teal-200 transition-all cursor-pointer active:scale-95"
                           >
                             <Eye className="w-3.5 h-3.5" />
-                            <span>View Dossier</span>
+                            <span>{t("branchManagerSecurityEvents.viewDossier", "View Dossier")}</span>
                           </button>
                         </td>
                       </tr>

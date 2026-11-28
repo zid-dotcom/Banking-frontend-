@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import StatCard from '../../components/dashboard/StatCard';
 import SecurityEventDetailModal from '../../components/dashboard/SecurityEventDetailModal';
@@ -48,6 +49,7 @@ function formatDateTime(isoString) {
 }
 
 export default function BranchManagerSecurityEvents({ embedded = false }) {
+  const { t } = useTranslation();
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -183,7 +185,7 @@ export default function BranchManagerSecurityEvents({ embedded = false }) {
             <div className="inline-flex flex-wrap items-center gap-x-2 gap-y-1 px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-xs text-[11px] sm:text-xs font-semibold border border-teal-200/80 shadow-2xs text-[#0f766e] mb-3">
               <span className="inline-flex items-center gap-1.5 flex-shrink-0">
                 <ShieldCheck className="w-4 h-4 text-[#00b4a7]" />
-                <span>Branch Security &amp; Access Center</span>
+                <span>{t("branchManagerSecurityEvents.branchSecurityAccessCenter", "Branch Security & Access Center")}</span>
               </span>
               <span className="text-teal-300 hidden sm:inline">•</span>
               <span className="text-slate-600">{branchUser.branch_name}</span>
@@ -192,11 +194,11 @@ export default function BranchManagerSecurityEvents({ embedded = false }) {
             <div className="flex items-center gap-2.5 sm:gap-3">
               <span className="w-1.5 h-7 sm:h-9 bg-[#00b4a7] rounded-full flex-shrink-0" />
               <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-                Branch Security Audit Events
+                {t("branchManagerSecurityEvents.branchSecurityAuditEvents", "Branch Security Audit Events")}
               </h1>
             </div>
             <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed mt-2">
-              Review authentication logs, sensitive member access, credential updates, and staff security activities occurring within {branchUser.branch_name}.
+              {t("branchManagerSecurityEvents.reviewAuthenticationLogsSensitiveMember", "Review authentication logs, sensitive member access, credential updates, and staff security activities occurring within")} {branchUser.branch_name}.
             </p>
 
             <div className="flex items-center gap-3 mt-4 flex-wrap">
@@ -207,7 +209,7 @@ export default function BranchManagerSecurityEvents({ embedded = false }) {
                 className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-2xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs border border-slate-200 shadow-2xs transition-all cursor-pointer disabled:opacity-50"
               >
                 <RefreshCw className={`w-3.5 h-3.5 text-[#00b4a7] ${refreshing ? 'animate-spin' : ''}`} />
-                <span>Refresh Logs</span>
+                <span>{t("branchManagerSecurityEvents.refreshLogs", "Refresh Logs")}</span>
               </button>
             </div>
           </div>
@@ -223,7 +225,7 @@ export default function BranchManagerSecurityEvents({ embedded = false }) {
         {/* 4 Stat Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
           <StatCard
-            title="Total Security Events"
+            title={t("branchManagerSecurityEvents.totalSecurityEvents", "Total Security Events")}
             value={totalCount}
             valueClassName="text-xl sm:text-2xl font-bold text-slate-900 tracking-normal font-sans"
             subtext="Audit log entries"
@@ -231,7 +233,7 @@ export default function BranchManagerSecurityEvents({ embedded = false }) {
           />
 
           <StatCard
-            title="Suspicious Flags"
+            title={t("branchManagerSecurityEvents.suspiciousFlags", "Suspicious Flags")}
             value={suspiciousCount}
             valueClassName={
               suspiciousCount > 0
@@ -243,7 +245,7 @@ export default function BranchManagerSecurityEvents({ embedded = false }) {
           />
 
           <StatCard
-            title="Successful Actions"
+            title={t("branchManagerSecurityEvents.successfulActions", "Successful Actions")}
             value={succeededCount}
             valueClassName="text-xl sm:text-2xl font-bold text-emerald-600 tracking-normal font-sans"
             subtext="Authorized & verified"
@@ -251,7 +253,7 @@ export default function BranchManagerSecurityEvents({ embedded = false }) {
           />
 
           <StatCard
-            title="Failed Attempts"
+            title={t("branchManagerSecurityEvents.failedAttempts", "Failed Attempts")}
             value={failedCount}
             valueClassName={
               failedCount > 0
@@ -268,7 +270,7 @@ export default function BranchManagerSecurityEvents({ embedded = false }) {
           <div className="p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-xs sm:text-sm font-semibold flex items-center justify-between">
             <span>{error}</span>
             <button onClick={() => fetchBranchEvents(true)} className="underline cursor-pointer">
-              Retry
+              {t("common.retry", "Retry")}
             </button>
           </div>
         )}
@@ -280,10 +282,10 @@ export default function BranchManagerSecurityEvents({ embedded = false }) {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
                 <h3 className="text-base sm:text-lg font-black text-slate-900">
-                  Branch Security Log
+                  {t("branchManagerSecurityEvents.branchSecurityLog", "Branch Security Log")}
                 </h3>
                 <p className="text-xs text-slate-500 font-medium">
-                  Showing {filteredEvents.length} security events recorded for {branchUser.branch_name}
+                  {t("common.showing", "Showing")} {filteredEvents.length} {t("branchManagerSecurityEvents.securityEventsRecordedFor", "security events recorded for")} {branchUser.branch_name}
                 </p>
               </div>
 
@@ -292,7 +294,7 @@ export default function BranchManagerSecurityEvents({ embedded = false }) {
                 <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
-                  placeholder="Search user, IP, code..."
+                  placeholder={t("branchManagerSecurityEvents.searchUserIpCode", "Search user, IP, code...")}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 text-xs font-medium text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-[#14b8a6]"
@@ -305,33 +307,33 @@ export default function BranchManagerSecurityEvents({ embedded = false }) {
               {/* Account Role Filter */}
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
-                  Role
+                  {t("branchManagerSecurityEvents.role", "Role")}
                 </label>
                 <select
                   value={selectedRole}
                   onChange={(e) => setSelectedRole(e.target.value)}
                   className="w-full px-2.5 py-1.5 rounded-xl border border-slate-200 font-semibold text-slate-700 bg-white focus:outline-none focus:border-[#14b8a6]"
                 >
-                  <option value="all">All Roles</option>
-                  <option value="member">Member</option>
-                  <option value="staff">Branch Staff</option>
-                  <option value="branch_manager">Branch Manager</option>
+                  <option value="all">{t("branchManagerSecurityEvents.allRoles", "All Roles")}</option>
+                  <option value="member">{t("dashboardModule.accountTransactions.roleMember", "Member")}</option>
+                  <option value="staff">{t("dashboardModule.passwordUpdate.fallbackBranchStaff", "Branch Staff")}</option>
+                  <option value="branch_manager">{t("nav.branchManager", "Branch Manager")}</option>
                 </select>
               </div>
 
               {/* Outcome / Result */}
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
-                  Outcome
+                  {t("branchManagerSecurityEvents.outcome", "Outcome")}
                 </label>
                 <select
                   value={selectedSucceeded}
                   onChange={(e) => setSelectedSucceeded(e.target.value)}
                   className="w-full px-2.5 py-1.5 rounded-xl border border-slate-200 font-semibold text-slate-700 bg-white focus:outline-none focus:border-[#14b8a6]"
                 >
-                  <option value="all">All Results</option>
-                  <option value="true">Succeeded</option>
-                  <option value="false">Failed / Denied</option>
+                  <option value="all">{t("branchManagerSecurityEvents.allResults", "All Results")}</option>
+                  <option value="true">{t("branchManagerSecurityEvents.succeeded", "Succeeded")}</option>
+                  <option value="false">{t("branchManagerSecurityEvents.failedDenied", "Failed / Denied")}</option>
                 </select>
               </div>
 
@@ -348,7 +350,7 @@ export default function BranchManagerSecurityEvents({ embedded = false }) {
                   }}
                   className="w-full py-1.5 px-3 rounded-xl border border-slate-200 hover:bg-slate-100 font-bold text-slate-600 text-center transition-colors cursor-pointer"
                 >
-                  Reset Filters
+                  {t("blog.resetFilters", "Reset Filters")}
                 </button>
               </div>
             </div>
@@ -358,16 +360,16 @@ export default function BranchManagerSecurityEvents({ embedded = false }) {
           {loading ? (
             <div className="p-16 text-center">
               <Loader2 className="w-8 h-8 animate-spin text-[#0f766e] mx-auto mb-2" />
-              <p className="text-xs text-slate-500 font-medium">Fetching branch security events...</p>
+              <p className="text-xs text-slate-500 font-medium">{t("branchManagerSecurityEvents.fetchingBranchSecurityEvents", "Fetching branch security events...")}</p>
             </div>
           ) : filteredEvents.length === 0 ? (
             <div className="p-16 text-center space-y-2">
               <ShieldCheck className="w-12 h-12 text-slate-300 mx-auto" />
-              <p className="text-sm font-bold text-slate-700">No branch security events found</p>
+              <p className="text-sm font-bold text-slate-700">{t("branchManagerSecurityEvents.noBranchSecurityEventsFound", "No branch security events found")}</p>
               <p className="text-xs text-slate-400">
                 {events.length > 0
-                  ? 'No records match your selected role or filter criteria.'
-                  : 'Security activities for your branch members and staff will appear here.'}
+                  ? t("branchManagerSecurityEvents.noRecordsMatchYourSelected", "No records match your selected role or filter criteria.")
+                  : t("branchManagerSecurityEvents.securityActivitiesForYourBranch", "Security activities for your branch members and staff will appear here.")}
               </p>
             </div>
           ) : (
@@ -375,18 +377,19 @@ export default function BranchManagerSecurityEvents({ embedded = false }) {
               <table className="w-full text-left border-collapse min-w-[850px]">
                 <thead>
                   <tr className="border-b border-slate-100 bg-slate-50/75 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                    <th className="py-3.5 px-6">Event ID</th>
-                    <th className="py-3.5 px-6">Timestamp</th>
-                    <th className="py-3.5 px-6">User &amp; Role</th>
-                    <th className="py-3.5 px-6">Event Type</th>
-                    <th className="py-3.5 px-6 text-center">Status</th>
-                    <th className="py-3.5 px-6 text-center">Risk Level</th>
-                    <th className="py-3.5 px-6">Client IP</th>
-                    <th className="py-3.5 px-6 text-right">Actions</th>
+                    <th className="py-3.5 px-6">{t("branchManagerSecurityEvents.eventId", "Event ID")}</th>
+                    <th className="py-3.5 px-6">{t("branchManagerSecurityEvents.timestamp", "Timestamp")}</th>
+                    <th className="py-3.5 px-6">{t("branchManagerSecurityEvents.userRole", "User & Role")}</th>
+                    <th className="py-3.5 px-6">{t("branchManagerSecurityEvents.eventType", "Event Type")}</th>
+                    <th className="py-3.5 px-6 text-center">{t("common.status", "Status")}</th>
+                    <th className="py-3.5 px-6 text-center">{t("branchManagerSecurityEvents.riskLevel", "Risk Level")}</th>
+                    <th className="py-3.5 px-6">{t("branchManagerSecurityEvents.clientIp", "Client IP")}</th>
+                    <th className="py-3.5 px-6 text-right">{t("common.actions", "Actions")}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-sm">
                   {filteredEvents.map((ev) => {
+  const { t } = useTranslation();
                     const badge = getSecurityEventTypeBadge(ev.event_type);
                     return (
                       <tr key={ev.id} className="hover:bg-teal-50/25 transition-colors group">
@@ -419,12 +422,12 @@ export default function BranchManagerSecurityEvents({ embedded = false }) {
                           {ev.succeeded ? (
                             <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
                               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                              <span>Success</span>
+                              <span>{t("branchManagerSecurityEvents.success", "Success")}</span>
                             </span>
                           ) : (
                             <span className="inline-flex items-center gap-1 text-xs font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200">
                               <XCircle className="w-3.5 h-3.5 text-rose-600" />
-                              <span>Failed</span>
+                              <span>{t("branchManagerSecurityEvents.failed", "Failed")}</span>
                             </span>
                           )}
                         </td>
@@ -432,10 +435,10 @@ export default function BranchManagerSecurityEvents({ embedded = false }) {
                           {ev.is_suspicious ? (
                             <span className="inline-flex items-center gap-1 text-xs font-extrabold text-amber-800 bg-amber-100 px-2.5 py-0.5 rounded-full border border-amber-300 animate-pulse">
                               <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
-                              <span>Suspicious</span>
+                              <span>{t("branchManagerSecurityEvents.suspicious", "Suspicious")}</span>
                             </span>
                           ) : (
-                            <span className="text-xs text-slate-400 font-medium">Normal</span>
+                            <span className="text-xs text-slate-400 font-medium">{t("branchManagerSecurityEvents.normal", "Normal")}</span>
                           )}
                         </td>
                         <td className="py-4 px-6 text-xs font-mono text-slate-600 whitespace-nowrap">
@@ -448,7 +451,7 @@ export default function BranchManagerSecurityEvents({ embedded = false }) {
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-[#0f766e] font-bold text-xs rounded-xl border border-teal-200 transition-all cursor-pointer active:scale-95"
                           >
                             <Eye className="w-3.5 h-3.5" />
-                            <span>View Dossier</span>
+                            <span>{t("branchManagerSecurityEvents.viewDossier", "View Dossier")}</span>
                           </button>
                         </td>
                       </tr>

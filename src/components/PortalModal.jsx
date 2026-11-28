@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
+import { i18n } from '../i18n/index.js';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { X, Lock, ShieldCheck, UserCheck, Building } from 'lucide-react';
 import { SOCIETY_INFO } from '../data/societyData';
 
 export default function PortalModal({ isOpen, onClose }) {
+  const { t } = useTranslation();
   const [memberId, setMemberId] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [statusMessage, setStatusMessage] = useState(null);
@@ -15,7 +18,7 @@ export default function PortalModal({ isOpen, onClose }) {
     setIsSearching(true);
     setTimeout(() => {
       setIsSearching(false);
-      setStatusMessage('Member records are validated against offline registered ledgers. For active account status or passbook updates, please present your Society Membership Card at Antony Master Square Counter, Thrissur.');
+      setStatusMessage(i18n.t("portalModal.memberRecordsAreValidatedAgainst", "Member records are validated against offline registered ledgers. For active account status or passbook updates, please present your Society Membership Card at Antony Master Square Counter, Thrissur."));
     }, 700);
   };
 
@@ -30,8 +33,8 @@ export default function PortalModal({ isOpen, onClose }) {
               <UserCheck className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="font-serif font-bold text-lg leading-tight">Member Portal & Services</h3>
-              <p className="text-xs text-teal-100">{SOCIETY_INFO.shortName} Co-operative Gateway</p>
+              <h3 className="font-serif font-bold text-lg leading-tight">{t("portalModal.memberPortalServices", "Member Portal & Services")}</h3>
+              <p className="text-xs text-teal-100">{SOCIETY_INFO.shortName} {t("portalModal.coOperativeGateway", "Co-operative Gateway")}</p>
             </div>
           </div>
           <button 
@@ -45,19 +48,19 @@ export default function PortalModal({ isOpen, onClose }) {
         {/* Content */}
         <div className="p-6">
           <p className="text-xs text-slate-600 mb-4 leading-relaxed">
-            Welcome to the member verification portal of <strong>{SOCIETY_INFO.fullName}</strong>. Registered members can verify their membership folio or submit assistance requests.
+            {t("portalModal.welcomeToTheMemberVerification", "Welcome to the member verification portal of")} <strong>{SOCIETY_INFO.fullName}</strong>{t("portalModal.registeredMembersCanVerifyTheir", ". Registered members can verify their membership folio or submit assistance requests.")}
           </p>
 
           <form onSubmit={handleVerify} className="space-y-4">
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Society Membership Folio / Application No.
+                {t("portalModal.societyMembershipFolioApplicationNo", "Society Membership Folio / Application No.")}
               </label>
               <div className="relative">
                 <input
                   type="text"
                   required
-                  placeholder="e.g. AFX-MEM-2026-XXXX"
+                  placeholder={t("portalModal.eGAfxMem2026", "e.g. AFX-MEM-2026-XXXX")}
                   value={memberId}
                   onChange={(e) => setMemberId(e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#00b4a7] text-slate-900 text-sm"
@@ -70,7 +73,7 @@ export default function PortalModal({ isOpen, onClose }) {
               disabled={isSearching}
               className="w-full bg-[#00b4a7] hover:bg-[#009d91] text-white font-bold py-2.5 rounded transition-all flex items-center justify-center gap-2 text-sm cursor-pointer disabled:opacity-75"
             >
-              {isSearching ? 'Verifying Society Register...' : 'Verify Member Records'}
+              {isSearching ? t("portalModal.verifyingSocietyRegister", "Verifying Society Register...") : t("portalModal.verifyMemberRecords", "Verify Member Records")}
             </button>
           </form>
 
@@ -86,23 +89,23 @@ export default function PortalModal({ isOpen, onClose }) {
           <div className="mt-6 pt-4 border-t border-slate-200 text-xs text-slate-500 space-y-2">
             <div className="flex items-center gap-2">
               <Building className="w-3.5 h-3.5 text-slate-400" />
-              <span>Head Office: Arimpoor, Veluthur P.O., Thrissur</span>
+              <span>{t("portalModal.headOfficeArimpoorVeluthurP", "Head Office: Arimpoor, Veluthur P.O., Thrissur")}</span>
             </div>
             <div className="flex items-center gap-2">
               <Lock className="w-3.5 h-3.5 text-slate-400" />
-              <span>Member data protected as per cooperative society bye-laws</span>
+              <span>{t("portalModal.memberDataProtectedAsPer", "Member data protected as per cooperative society bye-laws")}</span>
             </div>
           </div>
 
           <div className="mt-4 pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs">
-            <span className="text-slate-500 font-medium">Administration:</span>
+            <span className="text-slate-500 font-medium">{t("portalModal.administration", "Administration:")}</span>
             <div className="flex items-center gap-3 flex-wrap">
               <Link
                 to="/super-admin/login"
                 onClick={onClose}
                 className="font-semibold text-[#00b4a7] hover:underline"
               >
-                Super Admin &rarr;
+                {t("portalModal.superAdmin", "Super Admin →")}
               </Link>
               <span className="text-slate-300">&bull;</span>
               <Link
@@ -110,7 +113,7 @@ export default function PortalModal({ isOpen, onClose }) {
                 onClick={onClose}
                 className="font-semibold text-amber-600 hover:underline"
               >
-                Branch Admin &rarr;
+                {t("portalModal.branchAdmin", "Branch Admin →")}
               </Link>
               <span className="text-slate-300">&bull;</span>
               <Link
@@ -118,7 +121,7 @@ export default function PortalModal({ isOpen, onClose }) {
                 onClick={onClose}
                 className="font-semibold text-teal-700 hover:underline"
               >
-                Staff &rarr;
+                {t("portalModal.staff", "Staff →")}
               </Link>
             </div>
           </div>

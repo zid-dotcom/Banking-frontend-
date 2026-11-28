@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import StatCard from '../../components/dashboard/StatCard';
 import {
@@ -52,6 +53,7 @@ function formatDateTime(isoString) {
 }
 
 export default function MemberHelpdesk() {
+  const { t } = useTranslation();
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -273,7 +275,7 @@ export default function MemberHelpdesk() {
             <div className="inline-flex flex-wrap items-center gap-x-2 gap-y-1 px-3 sm:px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-xs text-[11px] sm:text-xs font-semibold border border-teal-200/80 shadow-2xs text-[#0f766e] mb-3">
               <span className="inline-flex items-center gap-1.5 flex-shrink-0">
                 <LifeBuoy className="w-3.5 h-3.5 text-[#00b4a7]" />
-                <span>Society Helpdesk &amp; Member Support</span>
+                <span>{t("memberHelpdesk.societyHelpdeskMemberSupport", "Society Helpdesk & Member Support")}</span>
               </span>
               <span className="text-teal-300 hidden sm:inline">•</span>
               <span className="text-slate-600">
@@ -285,12 +287,12 @@ export default function MemberHelpdesk() {
             <div className="flex items-center gap-3">
               <span className="w-1.5 h-8 sm:h-9 bg-[#00b4a7] rounded-full flex-shrink-0" />
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0f2e2e] tracking-tight">
-                Member Service Requests
+                {t("branchManagerServiceRequests.memberServiceRequests", "Member Service Requests")}
               </h1>
             </div>
 
             <p className="text-slate-600 text-xs sm:text-sm mt-2.5 font-medium leading-relaxed max-w-xl">
-              Submit assistance tickets, inquire about schemes or transactions, and track society grievance resolutions directly with branch officers.
+              {t("memberHelpdesk.submitAssistanceTicketsInquireAbout", "Submit assistance tickets, inquire about schemes or transactions, and track society grievance resolutions directly with branch officers.")}
             </p>
 
             <div className="mt-4 flex items-center gap-3">
@@ -300,7 +302,7 @@ export default function MemberHelpdesk() {
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-teal-500/20 transition-all cursor-pointer"
               >
                 <PlusCircle className="w-4 h-4" />
-                <span>New Service Request</span>
+                <span>{t("memberHelpdesk.newServiceRequest", "New Service Request")}</span>
               </button>
             </div>
           </div>
@@ -309,7 +311,7 @@ export default function MemberHelpdesk() {
           <div className="relative z-10 flex justify-center md:justify-end pointer-events-none -my-2 sm:-my-5 lg:-my-6 flex-shrink-0">
             <img
               src={supportSticker}
-              alt="Society Member Support"
+              alt={t("memberHelpdesk.societyMemberSupport", "Society Member Support")}
               className="h-36 sm:h-48 lg:h-56 w-auto object-contain drop-shadow-md select-none pointer-events-none"
             />
           </div>
@@ -323,32 +325,32 @@ export default function MemberHelpdesk() {
         {/* 4 Summary Stat Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <StatCard
-            title="Total Requests"
+            title={t("memberHelpdesk.totalRequests", "Total Requests")}
             value={totalCount}
-            subtitle="Logged Assistance Folios"
+            subtitle={t("memberHelpdesk.loggedAssistanceFolios", "Logged Assistance Folios")}
             icon={LifeBuoy}
             trend={`${pendingCount} pending`}
             trendType="up"
           />
           <StatCard
-            title="Open / In Progress"
+            title={t("memberHelpdesk.openInProgress", "Open / In Progress")}
             value={openCount}
-            subtitle="Active Attention"
+            subtitle={t("memberHelpdesk.activeAttention", "Active Attention")}
             icon={Clock}
             badge="Assigned Desk"
           />
           <StatCard
-            title="Solved Requests"
+            title={t("memberHelpdesk.solvedRequests", "Solved Requests")}
             value={solvedCount}
-            subtitle="Completed Solutions"
+            subtitle={t("memberHelpdesk.completedSolutions", "Completed Solutions")}
             icon={CheckCircle2}
             trend={totalCount > 0 ? `${Math.round((solvedCount / totalCount) * 100)}% solved` : '100%'}
             trendType="up"
           />
           <StatCard
-            title="Assistance Level"
+            title={t("memberHelpdesk.assistanceLevel", "Assistance Level")}
             value="Priority"
-            subtitle="Direct Branch Link"
+            subtitle={t("memberHelpdesk.directBranchLink", "Direct Branch Link")}
             icon={ShieldCheck}
             trend="Active Member"
             trendType="up"
@@ -373,11 +375,11 @@ export default function MemberHelpdesk() {
                   <MessageSquare className="w-4 h-4 text-[#00b4a7]" />
                 </div>
                 <h3 className="font-serif font-bold text-slate-900 text-lg">
-                  My Service &amp; Support Requests
+                  {t("memberHelpdesk.myServiceSupportRequests", "My Service & Support Requests")}
                 </h3>
               </div>
               <p className="text-xs text-slate-500 font-medium mt-0.5">
-                Official grievances, clarification queries, and member desk folios
+                {t("memberHelpdesk.officialGrievancesClarificationQueriesAnd", "Official grievances, clarification queries, and member desk folios")}
               </p>
             </div>
 
@@ -387,7 +389,7 @@ export default function MemberHelpdesk() {
                 <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
                   type="text"
-                  placeholder="Search by subject or ticket #..."
+                  placeholder={t("memberHelpdesk.searchBySubjectOrTicket", "Search by subject or ticket #...")}
                   value={searchQuery}
                   onChange={(e) => {
                     setSearchQuery(e.target.value);
@@ -416,16 +418,16 @@ export default function MemberHelpdesk() {
                 }}
                 className="py-2 px-3 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl font-medium focus:outline-none focus:border-teal-500 cursor-pointer"
               >
-                <option value="all">All Statuses</option>
-                <option value="pending">Pending</option>
-                <option value="in_progress">In Progress</option>
-                <option value="solved">Solved</option>
+                <option value="all">{t("branchManagerFdMisSchemes.allStatuses", "All Statuses")}</option>
+                <option value="pending">{t("common.pending", "Pending")}</option>
+                <option value="in_progress">{t("dashboardModule.branchOverview.statusInProgress", "In Progress")}</option>
+                <option value="solved">{t("dashboardModule.branchOverview.statusSolved", "Solved")}</option>
               </select>
 
               <button
                 onClick={() => fetchRequests(true)}
                 disabled={refreshing}
-                title="Refresh service requests"
+                title={t("memberHelpdesk.refreshServiceRequests", "Refresh service requests")}
                 className="p-2 border border-slate-200 rounded-xl hover:bg-slate-50 text-slate-600 transition-colors disabled:opacity-50 cursor-pointer"
               >
                 <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin text-teal-600' : ''}`} />
@@ -437,7 +439,7 @@ export default function MemberHelpdesk() {
                 className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
               >
                 <PlusCircle className="w-4 h-4" />
-                <span>New Request</span>
+                <span>{t("memberHelpdesk.newRequest", "New Request")}</span>
               </button>
             </div>
           </div>
@@ -448,7 +450,7 @@ export default function MemberHelpdesk() {
               <div className="flex items-start gap-2.5">
                 <AlertCircle className="w-5 h-5 flex-shrink-0 text-red-600 mt-0.5" />
                 <div>
-                  <p className="text-sm font-bold text-red-900">Failed to load service requests</p>
+                  <p className="text-sm font-bold text-red-900">{t("memberHelpdesk.failedToLoadServiceRequests", "Failed to load service requests")}</p>
                   <p className="text-xs text-red-700 mt-0.5">{error}</p>
                 </div>
               </div>
@@ -456,7 +458,7 @@ export default function MemberHelpdesk() {
                 onClick={() => fetchRequests()}
                 className="text-xs font-bold text-red-700 hover:text-red-900 underline cursor-pointer flex-shrink-0"
               >
-                Retry
+                {t("common.retry", "Retry")}
               </button>
             </div>
           )}
@@ -466,7 +468,7 @@ export default function MemberHelpdesk() {
             {loading ? (
               <div className="py-20 text-center space-y-3">
                 <div className="w-10 h-10 border-3 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto" />
-                <p className="text-sm text-slate-500 font-medium">Loading your support tickets...</p>
+                <p className="text-sm text-slate-500 font-medium">{t("memberHelpdesk.loadingYourSupportTickets", "Loading your support tickets...")}</p>
               </div>
             ) : filteredRequests.length === 0 ? (
               <div className="py-20 text-center space-y-4 max-w-sm mx-auto p-4">
@@ -475,12 +477,12 @@ export default function MemberHelpdesk() {
                 </div>
                 <div>
                   <p className="text-base font-bold text-slate-800">
-                    {searchQuery ? 'No matching service requests found' : 'No service requests submitted yet'}
+                    {searchQuery ? t("memberHelpdesk.noMatchingServiceRequestsFound", "No matching service requests found") : t("memberHelpdesk.noServiceRequestsSubmittedYet", "No service requests submitted yet")}
                   </p>
                   <p className="text-xs text-slate-500 mt-1 font-medium leading-relaxed">
                     {searchQuery
-                      ? 'Try clearing your search query or adjusting status filter.'
-                      : 'Have questions about your deposits, loans, or account? Click "New Request" to create one.'}
+                      ? t("memberHelpdesk.tryClearingYourSearchQuery", "Try clearing your search query or adjusting status filter.")
+                      : t("memberHelpdesk.haveQuestionsAboutYourDeposits", "Have questions about your deposits, loans, or account? Click \"New Request\" to create one.")}
                   </p>
                 </div>
                 {!searchQuery && (
@@ -490,7 +492,7 @@ export default function MemberHelpdesk() {
                     className="inline-flex items-center gap-1.5 px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer"
                   >
                     <PlusCircle className="w-4 h-4" />
-                    <span>Create Your First Request</span>
+                    <span>{t("memberHelpdesk.createYourFirstRequest", "Create Your First Request")}</span>
                   </button>
                 )}
               </div>
@@ -498,15 +500,16 @@ export default function MemberHelpdesk() {
               <table className="w-full text-left border-collapse min-w-[750px]">
                 <thead>
                   <tr className="border-b border-slate-100 bg-slate-50/75 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                    <th className="py-3.5 px-6">Request ID</th>
-                    <th className="py-3.5 px-6">Subject &amp; Description</th>
-                    <th className="py-3.5 px-6">Created On</th>
-                    <th className="py-3.5 px-6 text-center">Status</th>
-                    <th className="py-3.5 px-6 text-right">Actions</th>
+                    <th className="py-3.5 px-6">{t("branchManagerNominees.requestId", "Request ID")}</th>
+                    <th className="py-3.5 px-6">{t("branchManagerServiceRequests.subjectDescription", "Subject & Description")}</th>
+                    <th className="py-3.5 px-6">{t("memberHelpdesk.createdOn", "Created On")}</th>
+                    <th className="py-3.5 px-6 text-center">{t("common.status", "Status")}</th>
+                    <th className="py-3.5 px-6 text-right">{t("common.actions", "Actions")}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-sm">
                   {paginatedRequests.map((req) => {
+  const { t } = useTranslation();
                     const reqId = req.id || req.request_id || req.ticket_id || 'REQ-01';
                     const st = (req.status || 'open').toLowerCase();
 
@@ -566,10 +569,10 @@ export default function MemberHelpdesk() {
                           <button
                             onClick={() => handleViewDetail(req)}
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-800 font-bold text-xs rounded-xl transition-colors cursor-pointer border border-teal-200/60 shadow-2xs"
-                            title="View request details and replies"
+                            title={t("memberHelpdesk.viewRequestDetailsAndReplies", "View request details and replies")}
                           >
                             <Eye className="w-3.5 h-3.5 text-[#00b4a7]" />
-                            <span>View Replies</span>
+                            <span>{t("memberHelpdesk.viewReplies", "View Replies")}</span>
                           </button>
                         </td>
                       </tr>
@@ -584,15 +587,15 @@ export default function MemberHelpdesk() {
           {filteredRequests.length > itemsPerPage && (
             <div className="p-4 sm:p-5 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-medium">
               <div>
-                Showing{' '}
+                {t("common.showing", "Showing")}{' '}
                 <span className="font-bold text-slate-800">
                   {(currentPage - 1) * itemsPerPage + 1}
                 </span>{' '}
-                to{' '}
+                {t("common.to", "to")}{' '}
                 <span className="font-bold text-slate-800">
                   {Math.min(currentPage * itemsPerPage, filteredRequests.length)}
                 </span>{' '}
-                of <span className="font-bold text-slate-800">{filteredRequests.length}</span> requests
+                {t("common.of", "of")} <span className="font-bold text-slate-800">{filteredRequests.length}</span> {t("branchManagerNominees.requests", "requests")}
               </div>
 
               <div className="flex items-center gap-1">

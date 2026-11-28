@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import StatCard from '../../components/dashboard/StatCard';
@@ -24,6 +25,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 import modernTealBankIllustration from '../../assets/Modern Teal Bank with Coins and Rupee Bag.webp';
+
 
 function formatCurrency(val) {
   if (val === undefined || val === null || isNaN(val)) return '₹0';
@@ -53,6 +55,7 @@ function formatDateTime(isoString) {
 }
 
 export default function MemberAccountTransactions() {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
 
@@ -61,7 +64,7 @@ export default function MemberAccountTransactions() {
       const u = localStorage.getItem('member_user');
       const parsed = u ? JSON.parse(u) : null;
       if (parsed) {
-        const name = parsed.full_name || parsed.name || 'Member';
+        const name = parsed.full_name || parsed.name || t("dashboardModule.accountTransactions.roleMember", "Member");
         const branchObj = typeof parsed.branch === 'object' && parsed.branch !== null ? parsed.branch : null;
         const branchName = branchObj?.name || (typeof parsed.branch === 'string' ? parsed.branch : '');
         const branchLocation = [branchObj?.city, branchObj?.state].filter(Boolean).join(', ');
@@ -72,7 +75,7 @@ export default function MemberAccountTransactions() {
           member_code: parsed.member_code || (parsed.id ? String(parsed.id) : ''),
           email: parsed.email || '',
           mobile: parsed.mobile || '',
-          branch: branchName || 'Society Branch',
+          branch: branchName || t("dashboardModule.accountTransactions.societyBranch", "Society Branch"),
           branch_name: branchName,
           branch_location: branchLocation,
           status: parsed.status || 'approved',
@@ -81,13 +84,13 @@ export default function MemberAccountTransactions() {
       }
     } catch {}
     return {
-      name: 'Member',
-      full_name: 'Member',
+      name: t("dashboardModule.accountTransactions.roleMember", "Member"),
+      full_name: t("dashboardModule.accountTransactions.roleMember", "Member"),
       id: 'AFX-MEM-8842',
       member_code: '',
       email: '',
       mobile: '',
-      branch: 'Society Branch',
+      branch: t("dashboardModule.accountTransactions.societyBranch", "Society Branch"),
       branch_name: '',
       branch_location: '',
       status: 'approved',
@@ -100,7 +103,7 @@ export default function MemberAccountTransactions() {
     getMemberMe()
       .then((data) => {
         if (data) {
-          const name = data.full_name || data.name || 'Member';
+          const name = data.full_name || data.name || t("dashboardModule.accountTransactions.roleMember", "Member");
           const branchObj = typeof data.branch === 'object' && data.branch !== null ? data.branch : null;
           const branchName = branchObj?.name || (typeof data.branch === 'string' ? data.branch : '');
           const branchLocation = [branchObj?.city, branchObj?.state].filter(Boolean).join(', ');
@@ -111,7 +114,7 @@ export default function MemberAccountTransactions() {
             member_code: data.member_code || (data.id ? String(data.id) : ''),
             email: data.email || '',
             mobile: data.mobile || '',
-            branch: branchName || 'Society Branch',
+            branch: branchName || t("dashboardModule.accountTransactions.societyBranch", "Society Branch"),
             branch_name: branchName,
             branch_location: branchLocation,
             status: data.status || 'approved',
@@ -168,7 +171,7 @@ export default function MemberAccountTransactions() {
     if (!accId) return;
 
     if (fromDate && toDate && fromDate > toDate) {
-      setErrorTx('"From" date cannot be after "To" date.');
+      setErrorTx(t("dashboardModule.accountTransactions.invalidDateRange", "\"From\" date cannot be after \"To\" date."));
       return;
     }
 
@@ -189,7 +192,7 @@ export default function MemberAccountTransactions() {
       setTransactions(Array.isArray(data) ? data : []);
     } catch (err) {
       console.warn('getMemberSavingsAccountTransactions error:', err);
-      setErrorTx(err.message || 'Failed to load savings account transactions.');
+      setErrorTx(err.message || t("dashboardModule.accountTransactions.loadError", "Failed to load savings account transactions."));
       setTransactions([]);
     } finally {
       setLoadingTx(false);
@@ -307,27 +310,27 @@ export default function MemberAccountTransactions() {
             <div className="inline-flex flex-wrap items-center gap-x-2 gap-y-1 px-3 sm:px-3.5 py-1.5 rounded-2xl sm:rounded-full bg-white/95 backdrop-blur-xs text-[11px] sm:text-xs font-semibold border border-teal-200/80 shadow-2xs text-[#0f766e] mb-3 max-w-full">
               <span className="inline-flex items-center gap-1.5 flex-shrink-0">
                 <Landmark className="w-3.5 h-3.5 text-[#00b4a7]" />
-                <span>Role: <strong className="font-bold text-teal-950">Member</strong></span>
+                <span>{t("dashboardModule.accountTransactions.roleLabel", "Role:")} <strong className="font-bold text-teal-950">{t("dashboardModule.accountTransactions.roleMember", "Member")}</strong></span>
               </span>
               <span className="text-teal-300 hidden sm:inline">•</span>
               <span className="text-slate-600 sm:text-[#0f766e]">
-                {memberUser.branch_name || 'Society Savings Folios'}
+                {memberUser.branch_name || t("dashboardModule.accountTransactions.societySavingsFolios", "Society Savings Folios")}
               </span>
               <span className="text-teal-300 hidden sm:inline">•</span>
               <span className="inline-flex items-center gap-1.5 font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full text-[10px] sm:text-xs flex-shrink-0">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                Live Passbook
+                {t("dashboardModule.accountTransactions.livePassbook", "Live Passbook")}
               </span>
             </div>
 
             <div className="flex items-center gap-2.5 sm:gap-3">
               <span className="w-1.5 h-7 sm:h-9 bg-[#00b4a7] rounded-full flex-shrink-0" />
               <h1 className="text-xl sm:text-3xl lg:text-4xl font-serif font-bold text-slate-900 tracking-tight">
-                Account Transactions
+                {t("dashboardModule.accountTransactions.title", "Account Transactions")}
               </h1>
             </div>
             <p className="text-xs sm:text-sm text-slate-600 font-medium mt-2 leading-relaxed">
-              Real-time verified ledger of cash deposits and cash withdrawals processed across your cooperative society savings accounts.
+              {t("dashboardModule.accountTransactions.subtitle", "Real-time verified ledger of cash deposits and cash withdrawals processed across your cooperative society savings accounts.")}
             </p>
 
             <div className="flex items-center gap-3 mt-4 flex-wrap">
@@ -337,13 +340,13 @@ export default function MemberAccountTransactions() {
                 className="px-4 py-2.5 rounded-xl bg-white border border-teal-200/80 hover:bg-teal-50/60 text-[#0f766e] font-bold text-xs flex items-center gap-2 transition-all cursor-pointer shadow-2xs"
               >
                 <RefreshCw className={`w-3.5 h-3.5 text-[#00b4a7] ${loadingTx ? 'animate-spin' : ''}`} />
-                <span>Refresh Ledger</span>
+                <span>{t("dashboardModule.accountTransactions.refreshLedger", "Refresh Ledger")}</span>
               </button>
               <button
                 onClick={() => navigate('/member/savings-schemes')}
                 className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#14b8a6] to-[#0f766e] text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-xs cursor-pointer hover:shadow-md"
               >
-                <span>Savings Schemes</span>
+                <span>{t("sidebar.savingsSchemes", "Savings Schemes")}</span>
                 <ChevronRight className="w-3.5 h-3.5" />
               </button>
             </div>
@@ -352,7 +355,7 @@ export default function MemberAccountTransactions() {
           <div className="relative z-10 flex justify-center md:justify-end pointer-events-none -my-2 sm:-my-5 lg:-my-6 flex-shrink-0 w-full md:w-auto">
             <img
               src={modernTealBankIllustration}
-              alt="Account Transactions"
+              alt={t("dashboardModule.accountTransactions.title", "Account Transactions")}
               className="h-32 sm:h-44 lg:h-52 max-w-full w-auto object-contain drop-shadow-md select-none pointer-events-none transform hover:scale-102 transition-transform duration-300 mx-auto md:mx-0"
             />
           </div>
@@ -370,20 +373,20 @@ export default function MemberAccountTransactions() {
               </div>
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-teal-800 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-200">
-                  Active Savings Account
+                  {t("dashboardModule.accountTransactions.activeSavingsAccount", "Active Savings Account")}
                 </span>
                 <h3 className="font-extrabold text-slate-900 text-base sm:text-lg mt-1 font-mono">
-                  {currentAccount?.account_number || `Folio #${currentAccount?.id}`}
+                  {currentAccount?.account_number || `${t("dashboardModule.accountTransactions.folio", "Folio")} #${currentAccount?.id}`}
                 </h3>
                 <p className="text-xs text-slate-500 font-medium">
-                  {currentAccount?.scheme_name || 'Savings Scheme'} • {currentAccount?.branch_name || 'Society Branch'}
+                  {currentAccount?.scheme_name || t("dashboardModule.accountTransactions.savingsScheme", "Savings Scheme")} • {currentAccount?.branch_name || t("dashboardModule.accountTransactions.societyBranch", "Society Branch")}
                 </p>
               </div>
             </div>
 
             {/* Account Selector Dropdown */}
             <div className="flex items-center gap-2 self-start md:self-auto">
-              <label className="text-xs font-bold text-slate-500 whitespace-nowrap">Switch Scheme:</label>
+              <label className="text-xs font-bold text-slate-500 whitespace-nowrap">{t("dashboardModule.accountTransactions.switchScheme", "Switch Scheme:")}</label>
               <select
                 value={selectedAccountId || ''}
                 onChange={(e) => {
@@ -395,7 +398,7 @@ export default function MemberAccountTransactions() {
               >
                 {accounts.map((acc) => (
                   <option key={acc.id} value={acc.id}>
-                    {acc.account_number || `Folio #${acc.id}`} ({acc.scheme_name || 'Savings'}) - {formatCurrency(acc.balance || 0)}
+                    {acc.account_number || `${t("dashboardModule.accountTransactions.folio", "Folio")} #${acc.id}`} ({acc.scheme_name || t("dashboardModule.accountTransactions.savings", "Savings")}) - {formatCurrency(acc.balance || 0)}
                   </option>
                 ))}
               </select>
@@ -406,9 +409,9 @@ export default function MemberAccountTransactions() {
             <div className="flex items-center gap-3">
               <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0" />
               <div>
-                <p className="text-sm font-bold">No active savings accounts found</p>
+                <p className="text-sm font-bold">{t("dashboardModule.accountTransactions.noActiveAccountsTitle", "No active savings accounts found")}</p>
                 <p className="text-xs text-amber-700 mt-0.5">
-                  You need an active savings account to record and view cash transactions.
+                  {t("dashboardModule.accountTransactions.noActiveAccountsDesc", "You need an active savings account to record and view cash transactions.")}
                 </p>
               </div>
             </div>
@@ -416,7 +419,7 @@ export default function MemberAccountTransactions() {
               onClick={() => navigate('/member/savings-schemes')}
               className="px-3.5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs cursor-pointer transition-colors shadow-2xs"
             >
-              Browse Schemes
+              {t("dashboardModule.accountTransactions.browseSchemes", "Browse Schemes")}
             </button>
           </div>
         ) : null}
@@ -424,35 +427,35 @@ export default function MemberAccountTransactions() {
         {/* 4 Summary Stat Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <StatCard
-            title="Account Balance"
+            title={t("dashboardModule.accountTransactions.accountBalance", "Account Balance")}
             value={formatCurrency(currentAccount?.balance ?? 0)}
-            subtitle={currentAccount?.account_number ? `Acc #${currentAccount.account_number}` : 'Savings Balance'}
+            subtitle={currentAccount?.account_number ? `${t("dashboardModule.accountTransactions.accPrefix", "Acc #")}${currentAccount.account_number}` : t("dashboardModule.accountTransactions.savingsBalance", "Savings Balance")}
             icon={Wallet}
-            trend="Available Counter Balance"
+            trend={t("dashboardModule.accountTransactions.availableCounterBalance", "Available Counter Balance")}
             trendType="up"
           />
           <StatCard
-            title="Total Cash Deposits"
+            title={t("dashboardModule.accountTransactions.totalCashDeposits", "Total Cash Deposits")}
             value={formatCurrency(totalDepositsAmount)}
-            subtitle={`${totalDepositsCount} deposits ${hasDateFilter ? '(filtered)' : '(today)'}`}
+            subtitle={`${totalDepositsCount} ${t("dashboardModule.accountTransactions.depositsLabel", "deposits")} ${hasDateFilter ? t("dashboardModule.accountTransactions.filteredTag", "(filtered)") : t("dashboardModule.accountTransactions.todayTag", "(today)")}`}
             icon={ArrowDownLeft}
-            trend="Cash Desk Inflows"
+            trend={t("dashboardModule.accountTransactions.cashDeskInflows", "Cash Desk Inflows")}
             trendType="up"
           />
           <StatCard
-            title="Total Cash Withdrawals"
+            title={t("dashboardModule.accountTransactions.totalCashWithdrawals", "Total Cash Withdrawals")}
             value={formatCurrency(totalWithdrawalsAmount)}
-            subtitle={`${totalWithdrawalsCount} withdrawals ${hasDateFilter ? '(filtered)' : '(today)'}`}
+            subtitle={`${totalWithdrawalsCount} ${t("dashboardModule.accountTransactions.withdrawalsLabel", "withdrawals")} ${hasDateFilter ? t("dashboardModule.accountTransactions.filteredTag", "(filtered)") : t("dashboardModule.accountTransactions.todayTag", "(today)")}`}
             icon={ArrowUpRight}
-            trend="Counter Cash Releases"
+            trend={t("dashboardModule.accountTransactions.counterCashReleases", "Counter Cash Releases")}
             trendType="down"
           />
           <StatCard
-            title="Total Transactions"
+            title={t("dashboardModule.accountTransactions.totalTransactions", "Total Transactions")}
             value={totalTxCount.toString()}
-            subtitle={hasDateFilter ? 'Filtered ledger entries' : "Today's ledger entries"}
+            subtitle={hasDateFilter ? t("dashboardModule.accountTransactions.filteredLedgerEntries", "Filtered ledger entries") : t("dashboardModule.accountTransactions.todaysLedgerEntries", "Today's ledger entries")}
             icon={Coins}
-            trend="Verified Ledger Count"
+            trend={t("dashboardModule.accountTransactions.verifiedLedgerCount", "Verified Ledger Count")}
             trendType="neutral"
           />
         </div>
@@ -473,7 +476,7 @@ export default function MemberAccountTransactions() {
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  All ({filteredTransactions.length})
+                  {t("dashboardModule.accountTransactions.filterAll", "All")} ({filteredTransactions.length})
                 </button>
                 <button
                   type="button"
@@ -484,7 +487,7 @@ export default function MemberAccountTransactions() {
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  Deposits ({totalDepositsCount})
+                  {t("dashboardModule.accountTransactions.filterDeposits", "Deposits")} ({totalDepositsCount})
                 </button>
                 <button
                   type="button"
@@ -495,7 +498,7 @@ export default function MemberAccountTransactions() {
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  Withdrawals ({totalWithdrawalsCount})
+                  {t("dashboardModule.accountTransactions.filterWithdrawals", "Withdrawals")} ({totalWithdrawalsCount})
                 </button>
               </div>
             </div>
@@ -507,28 +510,28 @@ export default function MemberAccountTransactions() {
                 {/* FROM Box */}
                 <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-slate-200 shadow-2xs hover:border-teal-400 focus-within:border-teal-500 focus-within:ring-2 focus-within:ring-teal-100 transition-all">
                   <span className="text-[10px] font-black uppercase tracking-wider text-teal-800 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-200 select-none">
-                    From
+                    {t("dashboardModule.accountTransactions.from", "From")}
                   </span>
                   <input
                     type="date"
                     value={fromDate}
                     onChange={(e) => setFromDate(e.target.value)}
                     className="text-xs text-slate-800 font-bold focus:outline-none bg-transparent cursor-pointer"
-                    title="Filter transactions starting from this date"
+                    title={t("dashboardModule.accountTransactions.fromDateTitle", "Filter transactions starting from this date")}
                   />
                 </div>
 
                 {/* TO Box */}
                 <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-slate-200 shadow-2xs hover:border-teal-400 focus-within:border-teal-500 focus-within:ring-2 focus-within:ring-teal-100 transition-all">
                   <span className="text-[10px] font-black uppercase tracking-wider text-teal-800 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-200 select-none">
-                    To
+                    {t("dashboardModule.accountTransactions.to", "To")}
                   </span>
                   <input
                     type="date"
                     value={toDate}
                     onChange={(e) => setToDate(e.target.value)}
                     className="text-xs text-slate-800 font-bold focus:outline-none bg-transparent cursor-pointer"
-                    title="Filter transactions up to this date"
+                    title={t("dashboardModule.accountTransactions.toDateTitle", "Filter transactions up to this date")}
                   />
                 </div>
 
@@ -541,10 +544,10 @@ export default function MemberAccountTransactions() {
                       setToDate('');
                     }}
                     className="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 text-xs font-bold transition-all cursor-pointer flex items-center gap-1 shadow-2xs border border-slate-200"
-                    title="Clear Date Range"
+                    title={t("dashboardModule.accountTransactions.clearDateRangeTitle", "Clear Date Range")}
                   >
                     <X className="w-3.5 h-3.5 text-slate-500" />
-                    <span className="text-[11px]">Clear</span>
+                    <span className="text-[11px]">{t("dashboardModule.accountTransactions.clear", "Clear")}</span>
                   </button>
                 )}
               </div>
@@ -554,7 +557,7 @@ export default function MemberAccountTransactions() {
                 <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
                   type="text"
-                  placeholder="Search receipt, cashier, notes..."
+                  placeholder={t("dashboardModule.accountTransactions.searchPlaceholder", "Search receipt, cashier, notes...")}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-9 pr-8 py-2 rounded-xl border border-slate-200 bg-white text-xs text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-teal-100 focus:border-teal-500 w-full sm:w-56"
@@ -577,7 +580,7 @@ export default function MemberAccountTransactions() {
             {loadingTx ? (
               <div className="py-20 text-center space-y-3">
                 <div className="w-10 h-10 border-3 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto" />
-                <p className="text-sm text-slate-500 font-medium">Fetching savings account transactions...</p>
+                <p className="text-sm text-slate-500 font-medium">{t("dashboardModule.accountTransactions.fetchingTransactions", "Fetching savings account transactions...")}</p>
               </div>
             ) : errorTx ? (
               <div className="p-8 text-center text-rose-600 text-xs font-semibold">
@@ -589,30 +592,30 @@ export default function MemberAccountTransactions() {
                 <div className="w-14 h-14 rounded-2xl bg-teal-50 text-[#00b4a7] flex items-center justify-center mx-auto">
                   <Receipt className="w-7 h-7" />
                 </div>
-                <h4 className="text-base font-bold text-slate-900">No Transactions Found</h4>
+                <h4 className="text-base font-bold text-slate-900">{t("dashboardModule.accountTransactions.noTransactionsTitle", "No Transactions Found")}</h4>
                 <p className="text-xs text-slate-500 max-w-sm mx-auto">
                   {fromDate || toDate || searchQuery || typeFilter !== 'all'
-                    ? 'No transactions matched your filter criteria.'
-                    : 'No transactions have been recorded for this savings folio yet.'}
+                    ? t("dashboardModule.accountTransactions.noTransactionsFiltered", "No transactions matched your filter criteria.")
+                    : t("dashboardModule.accountTransactions.noTransactionsEmpty", "No transactions have been recorded for this savings folio yet.")}
                 </p>
               </div>
             ) : (
               <table className="w-full text-left border-collapse min-w-[1150px]">
                 <thead>
                   <tr className="border-b border-slate-100 bg-slate-50/75 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                    <th className="py-3.5 px-6">Receipt Number</th>
-                    <th className="py-3.5 px-6">Account Number</th>
-                    <th className="py-3.5 px-6">Transaction Type</th>
-                    <th className="py-3.5 px-6">Amount</th>
-                    <th className="py-3.5 px-6">Balance Before</th>
-                    <th className="py-3.5 px-6">Balance After</th>
-                    <th className="py-3.5 px-6">Branch Name</th>
-                    <th className="py-3.5 px-6">Branch Code</th>
-                    <th className="py-3.5 px-6">IFSC Code</th>
-                    <th className="py-3.5 px-6">Cashier Code</th>
-                    <th className="py-3.5 px-6">Cashier Name</th>
-                    <th className="py-3.5 px-6">Date &amp; Time</th>
-                    <th className="py-3.5 px-6">Notes</th>
+                    <th className="py-3.5 px-6">{t("dashboardModule.accountTransactions.colReceiptNumber", "Receipt Number")}</th>
+                    <th className="py-3.5 px-6">{t("dashboard.accountNumber", "Account Number")}</th>
+                    <th className="py-3.5 px-6">{t("dashboardModule.accountTransactions.colTransactionType", "Transaction Type")}</th>
+                    <th className="py-3.5 px-6">{t("dashboardModule.accountTransactions.colAmount", "Amount")}</th>
+                    <th className="py-3.5 px-6">{t("dashboardModule.accountTransactions.colBalanceBefore", "Balance Before")}</th>
+                    <th className="py-3.5 px-6">{t("dashboardModule.accountTransactions.colBalanceAfter", "Balance After")}</th>
+                    <th className="py-3.5 px-6">{t("dashboardModule.accountTransactions.colBranchName", "Branch Name")}</th>
+                    <th className="py-3.5 px-6">{t("dashboardModule.accountTransactions.colBranchCode", "Branch Code")}</th>
+                    <th className="py-3.5 px-6">{t("dashboardModule.accountTransactions.colIfscCode", "IFSC Code")}</th>
+                    <th className="py-3.5 px-6">{t("dashboardModule.accountTransactions.colCashierCode", "Cashier Code")}</th>
+                    <th className="py-3.5 px-6">{t("dashboardModule.accountTransactions.colCashierName", "Cashier Name")}</th>
+                    <th className="py-3.5 px-6">{t("dashboardModule.accountTransactions.colDateTime", "Date & Time")}</th>
+                    <th className="py-3.5 px-6">{t("dashboardModule.accountTransactions.colNotes", "Notes")}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-sm">
@@ -641,7 +644,7 @@ export default function MemberAccountTransactions() {
                             ) : (
                               <ArrowUpRight className="w-3.5 h-3.5 text-rose-600" />
                             )}
-                            <span>{isDeposit ? 'Deposit' : 'Withdrawal'}</span>
+                            <span>{isDeposit ? t("dashboardModule.accountTransactions.deposit", "Deposit") : t("dashboardModule.accountTransactions.withdrawal", "Withdrawal")}</span>
                           </span>
                         </td>
                         <td className="py-4 px-6 font-black font-sans text-sm whitespace-nowrap">
@@ -660,7 +663,7 @@ export default function MemberAccountTransactions() {
                             : '—'}
                         </td>
                         <td className="py-4 px-6 text-xs text-slate-800 font-medium whitespace-nowrap">
-                          {tx.branch_name || currentAccount?.branch_name || 'Society Branch'}
+                          {tx.branch_name || currentAccount?.branch_name || t("dashboardModule.accountTransactions.societyBranch", "Society Branch")}
                         </td>
                         <td className="py-4 px-6 font-mono text-xs text-slate-600 whitespace-nowrap">
                           {tx.branch_code || currentAccount?.branch_code || '—'}
@@ -678,7 +681,7 @@ export default function MemberAccountTransactions() {
                           {tx.cashier_code ? `#${tx.cashier_code}` : '—'}
                         </td>
                         <td className="py-4 px-6 text-xs text-slate-800 font-semibold whitespace-nowrap">
-                          {tx.cashier_name || 'Counter Cashier'}
+                          {tx.cashier_name || t("dashboardModule.accountTransactions.counterCashier", "Counter Cashier")}
                         </td>
                         <td className="py-4 px-6 text-xs text-slate-600 font-medium whitespace-nowrap">
                           {formatDateTime(tx.created_at || tx.timestamp || tx.date)}

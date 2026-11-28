@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import StatCard from '../../components/dashboard/StatCard';
 import { AnnouncementDetailModal } from '../../components/dashboard/AnnouncementModals';
@@ -22,8 +23,9 @@ import {
 } from 'lucide-react';
 import noticeIllustration from '../../assets/Glossy Banking Notice Collection.png';
 
-function formatDateTime(isoString) {
-  if (!isoString) return 'N/A';
+
+function formatDateTime(isoString, t) {
+  if (!isoString) return t ? t("common.na", "N/A") : 'N/A';
   try {
     const d = new Date(isoString);
     if (isNaN(d.getTime())) return isoString;
@@ -40,15 +42,18 @@ function formatDateTime(isoString) {
   }
 }
 
-function parseBranchInfo(obj = {}) {
+function parseBranchInfo(obj = {}, t) {
   const b = obj.branch;
   const isObj = b && typeof b === 'object';
+
+  const defaultBranchName = t ? t("dashboardModule.announcements.societyBranch", "Society Branch") : 'Society Branch';
+  const defaultLocation = t ? t("dashboardModule.announcements.defaultLocation", "Kerala") : 'Kerala';
 
   const name =
     (isObj ? (b.name || b.branch_name) : null) ||
     (typeof obj.branch_name === 'string' ? obj.branch_name : null) ||
     (typeof b === 'string' ? b : null) ||
-    'Society Branch';
+    defaultBranchName;
 
   const code =
     (isObj ? b.branch_code : null) ||
@@ -56,13 +61,14 @@ function parseBranchInfo(obj = {}) {
     (obj.branch_id ? `BRA-${obj.branch_id}` : 'BRA-01');
 
   const loc =
-    (isObj ? (b.city ? `${b.city}, ${b.state || 'Kerala'}` : b.state) : null) ||
-    (typeof obj.location === 'string' ? obj.location : 'Kerala');
+    (isObj ? (b.city ? `${b.city}, ${b.state || defaultLocation}` : b.state) : null) ||
+    (typeof obj.location === 'string' ? obj.location : defaultLocation);
 
   return { name, code, loc };
 }
 
 export default function BranchManagerAnnouncements() {
+  const { t } = useTranslation();
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -84,15 +90,15 @@ export default function BranchManagerAnnouncements() {
       const u = localStorage.getItem('branch_user') || localStorage.getItem('branch_manager_user');
       const parsed = u ? JSON.parse(u) : null;
       if (parsed) {
-        const name = parsed.full_name || parsed.name || 'Branch Manager';
-        const { name: bName, code: bCode, loc: bLoc } = parseBranchInfo(parsed);
+        const name = parsed.full_name || parsed.name || t("nav.branchManager", "Branch Manager");
+        const { name: bName, code: bCode, loc: bLoc } = parseBranchInfo(parsed, t);
         return {
           name,
           full_name: name,
           id: parsed.user_code || (parsed.id ? `MGR-${parsed.id}` : 'MGR-001'),
           user_code: parsed.user_code || (parsed.id ? `MGR-${parsed.id}` : 'MGR-001'),
           avatarText: name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'BM',
-          role: 'Branch Manager',
+          role: t("nav.branchManager", "Branch Manager"),
           branch: bName,
           branch_name: bName,
           branch_code: bCode,
@@ -103,16 +109,16 @@ export default function BranchManagerAnnouncements() {
       }
     } catch {}
     return {
-      name: 'Branch Manager',
-      full_name: 'Branch Manager',
+      name: t("nav.branchManager", "Branch Manager"),
+      full_name: t("nav.branchManager", "Branch Manager"),
       id: 'MGR-001',
       user_code: 'MGR-001',
       avatarText: 'BM',
-      role: 'Branch Manager',
-      branch: 'Society Branch',
-      branch_name: 'Society Branch',
+      role: t("nav.branchManager", "Branch Manager"),
+      branch: t("dashboardModule.announcements.societyBranch", "Society Branch"),
+      branch_name: t("dashboardModule.announcements.societyBranch", "Society Branch"),
       branch_code: 'BRA-01',
-      location: 'Kerala',
+      location: t("dashboardModule.announcements.defaultLocation", "Kerala"),
       is_active: true
     };
   });
@@ -138,7 +144,7 @@ export default function BranchManagerAnnouncements() {
           } catch {}
 
           const name = profile.full_name || profile.name || managerUser.name;
-          const { name: bName, code: bCode, loc: bLoc } = parseBranchInfo({ ...profile, ...branchInfo });
+          const { name: bName, code: bCode, loc: bLoc } = parseBranchInfo({ ...profile, ...branchInfo }, t);
 
           setManagerUser(prev => ({
             ...prev,
@@ -181,7 +187,7 @@ export default function BranchManagerAnnouncements() {
       if (err.message && err.message.toLowerCase().includes('token is expired')) {
         return;
       }
-      setError(err.message || 'Failed to load official announcements for branch admin.');
+      setError(err.message || t("dashboardModule.announcements.fetchError", "Failed to load official announcements for branch admin."));
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -224,16 +230,16 @@ export default function BranchManagerAnnouncements() {
             <div className="inline-flex flex-wrap items-center gap-x-2 gap-y-1 px-3 sm:px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-xs text-[11px] sm:text-xs font-semibold border border-teal-200/80 shadow-2xs text-[#0f766e] mb-3">
               <span className="inline-flex items-center gap-1.5 flex-shrink-0">
                 <Building2 className="w-3.5 h-3.5 text-[#00b4a7]" />
-                <span>Role: Branch Manager</span>
+                <span>{t("dashboardModule.announcements.roleBadge", "Role: Branch Manager")}</span>
               </span>
               <span className="text-teal-300 hidden sm:inline">•</span>
               <span className="text-slate-600">
-                {managerUser.branch_name || 'Society Branch'} (#{managerUser.branch_code || 'BRA-01'})
+                {managerUser.branch_name || t("dashboardModule.announcements.societyBranch", "Society Branch")} (#{managerUser.branch_code || 'BRA-01'})
               </span>
               <span className="text-teal-300 hidden sm:inline">•</span>
               <span className="inline-flex items-center gap-1 font-bold text-emerald-700">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                Live Feed
+                {t("dashboardModule.announcements.liveFeed", "Live Feed")}
               </span>
             </div>
 
@@ -241,12 +247,12 @@ export default function BranchManagerAnnouncements() {
             <div className="flex items-center gap-3">
               <span className="w-1.5 h-8 sm:h-9 bg-[#00b4a7] rounded-full flex-shrink-0" />
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0f2e2e] tracking-tight">
-                Society Announcements
+                {t("dashboardModule.announcements.title", "Society Announcements")}
               </h1>
             </div>
 
             <p className="text-slate-600 text-xs sm:text-sm mt-2.5 font-medium leading-relaxed max-w-xl">
-              Official cooperative broadcasts, board resolutions, regulatory circulars, and branch administrative notices issued by the apex super admin management.
+              {t("dashboardModule.announcements.subtitle", "Official cooperative broadcasts, board resolutions, regulatory circulars, and branch administrative notices issued by the apex super admin management.")}
             </p>
           </div>
 
@@ -254,7 +260,7 @@ export default function BranchManagerAnnouncements() {
           <div className="relative z-10 flex justify-center md:justify-end pointer-events-none -my-2 sm:-my-5 lg:-my-6 flex-shrink-0">
             <img
               src={noticeIllustration}
-              alt="Society Announcements Notice Collection"
+              alt={t("dashboardModule.announcements.bannerAlt", "Society Announcements Notice Collection")}
               className="h-36 sm:h-48 lg:h-56 w-auto object-contain drop-shadow-md select-none pointer-events-none"
             />
           </div>
@@ -268,26 +274,26 @@ export default function BranchManagerAnnouncements() {
         {/* 3 Summary Stat Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
           <StatCard
-            title="Total Notices"
+            title={t("dashboardModule.announcements.totalNotices", "Total Notices")}
             value={totalCount}
-            subtitle="Published by Apex Management"
+            subtitle={t("dashboardModule.announcements.publishedByApex", "Published by Apex Management")}
             icon={Megaphone}
-            trend={`${activeCount} active`}
+            trend={`${activeCount} ${t("dashboardModule.announcements.activeLabel", "active")}`}
             trendType="up"
           />
           <StatCard
-            title="Active Notices"
+            title={t("dashboardModule.announcements.activeNotices", "Active Notices")}
             value={activeCount}
-            subtitle="Current In-Effect Directives"
+            subtitle={t("dashboardModule.announcements.activeNoticesSubtitle", "Current In-Effect Directives")}
             icon={CheckCircle2}
-            badge="Verified Circulars"
+            badge={t("dashboardModule.announcements.verifiedCirculars", "Verified Circulars")}
           />
           <StatCard
-            title="Administrative Channel"
-            value="Super Admin Feed"
-            subtitle="Official Society Channel"
+            title={t("dashboardModule.announcements.adminChannel", "Administrative Channel")}
+            value={t("dashboardModule.announcements.superAdminFeed", "Super Admin Feed")}
+            subtitle={t("dashboardModule.announcements.officialChannelSubtitle", "Official Society Channel")}
             icon={Bell}
-            trend="Instant Updates"
+            trend={t("dashboardModule.announcements.instantUpdates", "Instant Updates")}
             trendType="up"
           />
         </div>
@@ -302,11 +308,11 @@ export default function BranchManagerAnnouncements() {
                   <Megaphone className="w-4 h-4 text-[#00b4a7]" />
                 </div>
                 <h3 className="font-serif font-bold text-slate-900 text-lg">
-                  Branch Circulars &amp; Notice Board
+                  {t("dashboardModule.announcements.boardTitle", "Branch Circulars & Notice Board")}
                 </h3>
               </div>
               <p className="text-xs text-slate-500 font-medium mt-0.5">
-                Official notices broadcasted to all cooperative branches
+                {t("dashboardModule.announcements.boardSubtitle", "Official notices broadcasted to all cooperative branches")}
               </p>
             </div>
 
@@ -316,7 +322,7 @@ export default function BranchManagerAnnouncements() {
                 <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
                   type="text"
-                  placeholder="Search notices by title or content..."
+                  placeholder={t("dashboardModule.announcements.searchPlaceholder", "Search notices by title or content...")}
                   value={searchQuery}
                   onChange={(e) => {
                     setSearchQuery(e.target.value);
@@ -340,7 +346,7 @@ export default function BranchManagerAnnouncements() {
               <button
                 onClick={() => fetchAnnouncements(true)}
                 disabled={refreshing}
-                title="Refresh announcements"
+                title={t("dashboardModule.announcements.refreshTooltip", "Refresh announcements")}
                 className="p-2 border border-slate-200 rounded-xl hover:bg-slate-50 text-slate-600 transition-colors disabled:opacity-50 cursor-pointer"
               >
                 <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin text-teal-600' : ''}`} />
@@ -354,7 +360,7 @@ export default function BranchManagerAnnouncements() {
               <div className="flex items-start gap-2.5">
                 <AlertCircle className="w-5 h-5 flex-shrink-0 text-red-600 mt-0.5" />
                 <div>
-                  <p className="text-sm font-bold text-red-900">Failed to load branch announcements</p>
+                  <p className="text-sm font-bold text-red-900">{t("dashboardModule.announcements.errorHeading", "Failed to load branch announcements")}</p>
                   <p className="text-xs text-red-700 mt-0.5">{error}</p>
                 </div>
               </div>
@@ -362,7 +368,7 @@ export default function BranchManagerAnnouncements() {
                 onClick={() => fetchAnnouncements()}
                 className="text-xs font-bold text-red-700 hover:text-red-900 underline cursor-pointer flex-shrink-0"
               >
-                Retry
+                {t("common.retry", "Retry")}
               </button>
             </div>
           )}
@@ -372,7 +378,7 @@ export default function BranchManagerAnnouncements() {
             {loading ? (
               <div className="py-20 text-center space-y-3">
                 <div className="w-10 h-10 border-3 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto" />
-                <p className="text-sm text-slate-500 font-medium">Loading society notices from central registry...</p>
+                <p className="text-sm text-slate-500 font-medium">{t("dashboardModule.announcements.loading", "Loading society notices from central registry...")}</p>
               </div>
             ) : filteredAnnouncements.length === 0 ? (
               <div className="py-20 text-center space-y-4 max-w-sm mx-auto p-4">
@@ -381,12 +387,12 @@ export default function BranchManagerAnnouncements() {
                 </div>
                 <div>
                   <p className="text-base font-bold text-slate-800">
-                    {searchQuery ? 'No matching announcements found' : 'No announcements published yet'}
+                    {searchQuery ? t("dashboardModule.announcements.noMatchingTitle", "No matching announcements found") : t("dashboardModule.announcements.emptyTitle", "No announcements published yet")}
                   </p>
                   <p className="text-xs text-slate-500 mt-1 font-medium leading-relaxed">
                     {searchQuery
-                      ? 'Try adjusting your search keywords or clear filter.'
-                      : 'Notices and administrative circulars broadcast by super admin will appear here.'}
+                      ? t("dashboardModule.announcements.noMatchingSubtitle", "Try adjusting your search keywords or clear filter.")
+                      : t("dashboardModule.announcements.emptySubtitle", "Notices and administrative circulars broadcast by super admin will appear here.")}
                   </p>
                 </div>
               </div>
@@ -394,11 +400,11 @@ export default function BranchManagerAnnouncements() {
               <table className="w-full text-left border-collapse min-w-[750px]">
                 <thead>
                   <tr className="border-b border-slate-100 bg-slate-50/75 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                    <th className="py-3.5 px-6">Notice ID</th>
-                    <th className="py-3.5 px-6">Announcement Title &amp; Details</th>
-                    <th className="py-3.5 px-6">Published Date</th>
-                    <th className="py-3.5 px-6 text-center">Status</th>
-                    <th className="py-3.5 px-6 text-right">Actions</th>
+                    <th className="py-3.5 px-6">{t("dashboardModule.announcements.colNoticeId", "Notice ID")}</th>
+                    <th className="py-3.5 px-6">{t("dashboardModule.announcements.colTitleDetails", "Announcement Title & Details")}</th>
+                    <th className="py-3.5 px-6">{t("dashboardModule.announcements.colPublishedDate", "Published Date")}</th>
+                    <th className="py-3.5 px-6 text-center">{t("common.status", "Status")}</th>
+                    <th className="py-3.5 px-6 text-right">{t("common.actions", "Actions")}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-sm">
@@ -432,7 +438,7 @@ export default function BranchManagerAnnouncements() {
 
                         {/* Published Date */}
                         <td className="py-4 px-6 text-xs text-slate-500 whitespace-nowrap font-medium">
-                          {formatDateTime(item.created_at || item.date)}
+                          {formatDateTime(item.created_at || item.date, t)}
                         </td>
 
                         {/* Status */}
@@ -449,7 +455,7 @@ export default function BranchManagerAnnouncements() {
                                 isActive ? 'bg-emerald-500' : 'bg-slate-400'
                               }`}
                             />
-                            {isActive ? 'Published' : 'Archived'}
+                            {isActive ? t("dashboardModule.announcements.statusPublished", "Published") : t("dashboardModule.announcements.statusArchived", "Archived")}
                           </span>
                         </td>
 
@@ -458,10 +464,10 @@ export default function BranchManagerAnnouncements() {
                           <button
                             onClick={() => setDetailModal({ isOpen: true, announcement: item })}
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-800 font-bold text-xs rounded-xl transition-colors cursor-pointer border border-teal-200/60 shadow-2xs"
-                            title="Read complete announcement"
+                            title={t("dashboardModule.announcements.readCompleteTooltip", "Read complete announcement")}
                           >
                             <Eye className="w-3.5 h-3.5 text-[#00b4a7]" />
-                            <span>Read Notice</span>
+                            <span>{t("dashboardModule.announcements.readNotice", "Read Notice")}</span>
                           </button>
                         </td>
                       </tr>
@@ -476,15 +482,15 @@ export default function BranchManagerAnnouncements() {
           {filteredAnnouncements.length > itemsPerPage && (
             <div className="p-4 sm:p-5 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-medium">
               <div>
-                Showing{' '}
+                {t("common.showing", "Showing")}{' '}
                 <span className="font-bold text-slate-800">
                   {(currentPage - 1) * itemsPerPage + 1}
                 </span>{' '}
-                to{' '}
+                {t("common.to", "to")}{' '}
                 <span className="font-bold text-slate-800">
                   {Math.min(currentPage * itemsPerPage, filteredAnnouncements.length)}
                 </span>{' '}
-                of <span className="font-bold text-slate-800">{filteredAnnouncements.length}</span> notices
+                {t("common.of", "of")} <span className="font-bold text-slate-800">{filteredAnnouncements.length}</span> {t("dashboardModule.announcements.noticesUnit", "notices")}
               </div>
 
               <div className="flex items-center gap-1">

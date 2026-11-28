@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   getBranchAdminEmergencyCase,
   sendBranchAdminEmergencyMessage,
@@ -48,6 +49,7 @@ export default function EmergencyCaseThreadModal({
   onClose,
   onCaseUpdated,
 }) {
+  const { t } = useTranslation();
   const [caseDetail, setCaseDetail] = useState(null);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -157,7 +159,7 @@ export default function EmergencyCaseThreadModal({
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-[11px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-teal-100 text-[#0f766e]">
-                  Case #{caseId}
+                  {t("emergencyCaseThreadModal.case", "Case #")}{caseId}
                 </span>
                 {branch && (
                   <span className="text-xs font-bold text-slate-700 bg-white px-2.5 py-0.5 rounded-md border border-slate-200">
@@ -175,7 +177,7 @@ export default function EmergencyCaseThreadModal({
             <button
               onClick={() => fetchDetail(true)}
               disabled={refreshing}
-              title="Refresh conversation"
+              title={t("emergencyCaseThreadModal.refreshConversation", "Refresh conversation")}
               className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer disabled:opacity-50"
             >
               <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin text-[#00b4a7]' : ''}`} />
@@ -195,14 +197,14 @@ export default function EmergencyCaseThreadModal({
             <div className="flex items-center gap-3">
               <span className="flex items-center gap-1 font-medium">
                 <User className="w-3.5 h-3.5 text-slate-400" />
-                <span>Opened by:</span>
+                <span>{t("emergencyCaseThreadModal.openedBy", "Opened by:")}</span>
                 <strong className="text-slate-800">{createdBy?.full_name || 'Branch Admin'}</strong>
                 <span className="text-slate-400">({createdBy?.email || 'branch admin'})</span>
               </span>
             </div>
             <div className="flex items-center gap-1 text-[11px] text-slate-400">
               <Clock className="w-3 h-3" />
-              <span>Created {formatDateTime(caseDetail.created_at)}</span>
+              <span>{t("emergencyCaseThreadModal.created", "Created")} {formatDateTime(caseDetail.created_at)}</span>
             </div>
           </div>
         )}
@@ -212,7 +214,7 @@ export default function EmergencyCaseThreadModal({
           {loading ? (
             <div className="py-24 text-center space-y-3">
               <Loader2 className="w-8 h-8 animate-spin text-[#00b4a7] mx-auto" />
-              <p className="text-xs text-slate-500 font-medium">Loading emergency conversation thread...</p>
+              <p className="text-xs text-slate-500 font-medium">{t("emergencyCaseThreadModal.loadingEmergencyConversationThread", "Loading emergency conversation thread...")}</p>
             </div>
           ) : error ? (
             <div className="p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold flex items-center justify-between">
@@ -221,17 +223,18 @@ export default function EmergencyCaseThreadModal({
                 onClick={() => fetchDetail(true)}
                 className="underline font-bold hover:text-red-900 cursor-pointer"
               >
-                Retry
+                {t("common.retry", "Retry")}
               </button>
             </div>
           ) : messages.length === 0 ? (
             <div className="py-20 text-center space-y-2 text-slate-400">
               <AlertOctagon className="w-10 h-10 mx-auto text-slate-300" />
-              <p className="text-sm font-bold text-slate-600">No messages in this case yet.</p>
-              <p className="text-xs text-slate-400">Send a message below to start the conversation.</p>
+              <p className="text-sm font-bold text-slate-600">{t("emergencyCaseThreadModal.noMessagesInThisCase", "No messages in this case yet.")}</p>
+              <p className="text-xs text-slate-400">{t("emergencyCaseThreadModal.sendAMessageBelowTo", "Send a message below to start the conversation.")}</p>
             </div>
           ) : (
             messages.map((msg) => {
+  const { t } = useTranslation();
               const sender = msg.sender || {};
               const senderRole = (sender.role || '').toLowerCase();
               const isSuperAdminSender =
@@ -251,7 +254,7 @@ export default function EmergencyCaseThreadModal({
                 >
                   <div className="flex items-center gap-2 px-1">
                     <span className="text-[11px] font-black tracking-tight text-slate-600">
-                      {isSuperAdminSender ? 'Super Admin' : sender.full_name || 'Branch Manager'}
+                      {isSuperAdminSender ? t("login.superAdmin.portalTitleLine1", "Super Admin") : sender.full_name || 'Branch Manager'}
                     </span>
                     <span
                       className={`text-[10px] font-bold px-1.5 py-0.2 rounded-md ${
@@ -260,7 +263,7 @@ export default function EmergencyCaseThreadModal({
                           : 'bg-teal-100 text-teal-800'
                       }`}
                     >
-                      {isSuperAdminSender ? 'HQ / Superadmin' : 'Branch'}
+                      {isSuperAdminSender ? t("emergencyCaseThreadModal.hqSuperadmin", "HQ / Superadmin") : t("dashboard.branch", "Branch")}
                     </span>
                     <span className="text-[10px] text-slate-400">
                       {formatDateTime(msg.created_at)}
@@ -281,12 +284,12 @@ export default function EmergencyCaseThreadModal({
                     {msg.is_read ? (
                       <span className="inline-flex items-center gap-1 text-emerald-600 font-bold">
                         <CheckCheck className="w-3.5 h-3.5 stroke-[2.5] text-emerald-600" />
-                        <span>Read</span>
+                        <span>{t("dashboardModule.branchOverview.read", "Read")}</span>
                       </span>
                     ) : (
                       <span className="inline-flex items-center gap-1 text-slate-400 font-medium">
                         <Check className="w-3 h-3 stroke-[2] text-slate-400" />
-                        <span>Unread</span>
+                        <span>{t("memberNotifications.unread", "Unread")}</span>
                       </span>
                     )}
                   </div>
@@ -314,8 +317,8 @@ export default function EmergencyCaseThreadModal({
               onChange={(e) => setReplyText(e.target.value)}
               placeholder={
                 role === 'super_admin'
-                  ? 'Type a Superadmin response to this branch...'
-                  : 'Type an urgent reply or update for Superadmin...'
+                  ? t("emergencyCaseThreadModal.typeASuperadminResponseTo", "Type a Superadmin response to this branch...")
+                  : t("emergencyCaseThreadModal.typeAnUrgentReplyOr", "Type an urgent reply or update for Superadmin...")
               }
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
@@ -336,13 +339,13 @@ export default function EmergencyCaseThreadModal({
               ) : (
                 <>
                   <Send className="w-4 h-4" />
-                  <span className="hidden sm:inline">Send</span>
+                  <span className="hidden sm:inline">{t("emergencyCaseThreadModal.send", "Send")}</span>
                 </>
               )}
             </button>
           </div>
           <p className="text-[10px] text-slate-400 px-1">
-            Press <kbd className="font-sans px-1 bg-slate-100 rounded text-slate-500">Enter</kbd> to send, <kbd className="font-sans px-1 bg-slate-100 rounded text-slate-500">Shift + Enter</kbd> for a new line. Messages are transmitted with high emergency priority.
+            {t("emergencyCaseThreadModal.press", "Press")} <kbd className="font-sans px-1 bg-slate-100 rounded text-slate-500">{t("emergencyCaseThreadModal.enter", "Enter")}</kbd> {t("emergencyCaseThreadModal.toSend", "to send,")} <kbd className="font-sans px-1 bg-slate-100 rounded text-slate-500">{t("emergencyCaseThreadModal.shiftEnter", "Shift + Enter")}</kbd> {t("emergencyCaseThreadModal.forANewLineMessages", "for a new line. Messages are transmitted with high emergency priority.")}
           </p>
         </form>
       </div>

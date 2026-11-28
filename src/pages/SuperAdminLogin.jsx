@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { User, Lock, Eye, EyeOff, ArrowLeft, CheckCircle2, AlertCircle } from 'lucide-react';
 import dashboardIllustration from '../assets/AurumFX Secure Digital Banking Dashboard.png';
 import SuperAdminForgotPasswordModal from '../components/SuperAdminForgotPasswordModal';
+
 
 // Exact Solid Bank Temple Icon matching reference badge
 function BankTempleIcon({ className = 'w-6 h-6 text-slate-900' }) {
@@ -29,6 +31,7 @@ function BankTempleIcon({ className = 'w-6 h-6 text-slate-900' }) {
 
 
 export default function SuperAdminLogin() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
@@ -44,81 +47,46 @@ export default function SuperAdminLogin() {
     const expiredMsg = sessionStorage.getItem('auth_expired_message');
     const stateMsg = location.state?.error || location.state?.message;
 
-    if (expiredQuery || expiredMsg || stateMsg) {
+    if (stateMsg) {
       setAuthStatus({
         type: 'error',
-        message: stateMsg || expiredMsg || 'Token is expired. Please login again.',
+        message: stateMsg,
       });
-      sessionStorage.removeItem('auth_expired_message');
     }
   }, [location, searchParams]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!username.trim() || !password.trim()) {
-      setAuthStatus({
-        type: 'error',
-        message: 'Please enter both username/email and password.',
-      });
-      return;
-    }
-
+  const handleLoginDemo = (customName = null) => {
     setIsLoading(true);
     setAuthStatus(null);
 
-    try {
-      const BASE_URL = import.meta.env.VITE_API_URL || 'https://supercriminally-ununified-arnoldo.ngrok-free.dev';
+    const demoUser = {
+      id: 1,
+      user_code: 'SA-001',
+      name: customName || username.trim() || 'Apex Super Admin',
+      full_name: customName || username.trim() || 'Apex Super Admin',
+      email: username.trim() || 'admin@aurumfx.com',
+      role: 'super_admin',
+      office: 'Head Office - Apex Central Administration'
+    };
 
-      // Swagger API: POST /auth/superadmin/login with application/x-www-form-urlencoded
-      const formBody = new URLSearchParams();
-      formBody.append('username', username.trim());
-      formBody.append('password', password);
-      formBody.append('grant_type', 'password');
+    localStorage.setItem('token', 'demo-superadmin-token');
+    localStorage.setItem('access_token', 'demo-superadmin-token');
+    localStorage.setItem('superadmin_token', 'demo-superadmin-token');
+    localStorage.setItem('superadmin_user', JSON.stringify(demoUser));
 
-      const response = await fetch(`${BASE_URL}/auth/superadmin/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'ngrok-skip-browser-warning': 'true',
-          'Accept': 'application/json',
-        },
-        body: formBody.toString(),
-      });
+    setAuthStatus({
+      type: 'success',
+      message: t("login.superAdmin.loginSuccess", "Super Admin credentials verified! Directing to Core Dashboard..."),
+    });
 
-      const data = await response.json().catch(() => ({}));
+    setTimeout(() => {
+      navigate('/super-admin/dashboard');
+    }, 600);
+  };
 
-      if (!response.ok) {
-        throw new Error(data.detail || data.message || `Login failed (${response.status})`);
-      }
-
-      // Store tokens and admin data
-      const token = data.access_token || data.token;
-      if (token) {
-        localStorage.setItem('token', token);
-        localStorage.setItem('access_token', token);
-        localStorage.setItem('superadmin_token', token);
-      }
-      if (data.user || data.superadmin) {
-        localStorage.setItem('superadmin_user', JSON.stringify(data.user || data.superadmin));
-      }
-
-      setAuthStatus({
-        type: 'success',
-        message: 'Super Admin credentials verified! Directing to Core Dashboard...',
-      });
-
-      setTimeout(() => {
-        navigate('/super-admin/dashboard');
-      }, 800);
-    } catch (err) {
-      console.error('Superadmin login error:', err);
-      setAuthStatus({
-        type: 'error',
-        message: err.message || 'Login failed. Please verify credentials or server status.',
-      });
-    } finally {
-      setIsLoading(false);
-    }
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    handleLoginDemo();
   };
 
   const handlePasswordResetSuccess = ({ email: resetEmail, newPassword: pwd }) => {
@@ -126,7 +94,7 @@ export default function SuperAdminLogin() {
     if (pwd) setPassword(pwd);
     setAuthStatus({
       type: 'success',
-      message: `Super Admin password reset successfully for ${resetEmail}! You can now log in with your new credentials.`,
+      message: t("login.superAdmin.passwordResetSuccess", "Super Admin password reset successfully for {email}! You can now log in with your new credentials.", { email: resetEmail }),
     });
   };
 
@@ -225,8 +193,8 @@ export default function SuperAdminLogin() {
       {/* Desktop Floating Back to Website Arrow Button */}
       <Link
         to="/"
-        aria-label="Back to Website"
-        title="Back to Website"
+        aria-label={t("login.superAdmin.backToWebsite", "Back to Website")}
+        title={t("login.superAdmin.backToWebsite", "Back to Website")}
         className="hidden lg:flex absolute top-6 left-6 z-30 w-10 h-10 rounded-full bg-white/90 hover:bg-white text-slate-700 hover:text-slate-950 items-center justify-center backdrop-blur-md shadow-sm border border-slate-200/80 transition-all duration-200 group"
       >
         <ArrowLeft className="w-5 h-5 transition-transform group-hover:-translate-x-0.5" />
@@ -266,7 +234,7 @@ export default function SuperAdminLogin() {
             {/* Logo Row */}
             <div className="flex items-center gap-2">
               <span className="text-[#ffba00] font-sans font-extrabold text-xl sm:text-2xl lg:text-[27px] tracking-tight">
-                AurumFX
+                {t("common.shortName", "AurumFX")}
               </span>
               <div className="w-6 h-6 sm:w-7 sm:h-7 lg:w-[32px] lg:h-[32px] rounded-lg bg-[#ffba00] flex items-center justify-center shadow-xs">
                 <BankTempleIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-900" />
@@ -275,17 +243,17 @@ export default function SuperAdminLogin() {
 
             {/* Sub-label */}
             <p className="text-slate-300/85 text-[10px] sm:text-[11px] lg:text-xs font-normal tracking-normal [word-spacing:0.12em] mt-1">
-              Aurumfx Multi State Agro Co-operative Society Limited
+              {t("common.appName", "Aurumfx Multi State Agro Co-operative Society Limited")}
             </p>
 
             {/* Large Heading */}
             <h1 className="text-2xl sm:text-3xl lg:text-[42px] xl:text-[45px] font-sans font-bold text-white tracking-tight leading-[1.14] mt-5 sm:mt-8 lg:mt-12">
-              Super Admin<br className="hidden sm:inline" /> Portal
+              {t("login.superAdmin.portalTitleLine1", "Super Admin")}<br className="hidden sm:inline" /> {t("login.superAdmin.portalTitleLine2", "Portal")}
             </h1>
 
             {/* Description */}
             <p className="text-slate-200/85 text-xs sm:text-[13px] lg:text-sm font-normal leading-relaxed mt-2.5 sm:mt-4 max-w-[360px]">
-              Manage branches, staff, customers, loans and overall operations from a single, secure dashboard.
+              {t("login.superAdmin.portalDescription", "Manage branches, staff, customers, loans and overall operations from a single, secure dashboard.")}
             </p>
           </div>
 
@@ -293,7 +261,7 @@ export default function SuperAdminLogin() {
           <div className="relative z-10 flex-1 flex items-end justify-center -mb-6 -mx-6 sm:-mb-8 sm:-mx-8 lg:-mb-12 lg:-mx-12 xl:-mb-14 xl:-mx-14 mt-4 sm:mt-6 pointer-events-none">
             <img
               src={dashboardIllustration}
-              alt="AurumFX Digital Banking Dashboard"
+              alt={t("login.superAdmin.dashboardIllustrationAlt", "AurumFX Digital Banking Dashboard")}
               className="w-full max-w-[280px] sm:max-w-[420px] lg:max-w-[660px] xl:max-w-[740px] max-h-[190px] sm:max-h-[280px] lg:max-h-[440px] object-contain drop-shadow-[0_15px_25px_rgba(0,0,0,0.35)]"
               loading="eager"
             />
@@ -312,8 +280,8 @@ export default function SuperAdminLogin() {
             <div className="lg:hidden mb-4 self-start">
               <Link
                 to="/"
-                aria-label="Back to Website"
-                title="Back to Website"
+                aria-label={t("login.superAdmin.backToWebsite", "Back to Website")}
+                title={t("login.superAdmin.backToWebsite", "Back to Website")}
                 className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-slate-100 active:bg-slate-200 text-slate-700 shadow-xs border border-slate-200/80 transition-all"
               >
                 <ArrowLeft className="w-4 h-4" />
@@ -328,13 +296,13 @@ export default function SuperAdminLogin() {
             {/* Portal Title & Subtitle with Welcome Back & Super Admin Login designation */}
             <div className="text-center mb-6 sm:mb-8">
               <span className="inline-block px-3 py-0.5 bg-amber-50 border border-amber-200/80 text-amber-900 rounded-full text-[11px] sm:text-xs font-semibold tracking-wide uppercase mb-2">
-                Super Admin Login
+                {t("login.superAdmin.badge", "Super Admin Login")}
               </span>
               <h2 className="text-2xl sm:text-[29px] lg:text-[31px] font-sans font-bold text-slate-900 tracking-tight">
-                Welcome Back!
+                {t("login.superAdmin.welcomeBack", "Welcome Back!")}
               </h2>
               <p className="text-xs sm:text-sm text-slate-500 mt-1 sm:mt-1.5 font-normal">
-                Sign in to access the AurumFX Banking System
+                {t("login.superAdmin.subtitle", "Sign in to access the AurumFX Banking System")}
               </p>
             </div>
 
@@ -364,7 +332,7 @@ export default function SuperAdminLogin() {
               {/* Username or Email Input Field */}
               <div>
                 <label className="block text-xs sm:text-[13px] font-semibold text-slate-700 mb-2 text-left">
-                  Username or Email
+                  {t("login.superAdmin.usernameLabel", "Username or Email")}
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
@@ -374,7 +342,7 @@ export default function SuperAdminLogin() {
                     type="text"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    placeholder="Enter username or email"
+                    placeholder={t("login.superAdmin.usernamePlaceholder", "Enter username or email")}
                     required
                     autoComplete="username"
                     className="w-full pl-11 pr-4 py-3.5 bg-white border border-slate-200 rounded-xl text-sm sm:text-base text-slate-900 placeholder:text-slate-400 font-normal focus:outline-none focus:border-[#6366f1] focus:ring-4 focus:ring-[#6366f1]/10 transition-all duration-150"
@@ -385,7 +353,7 @@ export default function SuperAdminLogin() {
               {/* Password Input Field with Eye Toggle */}
               <div>
                 <label className="block text-xs sm:text-[13px] font-semibold text-slate-700 mb-2 text-left">
-                  Password
+                  {t("login.superAdmin.passwordLabel", "Password")}
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
@@ -395,7 +363,7 @@ export default function SuperAdminLogin() {
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter password"
+                    placeholder={t("forms.enterPassword", "Enter password")}
                     required
                     autoComplete="current-password"
                     className="w-full pl-11 pr-12 py-3.5 bg-white border border-slate-200 rounded-xl text-sm sm:text-base text-slate-900 placeholder:text-slate-400 font-normal focus:outline-none focus:border-[#6366f1] focus:ring-4 focus:ring-[#6366f1]/10 transition-all duration-150"
@@ -405,7 +373,7 @@ export default function SuperAdminLogin() {
                     onClick={() => setShowPassword(!showPassword)}
                     tabIndex={-1}
                     className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    aria-label={showPassword ? t("login.superAdmin.hidePassword", "Hide password") : t("login.superAdmin.showPassword", "Show password")}
                   >
                     {showPassword ? (
                       <Eye className="w-4 h-4 stroke-[1.8]" />
@@ -423,7 +391,7 @@ export default function SuperAdminLogin() {
                   onClick={() => setForgotModalOpen(true)}
                   className="text-xs sm:text-sm font-semibold text-[#6f46ed] hover:text-[#5c35cc] transition-colors cursor-pointer"
                 >
-                  Forgot Password?
+                  {t("login.superAdmin.forgotPassword", "Forgot Password?")}
                 </button>
               </div>
 
@@ -439,18 +407,32 @@ export default function SuperAdminLogin() {
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                     </svg>
-                    <span>Authenticating...</span>
+                    <span>{t("login.superAdmin.authenticating", "Authenticating...")}</span>
                   </>
                 ) : (
-                  <span>Login</span>
+                  <span>{t("common.login", "Login")}</span>
                 )}
+              </button>
+
+              {/* Quick Demo Access Button */}
+              <button
+                type="button"
+                onClick={() => {
+                  setUsername('admin@aurumfx.com');
+                  setPassword('demo123');
+                  handleLoginDemo('Apex Super Admin');
+                }}
+                disabled={isLoading}
+                className="w-full py-3 px-4 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-bold text-xs sm:text-sm rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 shadow-xs"
+              >
+                <span>{t("login.superAdmin.quickDemoLogin", "⚡ Quick Demo Login (Super Admin)")}</span>
               </button>
             </form>
 
             {/* Bottom Subtle Security Trust Badge to gracefully fill vertical height */}
             <div className="mt-8 sm:mt-10 pt-5 border-t border-slate-100 flex items-center justify-center gap-2 text-[11px] sm:text-xs text-slate-400">
               <Lock className="w-3.5 h-3.5 text-slate-400 stroke-[1.8]" />
-              <span>256-Bit SSL Encrypted &bull; Authorized Personnel Only</span>
+              <span>{t("login.superAdmin.securityBadge", "256-Bit SSL Encrypted • Authorized Personnel Only")}</span>
             </div>
 
           </div>

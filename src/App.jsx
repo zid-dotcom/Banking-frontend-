@@ -8,6 +8,8 @@ import Features from './pages/Features';
 import Loans from './pages/Loans';
 import Blog from './pages/Blog';
 import Contact from './pages/Contact';
+import Projects from './pages/Projects';
+import ProjectDetail from './pages/ProjectDetail';
 import SuperAdminLogin from './pages/SuperAdminLogin';
 import BranchAdminLogin from './pages/BranchAdminLogin';
 import MemberLogin from './pages/MemberLogin';
@@ -378,6 +380,8 @@ function MainApp() {
           <Route path="/" element={<Home onOpenEnquiry={handleOpenEnquiry} />} />
           <Route path="/about" element={<About onOpenEnquiry={handleOpenEnquiry} />} />
           <Route path="/features" element={<Features onOpenEnquiry={handleOpenEnquiry} />} />
+          <Route path="/projects" element={<Projects onOpenEnquiry={handleOpenEnquiry} />} />
+          <Route path="/projects/:slug" element={<ProjectDetail onOpenEnquiry={handleOpenEnquiry} />} />
           <Route path="/loans" element={<Loans onOpenEnquiry={handleOpenEnquiry} />} />
           <Route path="/blog" element={<Blog onOpenEnquiry={handleOpenEnquiry} />} />
           <Route path="/contact" element={<Contact />} />

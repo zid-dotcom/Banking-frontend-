@@ -1,35 +1,38 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
-const COST_CARDS = [
-  {
-    id: 1,
-    title: 'Flexible with your repayments',
-    description: 'Reschedule payments up to five days for free and within your loan term, we just need 24 hours notice.',
-    type: 'phone'
-  },
-  {
-    id: 2,
-    title: 'No early payment fees for your loan',
-    description: "So you can pay your loan off sooner and you'll save on interest.",
-    type: 'clipboard'
-  },
-  {
-    id: 3,
-    title: 'Good credit history is rewarded',
-    description: 'Loans are cheaper when you have a good credit profile and you have built your history with us.',
-    type: 'coin'
-  },
-  {
-    id: 4,
-    title: 'Fast online instant approvals',
-    description: 'We provide online instant cash loans with quick approval that suit you.',
-    type: 'clipboard'
-  }
-];
 
 export default function CostsOverviewSection() {
+  const { t } = useTranslation();
   const [activeDot, setActiveDot] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+
+  const COST_CARDS = [
+    {
+      id: 1,
+      title: t("costs.card1Title", "Flexible with your repayments"),
+      description: t("costs.card1Desc", "Reschedule payments up to five days for free and within your loan term, we just need 24 hours notice."),
+      type: 'phone'
+    },
+    {
+      id: 2,
+      title: t("costs.card2Title", "No early payment fees for your loan"),
+      description: t("costs.card2Desc", "So you can pay your loan off sooner and you'll save on interest."),
+      type: 'clipboard'
+    },
+    {
+      id: 3,
+      title: t("costs.card3Title", "Good credit history is rewarded"),
+      description: t("costs.card3Desc", "Loans are cheaper when you have a good credit profile and you have built your history with us."),
+      type: 'coin'
+    },
+    {
+      id: 4,
+      title: t("costs.card4Title", "Fast online instant approvals"),
+      description: t("costs.card4Desc", "We provide online instant cash loans with quick approval that suit you."),
+      type: 'clipboard'
+    }
+  ];
 
   // Auto-advance carousel smoothly every 5.5 seconds
   useEffect(() => {
@@ -232,10 +235,10 @@ export default function CostsOverviewSection() {
          ========================================================================= */}
       <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center mb-12 sm:mb-16 z-20">
         <h2 className="text-3xl sm:text-4xl lg:text-[44px] font-serif font-bold text-slate-900 leading-tight">
-          Things to know about our costs
+          {t("costs.title", "Things to know about our costs")}
         </h2>
         <p className="text-sm sm:text-base text-slate-500 mt-3 font-normal">
-          Transparent and fair costs, with no hidden fees
+          {t("costs.subtitle", "Transparent and fair costs, with no hidden fees")}
         </p>
       </div>
 

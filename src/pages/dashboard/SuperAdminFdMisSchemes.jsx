@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { i18n } from '../../i18n/index.js';
+import { useTranslation } from 'react-i18next';
 import {
   Coins,
   Search,
@@ -30,6 +32,7 @@ import {
 import mintFdMisIllustration from '../../assets/Mint FD & MIS Investment Growth.webp';
 
 export default function SuperAdminFdMisSchemes() {
+  const { t } = useTranslation();
   const [schemes, setSchemes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -115,7 +118,7 @@ export default function SuperAdminFdMisSchemes() {
         const res = await fdMisSchemeService.createFdMisScheme(formData);
         setFormModal({ isOpen: false, mode: 'create', data: null, isSubmitting: false });
         setSuccessPopup({
-          title: 'FD / MIS Scheme Created',
+          title: i18n.t("superAdminFdMisSchemes.fdMisSchemeCreated", "FD / MIS Scheme Created"),
           message: `Scheme "${res?.scheme_name || formData.scheme_name}" (${res?.scheme_code || formData.scheme_code}) was successfully created and registered.`
         });
       } else {
@@ -123,7 +126,7 @@ export default function SuperAdminFdMisSchemes() {
         const res = await fdMisSchemeService.updateFdMisScheme(schemeId, formData);
         setFormModal({ isOpen: false, mode: 'edit', data: null, isSubmitting: false });
         setSuccessPopup({
-          title: 'FD / MIS Scheme Updated',
+          title: i18n.t("superAdminFdMisSchemes.fdMisSchemeUpdated", "FD / MIS Scheme Updated"),
           message: `Scheme "${res?.scheme_name || formData.scheme_name}" has been updated.`
         });
       }
@@ -147,13 +150,13 @@ export default function SuperAdminFdMisSchemes() {
         prev.map((s) => (s.id === scheme.id ? { ...s, is_active: newStatus } : s))
       );
       setSuccessPopup({
-        title: 'Status Updated',
+        title: i18n.t("branchManagerMembers.statusUpdated", "Status Updated"),
         message: `Scheme "${scheme.scheme_name}" is now ${newStatus ? 'Active' : 'Inactive'}.`
       });
     } catch (err) {
       console.error('Failed to change status:', err);
       setErrorPopup({
-        title: 'Status Change Failed',
+        title: i18n.t("branchManagerStaff.statusChangeFailed", "Status Change Failed"),
         message: err.message || 'Unable to update scheme operational status.'
       });
     } finally {
@@ -167,14 +170,14 @@ export default function SuperAdminFdMisSchemes() {
       await fdMisSchemeService.deleteFdMisScheme(scheme.id);
       setDeleteModal({ isOpen: false, scheme: null, isDeleting: false });
       setSuccessPopup({
-        title: 'Scheme Deleted',
+        title: i18n.t("superAdminFdMisSchemes.schemeDeleted", "Scheme Deleted"),
         message: `Scheme "${scheme.scheme_name}" has been removed.`
       });
       await fetchSchemes(true);
     } catch (err) {
       console.error('Failed to delete scheme:', err);
       setErrorPopup({
-        title: 'Delete Failed',
+        title: i18n.t("branchManagerStaff.deleteFailed", "Delete Failed"),
         message: err.message || 'Unable to delete this FD/MIS scheme.'
       });
       setDeleteModal((prev) => ({ ...prev, isDeleting: false }));
@@ -256,33 +259,33 @@ export default function SuperAdminFdMisSchemes() {
             <div className="inline-flex flex-wrap items-center gap-x-2 gap-y-1 px-3 sm:px-3.5 py-1.5 rounded-2xl sm:rounded-full bg-white/95 backdrop-blur-xs text-[11px] sm:text-xs font-semibold border border-teal-200/80 shadow-2xs text-[#0f766e] mb-3 max-w-full">
               <span className="inline-flex items-center gap-1.5 flex-shrink-0">
                 <CheckCircle2 className="w-3.5 h-3.5 text-[#00b4a7]" />
-                <span>Role: <strong className="font-bold text-teal-950">Super Admin</strong></span>
+                <span>{t("dashboardModule.monthlyTargets.roleLabel", "Role:")} <strong className="font-bold text-teal-950">{t("login.superAdmin.portalTitleLine1", "Super Admin")}</strong></span>
               </span>
               <span className="text-teal-300 hidden sm:inline">•</span>
-              <span className="text-slate-600 sm:text-[#0f766e]">Term Deposit &amp; MIS Policy</span>
+              <span className="text-slate-600 sm:text-[#0f766e]">{t("superAdminFdMisSchemes.termDepositMisPolicy", "Term Deposit & MIS Policy")}</span>
               <span className="text-teal-300 hidden sm:inline">•</span>
               <span className="inline-flex items-center gap-1.5 font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full text-[10px] sm:text-xs flex-shrink-0">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                Active
+                {t("common.active", "Active")}
               </span>
             </div>
 
             <div className="flex items-center gap-2.5 sm:gap-3">
               <span className="w-1.5 h-7 sm:h-9 bg-[#00b4a7] rounded-full flex-shrink-0" />
               <h1 className="text-xl sm:text-3xl lg:text-4xl font-serif font-bold text-slate-900 tracking-tight">
-                Cooperative FD &amp; MIS Term Schemes
+                {t("memberFdMisSchemes.cooperativeFdMisTermSchemes", "Cooperative FD & MIS Term Schemes")}
               </h1>
             </div>
 
             <p className="text-slate-600 text-xs sm:text-sm mt-2 sm:mt-2.5 font-medium leading-relaxed max-w-xl">
-              Manage fixed deposit accounts, track monthly income schemes (MIS), configure annual yield matrices, and handle lock-in intervals.
+              {t("superAdminFdMisSchemes.manageFixedDepositAccountsTrack", "Manage fixed deposit accounts, track monthly income schemes (MIS), configure annual yield matrices, and handle lock-in intervals.")}
             </p>
           </div>
 
           <div className="relative z-10 flex justify-center md:justify-end pointer-events-none -my-2 sm:-my-5 lg:-my-6 flex-shrink-0 w-full md:w-auto">
             <img
               src={mintFdMisIllustration}
-              alt="Mint FD & MIS Investment Growth"
+              alt={t("memberFdMisSchemes.mintFdMisInvestmentGrowth", "Mint FD & MIS Investment Growth")}
               className="h-32 sm:h-44 lg:h-52 max-w-full w-auto object-contain drop-shadow-md select-none pointer-events-none transform hover:scale-102 transition-transform duration-300 mx-auto md:mx-0"
             />
           </div>
@@ -298,33 +301,33 @@ export default function SuperAdminFdMisSchemes() {
         {/* 4 Summary Metric Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <StatCard
-            title="Total FD / MIS Schemes"
+            title={t("branchManagerFdMisSchemes.totalFdMisSchemes", "Total FD / MIS Schemes")}
             value={totalCount.toString()}
-            subtitle="Registered Term Products"
+            subtitle={t("branchManagerFdMisSchemes.registeredTermProducts", "Registered Term Products")}
             icon={Coins}
             trend={`${activeCount} active`}
             trendType="up"
           />
           <StatCard
-            title="Active Deposit Schemes"
+            title={t("branchManagerFdMisSchemes.activeDepositSchemes", "Active Deposit Schemes")}
             value={activeCount.toString()}
-            subtitle="Ready for Members"
+            subtitle={t("branchManagerFdMisSchemes.readyForMembers", "Ready for Members")}
             icon={CheckCircle2}
             trend={totalCount > 0 ? `${Math.round((activeCount / totalCount) * 100)}% active` : '100%'}
             trendType="up"
           />
           <StatCard
-            title="Max Annual Yield"
+            title={t("branchManagerFdMisSchemes.maxAnnualYield", "Max Annual Yield")}
             value={`${maxInterest}%`}
-            subtitle="Highest Term Yield p.a."
+            subtitle={t("branchManagerFdMisSchemes.highestTermYieldPA", "Highest Term Yield p.a.")}
             icon={TrendingUp}
             trend="Per Annum"
             trendType="neutral"
           />
           <StatCard
-            title="Min Investment Scheme"
+            title={t("branchManagerFdMisSchemes.minInvestmentScheme", "Min Investment Scheme")}
             value={minDeposit !== null ? formatCurrency(minDeposit) : '₹0'}
-            subtitle="Minimum Opening Deposit"
+            subtitle={t("branchManagerFdMisSchemes.minimumOpeningDeposit", "Minimum Opening Deposit")}
             icon={PiggyBank}
             trend="Base Entry"
             trendType="neutral"
@@ -338,10 +341,10 @@ export default function SuperAdminFdMisSchemes() {
           <div className="p-4 sm:p-6 border-b border-slate-100 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>
               <h2 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight">
-                Term Deposit &amp; MIS Schemes Directory
+                {t("memberFdMisSchemes.termDepositMisSchemesDirectory", "Term Deposit & MIS Schemes Directory")}
               </h2>
               <p className="text-xs text-slate-500 font-medium">
-                Comprehensive catalogue of term fixed deposits and regular payout instruments
+                {t("memberFdMisSchemes.comprehensiveCatalogueOfTermFixed", "Comprehensive catalogue of term fixed deposits and regular payout instruments")}
               </p>
             </div>
 
@@ -351,7 +354,7 @@ export default function SuperAdminFdMisSchemes() {
                 <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
-                  placeholder="Search scheme name or code..."
+                  placeholder={t("dashboardModule.productAccounts.searchSchemePlaceholder", "Search scheme name or code...")}
                   value={searchQuery}
                   onChange={(e) => {
                     setSearchQuery(e.target.value);
@@ -370,16 +373,16 @@ export default function SuperAdminFdMisSchemes() {
                 }}
                 className="px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-700 focus:outline-none focus:border-teal-500 cursor-pointer"
               >
-                <option value="all">All Status</option>
-                <option value="active">Active Only</option>
-                <option value="inactive">Inactive Only</option>
+                <option value="all">{t("branchManagerLoanSchemes.allStatus", "All Status")}</option>
+                <option value="active">{t("branchManagerFdMisSchemes.activeOnly", "Active Only")}</option>
+                <option value="inactive">{t("branchManagerFdMisSchemes.inactiveOnly", "Inactive Only")}</option>
               </select>
 
               {/* Refresh Button */}
               <button
                 onClick={() => fetchSchemes(true)}
                 disabled={refreshing}
-                title="Refresh schemes catalogue"
+                title={t("superAdminFdMisSchemes.refreshSchemesCatalogue", "Refresh schemes catalogue")}
                 className="p-2 sm:px-3 sm:py-2 text-slate-600 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl font-semibold text-xs transition-colors cursor-pointer disabled:opacity-50"
               >
                 <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin text-teal-600' : ''}`} />
@@ -391,7 +394,7 @@ export default function SuperAdminFdMisSchemes() {
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#00b4a7] to-[#0f766e] text-white text-sm font-bold shadow-md shadow-teal-500/20 hover:from-[#00a296] hover:to-[#0c625c] transition-all cursor-pointer"
               >
                 <PlusCircle className="w-4 h-4" />
-                <span>Create FD / MIS Scheme</span>
+                <span>{t("superAdminFdMisSchemes.createFdMisScheme", "Create FD / MIS Scheme")}</span>
               </button>
             </div>
           </div>
@@ -402,7 +405,7 @@ export default function SuperAdminFdMisSchemes() {
               <div className="flex items-start gap-2.5">
                 <AlertCircle className="w-5 h-5 flex-shrink-0 text-red-600 mt-0.5" />
                 <div>
-                  <p className="text-sm font-bold text-red-900">Failed to load FD/MIS schemes</p>
+                  <p className="text-sm font-bold text-red-900">{t("branchManagerFdMisSchemes.failedToLoadFdMis", "Failed to load FD/MIS schemes")}</p>
                   <p className="text-xs text-red-700 mt-0.5">{error}</p>
                 </div>
               </div>
@@ -410,7 +413,7 @@ export default function SuperAdminFdMisSchemes() {
                 onClick={() => fetchSchemes()}
                 className="text-xs font-bold text-red-700 hover:text-red-900 underline cursor-pointer flex-shrink-0"
               >
-                Retry
+                {t("common.retry", "Retry")}
               </button>
             </div>
           )}
@@ -420,7 +423,7 @@ export default function SuperAdminFdMisSchemes() {
             {loading ? (
               <div className="py-20 text-center space-y-3">
                 <div className="w-10 h-10 border-3 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto" />
-                <p className="text-sm text-slate-500 font-medium">Loading FD / MIS schemes...</p>
+                <p className="text-sm text-slate-500 font-medium">{t("superAdminFdMisSchemes.loadingFdMisSchemes", "Loading FD / MIS schemes...")}</p>
               </div>
             ) : filteredSchemes.length === 0 ? (
               <div className="py-20 text-center space-y-4 max-w-sm mx-auto p-4">
@@ -429,12 +432,12 @@ export default function SuperAdminFdMisSchemes() {
                 </div>
                 <div>
                   <p className="text-base font-bold text-slate-800">
-                    {searchQuery ? 'No matching schemes found' : 'No FD / MIS schemes configured yet'}
+                    {searchQuery ? t("branchManagerFdMisSchemes.noMatchingSchemesFound", "No matching schemes found") : t("superAdminFdMisSchemes.noFdMisSchemesConfigured", "No FD / MIS schemes configured yet")}
                   </p>
                   <p className="text-xs text-slate-500 mt-1 font-medium leading-relaxed">
                     {searchQuery
-                      ? 'Try adjusting your search query or clear the filter.'
-                      : 'Define term deposit products with lock-in duration, annual interest yield, and payout schedules.'}
+                      ? t("branchManagerFdMisSchemes.tryAdjustingYourSearchQuery", "Try adjusting your search query or clear the filter.")
+                      : t("superAdminFdMisSchemes.defineTermDepositProductsWith", "Define term deposit products with lock-in duration, annual interest yield, and payout schedules.")}
                   </p>
                 </div>
                 {!searchQuery && (
@@ -443,7 +446,7 @@ export default function SuperAdminFdMisSchemes() {
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold transition-colors cursor-pointer shadow-sm"
                   >
                     <PlusCircle className="w-4 h-4" />
-                    Create First FD / MIS Scheme
+                    {t("superAdminFdMisSchemes.createFirstFdMisScheme", "Create First FD / MIS Scheme")}
                   </button>
                 )}
               </div>
@@ -451,16 +454,16 @@ export default function SuperAdminFdMisSchemes() {
               <table className="w-full text-left border-collapse min-w-[1100px]">
                 <thead>
                   <tr className="border-b border-slate-100 bg-slate-50/75 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                    <th className="py-3.5 px-6">Scheme Name</th>
-                    <th className="py-3.5 px-6">Scheme Code</th>
-                    <th className="py-3.5 px-6">Duration</th>
-                    <th className="py-3.5 px-6">Annual Yield</th>
-                    <th className="py-3.5 px-6">Min Deposit</th>
-                    <th className="py-3.5 px-6">Payout Frequency</th>
-                    <th className="py-3.5 px-6 whitespace-nowrap">Minimum Deposit Period</th>
-                    <th className="py-3.5 px-6">Created At</th>
-                    <th className="py-3.5 px-6 text-center">Status</th>
-                    <th className="py-3.5 px-6 text-right">Actions</th>
+                    <th className="py-3.5 px-6">{t("dashboardModule.productAccounts.schemeName", "Scheme Name")}</th>
+                    <th className="py-3.5 px-6">{t("dashboardModule.productAccounts.schemeCode", "Scheme Code")}</th>
+                    <th className="py-3.5 px-6">{t("branchManagerFdMisSchemes.duration", "Duration")}</th>
+                    <th className="py-3.5 px-6">{t("branchManagerFdMisSchemes.annualYield", "Annual Yield")}</th>
+                    <th className="py-3.5 px-6">{t("branchManagerFdMisSchemes.minDeposit", "Min Deposit")}</th>
+                    <th className="py-3.5 px-6">{t("branchManagerFdMisSchemes.payoutFrequency", "Payout Frequency")}</th>
+                    <th className="py-3.5 px-6 whitespace-nowrap">{t("branchManagerFdMisSchemes.minimumDepositPeriod", "Minimum Deposit Period")}</th>
+                    <th className="py-3.5 px-6">{t("dashboardModule.emergency.table.createdAt", "Created At")}</th>
+                    <th className="py-3.5 px-6 text-center">{t("common.status", "Status")}</th>
+                    <th className="py-3.5 px-6 text-right">{t("common.actions", "Actions")}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-sm">
@@ -514,7 +517,7 @@ export default function SuperAdminFdMisSchemes() {
 
                       {/* Minimum Deposit Period */}
                       <td className="py-4 px-6 whitespace-nowrap text-xs font-bold text-slate-700">
-                        {scheme.fd_mis_lock_in_period_months ? `${scheme.fd_mis_lock_in_period_months} Months` : 'None'}
+                        {scheme.fd_mis_lock_in_period_months ? `${scheme.fd_mis_lock_in_period_months} Months` : t("branchManagerFdMisSchemes.none", "None")}
                       </td>
 
                       {/* Created At */}
@@ -532,7 +535,7 @@ export default function SuperAdminFdMisSchemes() {
                           className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
                             scheme.is_active ? 'bg-emerald-500' : 'bg-slate-300'
                           } ${actionLoadingId === scheme.id ? 'opacity-50 cursor-wait' : ''}`}
-                          title={`Click to ${scheme.is_active ? 'deactivate' : 'activate'} this scheme`}
+                          title={`Click to ${scheme.is_active ? t("branchManagerMembers.deactivate", "deactivate") : t("branchManagerMembers.activate", "activate")} this scheme`}
                         >
                           <span
                             aria-hidden="true"
@@ -543,9 +546,9 @@ export default function SuperAdminFdMisSchemes() {
                         </button>
                         <div className="text-[10px] font-bold mt-1">
                           {scheme.is_active ? (
-                            <span className="text-emerald-700">Active</span>
+                            <span className="text-emerald-700">{t("common.active", "Active")}</span>
                           ) : (
-                            <span className="text-slate-400">Inactive</span>
+                            <span className="text-slate-400">{t("common.inactive", "Inactive")}</span>
                           )}
                         </div>
                       </td>
@@ -555,21 +558,21 @@ export default function SuperAdminFdMisSchemes() {
                         <div className="flex items-center justify-end gap-1.5">
                           <button
                             onClick={() => setDetailModal({ isOpen: true, scheme })}
-                            title="View Scheme Details"
+                            title={t("branchManagerFdMisSchemes.viewSchemeDetails", "View Scheme Details")}
                             className="p-2 rounded-lg text-slate-400 hover:text-teal-700 hover:bg-teal-50 transition-colors cursor-pointer"
                           >
                             <Eye className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleEditOpen(scheme)}
-                            title="Edit Scheme"
+                            title={t("superAdminFdMisSchemes.editScheme", "Edit Scheme")}
                             className="p-2 rounded-lg text-slate-400 hover:text-teal-700 hover:bg-teal-50 transition-colors cursor-pointer"
                           >
                             <Pencil className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => setDeleteModal({ isOpen: true, scheme, isDeleting: false })}
-                            title="Delete Scheme"
+                            title={t("superAdminFdMisSchemes.deleteScheme", "Delete Scheme")}
                             className="p-2 rounded-lg text-slate-400 hover:text-red-700 hover:bg-red-50 transition-colors cursor-pointer"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -587,8 +590,8 @@ export default function SuperAdminFdMisSchemes() {
           {filteredSchemes.length > itemsPerPage && (
             <div className="p-4 sm:p-5 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
               <span>
-                Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
-                {Math.min(currentPage * itemsPerPage, filteredSchemes.length)} of {filteredSchemes.length} schemes
+                {t("common.showing", "Showing")} {(currentPage - 1) * itemsPerPage + 1} {t("common.to", "to")}{' '}
+                {Math.min(currentPage * itemsPerPage, filteredSchemes.length)} {t("common.of", "of")} {filteredSchemes.length} {t("branchManagerFdMisSchemes.schemes", "schemes")}
               </span>
               <div className="flex items-center gap-1.5">
                 <button
@@ -599,7 +602,7 @@ export default function SuperAdminFdMisSchemes() {
                   <ChevronLeft className="w-4 h-4" />
                 </button>
                 <span className="px-2 font-bold text-slate-700">
-                  Page {currentPage} of {totalPages}
+                  {t("branchManagerInvestmentSchemes.page", "Page")} {currentPage} {t("common.of", "of")} {totalPages}
                 </span>
                 <button
                   onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
@@ -657,7 +660,7 @@ export default function SuperAdminFdMisSchemes() {
               onClick={() => setSuccessPopup(null)}
               className="w-full py-2.5 rounded-xl bg-gradient-to-r from-[#00b4a7] to-[#0f766e] text-white text-xs sm:text-sm font-bold shadow-md shadow-teal-500/20 hover:from-[#00a296] hover:to-[#0c625c] transition-all cursor-pointer"
             >
-              Continue
+              {t("branchManagerMembershipSettings.continue", "Continue")}
             </button>
           </div>
         </div>
@@ -678,7 +681,7 @@ export default function SuperAdminFdMisSchemes() {
               onClick={() => setErrorPopup(null)}
               className="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs sm:text-sm font-bold transition-all cursor-pointer"
             >
-              Dismiss
+              {t("branchManagerMemberPasswordUpdate.dismiss", "Dismiss")}
             </button>
           </div>
         </div>

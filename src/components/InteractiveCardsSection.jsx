@@ -1,35 +1,37 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
-const CARDS_DATA = [
-  {
-    id: 1,
-    title: 'Tools to help you reach your financial goals',
-    subtext: 'Find out more',
-    description: 'Empowering our agricultural and rural members with tailored crop loan calculators, competitive low interest schemes, flexible repayment terms, and personalized financial advisory to accelerate your farm productivity and family prosperity.',
-    image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80',
-    link: '/calculator'
-  },
-  {
-    id: 2,
-    title: 'A community of over 60 million',
-    subtext: 'Find out more',
-    description: 'Join a proud, growing multi-state cooperative society dedicated to grassroots prosperity. We unite farmers, rural entrepreneurs, and self-help groups through transparent collective credit, mutual savings, and community financial support.',
-    image: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1200&q=80',
-    link: '/about'
-  },
-  {
-    id: 3,
-    title: 'In-depth articles and analysis',
-    subtext: 'Find out more',
-    description: 'Access regular financial market research, seasonal crop loan updates, financial literacy guides, and expert cooperative banking advisory directly from our dedicated knowledge desk to keep your agribusiness financially resilient.',
-    // Professional banking and financial market analysis image
-    image: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1200&q=80',
-    link: '/blog'
-  }
-];
 
 export default function InteractiveCardsSection() {
+  const { t } = useTranslation();
+
+  const CARDS_DATA = [
+    {
+      id: 1,
+      title: t("interactive.card1Title", "Tools to help you reach your financial goals"),
+      subtext: t("common.findOutMore", "Find out more"),
+      description: t("interactive.card1Desc", "Empowering our agricultural and rural members with tailored crop loan calculators, competitive low interest schemes, flexible repayment terms, and personalized financial advisory to accelerate your farm productivity and family prosperity."),
+      image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80',
+      link: '/calculator'
+    },
+    {
+      id: 2,
+      title: t("interactive.card2Title", "A community of over 60 million"),
+      subtext: t("common.findOutMore", "Find out more"),
+      description: t("interactive.card2Desc", "Join a proud, growing multi-state cooperative society dedicated to grassroots prosperity. We unite farmers, rural entrepreneurs, and self-help groups through transparent collective credit, mutual savings, and community financial support."),
+      image: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1200&q=80',
+      link: '/about'
+    },
+    {
+      id: 3,
+      title: t("interactive.card3Title", "In-depth articles and analysis"),
+      subtext: t("common.findOutMore", "Find out more"),
+      description: t("interactive.card3Desc", "Access regular financial market research, seasonal crop loan updates, financial literacy guides, and expert cooperative banking advisory directly from our dedicated knowledge desk to keep your agribusiness financially resilient."),
+      image: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1200&q=80',
+      link: '/blog'
+    }
+  ];
   return (
     <section className="relative w-full bg-[#f8f9fa] overflow-hidden select-none">
       <div className="grid grid-cols-1 md:grid-cols-3 w-full">

@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { i18n } from '../../i18n/index.js';
+import { useTranslation } from 'react-i18next';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import StatCard from '../../components/dashboard/StatCard';
 import {
@@ -72,6 +74,7 @@ function formatDateTime(isoString) {
 }
 
 export default function BranchManagerMembershipSettings() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('settings'); // 'settings' | 'applications'
   const [settings, setSettings] = useState(null);
   const [settingsLoading, setSettingsLoading] = useState(true);
@@ -251,7 +254,7 @@ export default function BranchManagerMembershipSettings() {
     e.preventDefault();
     if (!feeInput || isNaN(Number(feeInput)) || Number(feeInput) < 0) {
       setErrorPopup({
-        title: 'Invalid Fee Amount',
+        title: i18n.t("branchManagerMembershipSettings.invalidFeeAmount", "Invalid Fee Amount"),
         message: 'Please enter a valid numeric membership fee (₹).',
       });
       return;
@@ -261,7 +264,7 @@ export default function BranchManagerMembershipSettings() {
 
     if (!isConfigured && !qrFile) {
       setErrorPopup({
-        title: 'QR Code Required',
+        title: i18n.t("branchManagerMembershipSettings.qrCodeRequired", "QR Code Required"),
         message: 'Please upload the branch UPI QR code image to set membership settings.',
       });
       return;
@@ -306,13 +309,13 @@ export default function BranchManagerMembershipSettings() {
       setQrFile(null);
       setQrPreviewUrl(null);
       setSuccessPopup({
-        title: 'Settings Saved Successfully!',
+        title: i18n.t("branchManagerMembershipSettings.settingsSavedSuccessfully", "Settings Saved Successfully!"),
         message: `Branch membership fee is set to ${formatCurrency(res.membership_fee || feeInput)} with active QR code published.`,
       });
     } catch (err) {
       console.error('Save membership settings error:', err);
       setErrorPopup({
-        title: 'Failed to Save Settings',
+        title: i18n.t("branchManagerMembershipSettings.failedToSaveSettings", "Failed to Save Settings"),
         message: err.message || 'Could not update membership settings.',
       });
     } finally {
@@ -350,7 +353,7 @@ export default function BranchManagerMembershipSettings() {
         window.open(fallbackUrl, '_blank', 'noopener,noreferrer');
       } else {
         setErrorPopup({
-          title: 'Document Unavailable',
+          title: i18n.t("modal.member.documentUnavailable", "Document Unavailable"),
           message: err.message || 'Could not load requested document.',
         });
       }
@@ -379,7 +382,7 @@ export default function BranchManagerMembershipSettings() {
 
     if (action === 'rejected' && !rejectionReason.trim()) {
       setErrorPopup({
-        title: 'Rejection Reason Required',
+        title: i18n.t("modal.member.rejectionReasonRequired", "Rejection Reason Required"),
         message: 'Please provide a clear reason for declining this member application.',
       });
       return;
@@ -410,7 +413,7 @@ export default function BranchManagerMembershipSettings() {
     } catch (err) {
       console.error('Decision error:', err);
       setErrorPopup({
-        title: 'Decision Action Failed',
+        title: i18n.t("branchManagerMembershipSettings.decisionActionFailed", "Decision Action Failed"),
         message: err.message || 'Could not process application decision.',
       });
     } finally {
@@ -444,7 +447,7 @@ export default function BranchManagerMembershipSettings() {
           <div className="relative z-10 flex-1 max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/95 backdrop-blur-xs text-xs font-semibold border border-teal-200/80 text-[#0f766e] mb-3 shadow-2xs">
               <QrCode className="w-3.5 h-3.5 text-[#00b4a7]" />
-              <span>Branch Membership &amp; Fee Management</span>
+              <span>{t("branchManagerMembershipSettings.branchMembershipFeeManagement", "Branch Membership & Fee Management")}</span>
               <span className="text-teal-300">•</span>
               <span className="text-slate-600 font-mono">
                 {managerUser.branch || 'Branch Office'}
@@ -452,10 +455,10 @@ export default function BranchManagerMembershipSettings() {
             </div>
 
             <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mb-2">
-              Membership Fee &amp; QR Settings
+              {t("branchManagerMembershipSettings.membershipFeeQrSettings", "Membership Fee & QR Settings")}
             </h1>
             <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed">
-              Configure your branch’s official membership enrollment fee, publish the UPI payment QR code, and audit incoming prospective member applications and payment screenshots.
+              {t("branchManagerMembershipSettings.configureYourBranchSOfficial", "Configure your branch’s official membership enrollment fee, publish the UPI payment QR code, and audit incoming prospective member applications and payment screenshots.")}
             </p>
 
             <div className="flex items-center gap-3 mt-4 flex-wrap">
@@ -469,7 +472,7 @@ export default function BranchManagerMembershipSettings() {
                 className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs border border-teal-200 shadow-2xs transition-all cursor-pointer disabled:opacity-50"
               >
                 <RefreshCw className={`w-3.5 h-3.5 text-teal-600 ${(settingsLoading || appsLoading) ? 'animate-spin' : ''}`} />
-                <span>Refresh Data</span>
+                <span>{t("branchManagerMembershipSettings.refreshData", "Refresh Data")}</span>
               </button>
             </div>
           </div>
@@ -479,9 +482,9 @@ export default function BranchManagerMembershipSettings() {
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#14b8a6] to-[#0f766e] text-white flex items-center justify-center mx-auto shadow-md shadow-teal-600/20 mb-2">
                 <Receipt className="w-8 h-8" />
               </div>
-              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Current Fee</p>
+              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">{t("branchManagerMembershipSettings.currentFee", "Current Fee")}</p>
               <p className="text-xl font-black text-teal-900 mt-0.5">
-                {isConfigured && settings?.membership_fee !== undefined && settings?.membership_fee !== null ? formatCurrency(settings.membership_fee) : 'Not Set'}
+                {isConfigured && settings?.membership_fee !== undefined && settings?.membership_fee !== null ? formatCurrency(settings.membership_fee) : t("branchManagerMembershipSettings.notSet", "Not Set")}
               </p>
             </div>
           </div>
@@ -492,7 +495,7 @@ export default function BranchManagerMembershipSettings() {
         {/* 4 Stat Overview Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
           <StatCard
-            title="Membership Fee"
+            title={t("branchManagerMembershipSettings.membershipFee", "Membership Fee")}
             value={isConfigured && settings?.membership_fee !== undefined && settings?.membership_fee !== null ? formatCurrency(settings.membership_fee) : '₹0.00'}
             valueClassName="text-lg sm:text-[21px] font-black text-slate-900 tracking-tight font-sans"
             subtext={isConfigured ? 'Active Branch Fee' : 'Configuration Pending'}
@@ -502,7 +505,7 @@ export default function BranchManagerMembershipSettings() {
           />
 
           <StatCard
-            title="Payment QR Code"
+            title={t("branchManagerMembershipSettings.paymentQrCode", "Payment QR Code")}
             value={(activeQrDisplayUrl || settings?.qr_display_url || settings?.qr_image_url || settings?.qr_code_url) ? 'Configured' : 'Not Uploaded'}
             valueClassName={`text-lg sm:text-[21px] font-black tracking-tight font-sans ${
               (activeQrDisplayUrl || settings?.qr_display_url || settings?.qr_image_url || settings?.qr_code_url) ? 'text-emerald-600' : 'text-amber-600'
@@ -514,7 +517,7 @@ export default function BranchManagerMembershipSettings() {
           />
 
           <StatCard
-            title="Pending Applications"
+            title={t("branchManagerDashboard.pendingApplications", "Pending Applications")}
             value={String(pendingCount)}
             valueClassName="text-lg sm:text-[21px] font-black text-amber-600 tracking-tight font-sans"
             subtext="Awaiting Verification"
@@ -524,7 +527,7 @@ export default function BranchManagerMembershipSettings() {
           />
 
           <StatCard
-            title="Approved Members"
+            title={t("branchManagerMembers.approvedMembers", "Approved Members")}
             value={String(approvedCount)}
             valueClassName="text-lg sm:text-[21px] font-black text-emerald-600 tracking-tight font-sans"
             subtext="Enrolled via Applications"
@@ -546,7 +549,7 @@ export default function BranchManagerMembershipSettings() {
             }`}
           >
             <QrCode className="w-4 h-4" />
-            <span>Membership Fee &amp; QR Settings</span>
+            <span>{t("branchManagerMembershipSettings.membershipFeeQrSettings", "Membership Fee & QR Settings")}</span>
           </button>
 
           <button
@@ -559,7 +562,7 @@ export default function BranchManagerMembershipSettings() {
             }`}
           >
             <User className="w-4 h-4" />
-            <span>Member Applications</span>
+            <span>{t("branchManagerMembershipSettings.memberApplications", "Member Applications")}</span>
             {pendingCount > 0 && (
               <span className="px-1.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-400 text-slate-900">
                 {pendingCount}
@@ -580,10 +583,10 @@ export default function BranchManagerMembershipSettings() {
                   </div>
                   <div>
                     <h3 className="text-base sm:text-lg font-black text-slate-900">
-                      {isConfigured ? 'Update Membership Settings' : 'Configure Membership Settings'}
+                      {isConfigured ? t("branchManagerMembershipSettings.updateMembershipSettings", "Update Membership Settings") : t("branchManagerMembershipSettings.configureMembershipSettings", "Configure Membership Settings")}
                     </h3>
                     <p className="text-xs text-slate-500 font-medium">
-                      Set mandatory enrollment fee and upload your branch’s UPI payment QR code
+                      {t("branchManagerMembershipSettings.setMandatoryEnrollmentFeeAnd", "Set mandatory enrollment fee and upload your branch’s UPI payment QR code")}
                     </p>
                   </div>
                 </div>
@@ -591,12 +594,12 @@ export default function BranchManagerMembershipSettings() {
                 {isConfigured ? (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                    <span>Configured &amp; Active</span>
+                    <span>{t("branchManagerMembershipSettings.configuredActive", "Configured & Active")}</span>
                   </span>
                 ) : (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
                     <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                    <span>Not Configured</span>
+                    <span>{t("branchManagerMembershipSettings.notConfigured", "Not Configured")}</span>
                   </span>
                 )}
               </div>
@@ -605,7 +608,7 @@ export default function BranchManagerMembershipSettings() {
                 {/* Fee Amount Input */}
                 <div className="space-y-2">
                   <label className="block text-xs font-bold uppercase tracking-wider text-slate-500">
-                    Membership Enrollment Fee (₹) <span className="text-rose-500">*</span>
+                    {t("branchManagerMembershipSettings.membershipEnrollmentFee", "Membership Enrollment Fee (₹)")} <span className="text-rose-500">*</span>
                   </label>
                   <div className="relative rounded-2xl shadow-2xs">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 font-bold text-sm">
@@ -623,14 +626,14 @@ export default function BranchManagerMembershipSettings() {
                     />
                   </div>
                   <p className="text-[11px] text-slate-500 font-medium">
-                    This amount is charged to new members upon registration. They pay via the branch QR code below.
+                    {t("branchManagerMembershipSettings.thisAmountIsChargedTo", "This amount is charged to new members upon registration. They pay via the branch QR code below.")}
                   </p>
                 </div>
 
                 {/* QR Code Upload */}
                 <div className="space-y-2">
                   <label className="block text-xs font-bold uppercase tracking-wider text-slate-500">
-                    Branch UPI QR Code Image {!isConfigured && <span className="text-rose-500">*</span>}
+                    {t("branchManagerMembershipSettings.branchUpiQrCodeImage", "Branch UPI QR Code Image")} {!isConfigured && <span className="text-rose-500">*</span>}
                   </label>
                   
                   <div className="border-2 border-dashed border-teal-200/90 rounded-2xl p-6 bg-teal-50/20 hover:bg-teal-50/40 transition-colors text-center relative group">
@@ -645,14 +648,14 @@ export default function BranchManagerMembershipSettings() {
                       <div className="space-y-3">
                         <img
                           src={qrPreviewUrl}
-                          alt="New QR Preview"
+                          alt={t("branchManagerMembershipSettings.newQrPreview", "New QR Preview")}
                           className="w-36 h-36 object-contain mx-auto rounded-xl border border-teal-300 shadow-sm bg-white p-2"
                         />
                         <div className="flex items-center justify-center gap-2 text-xs font-bold text-teal-800">
                           <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                          <span>Selected: {qrFile?.name}</span>
+                          <span>{t("branchManagerMembershipSettings.selected", "Selected:")} {qrFile?.name}</span>
                         </div>
-                        <p className="text-[11px] text-slate-400">Click or drag a different image to replace</p>
+                        <p className="text-[11px] text-slate-400">{t("branchManagerMembershipSettings.clickOrDragADifferent", "Click or drag a different image to replace")}</p>
                       </div>
                     ) : (
                       <div className="space-y-2">
@@ -660,10 +663,10 @@ export default function BranchManagerMembershipSettings() {
                           <Upload className="w-6 h-6 text-teal-700" />
                         </div>
                         <p className="text-xs font-bold text-slate-800">
-                          Click to upload or drag &amp; drop your UPI QR code image
+                          {t("branchManagerMembershipSettings.clickToUploadOrDrag", "Click to upload or drag & drop your UPI QR code image")}
                         </p>
                         <p className="text-[11px] text-slate-500">
-                          Supported formats: PNG, JPG, JPEG, WEBP (Square QR code recommended)
+                          {t("branchManagerMembershipSettings.supportedFormatsPngJpgJpeg", "Supported formats: PNG, JPG, JPEG, WEBP (Square QR code recommended)")}
                         </p>
                       </div>
                     )}
@@ -674,7 +677,7 @@ export default function BranchManagerMembershipSettings() {
                 <div className="pt-2 flex items-center justify-between gap-4 flex-wrap">
                   <div className="text-[11px] text-slate-500 font-medium">
                     {settings?.updated_at && (
-                      <span>Last updated: {formatDateTime(settings.updated_at)}</span>
+                      <span>{t("branchManagerMembershipSettings.lastUpdated", "Last updated:")} {formatDateTime(settings.updated_at)}</span>
                     )}
                   </div>
 
@@ -688,7 +691,7 @@ export default function BranchManagerMembershipSettings() {
                     ) : (
                       <CheckCircle2 className="w-4 h-4 text-white" />
                     )}
-                    <span>{isConfigured ? 'Update Membership Settings' : 'Save & Set Membership Settings'}</span>
+                    <span>{isConfigured ? t("branchManagerMembershipSettings.updateMembershipSettings", "Update Membership Settings") : t("branchManagerMembershipSettings.saveSetMembershipSettings", "Save & Set Membership Settings")}</span>
                   </button>
                 </div>
               </form>
@@ -699,30 +702,30 @@ export default function BranchManagerMembershipSettings() {
               <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden p-6 text-center space-y-4">
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-teal-50 text-teal-800 border border-teal-200">
                   <Eye className="w-3.5 h-3.5 text-teal-600" />
-                  <span>Applicant View Preview</span>
+                  <span>{t("branchManagerMembershipSettings.applicantViewPreview", "Applicant View Preview")}</span>
                 </div>
 
                 <h4 className="text-base font-black text-slate-900">
-                  Active Branch Payment QR Code
+                  {t("branchManagerMembershipSettings.activeBranchPaymentQrCode", "Active Branch Payment QR Code")}
                 </h4>
 
                 <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200/80 inline-block mx-auto">
                   {qrPreviewUrl ? (
                     <img
                       src={qrPreviewUrl}
-                      alt="Selected QR Preview"
+                      alt={t("branchManagerMembershipSettings.selectedQrPreview", "Selected QR Preview")}
                       className="w-48 h-48 object-contain rounded-xl bg-white p-2 shadow-xs"
                     />
                   ) : activeQrDisplayUrl ? (
                     <img
                       src={activeQrDisplayUrl}
-                      alt="Active Branch QR"
+                      alt={t("branchManagerMembershipSettings.activeBranchQr", "Active Branch QR")}
                       className="w-48 h-48 object-contain rounded-xl bg-white p-2 shadow-xs"
                     />
                   ) : (settings?.qr_display_url || settings?.qr_image_url || settings?.qr_code_url) ? (
                     <img
                       src={settings.qr_display_url || settings.qr_image_url || settings.qr_code_url}
-                      alt="Active Branch QR"
+                      alt={t("branchManagerMembershipSettings.activeBranchQr", "Active Branch QR")}
                       className="w-48 h-48 object-contain rounded-xl bg-white p-2 shadow-xs"
                       onError={async (e) => {
                         if (!e.target.dataset.tried) {
@@ -738,25 +741,25 @@ export default function BranchManagerMembershipSettings() {
                   ) : (
                     <div className="w-48 h-48 rounded-xl bg-slate-100 flex flex-col items-center justify-center text-slate-400 p-4">
                       <QrCode className="w-12 h-12 stroke-[1.5] mb-2" />
-                      <p className="text-xs font-semibold">No QR Uploaded</p>
+                      <p className="text-xs font-semibold">{t("branchManagerMembershipSettings.noQrUploaded", "No QR Uploaded")}</p>
                     </div>
                   )}
                 </div>
 
                 <div className="space-y-1">
-                  <p className="text-xs font-bold text-slate-500 uppercase">Applicable Fee</p>
+                  <p className="text-xs font-bold text-slate-500 uppercase">{t("branchManagerMembershipSettings.applicableFee", "Applicable Fee")}</p>
                   <p className="text-2xl font-black text-teal-700">
                     {formatCurrency(feeInput || settings?.membership_fee || 0)}
                   </p>
                 </div>
 
                 <div className="p-3.5 rounded-2xl bg-teal-50/60 border border-teal-100 text-left text-xs space-y-1">
-                  <p className="font-bold text-teal-900">How this works for members:</p>
+                  <p className="font-bold text-teal-900">{t("branchManagerMembershipSettings.howThisWorksForMembers", "How this works for members:")}</p>
                   <p className="text-slate-600 text-[11px] leading-relaxed">
-                    1. Member chooses this branch during online registration.<br />
-                    2. This QR code &amp; fee appear automatically.<br />
-                    3. Member scans with GPay/PhonePe/Paytm, pays, and uploads the screenshot.<br />
-                    4. Application appears under &quot;Member Applications&quot; tab for your audit &amp; approval.
+                    {t("branchManagerMembershipSettings.1MemberChoosesThisBranch", "1. Member chooses this branch during online registration.")}<br />
+                    {t("branchManagerMembershipSettings.2ThisQrCodeFee", "2. This QR code & fee appear automatically.")}<br />
+                    {t("branchManagerMembershipSettings.3MemberScansWithGpay", "3. Member scans with GPay/PhonePe/Paytm, pays, and uploads the screenshot.")}<br />
+                    {t("branchManagerMembershipSettings.4ApplicationAppearsUnderMember", "4. Application appears under \"Member Applications\" tab for your audit & approval.")}
                   </p>
                 </div>
               </div>
@@ -772,10 +775,10 @@ export default function BranchManagerMembershipSettings() {
               {/* Status Filter Tabs */}
               <div className="flex items-center gap-1.5 p-1 bg-slate-100/80 rounded-2xl overflow-x-auto w-full sm:w-auto">
                 {[
-                  { id: 'all', label: 'All Applications' },
-                  { id: 'pending', label: 'Pending Review' },
-                  { id: 'approved', label: 'Approved' },
-                  { id: 'rejected', label: 'Rejected' },
+                  { id: 'all', label: t("branchManagerMembershipSettings.allApplications", "All Applications") },
+                  { id: 'pending', label: t("branchManagerMembers.pendingReview", "Pending Review") },
+                  { id: 'approved', label: t("common.approved", "Approved") },
+                  { id: 'rejected', label: t("common.rejected", "Rejected") },
                 ].map((st) => (
                   <button
                     key={st.id}
@@ -797,7 +800,7 @@ export default function BranchManagerMembershipSettings() {
                 <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
                   type="text"
-                  placeholder="Search applicant, mobile, email, agent..."
+                  placeholder={t("branchManagerMembershipSettings.searchApplicantMobileEmailAgent", "Search applicant, mobile, email, agent...")}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 bg-slate-50/50"
@@ -810,18 +813,18 @@ export default function BranchManagerMembershipSettings() {
               {appsLoading ? (
                 <div className="py-16 text-center space-y-3">
                   <Loader2 className="w-8 h-8 animate-spin text-teal-600 mx-auto" />
-                  <p className="text-xs font-bold text-slate-500">Loading member registration applications...</p>
+                  <p className="text-xs font-bold text-slate-500">{t("branchManagerMembershipSettings.loadingMemberRegistrationApplications", "Loading member registration applications...")}</p>
                 </div>
               ) : filteredApps.length === 0 ? (
                 <div className="py-16 text-center space-y-2 p-6">
                   <div className="w-12 h-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center mx-auto mb-2">
                     <User className="w-6 h-6" />
                   </div>
-                  <h4 className="font-bold text-slate-800 text-sm">No Applications Found</h4>
+                  <h4 className="font-bold text-slate-800 text-sm">{t("dashboardModule.productAccounts.noApplicationsFound", "No Applications Found")}</h4>
                   <p className="text-xs text-slate-500 max-w-sm mx-auto">
                     {searchQuery
-                      ? 'No applications match your search criteria. Try a different query.'
-                      : 'There are no registration applications submitted under this status category.'}
+                      ? t("branchManagerMembershipSettings.noApplicationsMatchYourSearch", "No applications match your search criteria. Try a different query.")
+                      : t("branchManagerMembershipSettings.thereAreNoRegistrationApplications", "There are no registration applications submitted under this status category.")}
                   </p>
                 </div>
               ) : (
@@ -829,19 +832,20 @@ export default function BranchManagerMembershipSettings() {
                   <table className="w-full text-left border-collapse min-w-[850px]">
                     <thead>
                       <tr className="border-b border-slate-100 bg-slate-50/75 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                        <th className="py-3.5 px-6">App ID</th>
-                        <th className="py-3.5 px-6">Applicant</th>
-                        <th className="py-3.5 px-6">Mobile &amp; Email</th>
-                        <th className="py-3.5 px-6">Agent Code</th>
-                        <th className="py-3.5 px-6">Fee Paid</th>
-                        <th className="py-3.5 px-6 text-center">Payment Proof</th>
-                        <th className="py-3.5 px-6">Date</th>
-                        <th className="py-3.5 px-6 text-center">Status</th>
-                        <th className="py-3.5 px-6 text-right">Actions</th>
+                        <th className="py-3.5 px-6">{t("branchManagerMembershipSettings.appId", "App ID")}</th>
+                        <th className="py-3.5 px-6">{t("branchManagerMembershipSettings.applicant", "Applicant")}</th>
+                        <th className="py-3.5 px-6">{t("branchManagerMembershipSettings.mobileEmail", "Mobile & Email")}</th>
+                        <th className="py-3.5 px-6">{t("branchManagerMembershipSettings.agentCode", "Agent Code")}</th>
+                        <th className="py-3.5 px-6">{t("branchManagerMembershipSettings.feePaid", "Fee Paid")}</th>
+                        <th className="py-3.5 px-6 text-center">{t("branchManagerMembershipSettings.paymentProof", "Payment Proof")}</th>
+                        <th className="py-3.5 px-6">{t("branchManagerMembershipSettings.date", "Date")}</th>
+                        <th className="py-3.5 px-6 text-center">{t("common.status", "Status")}</th>
+                        <th className="py-3.5 px-6 text-right">{t("common.actions", "Actions")}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 text-sm">
                       {filteredApps.map((app) => {
+  const { t } = useTranslation();
                         const s = (app.status || 'pending').toLowerCase();
                         const isPending = s === 'pending';
                         const isApproved = s === 'approved';
@@ -850,14 +854,14 @@ export default function BranchManagerMembershipSettings() {
                         return (
                           <tr key={app.id} className="hover:bg-slate-50/50 transition-colors">
                             <td className="py-4 px-6 font-mono font-extrabold text-teal-800 text-sm whitespace-nowrap">
-                              #APP-{app.id}
+                              {t("branchManagerMembershipSettings.app", "#APP-")}{app.id}
                             </td>
 
                             <td className="py-4 px-6">
                               <div className="font-bold text-slate-900">{app.full_name}</div>
                               {app.member_code && (
                                 <span className="font-mono text-[11px] text-teal-700 font-bold block mt-0.5">
-                                  Member ID: {app.member_code}
+                                  {t("branchManagerMembershipSettings.memberId", "Member ID:")} {app.member_code}
                                 </span>
                               )}
                             </td>
@@ -873,7 +877,7 @@ export default function BranchManagerMembershipSettings() {
                                   {app.agent_code}
                                 </span>
                               ) : (
-                                <span className="text-slate-400 text-xs">Direct (None)</span>
+                                <span className="text-slate-400 text-xs">{t("branchManagerMembershipSettings.directNone", "Direct (None)")}</span>
                               )}
                             </td>
 
@@ -889,7 +893,7 @@ export default function BranchManagerMembershipSettings() {
                                   className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-800 text-xs font-bold border border-teal-200 transition-colors cursor-pointer"
                                 >
                                   <ImageIcon className="w-3.5 h-3.5 text-teal-600" />
-                                  <span>View Receipt</span>
+                                  <span>{t("branchManagerMembershipSettings.viewReceipt", "View Receipt")}</span>
                                 </button>
                               ) : (
                                 <span className="text-slate-400 text-xs">—</span>
@@ -927,7 +931,7 @@ export default function BranchManagerMembershipSettings() {
                                   type="button"
                                   onClick={() => handleInspectApp(app)}
                                   className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-teal-50 text-slate-600 hover:text-teal-700 flex items-center justify-center transition-colors cursor-pointer"
-                                  title="View Application Details"
+                                  title={t("branchManagerMembershipSettings.viewApplicationDetails", "View Application Details")}
                                 >
                                   <Eye className="w-4 h-4" />
                                 </button>
@@ -938,20 +942,20 @@ export default function BranchManagerMembershipSettings() {
                                       type="button"
                                       onClick={() => openDecisionModal(app, 'approved')}
                                       className="px-2.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1 shadow-2xs transition-colors cursor-pointer"
-                                      title="Approve Member Application"
+                                      title={t("branchManagerMembershipSettings.approveMemberApplication", "Approve Member Application")}
                                     >
                                       <Check className="w-3.5 h-3.5" />
-                                      <span>Approve</span>
+                                      <span>{t("branchManagerMembers.approve", "Approve")}</span>
                                     </button>
 
                                     <button
                                       type="button"
                                       onClick={() => openDecisionModal(app, 'rejected')}
                                       className="px-2.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs flex items-center gap-1 border border-rose-200 transition-colors cursor-pointer"
-                                      title="Reject Application"
+                                      title={t("branchManagerMembershipSettings.rejectApplication", "Reject Application")}
                                     >
                                       <X className="w-3.5 h-3.5" />
-                                      <span>Reject</span>
+                                      <span>{t("modal.nominee.reject", "Reject")}</span>
                                     </button>
                                   </>
                                 )}
@@ -981,11 +985,11 @@ export default function BranchManagerMembershipSettings() {
                     <div className="flex items-center gap-2">
                       <h3 className="text-lg font-black text-slate-900">{selectedApp.full_name}</h3>
                       <span className="font-mono text-xs font-bold text-teal-700 bg-teal-100 px-2 py-0.5 rounded">
-                        #APP-{selectedApp.id}
+                        {t("branchManagerMembershipSettings.app", "#APP-")}{selectedApp.id}
                       </span>
                     </div>
                     <p className="text-xs text-slate-500">
-                      Submitted on {formatDateTime(selectedApp.created_at)}
+                      {t("branchManagerMembershipSettings.submittedOn", "Submitted on")} {formatDateTime(selectedApp.created_at)}
                     </p>
                   </div>
                 </div>
@@ -1003,31 +1007,31 @@ export default function BranchManagerMembershipSettings() {
                 {/* Personal & Contact Grid */}
                 <div>
                   <h4 className="font-bold uppercase tracking-wider text-slate-400 text-[11px] mb-3">
-                    Personal &amp; Contact Details
+                    {t("branchManagerMembershipSettings.personalContactDetails", "Personal & Contact Details")}
                   </h4>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                     <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                      <span className="text-[10px] text-slate-400 font-bold uppercase">Mobile Number</span>
+                      <span className="text-[10px] text-slate-400 font-bold uppercase">{t("modal.member.mobileNumber", "Mobile Number")}</span>
                       <p className="font-bold text-slate-900 mt-0.5">{selectedApp.mobile || '—'}</p>
                     </div>
                     <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                      <span className="text-[10px] text-slate-400 font-bold uppercase">Email Address</span>
+                      <span className="text-[10px] text-slate-400 font-bold uppercase">{t("modal.member.emailAddress", "Email Address")}</span>
                       <p className="font-bold text-slate-900 mt-0.5 break-all">{selectedApp.email || '—'}</p>
                     </div>
                     <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                      <span className="text-[10px] text-slate-400 font-bold uppercase">Date of Birth</span>
+                      <span className="text-[10px] text-slate-400 font-bold uppercase">{t("modal.member.dateOfBirth", "Date of Birth")}</span>
                       <p className="font-bold text-slate-900 mt-0.5">{selectedApp.date_of_birth || '—'}</p>
                     </div>
                     <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                      <span className="text-[10px] text-slate-400 font-bold uppercase">Gender</span>
+                      <span className="text-[10px] text-slate-400 font-bold uppercase">{t("modal.member.gender", "Gender")}</span>
                       <p className="font-bold text-slate-900 mt-0.5 capitalize">{selectedApp.gender || '—'}</p>
                     </div>
                     <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                      <span className="text-[10px] text-slate-400 font-bold uppercase">Aadhaar Card</span>
+                      <span className="text-[10px] text-slate-400 font-bold uppercase">{t("branchManagerMembershipSettings.aadhaarCard", "Aadhaar Card")}</span>
                       <p className="font-mono font-bold text-slate-900 mt-0.5">{selectedApp.aadhaar_number || '—'}</p>
                     </div>
                     <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                      <span className="text-[10px] text-slate-400 font-bold uppercase">PAN Number</span>
+                      <span className="text-[10px] text-slate-400 font-bold uppercase">{t("branchManagerMembershipSettings.panNumber", "PAN Number")}</span>
                       <p className="font-mono font-bold text-slate-900 mt-0.5">{selectedApp.pan_number || '—'}</p>
                     </div>
                   </div>
@@ -1036,7 +1040,7 @@ export default function BranchManagerMembershipSettings() {
                 {/* Address Info */}
                 <div>
                   <h4 className="font-bold uppercase tracking-wider text-slate-400 text-[11px] mb-3">
-                    Address Records
+                    {t("branchManagerMembershipSettings.addressRecords", "Address Records")}
                   </h4>
                   <div className="p-4 rounded-xl bg-slate-50 border border-slate-100 text-slate-700 leading-relaxed">
                     {[
@@ -1056,19 +1060,19 @@ export default function BranchManagerMembershipSettings() {
                 {/* Bank Credentials */}
                 <div>
                   <h4 className="font-bold uppercase tracking-wider text-slate-400 text-[11px] mb-3">
-                    Bank Account (Disbursements)
+                    {t("branchManagerMembershipSettings.bankAccountDisbursements", "Bank Account (Disbursements)")}
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                      <span className="text-[10px] text-slate-400 font-bold uppercase">Account Holder</span>
+                      <span className="text-[10px] text-slate-400 font-bold uppercase">{t("modal.member.accountHolder", "Account Holder")}</span>
                       <p className="font-bold text-slate-900 mt-0.5">{selectedApp.bank_holder_name || '—'}</p>
                     </div>
                     <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                      <span className="text-[10px] text-slate-400 font-bold uppercase">Account Number</span>
+                      <span className="text-[10px] text-slate-400 font-bold uppercase">{t("dashboard.accountNumber", "Account Number")}</span>
                       <p className="font-mono font-bold text-teal-800 mt-0.5">{selectedApp.bank_account_number || '—'}</p>
                     </div>
                     <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                      <span className="text-[10px] text-slate-400 font-bold uppercase">IFSC Code</span>
+                      <span className="text-[10px] text-slate-400 font-bold uppercase">{t("dashboardModule.accountTransactions.colIfscCode", "IFSC Code")}</span>
                       <p className="font-mono font-bold text-slate-900 mt-0.5">{selectedApp.ifsc_code || '—'}</p>
                     </div>
                   </div>
@@ -1077,13 +1081,13 @@ export default function BranchManagerMembershipSettings() {
                 {/* Membership Fee & Payment Proof Banner */}
                 <div className="p-4 rounded-2xl bg-teal-50/70 border border-teal-200/80 flex items-center justify-between flex-wrap gap-4">
                   <div>
-                    <span className="text-[10px] uppercase font-bold text-teal-800">Membership Fee Paid</span>
+                    <span className="text-[10px] uppercase font-bold text-teal-800">{t("branchManagerMembershipSettings.membershipFeePaid", "Membership Fee Paid")}</span>
                     <p className="text-xl font-black text-teal-950 mt-0.5">
                       {formatCurrency(selectedApp.membership_fee_paid || 0)}
                     </p>
                     {selectedApp.agent_code && (
                       <span className="font-mono text-[11px] font-semibold text-purple-700 mt-1 block">
-                        Assisting Agent Code: {selectedApp.agent_code}
+                        {t("branchManagerMembershipSettings.assistingAgentCode", "Assisting Agent Code:")} {selectedApp.agent_code}
                       </span>
                     )}
                   </div>
@@ -1095,7 +1099,7 @@ export default function BranchManagerMembershipSettings() {
                       className="px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer"
                     >
                       <ImageIcon className="w-4 h-4" />
-                      <span>Inspect Payment Screenshot</span>
+                      <span>{t("branchManagerMembershipSettings.inspectPaymentScreenshot", "Inspect Payment Screenshot")}</span>
                     </button>
                   )}
                 </div>
@@ -1103,14 +1107,14 @@ export default function BranchManagerMembershipSettings() {
                 {/* Verification Documents Gallery */}
                 <div>
                   <h4 className="font-bold uppercase tracking-wider text-slate-400 text-[11px] mb-3">
-                    Verification Documents
+                    {t("branchManagerMembershipSettings.verificationDocuments", "Verification Documents")}
                   </h4>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                     {[
-                      { key: 'aadhaar_front', label: 'Aadhaar Front', url: selectedApp.aadhaar_front_url },
-                      { key: 'aadhaar_back', label: 'Aadhaar Back', url: selectedApp.aadhaar_back_url },
-                      { key: 'passbook_image', label: 'Bank Passbook', url: selectedApp.passbook_image_url },
-                      { key: 'pan_image', label: 'PAN Card', url: selectedApp.pan_image_url },
+                      { key: 'aadhaar_front', label: t("modal.member.aadhaarFront", "Aadhaar Front"), url: selectedApp.aadhaar_front_url },
+                      { key: 'aadhaar_back', label: t("modal.member.aadhaarBack", "Aadhaar Back"), url: selectedApp.aadhaar_back_url },
+                      { key: 'passbook_image', label: t("branchManagerMembershipSettings.bankPassbook", "Bank Passbook"), url: selectedApp.passbook_image_url },
+                      { key: 'pan_image', label: t("branchManagerMembershipSettings.panCard", "PAN Card"), url: selectedApp.pan_image_url },
                     ].map((doc) => (
                       <button
                         key={doc.key}
@@ -1122,7 +1126,7 @@ export default function BranchManagerMembershipSettings() {
                         <FileText className="w-5 h-5 text-teal-700 mx-auto mb-1" />
                         <span className="block font-bold text-slate-800 truncate text-[11px]">{doc.label}</span>
                         <span className="text-[10px] text-teal-600 font-semibold">
-                          {docLoading[doc.key] ? 'Loading...' : doc.url ? 'View Document' : 'Not Attached'}
+                          {docLoading[doc.key] ? t("branchManagerMembershipSettings.loading", "Loading...") : doc.url ? t("branchManagerMembershipSettings.viewDocument", "View Document") : t("branchManagerMembershipSettings.notAttached", "Not Attached")}
                         </span>
                       </button>
                     ))}
@@ -1137,7 +1141,7 @@ export default function BranchManagerMembershipSettings() {
                   onClick={() => setDetailModalOpen(false)}
                   className="px-4 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 font-bold text-xs hover:bg-slate-100 transition-colors cursor-pointer"
                 >
-                  Close
+                  {t("common.close", "Close")}
                 </button>
 
                 {(selectedApp.status || '').toLowerCase() === 'pending' && (
@@ -1147,14 +1151,14 @@ export default function BranchManagerMembershipSettings() {
                       onClick={() => openDecisionModal(selectedApp, 'rejected')}
                       className="px-4 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs border border-rose-200 transition-colors cursor-pointer"
                     >
-                      Reject Application
+                      {t("branchManagerMembershipSettings.rejectApplication", "Reject Application")}
                     </button>
                     <button
                       type="button"
                       onClick={() => openDecisionModal(selectedApp, 'approved')}
                       className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm transition-colors cursor-pointer"
                     >
-                      Approve &amp; Activate Member
+                      {t("branchManagerMembershipSettings.approveActivateMember", "Approve & Activate Member")}
                     </button>
                   </div>
                 )}
@@ -1183,10 +1187,10 @@ export default function BranchManagerMembershipSettings() {
                 </div>
                 <div>
                   <h3 className="text-base font-black text-slate-900">
-                    {decisionModal.action === 'approved' ? 'Approve Member Application' : 'Reject Application'}
+                    {decisionModal.action === 'approved' ? t("branchManagerMembershipSettings.approveMemberApplication", "Approve Member Application") : t("branchManagerMembershipSettings.rejectApplication", "Reject Application")}
                   </h3>
                   <p className="text-xs text-slate-500 font-medium">
-                    {decisionModal.app.full_name} (#APP-{decisionModal.app.id})
+                    {decisionModal.app.full_name} {t("branchManagerMembershipSettings.app2", "(#APP-")}{decisionModal.app.id})
                   </p>
                 </div>
               </div>
@@ -1195,15 +1199,15 @@ export default function BranchManagerMembershipSettings() {
                 {decisionModal.action === 'approved' ? (
                   <>
                     <p className="text-slate-600 leading-relaxed">
-                      Approving this application verifies the membership fee payment and identity records. An active member account and official Member ID code will be generated.
+                      {t("branchManagerMembershipSettings.approvingThisApplicationVerifiesThe", "Approving this application verifies the membership fee payment and identity records. An active member account and official Member ID code will be generated.")}
                     </p>
                     <div className="space-y-1.5">
                       <label className="block font-bold uppercase tracking-wider text-slate-400 text-[10px]">
-                        Assign / Confirm Agent Code (Optional)
+                        {t("branchManagerMembershipSettings.assignConfirmAgentCodeOptional", "Assign / Confirm Agent Code (Optional)")}
                       </label>
                       <input
                         type="text"
-                        placeholder="e.g. AGT1234"
+                        placeholder={t("branchManagerMembershipSettings.eGAgt1234", "e.g. AGT1234")}
                         value={decisionModal.agentCode}
                         onChange={(e) =>
                           setDecisionModal((prev) => ({ ...prev, agentCode: e.target.value }))
@@ -1215,16 +1219,16 @@ export default function BranchManagerMembershipSettings() {
                 ) : (
                   <>
                     <p className="text-slate-600 leading-relaxed">
-                      Please enter a clear reason for rejecting this application (e.g. invalid payment screenshot, mismatch in Aadhaar, etc.).
+                      {t("branchManagerMembershipSettings.pleaseEnterAClearReason", "Please enter a clear reason for rejecting this application (e.g. invalid payment screenshot, mismatch in Aadhaar, etc.).")}
                     </p>
                     <div className="space-y-1.5">
                       <label className="block font-bold uppercase tracking-wider text-slate-400 text-[10px]">
-                        Rejection Reason <span className="text-rose-500">*</span>
+                        {t("branchManagerMembershipSettings.rejectionReason", "Rejection Reason")} <span className="text-rose-500">*</span>
                       </label>
                       <textarea
                         required
                         rows={3}
-                        placeholder="Provide reason for declining application..."
+                        placeholder={t("branchManagerMembershipSettings.provideReasonForDecliningApplication", "Provide reason for declining application...")}
                         value={decisionModal.rejectionReason}
                         onChange={(e) =>
                           setDecisionModal((prev) => ({ ...prev, rejectionReason: e.target.value }))
@@ -1241,7 +1245,7 @@ export default function BranchManagerMembershipSettings() {
                     onClick={() => setDecisionModal({ isOpen: false, app: null, action: 'approved', rejectionReason: '', agentCode: '', loading: false })}
                     className="px-4 py-2 rounded-xl bg-slate-100 text-slate-600 font-bold text-xs hover:bg-slate-200"
                   >
-                    Cancel
+                    {t("common.cancel", "Cancel")}
                   </button>
 
                   <button
@@ -1254,7 +1258,7 @@ export default function BranchManagerMembershipSettings() {
                     }`}
                   >
                     {decisionModal.loading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-                    <span>{decisionModal.action === 'approved' ? 'Confirm Approval' : 'Confirm Rejection'}</span>
+                    <span>{decisionModal.action === 'approved' ? t("branchManagerMembershipSettings.confirmApproval", "Confirm Approval") : t("modal.nominee.confirmRejection", "Confirm Rejection")}</span>
                   </button>
                 </div>
               </form>
@@ -1302,7 +1306,7 @@ export default function BranchManagerMembershipSettings() {
                 onClick={() => setErrorPopup(null)}
                 className="w-full py-2.5 rounded-xl bg-slate-900 text-white font-bold text-xs"
               >
-                Dismiss
+                {t("branchManagerMemberPasswordUpdate.dismiss", "Dismiss")}
               </button>
             </div>
           </div>
@@ -1321,7 +1325,7 @@ export default function BranchManagerMembershipSettings() {
                 onClick={() => setSuccessPopup(null)}
                 className="w-full py-2.5 rounded-xl bg-emerald-600 text-white font-bold text-xs"
               >
-                Continue
+                {t("branchManagerMembershipSettings.continue", "Continue")}
               </button>
             </div>
           </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   X,
   User,
@@ -53,6 +54,7 @@ export function BranchStaffFormModal({
   isSuperAdmin = false,
   isSubmitting = false
 }) {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     full_name: '',
     email: '',
@@ -250,12 +252,12 @@ export function BranchStaffFormModal({
             </div>
             <div>
               <h3 className="text-base sm:text-lg font-bold text-slate-900">
-                {mode === 'create' ? 'Register New Staff Member' : 'Edit Staff Profile'}
+                {mode === 'create' ? t("branchStaffModals.registerNewStaffMember", "Register New Staff Member") : t("branchStaffModals.editStaffProfile", "Edit Staff Profile")}
               </h3>
               <p className="text-xs text-slate-500">
                 {mode === 'create'
-                  ? 'Add branch staff credentials and assign an operational role'
-                  : 'Update contact information and assigned duties'}
+                  ? t("branchStaffModals.addBranchStaffCredentialsAnd", "Add branch staff credentials and assign an operational role")
+                  : t("branchStaffModals.updateContactInformationAndAssigned", "Update contact information and assigned duties")}
               </p>
             </div>
           </div>
@@ -273,7 +275,7 @@ export function BranchStaffFormModal({
           {/* Full Name */}
           <div>
             <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-              Full Name <span className="text-red-500">*</span>
+              {t("contact.fullName", "Full Name")} <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -282,7 +284,7 @@ export function BranchStaffFormModal({
                 name="full_name"
                 value={formData.full_name}
                 onChange={handleChange}
-                placeholder="e.g. Suresh Kumar"
+                placeholder={t("branchStaffModals.eGSureshKumar", "e.g. Suresh Kumar")}
                 maxLength={100}
                 className={`w-full pl-10 pr-4 py-2.5 rounded-xl border text-sm transition-all focus:outline-none focus:ring-2 font-medium ${
                   formErrors.full_name
@@ -303,7 +305,7 @@ export function BranchStaffFormModal({
             {/* Email Address */}
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                Official Email <span className="text-red-500">*</span>
+                {t("branchManagerStaff.officialEmail", "Official Email")} <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -313,7 +315,7 @@ export function BranchStaffFormModal({
                   autoComplete="off"
                   value={formData.email}
                   onChange={handleChange}
-                  placeholder="e.g. suresh@aurumfx.org"
+                  placeholder={t("branchStaffModals.eGSureshAurumfxOrg", "e.g. suresh@aurumfx.org")}
                   className={`w-full pl-10 pr-4 py-2.5 rounded-xl border text-sm transition-all focus:outline-none focus:ring-2 font-medium ${
                     formErrors.email
                       ? 'border-red-300 focus:border-red-500 focus:ring-red-100 bg-red-50/30'
@@ -332,7 +334,7 @@ export function BranchStaffFormModal({
             {/* Contact Number */}
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                Contact Number <span className="text-red-500">*</span>
+                {t("modal.branchAdmin.contactNumberLabel", "Contact Number")} <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <Phone className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -363,7 +365,7 @@ export function BranchStaffFormModal({
           {isSuperAdmin && Array.isArray(branches) && (
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                Assigned Branch <span className="text-red-500">*</span>
+                {t("memberProfile.assignedBranch", "Assigned Branch")} <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <Building2 className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -377,7 +379,7 @@ export function BranchStaffFormModal({
                       : 'border-slate-200 focus:border-teal-500 focus:ring-teal-100'
                   }`}
                 >
-                  <option value="">Select Branch</option>
+                  <option value="">{t("branchStaffModals.selectBranch", "Select Branch")}</option>
                   {branches.map((b) => (
                     <option key={b.id} value={b.id}>
                       {b.name || `Branch #${b.branch_code || b.id}`} ({b.city || 'Kerala'})
@@ -398,7 +400,7 @@ export function BranchStaffFormModal({
             {/* Staff Role */}
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                Assigned Role <span className="text-red-500">*</span>
+                {t("branchStaffModals.assignedRole", "Assigned Role")} <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <Briefcase className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -414,7 +416,7 @@ export function BranchStaffFormModal({
                   }`}
                 >
                   <option value="">
-                    {loadingRoles ? 'Loading available roles...' : 'Select Staff Role'}
+                    {loadingRoles ? t("branchStaffModals.loadingAvailableRoles", "Loading available roles...") : t("branchStaffModals.selectStaffRole", "Select Staff Role")}
                   </option>
                   {roles.map((r) => (
                     <option key={r.id} value={r.id}>
@@ -436,10 +438,10 @@ export function BranchStaffFormModal({
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
                 {mode === 'create' ? (
                   <>
-                    Account Password <span className="text-red-500">*</span>
+                    {t("branchStaffModals.accountPassword", "Account Password")} <span className="text-red-500">*</span>
                   </>
                 ) : (
-                  <>New Password (Leave blank to keep)</>
+                  <>{t("branchStaffModals.newPasswordLeaveBlankTo", "New Password (Leave blank to keep)")}</>
                 )}
               </label>
               <div className="relative">
@@ -450,7 +452,7 @@ export function BranchStaffFormModal({
                   autoComplete="new-password"
                   value={formData.password}
                   onChange={handleChange}
-                  placeholder={mode === 'create' ? 'Min. 8 characters' : 'Enter new password'}
+                  placeholder={mode === 'create' ? t("branchStaffModals.min8Characters", "Min. 8 characters") : t("branchStaffModals.enterNewPassword", "Enter new password")}
                   maxLength={72}
                   className={`w-full pl-10 pr-10 py-2.5 rounded-xl border text-sm transition-all focus:outline-none focus:ring-2 font-medium ${
                     formErrors.password
@@ -478,7 +480,7 @@ export function BranchStaffFormModal({
           {/* Address */}
           <div>
             <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-              Residential / Official Address <span className="text-red-500">*</span>
+              {t("branchStaffModals.residentialOfficialAddress", "Residential / Official Address")} <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <MapPin className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
@@ -487,7 +489,7 @@ export function BranchStaffFormModal({
                 rows={3}
                 value={formData.address}
                 onChange={handleChange}
-                placeholder="Complete street address, village/city, pincode"
+                placeholder={t("branchStaffModals.completeStreetAddressVillageCity", "Complete street address, village/city, pincode")}
                 maxLength={255}
                 className={`w-full pl-10 pr-4 py-2.5 rounded-xl border text-sm transition-all focus:outline-none focus:ring-2 font-medium resize-none ${
                   formErrors.address
@@ -512,7 +514,7 @@ export function BranchStaffFormModal({
               disabled={isSubmitting}
               className="px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer"
             >
-              Cancel
+              {t("common.cancel", "Cancel")}
             </button>
             <button
               type="submit"
@@ -522,12 +524,12 @@ export function BranchStaffFormModal({
               {isSubmitting ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Saving...</span>
+                  <span>{t("branchStaffModals.saving", "Saving...")}</span>
                 </>
               ) : (
                 <>
                   <CheckCircle2 className="w-4 h-4" />
-                  <span>{mode === 'create' ? 'Create Staff' : 'Save Changes'}</span>
+                  <span>{mode === 'create' ? t("branchStaffModals.createStaff", "Create Staff") : t("memberNominee.saveChanges", "Save Changes")}</span>
                 </>
               )}
             </button>
@@ -549,6 +551,7 @@ export function BranchStaffDetailModal({
   onEditClick,
   onDeleteClick
 }) {
+  const { t } = useTranslation();
   if (!isOpen || !staff) return null;
 
   const roleName =
@@ -578,7 +581,7 @@ export function BranchStaffDetailModal({
                       : 'bg-slate-100 text-slate-500 border border-slate-200'
                   }`}
                 >
-                  {staff.is_active !== false ? '● Active' : '○ Inactive'}
+                  {staff.is_active !== false ? t("announcementModals.active", "● Active") : t("announcementModals.inactive", "○ Inactive")}
                 </span>
               </div>
               <p className="text-xs text-slate-500 mt-0.5 flex items-center gap-1.5">
@@ -602,14 +605,14 @@ export function BranchStaffDetailModal({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="p-3.5 bg-slate-50/80 rounded-2xl border border-slate-100">
               <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
-                Official Email
+                {t("branchManagerStaff.officialEmail", "Official Email")}
               </span>
               <p className="text-sm font-semibold text-slate-800 break-all">{staff.email}</p>
             </div>
 
             <div className="p-3.5 bg-slate-50/80 rounded-2xl border border-slate-100">
               <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
-                Contact Number
+                {t("modal.branchAdmin.contactNumberLabel", "Contact Number")}
               </span>
               <p className="text-sm font-semibold text-slate-800">{staff.contact_number || 'N/A'}</p>
             </div>
@@ -620,7 +623,7 @@ export function BranchStaffDetailModal({
             <div className="p-3.5 bg-slate-50/80 rounded-2xl border border-slate-100 flex items-center justify-between">
               <div>
                 <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">
-                  Assigned Branch
+                  {t("memberProfile.assignedBranch", "Assigned Branch")}
                 </span>
                 <p className="text-sm font-bold text-slate-800">
                   {staff.branch_name || staff.branch?.name || `Branch #${staff.branch_id}`}
@@ -637,7 +640,7 @@ export function BranchStaffDetailModal({
           {/* Address */}
           <div className="p-3.5 bg-slate-50/80 rounded-2xl border border-slate-100">
             <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
-              Residential / Official Address
+              {t("branchStaffModals.residentialOfficialAddress", "Residential / Official Address")}
             </span>
             <p className="text-sm font-medium text-slate-700 leading-relaxed">
               {staff.address || 'No address registered.'}
@@ -648,7 +651,7 @@ export function BranchStaffDetailModal({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="p-3 bg-slate-50/50 rounded-xl border border-slate-100">
               <span className="text-[11px] text-slate-400 uppercase font-bold tracking-wider block">
-                Role Designation
+                {t("superAdminStaff.roleDesignation", "Role Designation")}
               </span>
               <p className="text-xs font-bold text-slate-700 mt-1">
                 {roleName} {staff.staff_role_id ? `(#${staff.staff_role_id})` : ''}
@@ -656,7 +659,7 @@ export function BranchStaffDetailModal({
             </div>
             <div className="p-3 bg-slate-50/50 rounded-xl border border-slate-100">
               <span className="text-[11px] text-slate-400 uppercase font-bold tracking-wider block">
-                Created At
+                {t("dashboardModule.emergency.table.createdAt", "Created At")}
               </span>
               <p className="text-xs font-bold text-slate-700 mt-1">
                 {formatDateTime(staff.created_at)}
@@ -675,7 +678,7 @@ export function BranchStaffDetailModal({
             className="inline-flex items-center gap-1.5 px-3 py-2 text-rose-600 hover:bg-rose-50 rounded-xl text-xs sm:text-sm font-bold transition-colors cursor-pointer"
           >
             <Trash2 className="w-4 h-4" />
-            <span>Delete Staff</span>
+            <span>{t("branchStaffModals.deleteStaff", "Delete Staff")}</span>
           </button>
 
           <div className="flex items-center gap-2">
@@ -687,13 +690,13 @@ export function BranchStaffDetailModal({
               className="inline-flex items-center gap-1.5 px-4 py-2 bg-teal-50 text-teal-800 hover:bg-teal-100 border border-teal-200/80 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer"
             >
               <Pencil className="w-3.5 h-3.5" />
-              <span>Edit Staff</span>
+              <span>{t("branchStaffModals.editStaff", "Edit Staff")}</span>
             </button>
             <button
               onClick={onClose}
               className="px-5 py-2 bg-[#00b4a7] text-white hover:bg-[#00a296] rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer shadow-xs"
             >
-              Done
+              {t("branchManagerMemberPasswordUpdate.done", "Done")}
             </button>
           </div>
         </div>
@@ -712,6 +715,7 @@ export function BranchStaffDeleteModal({
   onConfirm,
   isDeleting = false
 }) {
+  const { t } = useTranslation();
   if (!isOpen || !staff) return null;
 
   return (
@@ -723,11 +727,10 @@ export function BranchStaffDeleteModal({
           </div>
 
           <div>
-            <h3 className="text-lg font-bold text-slate-900">Delete Staff Member?</h3>
+            <h3 className="text-lg font-bold text-slate-900">{t("branchStaffModals.deleteStaffMember", "Delete Staff Member?")}</h3>
             <p className="text-xs sm:text-sm text-slate-500 mt-1.5 leading-relaxed font-medium">
-              Are you sure you want to remove{' '}
-              <strong className="text-slate-800 font-bold">"{staff.full_name}"</strong> ({staff.staff_code})
-              from the branch registry?
+              {t("branchStaffModals.areYouSureYouWant", "Are you sure you want to remove")}{' '}
+              <strong className="text-slate-800 font-bold">"{staff.full_name}"</strong> ({staff.staff_code}{t("branchStaffModals.fromTheBranchRegistry", ") from the branch registry?")}
             </p>
           </div>
 
@@ -735,7 +738,7 @@ export function BranchStaffDeleteModal({
             <p className="text-xs text-amber-800 flex items-start gap-2 font-medium">
               <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
               <span>
-                This will immediately revoke their staff portal login access and active sessions.
+                {t("branchStaffModals.thisWillImmediatelyRevokeTheir", "This will immediately revoke their staff portal login access and active sessions.")}
               </span>
             </p>
           </div>
@@ -746,7 +749,7 @@ export function BranchStaffDeleteModal({
               disabled={isDeleting}
               className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
             >
-              Cancel
+              {t("common.cancel", "Cancel")}
             </button>
             <button
               onClick={() => onConfirm(staff)}
@@ -756,12 +759,12 @@ export function BranchStaffDeleteModal({
               {isDeleting ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Deleting...</span>
+                  <span>{t("branchStaffModals.deleting", "Deleting...")}</span>
                 </>
               ) : (
                 <>
                   <Trash2 className="w-4 h-4" />
-                  <span>Yes, Delete</span>
+                  <span>{t("branchStaffModals.yesDelete", "Yes, Delete")}</span>
                 </>
               )}
             </button>

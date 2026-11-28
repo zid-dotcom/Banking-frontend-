@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { i18n } from '../../i18n/index.js';
+import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -43,6 +45,33 @@ import {
   EMERGENCY_UNREAD_UPDATED_EVENT,
 } from '../../services/emergencyService';
 import { getStaffCustomerServicePendingCount } from '../../services/serviceRequestService';
+const SIDEBAR_MESSAGES = {
+  branchDashboard: { id: 'sidebar.branchDashboard', message: 'Branch Dashboard' },
+  staffDashboard: { id: 'sidebar.staffDashboard', message: 'Staff Dashboard' },
+  dashboard: { id: 'sidebar.dashboard', message: 'Dashboard' },
+  myProfile: { id: 'sidebar.myProfile', message: 'My Profile' },
+  nomineeDetails: { id: 'sidebar.nomineeDetails', message: 'Nominee Details' },
+  branchNominees: { id: 'sidebar.branchNominees', message: 'Branch Nominees' },
+  savingsSchemes: { id: 'sidebar.savingsSchemes', message: 'Savings Schemes' },
+  fdMisSchemes: { id: 'sidebar.fdMisSchemes', message: 'FD / MIS Schemes' },
+  investmentSchemes: { id: 'sidebar.investmentSchemes', message: 'Investment Schemes' },
+  loanSchemes: { id: 'sidebar.loanSchemes', message: 'Loan Schemes' },
+  announcements: { id: 'sidebar.announcements', message: 'Announcements' },
+  notifications: { id: 'sidebar.notifications', message: 'Notifications' },
+  securityEvents: { id: 'sidebar.securityEvents', message: 'Security Events' },
+  passwordUpdate: { id: 'sidebar.passwordUpdate', message: 'Password Update' },
+  branchMembers: { id: 'sidebar.branchMembers', message: 'Branch Members' },
+  membershipFeeSettings: { id: 'sidebar.membershipFeeSettings', message: 'Membership Fee Settings' },
+  branchStaff: { id: 'sidebar.branchStaff', message: 'Branch Staff' },
+  monthlyTargets: { id: 'sidebar.monthlyTargets', message: 'Monthly Targets' },
+  serviceRequests: { id: 'sidebar.serviceRequests', message: 'Service Requests' },
+  emergencyCases: { id: 'sidebar.emergencyCases', message: 'Emergency Cases' },
+  memberPasswordUpdate: { id: 'sidebar.memberPasswordUpdate', message: 'Member Password Update' },
+  branches: { id: 'sidebar.branches', message: 'Branches' },
+  branchAdmins: { id: 'sidebar.branchAdmins', message: 'Branch Admins' },
+  staffRoles: { id: 'sidebar.staffRoles', message: 'Staff Roles' },
+  staffMembers: { id: 'sidebar.staffMembers', message: 'Staff Members' },
+};
 
 export default function DashboardSidebar({
   role = 'member',
@@ -54,6 +83,39 @@ export default function DashboardSidebar({
 }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t, i18n } = useTranslation();
+
+  const getTranslatedLabel = (item) => {
+    const keyMap = {
+      overview: role === 'branch_manager' ? 'branchDashboard' : (role === 'staff' ? 'staffDashboard' : 'dashboard'),
+      profile: 'myProfile',
+      nominee: 'nomineeDetails',
+      nominees: 'branchNominees',
+      savings_schemes: 'savingsSchemes',
+      fd_mis_schemes: 'fdMisSchemes',
+      investment_schemes: 'investmentSchemes',
+      loan_schemes: 'loanSchemes',
+      announcements: 'announcements',
+      notifications: 'notifications',
+      security_events: 'securityEvents',
+      password_update: 'passwordUpdate',
+      members: role === 'branch_manager' ? 'branchMembers' : 'branchMembers',
+      membership_settings: 'membershipFeeSettings',
+      staff: role === 'super_admin' ? 'staffMembers' : 'branchStaff',
+      monthly_targets: 'monthlyTargets',
+      service_requests: 'serviceRequests',
+      emergency_cases: 'emergencyCases',
+      member_password_update: 'memberPasswordUpdate',
+      branches: 'branches',
+      branch_admins: 'branchAdmins',
+      staff_roles: 'staffRoles',
+      member_base: 'branchMembers',
+      cash_operations: 'savingsSchemes',
+      product_accounts: 'investmentSchemes',
+    };
+    const key = keyMap[item.id];
+    return key ? t(SIDEBAR_MESSAGES[key].id, SIDEBAR_MESSAGES[key].message) : item.label;
+  };
 
   // Resolve user data with localStorage fallback
   const effectiveUser = (() => {
@@ -81,53 +143,53 @@ export default function DashboardSidebar({
   // Role based navigation menus with dedicated page routes
   const roleNavItems = {
     member: [
-      { id: 'overview', label: 'Dashboard', icon: LayoutDashboard, path: '/member/dashboard' },
-      { id: 'profile', label: 'My Profile', icon: User, path: '/member/profile' },
-      { id: 'nominee', label: 'Nominee Details', icon: HeartHandshake, path: '/member/nominee' },
-      { id: 'savings_schemes', label: 'Savings Schemes', icon: PiggyBank, path: '/member/savings-schemes' },
-      { id: 'fd_mis_schemes', label: 'FD / MIS Schemes', icon: Coins, path: '/member/fd-mis-schemes' },
-      { id: 'investment_schemes', label: 'Investment Schemes', icon: TrendingUp, path: '/member/investment-schemes' },
-      { id: 'loan_schemes', label: 'Loan Schemes', icon: Landmark, path: '/member/loan-schemes' },
-      { id: 'announcements', label: 'Announcements', icon: Megaphone, path: '/member/announcements' },
-      { id: 'notifications', label: 'Notifications', icon: Bell, path: '/member/notifications' },
-      { id: 'security_events', label: 'Security & Access', icon: ShieldCheck, path: '/member/security' },
-      { id: 'password_update', label: 'Password Update', icon: KeyRound, path: '/member/password-update' },
+      { id: 'overview', label: t("sidebar.dashboard", "Dashboard"), icon: LayoutDashboard, path: '/member/dashboard' },
+      { id: 'profile', label: t("sidebar.myProfile", "My Profile"), icon: User, path: '/member/profile' },
+      { id: 'nominee', label: t("sidebar.nomineeDetails", "Nominee Details"), icon: HeartHandshake, path: '/member/nominee' },
+      { id: 'savings_schemes', label: t("sidebar.savingsSchemes", "Savings Schemes"), icon: PiggyBank, path: '/member/savings-schemes' },
+      { id: 'fd_mis_schemes', label: t("sidebar.fdMisSchemes", "FD / MIS Schemes"), icon: Coins, path: '/member/fd-mis-schemes' },
+      { id: 'investment_schemes', label: t("sidebar.investmentSchemes", "Investment Schemes"), icon: TrendingUp, path: '/member/investment-schemes' },
+      { id: 'loan_schemes', label: t("sidebar.loanSchemes", "Loan Schemes"), icon: Landmark, path: '/member/loan-schemes' },
+      { id: 'announcements', label: t("sidebar.announcements", "Announcements"), icon: Megaphone, path: '/member/announcements' },
+      { id: 'notifications', label: t("sidebar.notifications", "Notifications"), icon: Bell, path: '/member/notifications' },
+      { id: 'security_events', label: t("dashboardSidebar.securityAccess", "Security & Access"), icon: ShieldCheck, path: '/member/security' },
+      { id: 'password_update', label: t("dashboardModule.passwordUpdate.badge", "Password Update"), icon: KeyRound, path: '/member/password-update' },
     ],
     branch_manager: [
-      { id: 'overview', label: 'Branch Dashboard', icon: LayoutDashboard, path: '/branch-manager/dashboard' },
-      { id: 'members', label: 'Branch Members', icon: Users, path: '/branch-manager/members' },
-      { id: 'membership_settings', label: 'Membership Fee Settings', icon: QrCode, path: '/branch-manager/membership-settings' },
-      { id: 'nominees', label: 'Branch Nominees', icon: HeartHandshake, path: '/branch-manager/nominees' },
-      { id: 'staff', label: 'Branch Staff', icon: ShieldCheck, path: '/branch-manager/staff' },
-      { id: 'savings_schemes', label: 'Savings Schemes', icon: PiggyBank, path: '/branch-manager/savings-schemes' },
-      { id: 'fd_mis_schemes', label: 'FD / MIS Schemes', icon: Coins, path: '/branch-manager/fd-mis-schemes' },
-      { id: 'investment_schemes', label: 'Investment Schemes', icon: TrendingUp, path: '/branch-manager/investment-schemes' },
-      { id: 'monthly_targets', label: 'Monthly Targets', icon: Target, path: '/branch-manager/monthly-targets' },
-      { id: 'loan_schemes', label: 'Loan Schemes', icon: Landmark, path: '/branch-manager/loan-schemes' },
-      { id: 'announcements', label: 'Announcements', icon: Megaphone, path: '/branch-manager/announcements' },
-      { id: 'service_requests', label: 'Service Requests', icon: Headset, path: '/branch-manager/service-requests' },
-      { id: 'emergency_cases', label: 'Emergency Cases', icon: AlertOctagon, path: '/branch-manager/emergency-cases' },
-      { id: 'security_events', label: 'Security Events', icon: ShieldCheck, path: '/branch-manager/security-events' },
-      { id: 'member_password_update', label: 'Member Password Update', icon: KeyRound, path: '/branch-manager/member-password-update' },
-      { id: 'password_update', label: 'Password Update', icon: KeyRound, path: '/branch-manager/password-update' },
+      { id: 'overview', label: t("sidebar.branchDashboard", "Branch Dashboard"), icon: LayoutDashboard, path: '/branch-manager/dashboard' },
+      { id: 'members', label: t("sidebar.branchMembers", "Branch Members"), icon: Users, path: '/branch-manager/members' },
+      { id: 'membership_settings', label: t("sidebar.membershipFeeSettings", "Membership Fee Settings"), icon: QrCode, path: '/branch-manager/membership-settings' },
+      { id: 'nominees', label: t("sidebar.branchNominees", "Branch Nominees"), icon: HeartHandshake, path: '/branch-manager/nominees' },
+      { id: 'staff', label: t("dashboardModule.passwordUpdate.fallbackBranchStaff", "Branch Staff"), icon: ShieldCheck, path: '/branch-manager/staff' },
+      { id: 'savings_schemes', label: t("sidebar.savingsSchemes", "Savings Schemes"), icon: PiggyBank, path: '/branch-manager/savings-schemes' },
+      { id: 'fd_mis_schemes', label: t("sidebar.fdMisSchemes", "FD / MIS Schemes"), icon: Coins, path: '/branch-manager/fd-mis-schemes' },
+      { id: 'investment_schemes', label: t("sidebar.investmentSchemes", "Investment Schemes"), icon: TrendingUp, path: '/branch-manager/investment-schemes' },
+      { id: 'monthly_targets', label: t("sidebar.monthlyTargets", "Monthly Targets"), icon: Target, path: '/branch-manager/monthly-targets' },
+      { id: 'loan_schemes', label: t("sidebar.loanSchemes", "Loan Schemes"), icon: Landmark, path: '/branch-manager/loan-schemes' },
+      { id: 'announcements', label: t("sidebar.announcements", "Announcements"), icon: Megaphone, path: '/branch-manager/announcements' },
+      { id: 'service_requests', label: t("sidebar.serviceRequests", "Service Requests"), icon: Headset, path: '/branch-manager/service-requests' },
+      { id: 'emergency_cases', label: t("sidebar.emergencyCases", "Emergency Cases"), icon: AlertOctagon, path: '/branch-manager/emergency-cases' },
+      { id: 'security_events', label: t("sidebar.securityEvents", "Security Events"), icon: ShieldCheck, path: '/branch-manager/security-events' },
+      { id: 'member_password_update', label: t("sidebar.memberPasswordUpdate", "Member Password Update"), icon: KeyRound, path: '/branch-manager/member-password-update' },
+      { id: 'password_update', label: t("dashboardModule.passwordUpdate.badge", "Password Update"), icon: KeyRound, path: '/branch-manager/password-update' },
     ],
     super_admin: [
-      { id: 'overview', label: 'Dashboard', icon: LayoutDashboard, path: '/super-admin/dashboard' },
-      { id: 'branches', label: 'Branches', icon: Building2, path: '/super-admin/branches' },
-      { id: 'branch_admins', label: 'Branch Manager', icon: UserCheck, path: '/super-admin/branch-admins' },
-      { id: 'staff_roles', label: 'Staff Roles', icon: ShieldCheck, path: '/super-admin/staff-roles' },
-      { id: 'staff', label: 'Staff Registry', icon: Users, path: '/super-admin/staff' },
-      { id: 'monthly_targets', label: 'Monthly Targets', icon: Target, path: '/super-admin/monthly-targets' },
-      { id: 'savings_schemes', label: 'Savings Schemes', icon: PiggyBank, path: '/super-admin/savings-schemes' },
-      { id: 'fd_mis_schemes', label: 'FD / MIS Schemes', icon: Coins, path: '/super-admin/fd-mis-schemes' },
-      { id: 'investment_schemes', label: 'Investment Schemes', icon: TrendingUp, path: '/super-admin/investment-schemes' },
-      { id: 'loan_schemes', label: 'Loan Schemes', icon: Landmark, path: '/super-admin/loan-schemes' },
-      { id: 'announcements', label: 'Announcements', icon: Megaphone, path: '/super-admin/announcements' },
-      { id: 'service_requests', label: 'Service Requests', icon: Headset, path: '/super-admin/service-requests' },
-      { id: 'emergency_cases', label: 'Emergency Cases', icon: AlertOctagon, path: '/super-admin/emergency-cases' },
-      { id: 'security_events', label: 'Security Events', icon: ShieldAlert, path: '/super-admin/security-events' },
-      { id: 'member_base', label: 'View Members', icon: Users, path: '/super-admin/members' },
-      { id: 'password_update', label: 'Password Update', icon: KeyRound, path: '/super-admin/password-update' },
+      { id: 'overview', label: t("sidebar.dashboard", "Dashboard"), icon: LayoutDashboard, path: '/super-admin/dashboard' },
+      { id: 'branches', label: t("sidebar.branches", "Branches"), icon: Building2, path: '/super-admin/branches' },
+      { id: 'branch_admins', label: t("nav.branchManager", "Branch Manager"), icon: UserCheck, path: '/super-admin/branch-admins' },
+      { id: 'staff_roles', label: t("sidebar.staffRoles", "Staff Roles"), icon: ShieldCheck, path: '/super-admin/staff-roles' },
+      { id: 'staff', label: t("dashboardSidebar.staffRegistry", "Staff Registry"), icon: Users, path: '/super-admin/staff' },
+      { id: 'monthly_targets', label: t("sidebar.monthlyTargets", "Monthly Targets"), icon: Target, path: '/super-admin/monthly-targets' },
+      { id: 'savings_schemes', label: t("sidebar.savingsSchemes", "Savings Schemes"), icon: PiggyBank, path: '/super-admin/savings-schemes' },
+      { id: 'fd_mis_schemes', label: t("sidebar.fdMisSchemes", "FD / MIS Schemes"), icon: Coins, path: '/super-admin/fd-mis-schemes' },
+      { id: 'investment_schemes', label: t("sidebar.investmentSchemes", "Investment Schemes"), icon: TrendingUp, path: '/super-admin/investment-schemes' },
+      { id: 'loan_schemes', label: t("sidebar.loanSchemes", "Loan Schemes"), icon: Landmark, path: '/super-admin/loan-schemes' },
+      { id: 'announcements', label: t("sidebar.announcements", "Announcements"), icon: Megaphone, path: '/super-admin/announcements' },
+      { id: 'service_requests', label: t("sidebar.serviceRequests", "Service Requests"), icon: Headset, path: '/super-admin/service-requests' },
+      { id: 'emergency_cases', label: t("sidebar.emergencyCases", "Emergency Cases"), icon: AlertOctagon, path: '/super-admin/emergency-cases' },
+      { id: 'security_events', label: t("sidebar.securityEvents", "Security Events"), icon: ShieldAlert, path: '/super-admin/security-events' },
+      { id: 'member_base', label: t("dashboardSidebar.viewMembers", "View Members"), icon: Users, path: '/super-admin/members' },
+      { id: 'password_update', label: t("dashboardModule.passwordUpdate.badge", "Password Update"), icon: KeyRound, path: '/super-admin/password-update' },
     ],
     staff: (() => {
       const roleStr = String(
@@ -151,40 +213,40 @@ export default function DashboardSidebar({
 
       if (isCustomerService) {
         return [
-          { id: 'overview', label: 'Staff Dashboard', icon: LayoutDashboard, path: '/staff/dashboard' },
-          { id: 'monthly_targets', label: 'Monthly Targets', icon: Target, path: '/staff/monthly-targets' },
-          { id: 'service_requests', label: 'Service Requests', icon: Headset, path: '/staff/service-requests' },
-          { id: 'announcements', label: 'Announcements', icon: Megaphone, path: '/staff/announcements' },
-          { id: 'password_update', label: 'Password Update', icon: KeyRound, path: '/staff/password-update' },
+          { id: 'overview', label: i18n.t("sidebar.staffDashboard", "Staff Dashboard"), icon: LayoutDashboard, path: '/staff/dashboard' },
+          { id: 'monthly_targets', label: i18n.t("sidebar.monthlyTargets", "Monthly Targets"), icon: Target, path: '/staff/monthly-targets' },
+          { id: 'service_requests', label: i18n.t("sidebar.serviceRequests", "Service Requests"), icon: Headset, path: '/staff/service-requests' },
+          { id: 'announcements', label: i18n.t("sidebar.announcements", "Announcements"), icon: Megaphone, path: '/staff/announcements' },
+          { id: 'password_update', label: i18n.t("dashboardModule.passwordUpdate.badge", "Password Update"), icon: KeyRound, path: '/staff/password-update' },
         ];
       }
       if (isAccountant) {
         return [
-          { id: 'overview', label: 'Staff Dashboard', icon: LayoutDashboard, path: '/staff/dashboard' },
-          { id: 'monthly_targets', label: 'Monthly Targets', icon: Target, path: '/staff/monthly-targets' },
-          { id: 'members', label: 'View Members', icon: Users, path: '/staff/members' },
-          { id: 'product_accounts', label: 'Deposit & Investment Accounts', icon: Landmark, path: '/staff/product-accounts' },
-          { id: 'announcements', label: 'Announcements', icon: Megaphone, path: '/staff/announcements' },
-          { id: 'password_update', label: 'Password Update', icon: KeyRound, path: '/staff/password-update' },
+          { id: 'overview', label: i18n.t("sidebar.staffDashboard", "Staff Dashboard"), icon: LayoutDashboard, path: '/staff/dashboard' },
+          { id: 'monthly_targets', label: i18n.t("sidebar.monthlyTargets", "Monthly Targets"), icon: Target, path: '/staff/monthly-targets' },
+          { id: 'members', label: i18n.t("dashboardSidebar.viewMembers", "View Members"), icon: Users, path: '/staff/members' },
+          { id: 'product_accounts', label: i18n.t("accountantProductAccounts.depositInvestmentAccounts", "Deposit & Investment Accounts"), icon: Landmark, path: '/staff/product-accounts' },
+          { id: 'announcements', label: i18n.t("sidebar.announcements", "Announcements"), icon: Megaphone, path: '/staff/announcements' },
+          { id: 'password_update', label: i18n.t("dashboardModule.passwordUpdate.badge", "Password Update"), icon: KeyRound, path: '/staff/password-update' },
         ];
       }
       // Dedicated sidebar menu for Collection Agent
       if (isCollectionAgent) {
         return [
-          { id: 'overview', label: 'Staff Dashboard', icon: LayoutDashboard, path: '/staff/dashboard' },
-          { id: 'monthly_targets', label: 'Monthly Targets', icon: Target, path: '/staff/monthly-targets' },
-          { id: 'cash_operations', label: 'Cash Operations', icon: Wallet, path: '/staff/cash-operations' },
-          { id: 'announcements', label: 'Announcements', icon: Megaphone, path: '/staff/announcements' },
-          { id: 'password_update', label: 'Password Update', icon: KeyRound, path: '/staff/password-update' },
+          { id: 'overview', label: i18n.t("sidebar.staffDashboard", "Staff Dashboard"), icon: LayoutDashboard, path: '/staff/dashboard' },
+          { id: 'monthly_targets', label: i18n.t("sidebar.monthlyTargets", "Monthly Targets"), icon: Target, path: '/staff/monthly-targets' },
+          { id: 'cash_operations', label: i18n.t("dashboardSidebar.cashOperations", "Cash Operations"), icon: Wallet, path: '/staff/cash-operations' },
+          { id: 'announcements', label: i18n.t("sidebar.announcements", "Announcements"), icon: Megaphone, path: '/staff/announcements' },
+          { id: 'password_update', label: i18n.t("dashboardModule.passwordUpdate.badge", "Password Update"), icon: KeyRound, path: '/staff/password-update' },
         ];
       }
       // General Cashier / Teller / Default Staff
       return [
-        { id: 'overview', label: 'Staff Dashboard', icon: LayoutDashboard, path: '/staff/dashboard' },
-        { id: 'monthly_targets', label: 'Monthly Targets', icon: Target, path: '/staff/monthly-targets' },
-        { id: 'cash_operations', label: 'Cash Operations', icon: Wallet, path: '/staff/cash-operations' },
-        { id: 'announcements', label: 'Announcements', icon: Megaphone, path: '/staff/announcements' },
-        { id: 'password_update', label: 'Password Update', icon: KeyRound, path: '/staff/password-update' },
+        { id: 'overview', label: i18n.t("sidebar.staffDashboard", "Staff Dashboard"), icon: LayoutDashboard, path: '/staff/dashboard' },
+        { id: 'monthly_targets', label: i18n.t("sidebar.monthlyTargets", "Monthly Targets"), icon: Target, path: '/staff/monthly-targets' },
+        { id: 'cash_operations', label: i18n.t("dashboardSidebar.cashOperations", "Cash Operations"), icon: Wallet, path: '/staff/cash-operations' },
+        { id: 'announcements', label: i18n.t("sidebar.announcements", "Announcements"), icon: Megaphone, path: '/staff/announcements' },
+        { id: 'password_update', label: i18n.t("dashboardModule.passwordUpdate.badge", "Password Update"), icon: KeyRound, path: '/staff/password-update' },
       ];
     })()
   };
@@ -200,9 +262,9 @@ export default function DashboardSidebar({
   const staffTitle = /cashier\/teller/i.test(String(rawStaffTitle)) ? 'Cashier' : rawStaffTitle;
 
   const roleLabels = {
-    member: { title: 'Member Portal', badge: 'Active Member', color: 'bg-teal-50 text-[#0f766e]' },
-    branch_manager: { title: 'Branch Manager', badge: branchDisplayName, color: 'bg-teal-50 text-[#0f766e]' },
-    super_admin: { title: 'Super Admin', badge: 'Apex Society Authority', color: 'bg-teal-50 text-[#0f766e]' },
+    member: { title: t("nav.memberPortal", "Member Portal"), badge: 'Active Member', color: 'bg-teal-50 text-[#0f766e]' },
+    branch_manager: { title: t("nav.branchManager", "Branch Manager"), badge: branchDisplayName, color: 'bg-teal-50 text-[#0f766e]' },
+    super_admin: { title: t("login.superAdmin.portalTitleLine1", "Super Admin"), badge: 'Apex Society Authority', color: 'bg-teal-50 text-[#0f766e]' },
     staff: { title: staffTitle, badge: branchDisplayName, color: 'bg-teal-50 text-[#0f766e]' },
   };
 
@@ -354,11 +416,11 @@ export default function DashboardSidebar({
             </div>
             <div>
               <div className="flex items-baseline leading-none">
-                <span className="font-extrabold text-lg text-slate-900 tracking-tight">Aurum</span>
-                <span className="font-extrabold text-lg text-[#14b8a6] tracking-tight">FX</span>
+                <span className="font-extrabold text-lg text-slate-900 tracking-tight">{t("branchAdminLogin.aurum", "Aurum")}</span>
+                <span className="font-extrabold text-lg text-[#14b8a6] tracking-tight">{t("branchAdminLogin.fx", "FX")}</span>
               </div>
               <p className="text-[10px] text-slate-400 font-medium truncate max-w-[150px]">
-                Co-operative Society
+                {t("dashboardSidebar.coOperativeSociety", "Co-operative Society")}
               </p>
             </div>
           </Link>
@@ -384,7 +446,7 @@ export default function DashboardSidebar({
         {/* Navigation Menu */}
         <div className="flex-1 overflow-y-auto px-3.5 py-4 space-y-1">
           <div className="px-3 pb-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-            Menu Navigation
+            {t("sidebar.menuNavigation", "MENU NAVIGATION")}
           </div>
 
           {currentNavItems.map((item) => {
@@ -407,7 +469,7 @@ export default function DashboardSidebar({
                 }`}
               >
                 <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
-                <span className="truncate whitespace-nowrap text-left">{item.label}</span>
+                <span className="truncate whitespace-nowrap text-left">{getTranslatedLabel(item)}</span>
                 {item.id === 'notifications' && role === 'member' && unreadCount > 0 && (
                   <span
                     className={`ml-auto px-2 py-0.5 text-[10px] font-black rounded-full shadow-2xs ${
@@ -442,7 +504,7 @@ export default function DashboardSidebar({
           {role !== 'super_admin' && role !== 'branch_manager' && role !== 'staff' && (
             <>
               <div className="pt-4 px-3 pb-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                Support & Help
+                {t("sidebar.supportHelp", "SUPPORT & HELP")}
               </div>
 
               {role === 'member' ? (
@@ -463,7 +525,7 @@ export default function DashboardSidebar({
                       ? 'text-white'
                       : 'text-slate-400'
                   }`} />
-                  <span>Society Helpdesk</span>
+                  <span>{t("sidebar.societyHelpdesk", "Society Helpdesk")}</span>
                 </button>
               ) : (
                 <Link
@@ -471,7 +533,7 @@ export default function DashboardSidebar({
                   className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
                 >
                   <HelpCircle className="w-4 h-4 text-slate-400" />
-                  <span>Society Helpdesk</span>
+                  <span>{t("sidebar.societyHelpdesk", "Society Helpdesk")}</span>
                 </Link>
               )}
             </>
@@ -480,25 +542,26 @@ export default function DashboardSidebar({
 
         {/* User Profile & Bottom Logout Button */}
         {(() => {
+  const { t } = useTranslation();
           const resolvedSidebarName =
             user?.full_name ||
             user?.name ||
             user?.username ||
-            (role === 'super_admin' ? 'Super Admin' : role === 'staff' ? 'Staff Member' : role === 'branch_manager' ? 'Branch Manager' : 'Member');
+            (role === 'super_admin' ? t("login.superAdmin.portalTitleLine1", "Super Admin") : role === 'staff' ? t("dashboardModule.monthlyTargets.staffMember", "Staff Member") : role === 'branch_manager' ? t("nav.branchManager", "Branch Manager") : t("dashboardModule.accountTransactions.roleMember", "Member"));
 
           const rawSidebarRole =
             user?.staff_role?.name ||
             user?.account_role ||
             user?.role_name ||
             user?.role ||
-            (role === 'super_admin' ? 'Super Admin' : role === 'staff' ? 'Staff' : role === 'branch_manager' ? 'Branch Manager' : (user?.id ? `Member #${user.id}` : 'Member'));
+            (role === 'super_admin' ? t("login.superAdmin.portalTitleLine1", "Super Admin") : role === 'staff' ? t("dashboardModule.branchOverview.tabStaff", "Staff") : role === 'branch_manager' ? t("nav.branchManager", "Branch Manager") : (user?.id ? `Member #${user.id}` : t("dashboardModule.accountTransactions.roleMember", "Member")));
 
           const resolvedSidebarRole =
-            /cashier\/teller/i.test(String(rawSidebarRole)) ? 'Cashier' : rawSidebarRole;
+            /cashier\/teller/i.test(String(rawSidebarRole)) ? t("branchManagerCashReconciliation.cashier", "Cashier") : rawSidebarRole;
 
           const resolvedSidebarAvatar =
             user?.avatarText ||
-            (resolvedSidebarName ? resolvedSidebarName.trim().charAt(0).toUpperCase() : (role === 'super_admin' ? 'SA' : 'U'));
+            (resolvedSidebarName ? resolvedSidebarName.trim().charAt(0).toUpperCase() : (role === 'super_admin' ? t("dashboardSidebar.sa", "SA") : 'U'));
 
           return (
             <div className="p-4 border-t border-slate-100 bg-slate-50/50">
@@ -512,7 +575,7 @@ export default function DashboardSidebar({
                 className={`flex items-center gap-3 mb-3 p-1.5 -m-1.5 rounded-xl transition-colors ${
                   role === 'member' ? 'hover:bg-teal-50/70 cursor-pointer group' : ''
                 }`}
-                title={role === 'member' ? 'View My Full Profile' : ''}
+                title={role === 'member' ? t("dashboardHeader.viewMyFullProfile", "View My Full Profile") : ''}
               >
                 <div className="w-9 h-9 rounded-full bg-teal-50 text-[#0f766e] font-bold flex items-center justify-center text-sm border border-teal-200/60 group-hover:scale-105 transition-transform">
                   {resolvedSidebarAvatar}
@@ -532,7 +595,7 @@ export default function DashboardSidebar({
                 className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50 border border-rose-200/70 transition-colors cursor-pointer"
               >
                 <LogOut className="w-3.5 h-3.5" />
-                <span>Sign Out</span>
+                <span>{t("sidebar.signOut", "Sign Out")}</span>
               </button>
             </div>
           );

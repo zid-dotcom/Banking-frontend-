@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import {
   ArrowRight,
@@ -23,7 +24,9 @@ import hero3 from '../assets/hero3.jpeg';
 import hero4 from '../assets/hero4.jpeg';
 import hero5 from '../assets/hero5.jpeg';
 
+
 export default function Home({ onOpenEnquiry }) {
+  const { t } = useTranslation();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [prevSlideIndex, setPrevSlideIndex] = useState(0);
 
@@ -31,41 +34,41 @@ export default function Home({ onOpenEnquiry }) {
     {
       id: 1,
       image: hero1,
-      smallText: 'Simple. Transparent. Secure.',
-      mainHeading: 'Building a brighter financial future',
-      ctaText: 'Get started today!',
+      smallText: t("hero.slide1Small", "Simple. Transparent. Secure."),
+      mainHeading: t("hero.slide1Heading", "Building a brighter financial future"),
+      ctaText: t("hero.slide1Cta", "Get started today!"),
       ctaLink: '/loans'
     },
     {
       id: 2,
       image: hero2,
-      smallText: 'We support your dream',
-      mainHeading: 'Need a lower monthly payment?',
-      ctaText: 'Get started today!',
+      smallText: t("hero.slide2Small", "We support your dream"),
+      mainHeading: t("hero.slide2Heading", "Need a lower monthly payment?"),
+      ctaText: t("hero.slide2Cta", "Get started today!"),
       ctaLink: '/loans'
     },
     {
       id: 3,
       image: hero3,
-      smallText: 'Empowering Rural Enterprise & MSME',
-      mainHeading: 'Smart Capital Solutions for Local Commerce',
-      ctaText: 'Get started today!',
+      smallText: t("hero.slide3Small", "Empowering Rural Enterprise & MSME"),
+      mainHeading: t("hero.slide3Heading", "Smart Capital Solutions for Local Commerce"),
+      ctaText: t("hero.slide3Cta", "Get started today!"),
       ctaLink: '/loans'
     },
     {
       id: 4,
       image: hero4,
-      smallText: 'Transparent Cooperative Savings',
-      mainHeading: 'Secure Your Family with Systematic Savings',
-      ctaText: 'Get started today!',
+      smallText: t("hero.slide4Small", "Transparent Cooperative Savings"),
+      mainHeading: t("hero.slide4Heading", "Secure Your Family with Systematic Savings"),
+      ctaText: t("hero.slide4Cta", "Get started today!"),
       ctaLink: '/loans'
     },
     {
       id: 5,
       image: hero5,
-      smallText: 'Direct Society Counter Processing',
-      mainHeading: 'Accessible Lending Without Hidden Barriers',
-      ctaText: 'Get started today!',
+      smallText: t("hero.slide5Small", "Direct Society Counter Processing"),
+      mainHeading: t("hero.slide5Heading", "Accessible Lending Without Hidden Barriers"),
+      ctaText: t("hero.slide5Cta", "Get started today!"),
       ctaLink: '/contact'
     }
   ];
@@ -111,6 +114,7 @@ export default function Home({ onOpenEnquiry }) {
 
         {/* Crisp HTML5 Images with Direct Native Resolution & Smooth Dissolve */}
         {slides.map((s, idx) => {
+  const { t } = useTranslation();
           const isActive = idx === currentSlide;
           const isPrevious = idx === prevSlideIndex;
 
@@ -126,7 +130,7 @@ export default function Home({ onOpenEnquiry }) {
             >
               <img
                 src={s.image}
-                alt="AurumFX Financial Services"
+                alt={t("home.aurumfxFinancialServices", "AurumFX Financial Services")}
                 loading="eager"
                 decoding="sync"
                 className={`w-full h-full object-cover hero-image-clarity ${isActive ? 'animate-pan-clarity' : ''
@@ -179,7 +183,7 @@ export default function Home({ onOpenEnquiry }) {
                 </svg>
               </div>
               <div className="text-white font-serif font-bold text-[11px] sm:text-sm lg:text-[14px] leading-tight drop-shadow-sm">
-                Fast Online Instant<br className="hidden sm:inline" /> Approvals
+                {t("hero.featureFastApproval", "Fast Online Instant Approvals")}
               </div>
             </div>
 
@@ -189,7 +193,7 @@ export default function Home({ onOpenEnquiry }) {
                 <Handshake className="w-6 h-6 sm:w-7 sm:h-7 stroke-[1.9] text-[#ffba00] drop-shadow-sm" />
               </div>
               <div className="text-white font-serif font-bold text-[11px] sm:text-sm lg:text-[14px] leading-tight drop-shadow-sm">
-                500,000 Customers
+                {t("hero.featureCustomers", "500,000 Customers")}
               </div>
             </div>
 
@@ -199,7 +203,7 @@ export default function Home({ onOpenEnquiry }) {
                 <CircleDollarSign className="w-6 h-6 sm:w-7 sm:h-7 stroke-[1.9] text-[#ffba00] drop-shadow-sm" />
               </div>
               <div className="text-white font-serif font-bold text-[11px] sm:text-sm lg:text-[14px] leading-tight drop-shadow-sm">
-                No Prepayment Fees
+                {t("hero.featureNoPrepayment", "No Prepayment Fees")}
               </div>
             </div>
 
@@ -215,7 +219,7 @@ export default function Home({ onOpenEnquiry }) {
                 </svg>
               </div>
               <div className="text-white font-serif font-bold text-[11px] sm:text-sm lg:text-[14px] leading-tight drop-shadow-sm">
-                Flexible payments
+                {t("hero.featureFlexiblePayments", "Flexible payments")}
               </div>
             </div>
 
@@ -243,7 +247,7 @@ export default function Home({ onOpenEnquiry }) {
               <div className="relative rounded-2xl overflow-hidden shadow-2xl">
                 <img
                   src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=1000&q=80"
-                  alt="Cooperative Meeting"
+                  alt={t("home.cooperativeMeeting", "Cooperative Meeting")}
                   className="w-full h-[460px] object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent" />
@@ -256,8 +260,12 @@ export default function Home({ onOpenEnquiry }) {
                     <Award className="w-6 h-6" />
                   </div>
                   <div>
-                    <h5 className="font-serif font-bold text-slate-900 text-sm">Multi-State Scope</h5>
-                    <p className="text-xs text-slate-600">Empowering Agricultural Prosperity</p>
+                    <h5 className="font-serif font-bold text-slate-900 text-sm">
+                      {t("home.aboutBadgeScope", "Multi-State Scope")}
+                    </h5>
+                    <p className="text-xs text-slate-600">
+                      {t("home.aboutBadgeDesc", "Empowering Agricultural Prosperity")}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -267,33 +275,33 @@ export default function Home({ onOpenEnquiry }) {
             <div className="lg:col-span-7 scroll-reveal" data-scroll-reveal style={{ '--reveal-delay': '220ms' }}>
               <div className="text-xs uppercase tracking-widest font-bold text-[#00b4a7] mb-2 flex items-center gap-2">
                 <span className="w-6 h-[2px] bg-[#00b4a7]"></span>
-                About Aurumfx Society
+                {t("home.aboutEyebrow", "About Aurumfx Society")}
               </div>
 
               <h2 className="text-3xl sm:text-4xl lg:text-[42px] font-serif font-bold text-slate-900 leading-tight mb-6">
-                Committed to Empowering Rural & Semi-Urban Growth
+                {t("home.aboutTitle", "Committed to Empowering Rural & Semi-Urban Growth")}
               </h2>
 
               <p className="text-slate-600 leading-relaxed mb-6 text-base">
-                <strong>{SOCIETY_INFO.fullName}</strong> is founded on the core principles of mutual self-help, collective strength, and financial transparency. We bridge the critical funding requirements of agricultural cultivators, dairy farmers, allied agro-industries, and rural entrepreneurs.
+                {t("home.aboutDesc1", "Aurumfx Multi State Agro Co-operative Society Limited is founded on the core principles of mutual self-help, collective strength, and financial transparency. We bridge the critical funding requirements of agricultural cultivators, dairy farmers, allied agro-industries, and rural entrepreneurs.")}
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
                 <div className="flex items-start gap-3">
                   <CheckCircle2 className="w-5 h-5 text-[#00b4a7] mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-slate-700 font-medium">Democratic member control and equitable participation</span>
+                  <span className="text-sm text-slate-700 font-medium">{t("home.tenet2", "Direct Member Democratic Governance")}</span>
                 </div>
                 <div className="flex items-start gap-3">
                   <CheckCircle2 className="w-5 h-5 text-[#00b4a7] mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-slate-700 font-medium">Clear interest structures without hidden fees</span>
+                  <span className="text-sm text-slate-700 font-medium">{t("costs.subtitle", "Transparent and fair costs, with no hidden fees")}</span>
                 </div>
                 <div className="flex items-start gap-3">
                   <CheckCircle2 className="w-5 h-5 text-[#00b4a7] mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-slate-700 font-medium">Established registered office at Antony Master Square, Thrissur</span>
+                  <span className="text-sm text-slate-700 font-medium">{t("home.tenet1", "Multi-State Operating Jurisdiction")}</span>
                 </div>
                 <div className="flex items-start gap-3">
                   <CheckCircle2 className="w-5 h-5 text-[#00b4a7] mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-slate-700 font-medium">Dedicated support for seasonal harvest and allied cycles</span>
+                  <span className="text-sm text-slate-700 font-medium">{t("home.tenet3", "Priority Credit for Agricultural Cultivators")}</span>
                 </div>
               </div>
 
@@ -302,12 +310,12 @@ export default function Home({ onOpenEnquiry }) {
                   to="/about"
                   className="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-bold px-6 py-3.5 rounded text-sm transition-colors"
                 >
-                  <span>Read Full Society Profile</span>
+                  <span>{t("home.readMoreAboutUs", "Read More About Us")}</span>
                   <ChevronRight className="w-4 h-4 text-[#ffba00]" />
                 </Link>
 
                 <div className="text-xs text-slate-500 border-l border-slate-300 pl-4 py-1">
-                  <span className="block font-semibold text-slate-800">Employer Representative:</span>
+                  <span className="block font-semibold text-slate-800">{t("contact.employer", "Society Employer")}:</span>
                   <span>{SOCIETY_INFO.employer}</span>
                 </div>
               </div>
@@ -351,15 +359,15 @@ export default function Home({ onOpenEnquiry }) {
             <div className="lg:col-span-6 space-y-6">
               <span className="text-xs uppercase tracking-widest font-bold text-[#00b4a7] flex items-center gap-2">
                 <span className="w-6 h-[2px] bg-[#00b4a7]"></span>
-                The Cooperative Advantage
+                {t("home.aboutEyebrow", "About Aurumfx Society")}
               </span>
 
               <h2 className="text-3xl sm:text-4xl lg:text-[40px] font-serif font-bold text-slate-900 leading-tight">
-                Why Farmers &amp; Businesses Partner with Aurumfx
+                {t("home.whyChooseTitle", "Why Choose Our Cooperative Society?")}
               </h2>
 
               <p className="text-slate-600 text-base leading-relaxed">
-                As a Multi-State Agro Co-Operative Society, our operations are driven by community development rather than outside commercial profit motives. We return value directly to our members.
+                {t("home.whyChooseDesc", "Experience banking centered on genuine solidarity and mutual prosperity.")}
               </p>
 
               <div className="space-y-4 pt-2">
@@ -382,7 +390,7 @@ export default function Home({ onOpenEnquiry }) {
               <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-slate-200">
                 <img
                   src="https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=1200&q=80"
-                  alt="Cooperative Banking Consultation"
+                  alt={t("home.cooperativeBankingConsultation", "Cooperative Banking Consultation")}
                   className="w-full h-[520px] object-cover object-center"
                 />
               </div>
@@ -420,7 +428,7 @@ export default function Home({ onOpenEnquiry }) {
         {/* Matching Hero Background Photo */}
         <img
           src={hero2}
-          alt="Ready to get started"
+          alt={t("home.readyToGetStarted", "Ready to get started")}
           className="absolute inset-0 w-full h-full object-cover object-[center_35%]"
         />
 
@@ -433,7 +441,7 @@ export default function Home({ onOpenEnquiry }) {
             
             {/* Left Heading */}
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-white tracking-tight drop-shadow-sm text-center sm:text-left">
-              Ready to get started?
+              {t("home.readyToGetStarted2", "Ready to get started?")}
             </h2>
 
             {/* Right Action Button */}
@@ -441,7 +449,7 @@ export default function Home({ onOpenEnquiry }) {
               onClick={() => onOpenEnquiry && onOpenEnquiry('Membership & Loan Application')}
               className="inline-flex items-center justify-center bg-[#fccb34] hover:bg-[#eab924] text-white font-medium sm:font-semibold px-9 sm:px-12 py-3.5 sm:py-4 rounded-[3px] shadow-md hover:shadow-lg transition-all duration-200 text-base sm:text-[17px] cursor-pointer tracking-normal flex-shrink-0"
             >
-              Apply Now
+              {t("common.applyNow", "Apply Now")}
             </button>
 
           </div>
@@ -457,17 +465,17 @@ export default function Home({ onOpenEnquiry }) {
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-14">
             <div>
               <span className="text-xs uppercase tracking-widest font-bold text-[#00b4a7] block mb-2">
-                Knowledge & Advisory Desk
+                {t("home.newsEyebrow", "Articles & Market Updates")}
               </span>
               <h2 className="text-3xl sm:text-4xl font-serif font-bold text-slate-900 leading-tight">
-                Latest Cooperative & Agro Updates
+                {t("home.newsTitle", "Latest From Society Newsroom")}
               </h2>
             </div>
             <Link
               to="/blog"
               className="mt-4 md:mt-0 inline-flex items-center gap-1.5 text-sm font-bold text-[#00b4a7] hover:text-[#00877c]"
             >
-              <span>Explore All Articles</span>
+              <span>{t("home.viewAllNews", "View All News & Updates")}</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -506,7 +514,7 @@ export default function Home({ onOpenEnquiry }) {
                     to="/blog"
                     className="inline-flex items-center gap-1.5 text-xs font-bold text-[#00b4a7] hover:text-[#00877c] pt-3 border-t border-slate-100"
                   >
-                    <span>Read Full Article</span>
+                    <span>{t("home.readFullArticle", "Read Full Article")}</span>
                     <ChevronRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>

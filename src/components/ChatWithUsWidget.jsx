@@ -1,6 +1,10 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
+
 
 export default function ChatWithUsWidget({ onClick }) {
+  const { t } = useTranslation();
+
   return (
     <div 
       className="fixed bottom-28 sm:bottom-32 lg:bottom-36 right-6 sm:right-8 z-50 flex items-center gap-2.5 cursor-pointer group select-none" 
@@ -9,14 +13,14 @@ export default function ChatWithUsWidget({ onClick }) {
       
       {/* White Speech Pill: "Chat with us!" */}
       <div className="bg-white text-slate-900 font-extrabold text-[13px] tracking-tight px-4 py-2 rounded-2xl shadow-[0_4px_16px_rgba(0,0,0,0.18)] border border-slate-100/90 transition-transform duration-200 group-hover:scale-105 animate-chat-blink">
-        Chat with us!
+        {t("chatWidget.label", "Chat with us!")}
       </div>
 
       {/* Vibrant Green Circular Button with Speech Bubble Icon */}
       <button
         type="button"
         className="w-12 h-12 rounded-full bg-[#48c22b] hover:bg-[#3fb024] active:bg-[#369b1f] flex items-center justify-center shadow-[0_4px_16px_rgba(0,0,0,0.22)] transition-all duration-200 transform group-hover:scale-110 cursor-pointer flex-shrink-0 animate-chat-blink"
-        aria-label="Chat with member desk on WhatsApp"
+        aria-label={t("chatWidget.ariaLabel", "Chat with member desk on WhatsApp")}
       >
         {/* WhatsApp-style speech bubble with phone receiver */}
         <svg

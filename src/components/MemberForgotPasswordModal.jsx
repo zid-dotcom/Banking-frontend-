@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   X,
   User,
@@ -17,12 +18,14 @@ import {
 import { memberForgotPassword, memberResetPassword } from '../services/authService';
 import { validateStrongPassword } from '../utils/passwordValidation';
 
+
 export default function MemberForgotPasswordModal({
   isOpen,
   initialMemberCode = '',
   onClose,
   onResetSuccess,
 }) {
+  const { t } = useTranslation();
   // Step 1: Request OTP
   // Step 2: Verify OTP
   // Step 3: Set New Password
@@ -66,7 +69,7 @@ export default function MemberForgotPasswordModal({
 
     const cleanCode = memberCode.trim().replace(/^#/, '');
     if (!cleanCode) {
-      setErrorMsg('Please enter your Member Code.');
+      setErrorMsg(t("forgotPassword.enterMemberCode", "Please enter your Member Code."));
       return;
     }
 
@@ -76,11 +79,11 @@ export default function MemberForgotPasswordModal({
       const msg =
         res?.message ||
         res?.detail ||
-        `Verification OTP sent to the registered email address for Member #${cleanCode}.`;
+        t("forgotPassword.otpSent", "Verification OTP sent to the registered email address for Member #{memberCode}.", { memberCode: cleanCode });
       setInfoMsg(msg);
       setStep(2);
     } catch (err) {
-      setErrorMsg(err.message || 'Could not send verification OTP. Please verify your Member Code.');
+      setErrorMsg(err.message || t("forgotPassword.otpSendError", "Could not send verification OTP. Please verify your Member Code."));
     } finally {
       setIsLoading(false);
     }
@@ -93,9 +96,9 @@ export default function MemberForgotPasswordModal({
     try {
       const cleanCode = memberCode.trim().replace(/^#/, '');
       const res = await memberForgotPassword(cleanCode);
-      setInfoMsg(res?.message || `A fresh OTP was sent to your registered email.`);
+      setInfoMsg(res?.message || t("forgotPassword.otpResent", "A fresh OTP was sent to your registered email."));
     } catch (err) {
-      setErrorMsg(err.message || 'Failed to resend OTP. Please try again.');
+      setErrorMsg(err.message || t("forgotPassword.otpResendError", "Failed to resend OTP. Please try again."));
     } finally {
       setIsResending(false);
     }
@@ -108,18 +111,18 @@ export default function MemberForgotPasswordModal({
 
     const cleanOtp = otp.trim();
     if (!cleanOtp) {
-      setErrorMsg('Please enter the verification OTP sent to your email.');
+      setErrorMsg(t("forgotPassword.enterOtp", "Please enter the verification OTP sent to your email."));
       return;
     }
 
     if (cleanOtp.length < 3) {
-      setErrorMsg('Please enter a valid verification OTP.');
+      setErrorMsg(t("forgotPassword.invalidOtp", "Please enter a valid verification OTP."));
       return;
     }
 
     // Advance to Step 3 to set the new password
     setStep(3);
-    setInfoMsg('OTP code confirmed. Please set your new member account password.');
+    setInfoMsg(t("forgotPassword.otpConfirmed", "OTP code confirmed. Please set your new member account password."));
   };
 
   // Step 3: Set New Password & Submit to Backend
@@ -128,16 +131,29 @@ export default function MemberForgotPasswordModal({
     setErrorMsg(null);
 
     if (!newPassword.trim()) {
-      setErrorMsg('Please enter a new password.');
+      setErrorMsg(t("forgotPassword.enterNewPassword", "Please enter a new password."));
       return;
     }
     const strongCheck = validateStrongPassword(newPassword);
     if (!strongCheck.isValid) {
-      setErrorMsg(strongCheck.message);
+      const pwdError = !newPassword
+        ? t("forgotPassword.passwordRequired", "Password is required.")
+        : !strongCheck.hasMinLength
+        ? t("forgotPassword.passwordMinLength", "Password must be at least 8 characters long.")
+        : !strongCheck.hasUppercase
+        ? t("forgotPassword.passwordUppercase", "Password must include at least one uppercase letter (A-Z).")
+        : !strongCheck.hasLowercase
+        ? t("forgotPassword.passwordLowercase", "Password must include at least one lowercase letter (a-z).")
+        : !strongCheck.hasNumber
+        ? t("forgotPassword.passwordNumber", "Password must include at least one number (0-9).")
+        : !strongCheck.hasSpecial
+        ? t("forgotPassword.passwordSpecial", "Password must include at least one special character (!@#$%^&*...).")
+        : strongCheck.message;
+      setErrorMsg(pwdError);
       return;
     }
     if (confirmPassword && newPassword !== confirmPassword) {
-      setErrorMsg('New password and confirmation password do not match.');
+      setErrorMsg(t("forgotPassword.passwordMismatch", "New password and confirmation password do not match."));
       return;
     }
 
@@ -153,7 +169,7 @@ export default function MemberForgotPasswordModal({
 
       setStep(4);
     } catch (err) {
-      const msg = err.message || 'Failed to reset password. Please check your OTP and try again.';
+      const msg = err.message || t("forgotPassword.resetError", "Failed to reset password. Please check your OTP and try again.");
       setErrorMsg(msg);
     } finally {
       setIsLoading(false);
@@ -187,7 +203,7 @@ export default function MemberForgotPasswordModal({
           type="button"
           onClick={onClose}
           disabled={isLoading}
-          aria-label="Close"
+          aria-label={t("common.close", "Close")}
           className="absolute top-4 sm:top-5 right-4 sm:right-5 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center transition-colors cursor-pointer disabled:opacity-50 z-20"
         >
           <X className="w-4 h-4" />
@@ -204,16 +220,16 @@ export default function MemberForgotPasswordModal({
               </div>
               <div className="min-w-0 flex-1">
                 <h3 className="text-base sm:text-lg font-bold text-slate-900 font-sans leading-snug">
-                  Reset Member Password
+                  {t("branchManagerMemberPasswordUpdate.resetMemberPassword", "Reset Member Password")}
                 </h3>
                 <span className="inline-block mt-0.5 text-[11px] font-semibold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-100">
-                  Step 1 of 3: Request OTP
+                  {t("memberForgotPasswordModal.step1Of3Request", "Step 1 of 3: Request OTP")}
                 </span>
               </div>
             </div>
 
             <p className="text-xs sm:text-sm text-slate-500 mb-4 leading-relaxed">
-              Enter your official Society Member ID. A secure verification OTP will be sent to your registered email address.
+              {t("memberForgotPasswordModal.enterYourOfficialSocietyMember", "Enter your official Society Member ID. A secure verification OTP will be sent to your registered email address.")}
             </p>
 
             {errorMsg && (
@@ -226,7 +242,7 @@ export default function MemberForgotPasswordModal({
             <form onSubmit={handleRequestOtp} className="space-y-4">
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
-                  Member ID / Code <span className="text-rose-500">*</span>
+                  {t("memberForgotPasswordModal.memberIdCode", "Member ID / Code")} <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
@@ -235,7 +251,7 @@ export default function MemberForgotPasswordModal({
                   <input
                     type="text"
                     required
-                    placeholder="e.g. 100234 or MEM001"
+                    placeholder={t("memberForgotPasswordModal.eG100234OrMem001", "e.g. 100234 or MEM001")}
                     value={memberCode}
                     onChange={(e) => setMemberCode(e.target.value)}
                     disabled={isLoading}
@@ -251,7 +267,7 @@ export default function MemberForgotPasswordModal({
                   disabled={isLoading}
                   className="px-4 py-2.5 text-xs font-bold text-slate-600 hover:text-slate-800 transition-colors cursor-pointer disabled:opacity-50"
                 >
-                  Cancel
+                  {t("common.cancel", "Cancel")}
                 </button>
                 <button
                   type="submit"
@@ -261,11 +277,11 @@ export default function MemberForgotPasswordModal({
                   {isLoading ? (
                     <>
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      <span>Sending OTP...</span>
+                      <span>{t("memberForgotPasswordModal.sendingOtp", "Sending OTP...")}</span>
                     </>
                   ) : (
                     <>
-                      <span>Send OTP</span>
+                      <span>{t("memberForgotPasswordModal.sendOtp", "Send OTP")}</span>
                       <KeyRound className="w-3.5 h-3.5" />
                     </>
                   )}
@@ -288,16 +304,16 @@ export default function MemberForgotPasswordModal({
                   setErrorMsg(null);
                 }}
                 className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors cursor-pointer flex-shrink-0 mt-0.5"
-                title="Change Member ID"
+                title={t("memberForgotPasswordModal.changeMemberId", "Change Member ID")}
               >
                 <ArrowLeft className="w-4 h-4" />
               </button>
               <div className="min-w-0 flex-1">
                 <h3 className="text-base sm:text-lg font-bold text-slate-900 font-sans leading-snug">
-                  Verify OTP
+                  {t("memberForgotPasswordModal.verifyOtp", "Verify OTP")}
                 </h3>
                 <span className="inline-block mt-0.5 text-[11px] font-semibold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-100">
-                  Step 2 of 3: Enter Verification Code
+                  {t("memberForgotPasswordModal.step2Of3Enter", "Step 2 of 3: Enter Verification Code")}
                 </span>
               </div>
             </div>
@@ -320,7 +336,7 @@ export default function MemberForgotPasswordModal({
               {/* Target Member ID Card with Change option */}
               <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/80">
                 <div className="flex items-center justify-between text-xs mb-1">
-                  <span className="font-semibold uppercase tracking-wider text-[10px] text-slate-500">Member Account</span>
+                  <span className="font-semibold uppercase tracking-wider text-[10px] text-slate-500">{t("branchManagerNominees.memberAccount", "Member Account")}</span>
                   <button
                     type="button"
                     onClick={() => {
@@ -329,18 +345,18 @@ export default function MemberForgotPasswordModal({
                     }}
                     className="text-[#008f85] hover:underline font-bold text-[11px] cursor-pointer"
                   >
-                    Change
+                    {t("memberForgotPasswordModal.change", "Change")}
                   </button>
                 </div>
                 <div className="text-xs font-bold text-slate-800 truncate">
-                  Member #{memberCode}
+                  {t("branchManagerMemberPasswordUpdate.member", "Member #")}{memberCode}
                 </div>
               </div>
 
               {/* OTP Input Field */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
-                  Verification OTP <span className="text-rose-500">*</span>
+                  {t("memberForgotPasswordModal.verificationOtp", "Verification OTP")} <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
@@ -350,7 +366,7 @@ export default function MemberForgotPasswordModal({
                     type="text"
                     required
                     autoFocus
-                    placeholder="Enter OTP from email"
+                    placeholder={t("memberForgotPasswordModal.enterOtpFromEmail", "Enter OTP from email")}
                     value={otp}
                     onChange={(e) => setOtp(e.target.value)}
                     disabled={isLoading}
@@ -358,7 +374,7 @@ export default function MemberForgotPasswordModal({
                   />
                 </div>
                 <p className="text-[11px] text-slate-400 mt-1">
-                  Enter the verification code sent to your registered email address.
+                  {t("memberForgotPasswordModal.enterTheVerificationCodeSent", "Enter the verification code sent to your registered email address.")}
                 </p>
               </div>
 
@@ -371,7 +387,7 @@ export default function MemberForgotPasswordModal({
                   className="text-xs font-bold text-[#008f85] hover:text-[#00756c] inline-flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
                 >
                   <RotateCcw className={`w-3.5 h-3.5 ${isResending ? 'animate-spin' : ''}`} />
-                  <span>{isResending ? 'Resending...' : 'Resend OTP'}</span>
+                  <span>{isResending ? t("memberForgotPasswordModal.resending", "Resending...") : t("memberForgotPasswordModal.resendOtp", "Resend OTP")}</span>
                 </button>
 
                 <button
@@ -379,7 +395,7 @@ export default function MemberForgotPasswordModal({
                   disabled={!otp.trim()}
                   className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#008f85] to-[#00756c] hover:from-[#00756c] hover:to-[#005e57] text-white text-xs font-bold rounded-xl shadow-sm hover:shadow transition-all cursor-pointer disabled:opacity-50 active:scale-95"
                 >
-                  <span>Verify OTP</span>
+                  <span>{t("memberForgotPasswordModal.verifyOtp", "Verify OTP")}</span>
                   <Check className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -400,16 +416,16 @@ export default function MemberForgotPasswordModal({
                   setErrorMsg(null);
                 }}
                 className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors cursor-pointer flex-shrink-0 mt-0.5"
-                title="Back to OTP"
+                title={t("memberForgotPasswordModal.backToOtp", "Back to OTP")}
               >
                 <ArrowLeft className="w-4 h-4" />
               </button>
               <div className="min-w-0 flex-1">
                 <h3 className="text-base sm:text-lg font-bold text-slate-900 font-sans leading-snug">
-                  Set New Password
+                  {t("memberForgotPasswordModal.setNewPassword", "Set New Password")}
                 </h3>
                 <span className="inline-block mt-0.5 text-[11px] font-semibold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-100">
-                  Step 3 of 3: New Credentials
+                  {t("memberForgotPasswordModal.step3Of3New", "Step 3 of 3: New Credentials")}
                 </span>
               </div>
             </div>
@@ -418,14 +434,14 @@ export default function MemberForgotPasswordModal({
             <div className="mb-4 p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between text-xs">
               <div className="flex items-center gap-2 text-emerald-800 font-medium truncate">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-                <span className="truncate">OTP entered for <b>Member #{memberCode}</b></span>
+                <span className="truncate">{t("memberForgotPasswordModal.otpEnteredFor", "OTP entered for")} <b>{t("branchManagerMemberPasswordUpdate.member", "Member #")}{memberCode}</b></span>
               </div>
               <button
                 type="button"
                 onClick={() => setStep(2)}
                 className="text-[#008f85] font-bold hover:underline text-[11px] cursor-pointer ml-2 flex-shrink-0"
               >
-                Change OTP
+                {t("memberForgotPasswordModal.changeOtp", "Change OTP")}
               </button>
             </div>
 
@@ -440,7 +456,7 @@ export default function MemberForgotPasswordModal({
                       onClick={() => setStep(2)}
                       className="mt-1.5 text-xs font-bold text-rose-900 underline hover:no-underline cursor-pointer block"
                     >
-                      Click here to re-enter your OTP code
+                      {t("memberForgotPasswordModal.clickHereToReEnter", "Click here to re-enter your OTP code")}
                     </button>
                   )}
                 </div>
@@ -451,7 +467,7 @@ export default function MemberForgotPasswordModal({
               {/* New Password */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">
-                  New Member Password <span className="text-rose-500">*</span>
+                  {t("branchManagerMemberPasswordUpdate.newMemberPassword", "New Member Password")} <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
@@ -461,7 +477,7 @@ export default function MemberForgotPasswordModal({
                     type={showNewPassword ? 'text' : 'password'}
                     required
                     autoFocus
-                    placeholder="Minimum 6 characters"
+                    placeholder={t("memberForgotPasswordModal.minimum6Characters", "Minimum 6 characters")}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     disabled={isLoading}
@@ -478,11 +494,12 @@ export default function MemberForgotPasswordModal({
 
                 {/* Strong Password Live Guidance */}
                 {Boolean(newPassword) && (() => {
+  const { t } = useTranslation();
                   const validation = validateStrongPassword(newPassword);
                   return (
                     <div className="mt-2.5 p-3 bg-slate-50 border border-slate-200/90 rounded-2xl space-y-2">
                       <div className="flex items-center justify-between text-xs">
-                        <span className="font-semibold text-slate-600">Password Strength:</span>
+                        <span className="font-semibold text-slate-600">{t("dashboardModule.passwordUpdate.passwordStrength", "Password Strength:")}</span>
                         <span
                           className={`font-black uppercase tracking-wider text-[11px] ${
                             validation.score <= 2
@@ -526,7 +543,7 @@ export default function MemberForgotPasswordModal({
                               validation.hasMinLength ? 'text-emerald-600 stroke-[3]' : 'opacity-30'
                             }`}
                           />
-                          <span>8+ characters</span>
+                          <span>{t("dashboardModule.passwordUpdate.ruleMinLength8", "8+ characters")}</span>
                         </span>
 
                         <span
@@ -539,7 +556,7 @@ export default function MemberForgotPasswordModal({
                               validation.hasUppercase ? 'text-emerald-600 stroke-[3]' : 'opacity-30'
                             }`}
                           />
-                          <span>Uppercase (A-Z)</span>
+                          <span>{t("dashboardModule.passwordUpdate.ruleUppercase", "Uppercase (A-Z)")}</span>
                         </span>
 
                         <span
@@ -552,7 +569,7 @@ export default function MemberForgotPasswordModal({
                               validation.hasLowercase ? 'text-emerald-600 stroke-[3]' : 'opacity-30'
                             }`}
                           />
-                          <span>Lowercase (a-z)</span>
+                          <span>{t("dashboardModule.passwordUpdate.ruleLowercase", "Lowercase (a-z)")}</span>
                         </span>
 
                         <span
@@ -565,7 +582,7 @@ export default function MemberForgotPasswordModal({
                               validation.hasNumber ? 'text-emerald-600 stroke-[3]' : 'opacity-30'
                             }`}
                           />
-                          <span>Number (0-9)</span>
+                          <span>{t("dashboardModule.passwordUpdate.ruleNumber", "Number (0-9)")}</span>
                         </span>
 
                         <span
@@ -578,7 +595,7 @@ export default function MemberForgotPasswordModal({
                               validation.hasSpecial ? 'text-emerald-600 stroke-[3]' : 'opacity-30'
                             }`}
                           />
-                          <span>Symbol (!@#$...)</span>
+                          <span>{t("dashboardModule.passwordUpdate.ruleSymbol", "Symbol (!@#$...)")}</span>
                         </span>
                       </div>
                     </div>
@@ -589,7 +606,7 @@ export default function MemberForgotPasswordModal({
               {/* Confirm New Password */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">
-                  Confirm Member Password <span className="text-rose-500">*</span>
+                  {t("memberForgotPasswordModal.confirmMemberPassword", "Confirm Member Password")} <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
@@ -598,7 +615,7 @@ export default function MemberForgotPasswordModal({
                   <input
                     type={showConfirmPassword ? 'text' : 'password'}
                     required
-                    placeholder="Re-enter new password"
+                    placeholder={t("branchManagerMemberPasswordUpdate.reEnterNewPassword", "Re-enter new password")}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     disabled={isLoading}
@@ -622,7 +639,7 @@ export default function MemberForgotPasswordModal({
                   disabled={isLoading}
                   className="text-xs font-bold text-slate-600 hover:text-slate-800 transition-colors cursor-pointer"
                 >
-                  Back to OTP
+                  {t("memberForgotPasswordModal.backToOtp", "Back to OTP")}
                 </button>
 
                 <button
@@ -633,11 +650,11 @@ export default function MemberForgotPasswordModal({
                   {isLoading ? (
                     <>
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      <span>Updating...</span>
+                      <span>{t("branchManagerMemberPasswordUpdate.updating", "Updating...")}</span>
                     </>
                   ) : (
                     <>
-                      <span>Reset Password</span>
+                      <span>{t("branchManagerMemberPasswordUpdate.resetPassword", "Reset Password")}</span>
                       <ShieldCheck className="w-3.5 h-3.5" />
                     </>
                   )}
@@ -658,10 +675,10 @@ export default function MemberForgotPasswordModal({
 
             <div className="space-y-1">
               <h3 className="text-xl font-bold text-slate-900 font-sans">
-                Password Reset Successful!
+                {t("branchManagerMembers.passwordResetSuccessful", "Password Reset Successful!")}
               </h3>
               <p className="text-xs sm:text-sm text-slate-600 max-w-xs mx-auto leading-relaxed">
-                Your member account password has been updated. You can now log in using your new credentials.
+                {t("memberForgotPasswordModal.yourMemberAccountPasswordHas", "Your member account password has been updated. You can now log in using your new credentials.")}
               </p>
             </div>
 
@@ -671,7 +688,7 @@ export default function MemberForgotPasswordModal({
                 onClick={handleFinish}
                 className="w-full py-3 bg-gradient-to-r from-[#008f85] to-[#00756c] hover:from-[#00756c] hover:to-[#005e57] text-white font-bold text-sm rounded-xl shadow-md shadow-teal-500/20 transition-all cursor-pointer active:scale-95"
               >
-                Back to Member Login
+                {t("memberForgotPasswordModal.backToMemberLogin", "Back to Member Login")}
               </button>
             </div>
           </div>

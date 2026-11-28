@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Landmark,
   Coins,
@@ -27,6 +28,7 @@ import {
 } from '../../services/productAccountService';
 import { getBranches } from '../../services/branchService';
 
+
 function formatCurrency(val) {
   if (val === undefined || val === null || isNaN(val)) return '₹0';
   return new Intl.NumberFormat('en-IN', {
@@ -36,8 +38,8 @@ function formatCurrency(val) {
   }).format(val);
 }
 
-function formatDate(isoString) {
-  if (!isoString) return 'N/A';
+function formatDate(isoString, naLabel = 'N/A') {
+  if (!isoString) return naLabel;
   try {
     const d = new Date(isoString);
     if (isNaN(d.getTime())) return isoString;
@@ -51,8 +53,8 @@ function formatDate(isoString) {
   }
 }
 
-function formatDateTime(isoString) {
-  if (!isoString) return 'N/A';
+function formatDateTime(isoString, naLabel = 'N/A') {
+  if (!isoString) return naLabel;
   try {
     const d = new Date(isoString);
     if (isNaN(d.getTime())) return isoString;
@@ -74,10 +76,13 @@ export default function ProductAccountsDirectoryView({
   productType = 'fd_mis', // 'fd_mis' | 'investment'
   title = null,
 }) {
+  const { t } = useTranslation();
   const isInvestment = productType === 'investment';
   const isSuperAdmin = role === 'super_admin';
 
-  const defaultTitle = isInvestment ? 'Investment Accounts Directory' : 'FD & MIS Accounts Directory';
+  const defaultTitle = isInvestment
+    ? t("dashboardModule.productAccounts.investmentAccountsDirectory", "Investment Accounts Directory")
+    : t("dashboardModule.productAccounts.fdMisAccountsDirectory", "FD & MIS Accounts Directory");
   const displayTitle = title || defaultTitle;
 
   const [accounts, setAccounts] = useState([]);
@@ -148,7 +153,7 @@ export default function ProductAccountsDirectoryView({
       setAccounts(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error(`Failed to load ${productType} accounts for ${role}:`, err);
-      setError(err.message || 'Failed to load product accounts.');
+      setError(err.message || t("dashboardModule.productAccounts.loadError", "Failed to load product accounts."));
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -205,42 +210,52 @@ export default function ProductAccountsDirectoryView({
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
         <div className="bg-white rounded-2xl p-4 border border-teal-200/80 shadow-2xs bg-teal-50/20">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold text-teal-800 uppercase tracking-wider">Total Accounts</span>
+            <span className="text-[10px] font-bold text-teal-800 uppercase tracking-wider">
+              {t("dashboardModule.productAccounts.totalAccounts", "Total Accounts")}
+            </span>
             <div className="w-7 h-7 rounded-lg bg-teal-100 text-teal-700 flex items-center justify-center">
               <Landmark className="w-3.5 h-3.5" />
             </div>
           </div>
           <h4 className="text-xl font-black text-teal-950 mt-1">{accounts.length}</h4>
-          <p className="text-[10px] text-teal-600 mt-0.5">Approved &amp; active folios</p>
+          <p className="text-[10px] text-teal-600 mt-0.5">
+            {t("dashboardModule.productAccounts.approvedActiveFolios", "Approved & active folios")}
+          </p>
         </div>
 
         <div className="bg-white rounded-2xl p-4 border border-emerald-200/80 shadow-2xs bg-emerald-50/20">
           <div className="flex items-center justify-between">
             <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider">
-              Total Portfolio Balance
+              {t("dashboardModule.productAccounts.totalPortfolioBalance", "Total Portfolio Balance")}
             </span>
             <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
               <Wallet className="w-3.5 h-3.5" />
             </div>
           </div>
           <h4 className="text-xl font-black text-emerald-950 mt-1">{formatCurrency(totalBalance)}</h4>
-          <p className="text-[10px] text-emerald-600 mt-0.5">Aggregated holding value</p>
+          <p className="text-[10px] text-emerald-600 mt-0.5">
+            {t("dashboardModule.productAccounts.aggregatedHoldingValue", "Aggregated holding value")}
+          </p>
         </div>
 
         <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-2xs">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Account Category</span>
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+              {t("dashboardModule.productAccounts.accountCategory", "Account Category")}
+            </span>
             <div className="w-7 h-7 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center">
               {isInvestment ? <TrendingUp className="w-3.5 h-3.5 text-emerald-600" /> : <Coins className="w-3.5 h-3.5 text-teal-600" />}
             </div>
           </div>
           <h4 className="text-xl font-black text-slate-900 mt-1 capitalize">
-            {isInvestment ? 'Investment Folios' : 'FD & MIS Accounts'}
+            {isInvestment
+              ? t("dashboardModule.productAccounts.investmentFolios", "Investment Folios")
+              : t("dashboardModule.productAccounts.fdMisAccounts", "FD & MIS Accounts")}
           </h4>
           <p className="text-[10px] text-slate-400 mt-0.5">
             {isSuperAdmin && branches.length > 0
-              ? `Branch: ${branches.find((b) => String(b.id) === String(selectedBranchId))?.name || 'Selected'}`
-              : 'Branch operational accounts'}
+              ? `${t("dashboard.branch", "Branch")}: ${branches.find((b) => String(b.id) === String(selectedBranchId))?.name || t("dashboardModule.productAccounts.selected", "Selected")}`
+              : t("dashboardModule.productAccounts.branchOperationalAccounts", "Branch operational accounts")}
           </p>
         </div>
       </div>
@@ -252,7 +267,7 @@ export default function ProductAccountsDirectoryView({
           <div>
             <h3 className="text-base font-bold text-slate-900">{displayTitle}</h3>
             <p className="text-xs text-slate-500 mt-0.5">
-              Live audit of opened member product folios, balances, and operational status
+              {t("dashboardModule.productAccounts.subtitle", "Live audit of opened member product folios, balances, and operational status")}
             </p>
           </div>
 
@@ -261,7 +276,7 @@ export default function ProductAccountsDirectoryView({
             {isSuperAdmin && (
               <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl shadow-2xs">
                 <Building2 className="w-4 h-4 text-teal-600 shrink-0" />
-                <span className="text-xs font-bold text-slate-600">Branch:</span>
+                <span className="text-xs font-bold text-slate-600">{t("dashboard.branch", "Branch")}:</span>
                 <select
                   value={selectedBranchId}
                   onChange={(e) => setSelectedBranchId(e.target.value)}
@@ -290,7 +305,11 @@ export default function ProductAccountsDirectoryView({
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  {st === 'awaiting_initial_funding' ? 'Funding Pending' : st}
+                  {st === 'awaiting_initial_funding'
+                    ? t("dashboardModule.productAccounts.fundingPending", "Funding Pending")
+                    : st === 'active'
+                      ? t("common.active", "Active")
+                      : t("dashboardModule.productAccounts.all", "All")}
                 </button>
               ))}
             </div>
@@ -302,7 +321,7 @@ export default function ProductAccountsDirectoryView({
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search account, member, scheme..."
+                placeholder={t("dashboardModule.productAccounts.searchPlaceholder", "Search account, member, scheme...")}
                 className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-teal-500 shadow-2xs font-medium"
               />
             </div>
@@ -313,7 +332,7 @@ export default function ProductAccountsDirectoryView({
               onClick={() => fetchAccounts(true)}
               disabled={loading || refreshing}
               className="p-2.5 border border-slate-200 hover:border-teal-400 text-slate-600 hover:text-teal-700 bg-white hover:bg-teal-50/50 rounded-xl transition-all cursor-pointer shadow-2xs"
-              title="Refresh accounts"
+              title={t("dashboardModule.productAccounts.refreshAccounts", "Refresh accounts")}
             >
               <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin text-teal-600' : ''}`} />
             </button>
@@ -324,7 +343,9 @@ export default function ProductAccountsDirectoryView({
         {loading ? (
           <div className="py-16 text-center text-slate-400">
             <RefreshCw className="w-8 h-8 animate-spin mx-auto text-teal-600 mb-3" />
-            <p className="text-xs sm:text-sm font-semibold text-slate-600">Loading product accounts...</p>
+            <p className="text-xs sm:text-sm font-semibold text-slate-600">
+              {t("dashboardModule.productAccounts.loadingAccounts", "Loading active accounts...")}
+            </p>
           </div>
         ) : error ? (
           <div className="py-12 text-center text-rose-500 px-4">
@@ -334,7 +355,7 @@ export default function ProductAccountsDirectoryView({
               onClick={() => fetchAccounts()}
               className="mt-3 px-4 py-2 bg-slate-900 text-white text-xs font-bold rounded-xl cursor-pointer"
             >
-              Retry
+              {t("dashboardModule.productAccounts.retry", "Retry")}
             </button>
           </div>
         ) : filteredAccounts.length === 0 ? (
@@ -342,11 +363,15 @@ export default function ProductAccountsDirectoryView({
             <div className="w-12 h-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center mx-auto mb-3">
               <Landmark className="w-6 h-6" />
             </div>
-            <p className="text-sm font-bold text-slate-700 mb-1">No Product Accounts Found</p>
+            <p className="text-sm font-bold text-slate-700 mb-1">
+              {t("dashboardModule.productAccounts.noAccountsFound", "No Product Accounts Found")}
+            </p>
             <p className="text-xs text-slate-500 max-w-sm mx-auto">
               {searchQuery || statusFilter !== 'all'
-                ? 'Try clearing your search query or status filter.'
-                : `No active ${isInvestment ? 'investment' : 'FD / MIS'} accounts have been opened under this branch yet.`}
+                ? t("dashboardModule.productAccounts.tryClearingFilters", "Try clearing your search query or status filter.")
+                : isInvestment
+                  ? t("dashboardModule.productAccounts.noActiveInvestmentAccounts", "No active investment accounts have been opened under this branch yet.")
+                  : t("dashboardModule.productAccounts.noActiveFdMisAccounts", "No active FD / MIS accounts have been opened under this branch yet.")}
             </p>
           </div>
         ) : (
@@ -355,24 +380,24 @@ export default function ProductAccountsDirectoryView({
               <thead>
                 <tr className="border-b border-slate-100 bg-slate-50/75 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                   <th className="py-3.5 px-4 text-center w-12">#</th>
-                  <th className="py-3.5 px-4">Account Number</th>
-                  <th className="py-3.5 px-4">Member Code</th>
-                  <th className="py-3.5 px-4">Member Name</th>
-                  <th className="py-3.5 px-4">Email Address</th>
-                  <th className="py-3.5 px-4">Phone Number</th>
-                  <th className="py-3.5 px-4">Scheme Code</th>
-                  <th className="py-3.5 px-4">Scheme Name</th>
-                  {isSuperAdmin && <th className="py-3.5 px-4">Branch</th>}
+                  <th className="py-3.5 px-4">{t("dashboard.accountNumber", "Account Number")}</th>
+                  <th className="py-3.5 px-4">{t("dashboardModule.productAccounts.memberCode", "Member Code")}</th>
+                  <th className="py-3.5 px-4">{t("dashboardModule.productAccounts.memberName", "Member Name")}</th>
+                  <th className="py-3.5 px-4">{t("dashboardModule.productAccounts.emailAddress", "Email Address")}</th>
+                  <th className="py-3.5 px-4">{t("dashboardModule.productAccounts.phoneNumber", "Phone Number")}</th>
+                  <th className="py-3.5 px-4">{t("dashboardModule.productAccounts.schemeCode", "Scheme Code")}</th>
+                  <th className="py-3.5 px-4">{t("dashboardModule.productAccounts.schemeName", "Scheme Name")}</th>
+                  {isSuperAdmin && <th className="py-3.5 px-4">{t("dashboard.branch", "Branch")}</th>}
                   {!isInvestment && (
                     <>
-                      <th className="py-3.5 px-4">Type</th>
-                      <th className="py-3.5 px-4">Principal Amount</th>
+                      <th className="py-3.5 px-4">{t("dashboardModule.productAccounts.type", "Type")}</th>
+                      <th className="py-3.5 px-4">{t("dashboardModule.productAccounts.principalAmount", "Principal Amount")}</th>
                     </>
                   )}
-                  <th className="py-3.5 px-4">Balance</th>
-                  <th className="py-3.5 px-4">Opened Date</th>
-                  <th className="py-3.5 px-4 text-center">Status</th>
-                  <th className="py-3.5 px-4 text-right">Actions</th>
+                  <th className="py-3.5 px-4">{t("dashboardModule.productAccounts.balance", "Balance")}</th>
+                  <th className="py-3.5 px-4">{t("dashboardModule.productAccounts.openedDate", "Opened Date")}</th>
+                  <th className="py-3.5 px-4 text-center">{t("common.status", "Status")}</th>
+                  <th className="py-3.5 px-4 text-right">{t("common.actions", "Actions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-xs">
@@ -407,7 +432,7 @@ export default function ProductAccountsDirectoryView({
                       {/* Member Name */}
                       <td className="py-4 px-4 whitespace-nowrap">
                         <span className="font-bold text-slate-900 block">
-                          {acc.member_name || `Member #${acc.member_id}`}
+                          {acc.member_name || `${t("dashboardModule.productAccounts.memberFallback", "Member")} #${acc.member_id}`}
                         </span>
                       </td>
 
@@ -437,7 +462,7 @@ export default function ProductAccountsDirectoryView({
                             <TrendingUp className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
                           )}
                           <span className="font-semibold text-slate-900 block">
-                            {acc.scheme_name || 'Scheme'}
+                            {acc.scheme_name || t("dashboardModule.productAccounts.schemeFallback", "Scheme")}
                           </span>
                         </div>
                       </td>
@@ -445,7 +470,7 @@ export default function ProductAccountsDirectoryView({
                       {/* Branch (Superadmin only) */}
                       {isSuperAdmin && (
                         <td className="py-4 px-4 whitespace-nowrap text-slate-600">
-                          {acc.branch_name || `Branch #${acc.branch_id}`}
+                          {acc.branch_name || `${t("dashboard.branch", "Branch")} #${acc.branch_id}`}
                         </td>
                       )}
 
@@ -454,7 +479,9 @@ export default function ProductAccountsDirectoryView({
                           {/* Type */}
                           <td className="py-4 px-4 whitespace-nowrap">
                             <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-700 inline-block">
-                              {isFd ? 'FD / MIS Term' : 'Recurring Investment'}
+                              {isFd
+                                ? t("dashboardModule.productAccounts.fdMisTerm", "FD / MIS Term")
+                                : t("dashboardModule.productAccounts.recurringInvestment", "Recurring Investment")}
                             </span>
                           </td>
 
@@ -474,7 +501,7 @@ export default function ProductAccountsDirectoryView({
 
                       {/* Opened Date */}
                       <td className="py-4 px-4 whitespace-nowrap text-slate-500">
-                        {formatDateTime(acc.opened_at)}
+                        {formatDateTime(acc.opened_at, t("dashboardModule.productAccounts.na", "N/A"))}
                       </td>
 
                       {/* Status */}
@@ -492,7 +519,9 @@ export default function ProductAccountsDirectoryView({
                             }`}
                           />
                           <span className="capitalize">
-                            {isFundingPending ? 'Funding Pending' : (acc.status || 'Active')}
+                            {isFundingPending
+                              ? t("dashboardModule.productAccounts.fundingPending", "Funding Pending")
+                              : (acc.status || t("common.active", "Active"))}
                           </span>
                         </span>
                       </td>
@@ -503,7 +532,7 @@ export default function ProductAccountsDirectoryView({
                           type="button"
                           onClick={() => setSelectedAccount(acc)}
                           className="p-1.5 rounded-xl border border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer"
-                          title="View account details"
+                          title={t("dashboardModule.productAccounts.viewAccountDetails", "View account details")}
                         >
                           <Eye className="w-3.5 h-3.5" />
                         </button>
@@ -524,7 +553,7 @@ export default function ProductAccountsDirectoryView({
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-teal-700 bg-teal-50 px-2.5 py-0.5 rounded-full">
-                  Account Folio
+                  {t("dashboardModule.productAccounts.accountFolio", "Account Folio")}
                 </span>
                 <h4 className="font-serif font-bold text-slate-900 text-lg mt-1 font-mono">
                   {selectedAccount.account_number}
@@ -541,27 +570,33 @@ export default function ProductAccountsDirectoryView({
             <div className="space-y-3.5 text-xs">
               <div className="p-4 rounded-2xl bg-teal-50/70 border border-teal-200 text-teal-950 flex items-center justify-between">
                 <div>
-                  <span className="text-[10px] uppercase font-bold text-teal-700 block">Total Balance</span>
+                  <span className="text-[10px] uppercase font-bold text-teal-700 block">
+                    {t("dashboardModule.productAccounts.totalBalance", "Total Balance")}
+                  </span>
                   <span className="font-black text-xl text-teal-950">
                     {formatCurrency(Number(selectedAccount.balance || selectedAccount.requested_principal || 0))}
                   </span>
                 </div>
                 <div className="text-right">
-                  <span className="text-[10px] uppercase font-bold text-teal-700 block">Status</span>
+                  <span className="text-[10px] uppercase font-bold text-teal-700 block">
+                    {t("common.status", "Status")}
+                  </span>
                   <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 capitalize">
-                    {selectedAccount.status || 'Active'}
+                    {selectedAccount.status || t("common.active", "Active")}
                   </span>
                 </div>
               </div>
 
               {/* Member Details */}
               <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
-                <span className="text-slate-400 block text-[10px] uppercase font-bold">Account Holder (Member)</span>
+                <span className="text-slate-400 block text-[10px] uppercase font-bold">
+                  {t("dashboardModule.productAccounts.accountHolderMember", "Account Holder (Member)")}
+                </span>
                 <div className="grid grid-cols-2 gap-2">
                   <div>
                     <span className="font-bold text-slate-900 text-sm block">{selectedAccount.member_name}</span>
                     <span className="text-[10px] text-teal-700 font-mono font-semibold">
-                      Code: {selectedAccount.member_code || `M-${selectedAccount.member_id}`}
+                      {t("dashboardModule.productAccounts.codeLabel", "Code:")} {selectedAccount.member_code || `M-${selectedAccount.member_id}`}
                     </span>
                   </div>
                   <div>
@@ -574,25 +609,37 @@ export default function ProductAccountsDirectoryView({
               {/* Scheme & Branch Info */}
               <div className="grid grid-cols-2 gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-200">
                 <div>
-                  <span className="text-slate-400 block text-[10px] uppercase font-bold">Scheme Name</span>
+                  <span className="text-slate-400 block text-[10px] uppercase font-bold">
+                    {t("dashboardModule.productAccounts.schemeName", "Scheme Name")}
+                  </span>
                   <span className="font-bold text-slate-900 text-xs block">{selectedAccount.scheme_name}</span>
                   <span className="text-[10px] text-teal-700 font-mono font-semibold">{selectedAccount.scheme_code}</span>
                 </div>
                 <div>
-                  <span className="text-slate-400 block text-[10px] uppercase font-bold">Serving Branch</span>
-                  <span className="font-bold text-slate-900 block">{selectedAccount.branch_name || 'Society Branch'}</span>
-                  <span className="text-[10px] text-slate-500 font-mono">Branch ID: #{selectedAccount.branch_id}</span>
-                </div>
-                <div>
-                  <span className="text-slate-400 block text-[10px] uppercase font-bold">Debit Savings A/C</span>
-                  <span className="font-mono font-bold text-slate-900">
-                    Account #{selectedAccount.savings_account_id}
+                  <span className="text-slate-400 block text-[10px] uppercase font-bold">
+                    {t("dashboardModule.productAccounts.servingBranch", "Serving Branch")}
+                  </span>
+                  <span className="font-bold text-slate-900 block">
+                    {selectedAccount.branch_name || t("dashboardModule.productAccounts.societyBranch", "Society Branch")}
+                  </span>
+                  <span className="text-[10px] text-slate-500 font-mono">
+                    {t("dashboardModule.productAccounts.branchIdLabel", "Branch ID:")} #{selectedAccount.branch_id}
                   </span>
                 </div>
                 <div>
-                  <span className="text-slate-400 block text-[10px] uppercase font-bold">Opened Date</span>
+                  <span className="text-slate-400 block text-[10px] uppercase font-bold">
+                    {t("dashboardModule.productAccounts.debitSavingsAc", "Debit Savings A/C")}
+                  </span>
+                  <span className="font-mono font-bold text-slate-900">
+                    {t("dashboardModule.productAccounts.accountLabel", "Account")} #{selectedAccount.savings_account_id}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-slate-400 block text-[10px] uppercase font-bold">
+                    {t("dashboardModule.productAccounts.openedDate", "Opened Date")}
+                  </span>
                   <span className="font-medium text-slate-800">
-                    {formatDateTime(selectedAccount.opened_at)}
+                    {formatDateTime(selectedAccount.opened_at, t("dashboardModule.productAccounts.na", "N/A"))}
                   </span>
                 </div>
               </div>
@@ -604,7 +651,7 @@ export default function ProductAccountsDirectoryView({
                 onClick={() => setSelectedAccount(null)}
                 className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-colors cursor-pointer"
               >
-                Close
+                {t("common.close", "Close")}
               </button>
             </div>
           </div>

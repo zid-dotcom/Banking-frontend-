@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { i18n } from '../../i18n/index.js';
+import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import StatCard from '../../components/dashboard/StatCard';
@@ -97,7 +99,7 @@ function renderAccountStatusBadge(status) {
     return (
       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-        <span>Account Opened</span>
+        <span>{i18n.t("branchManagerSavingsSchemes.accountOpened", "Account Opened")}</span>
       </span>
     );
   }
@@ -141,6 +143,7 @@ function calculateAge(dobString) {
 }
 
 export default function MemberProfile() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [securityEvents, setSecurityEvents] = useState([]);
@@ -364,7 +367,7 @@ export default function MemberProfile() {
             <div className="inline-flex flex-wrap items-center gap-x-2 gap-y-1 px-3 sm:px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-xs text-[11px] sm:text-xs font-semibold border border-teal-200/80 shadow-2xs text-[#0f766e] mb-3">
               <span className="inline-flex items-center gap-1.5 flex-shrink-0">
                 <BadgeCheck className="w-3.5 h-3.5 text-[#00b4a7]" />
-                <span>Verified Member Dossier</span>
+                <span>{t("memberProfile.verifiedMemberDossier", "Verified Member Dossier")}</span>
               </span>
               <span className="text-teal-300 hidden sm:inline">•</span>
               <span className="text-slate-600">
@@ -373,10 +376,10 @@ export default function MemberProfile() {
             </div>
 
             <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mb-2">
-              Member Profile &amp; KYC Records
+              {t("memberProfile.memberProfileKycRecords", "Member Profile & KYC Records")}
             </h1>
             <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed max-w-3xl">
-              Official membership registration details, verified address, statutory identity KYC records, and linked bank credentials.
+              {t("memberProfile.officialMembershipRegistrationDetailsVerified", "Official membership registration details, verified address, statutory identity KYC records, and linked bank credentials.")}
             </p>
 
             <div className="flex items-center gap-3 mt-4 flex-wrap">
@@ -387,7 +390,7 @@ export default function MemberProfile() {
                 className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs border border-teal-200 shadow-2xs transition-all cursor-pointer disabled:opacity-50"
               >
                 <RefreshCw className={`w-3.5 h-3.5 text-teal-600 ${refreshing ? 'animate-spin' : ''}`} />
-                <span>Refresh Profile</span>
+                <span>{t("memberProfile.refreshProfile", "Refresh Profile")}</span>
               </button>
 
               <Link
@@ -395,7 +398,7 @@ export default function MemberProfile() {
                 className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-md hover:shadow-lg transition-all"
               >
                 <HeartHandshake className="w-3.5 h-3.5" />
-                <span>Nominee Details →</span>
+                <span>{t("memberProfile.nomineeDetails", "Nominee Details →")}</span>
               </Link>
             </div>
           </div>
@@ -408,7 +411,7 @@ export default function MemberProfile() {
         {/* 4 Stat Overview Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
           <StatCard
-            title="Membership Status"
+            title={t("memberProfile.membershipStatus", "Membership Status")}
             value={profile?.status ? profile.status.charAt(0).toUpperCase() + profile.status.slice(1).toLowerCase() : 'Approved'}
             valueClassName="text-lg sm:text-[21px] font-semibold text-emerald-600 tracking-normal font-sans"
             subtext={`Member ID: ${profile?.member_code || memberUser.member_code || '—'}`}
@@ -418,7 +421,7 @@ export default function MemberProfile() {
           />
 
           <StatCard
-            title="KYC Verification"
+            title={t("memberProfile.kycVerification", "KYC Verification")}
             value={
               isKycApproved
                 ? 'Approved'
@@ -452,7 +455,7 @@ export default function MemberProfile() {
           />
 
           <StatCard
-            title="Home Branch"
+            title={t("memberProfile.homeBranch", "Home Branch")}
             value={branchName}
             valueClassName="text-base sm:text-lg font-medium text-slate-800 tracking-normal font-sans line-clamp-2"
             subtext={branchCode ? `Branch Code: #${branchCode}` : (branchLocation || 'Society Branch')}
@@ -460,7 +463,7 @@ export default function MemberProfile() {
           />
 
           <StatCard
-            title="Member Since"
+            title={t("memberProfile.memberSince", "Member Since")}
             value={profile?.member_created_at ? formatDate(profile.member_created_at) : 'Active Member'}
             valueClassName="text-base sm:text-lg font-medium text-slate-800 tracking-normal font-sans"
             subtext="Cooperative Membership"
@@ -479,7 +482,7 @@ export default function MemberProfile() {
               onClick={() => fetchProfile(true)}
               className="text-xs font-bold text-rose-700 hover:underline cursor-pointer flex-shrink-0"
             >
-              Retry
+              {t("common.retry", "Retry")}
             </button>
           </div>
         )}
@@ -489,15 +492,15 @@ export default function MemberProfile() {
           <div className="p-5 sm:p-6 rounded-3xl bg-red-50/90 border-2 border-red-300 shadow-sm space-y-3 animate-fadeIn">
             <div className="flex items-center gap-2.5 text-red-700 font-black text-sm sm:text-base">
               <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
-              <span>KYC Verification Status: Rejected</span>
+              <span>{t("memberProfile.kycVerificationStatusRejected", "KYC Verification Status: Rejected")}</span>
             </div>
             <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium">
-              Your member identity documents were reviewed by branch administration and rejected. Please review the reason below and contact your branch officer to re-submit valid proofs.
+              {t("memberProfile.yourMemberIdentityDocumentsWere", "Your member identity documents were reviewed by branch administration and rejected. Please review the reason below and contact your branch officer to re-submit valid proofs.")}
             </p>
             {/* Rejection Reason in RED */}
             <div className="p-4 rounded-2xl bg-white border-2 border-red-300 text-red-700 shadow-2xs space-y-1">
               <p className="text-[11px] font-black uppercase tracking-wider text-red-500">
-                Reason for KYC Rejection:
+                {t("memberProfile.reasonForKycRejection", "Reason for KYC Rejection:")}
               </p>
               <p className="text-sm sm:text-base font-extrabold text-red-600 leading-relaxed">
                 {profile.kyc_rejection_reason || 'Incomplete, blurred or mismatching identity verification records.'}
@@ -509,7 +512,7 @@ export default function MemberProfile() {
         {loading ? (
           <div className="py-20 text-center rounded-3xl bg-white border border-slate-100 shadow-sm space-y-3">
             <Loader2 className="w-8 h-8 animate-spin text-teal-600 mx-auto" />
-            <p className="text-xs text-slate-500 font-medium">Loading full member profile dossier...</p>
+            <p className="text-xs text-slate-500 font-medium">{t("memberProfile.loadingFullMemberProfileDossier", "Loading full member profile dossier...")}</p>
           </div>
         ) : profile ? (
           <div className="space-y-6 sm:space-y-8">
@@ -522,24 +525,24 @@ export default function MemberProfile() {
                   </div>
                   <div>
                     <h3 className="text-base sm:text-lg font-black text-slate-900">
-                      Personal &amp; Contact Details
+                      {t("branchManagerMembershipSettings.personalContactDetails", "Personal & Contact Details")}
                     </h3>
                     <p className="text-xs text-slate-500 font-medium">
-                      Primary member identification and contact folios
+                      {t("memberProfile.primaryMemberIdentificationAndContact", "Primary member identification and contact folios")}
                     </p>
                   </div>
                 </div>
 
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-800 font-bold text-xs rounded-full border border-emerald-200">
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>Official Member Record</span>
+                  <span>{t("memberProfile.officialMemberRecord", "Official Member Record")}</span>
                 </span>
               </div>
 
               <div className="p-5 sm:p-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
                 <div className="p-4 rounded-2xl bg-slate-50/70 border border-slate-100 space-y-1">
                   <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                    Full Legal Name
+                    {t("memberProfile.fullLegalName", "Full Legal Name")}
                   </p>
                   <p className="text-sm font-extrabold text-slate-900">
                     {profile.full_name || '—'}
@@ -548,7 +551,7 @@ export default function MemberProfile() {
 
                 <div className="p-4 rounded-2xl bg-slate-50/70 border border-slate-100 space-y-1">
                   <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                    Member Code
+                    {t("modal.member.memberCode", "Member Code")}
                   </p>
                   <p className="text-sm font-extrabold text-teal-700">
                     {profile.member_code || '—'}
@@ -557,7 +560,7 @@ export default function MemberProfile() {
 
                 <div className="p-4 rounded-2xl bg-slate-50/70 border border-slate-100 space-y-1">
                   <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                    Email Address
+                    {t("modal.member.emailAddress", "Email Address")}
                   </p>
                   <p className="text-sm font-extrabold text-slate-900 truncate" title={profile.email}>
                     {profile.email || '—'}
@@ -566,7 +569,7 @@ export default function MemberProfile() {
 
                 <div className="p-4 rounded-2xl bg-slate-50/70 border border-slate-100 space-y-1">
                   <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                    Registered Mobile
+                    {t("memberProfile.registeredMobile", "Registered Mobile")}
                   </p>
                   <p className="text-sm font-extrabold text-slate-900">
                     {profile.mobile || '—'}
@@ -575,13 +578,13 @@ export default function MemberProfile() {
 
                 <div className="p-4 rounded-2xl bg-slate-50/70 border border-slate-100 space-y-1">
                   <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                    Date of Birth &amp; Age
+                    {t("memberProfile.dateOfBirthAge", "Date of Birth & Age")}
                   </p>
                   <p className="text-sm font-extrabold text-slate-900">
                     {formatDate(profile.date_of_birth)}{' '}
                     {memberAge !== null && (
                       <span className="text-xs font-semibold text-slate-500">
-                        ({memberAge} yrs)
+                        ({memberAge} {t("memberProfile.yrs", "yrs)")}
                       </span>
                     )}
                   </p>
@@ -589,7 +592,7 @@ export default function MemberProfile() {
 
                 <div className="p-4 rounded-2xl bg-slate-50/70 border border-slate-100 space-y-1">
                   <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                    Gender
+                    {t("modal.member.gender", "Gender")}
                   </p>
                   <p className="text-sm font-extrabold text-slate-900 capitalize">
                     {profile.gender || '—'}
@@ -607,10 +610,10 @@ export default function MemberProfile() {
                   </div>
                   <div>
                     <h3 className="text-base sm:text-lg font-black text-slate-900">
-                      Residential &amp; Postal Address
+                      {t("memberProfile.residentialPostalAddress", "Residential & Postal Address")}
                     </h3>
                     <p className="text-xs text-slate-500 font-medium">
-                      Registered residential address mapped with society branch
+                      {t("memberProfile.registeredResidentialAddressMappedWith", "Registered residential address mapped with society branch")}
                     </p>
                   </div>
                 </div>
@@ -623,7 +626,7 @@ export default function MemberProfile() {
               <div className="p-5 sm:p-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
                 <div className="p-4 rounded-2xl bg-slate-50/70 border border-slate-100 space-y-1">
                   <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                    Building / House No
+                    {t("memberProfile.buildingHouseNo", "Building / House No")}
                   </p>
                   <p className="text-sm font-extrabold text-slate-900">
                     {profile.building_no || '—'}
@@ -632,7 +635,7 @@ export default function MemberProfile() {
 
                 <div className="p-4 rounded-2xl bg-slate-50/70 border border-slate-100 space-y-1">
                   <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                    Street / Landmark
+                    {t("memberProfile.streetLandmark", "Street / Landmark")}
                   </p>
                   <p className="text-sm font-extrabold text-slate-900">
                     {profile.street || '—'}
@@ -641,7 +644,7 @@ export default function MemberProfile() {
 
                 <div className="p-4 rounded-2xl bg-slate-50/70 border border-slate-100 space-y-1">
                   <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                    City / Town
+                    {t("memberProfile.cityTown", "City / Town")}
                   </p>
                   <p className="text-sm font-extrabold text-slate-900">
                     {profile.city || '—'}
@@ -650,7 +653,7 @@ export default function MemberProfile() {
 
                 <div className="p-4 rounded-2xl bg-slate-50/70 border border-slate-100 space-y-1">
                   <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                    District
+                    {t("memberProfile.district", "District")}
                   </p>
                   <p className="text-sm font-extrabold text-slate-900">
                     {profile.district || '—'}
@@ -659,7 +662,7 @@ export default function MemberProfile() {
 
                 <div className="p-4 rounded-2xl bg-slate-50/70 border border-slate-100 space-y-1">
                   <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                    State
+                    {t("memberProfile.state", "State")}
                   </p>
                   <p className="text-sm font-extrabold text-slate-900">
                     {profile.state || '—'}
@@ -668,7 +671,7 @@ export default function MemberProfile() {
 
                 <div className="p-4 rounded-2xl bg-slate-50/70 border border-slate-100 space-y-1">
                   <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                    Country
+                    {t("memberProfile.country", "Country")}
                   </p>
                   <p className="text-sm font-extrabold text-slate-900">
                     {profile.country || 'India'}
@@ -677,7 +680,7 @@ export default function MemberProfile() {
 
                 <div className="p-4 rounded-2xl bg-slate-50/70 border border-slate-100 space-y-1">
                   <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                    Postal / Zip Code
+                    {t("memberProfile.postalZipCode", "Postal / Zip Code")}
                   </p>
                   <p className="text-sm font-extrabold text-teal-700">
                     {profile.zip_code || '—'}
@@ -686,7 +689,7 @@ export default function MemberProfile() {
 
                 <div className="p-4 rounded-2xl bg-slate-50/70 border border-slate-100 space-y-1">
                   <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                    Assigned Branch
+                    {t("memberProfile.assignedBranch", "Assigned Branch")}
                   </p>
                   <p className="text-sm font-extrabold text-slate-900 truncate">
                     {branchName}
@@ -704,10 +707,10 @@ export default function MemberProfile() {
                   </div>
                   <div>
                     <h3 className="text-base sm:text-lg font-black text-slate-900">
-                      Identity &amp; Statutory KYC Verification
+                      {t("memberProfile.identityStatutoryKycVerification", "Identity & Statutory KYC Verification")}
                     </h3>
                     <p className="text-xs text-slate-500 font-medium">
-                      UIDAI Aadhaar and Income Tax PAN document compliance
+                      {t("memberProfile.uidaiAadhaarAndIncomeTax", "UIDAI Aadhaar and Income Tax PAN document compliance")}
                     </p>
                   </div>
                 </div>
@@ -715,17 +718,17 @@ export default function MemberProfile() {
                 {isKycApproved ? (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-800 font-bold text-xs rounded-full border border-emerald-200">
                     <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>KYC Verified</span>
+                    <span>{t("branchManagerMemberPasswordUpdate.kycVerified", "KYC Verified")}</span>
                   </span>
                 ) : isKycRejected ? (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-red-100 text-red-700 font-black text-xs rounded-full border border-red-300">
                     <AlertCircle className="w-3.5 h-3.5 text-red-600" />
-                    <span>KYC Rejected</span>
+                    <span>{t("memberProfile.kycRejected", "KYC Rejected")}</span>
                   </span>
                 ) : (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-800 font-bold text-xs rounded-full border border-amber-200">
                     <Clock className="w-3.5 h-3.5 text-amber-600" />
-                    <span>KYC Under Review</span>
+                    <span>{t("memberProfile.kycUnderReview", "KYC Under Review")}</span>
                   </span>
                 )}
               </div>
@@ -733,7 +736,7 @@ export default function MemberProfile() {
               <div className="p-5 sm:p-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
                 <div className="p-4 rounded-2xl bg-slate-50/70 border border-slate-100 space-y-1">
                   <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                    Aadhaar Card (Masked)
+                    {t("memberProfile.aadhaarCardMasked", "Aadhaar Card (Masked)")}
                   </p>
                   <p className="text-sm font-extrabold text-slate-900 font-mono">
                     {profile.aadhaar_masked || 'XXXX-XXXX-XXXX'}
@@ -742,7 +745,7 @@ export default function MemberProfile() {
 
                 <div className="p-4 rounded-2xl bg-slate-50/70 border border-slate-100 space-y-1">
                   <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                    PAN Card (Masked)
+                    {t("memberProfile.panCardMasked", "PAN Card (Masked)")}
                   </p>
                   <p className="text-sm font-extrabold text-slate-900 font-mono">
                     {profile.pan_masked || 'XXXXX0000X'}
@@ -751,7 +754,7 @@ export default function MemberProfile() {
 
                 <div className="p-4 rounded-2xl bg-slate-50/70 border border-slate-100 space-y-1">
                   <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                    KYC Review Date
+                    {t("memberProfile.kycReviewDate", "KYC Review Date")}
                   </p>
                   <p className="text-sm font-extrabold text-slate-900">
                     {formatDateTime(profile.kyc_reviewed_at)}
@@ -765,11 +768,11 @@ export default function MemberProfile() {
                   <div className="flex items-center gap-2">
                     <FileCheck2 className="w-4 h-4 text-teal-600" />
                     <h4 className="text-xs sm:text-sm font-extrabold text-slate-800 uppercase tracking-wider">
-                      Verified Identity Documents &amp; Compliance Dossier
+                      {t("memberProfile.verifiedIdentityDocumentsComplianceDossier", "Verified Identity Documents & Compliance Dossier")}
                     </h4>
                   </div>
                   <span className="text-[11px] font-semibold text-slate-400">
-                    4 Statutory Records Attached
+                    {t("memberProfile.4StatutoryRecordsAttached", "4 Statutory Records Attached")}
                   </span>
                 </div>
 
@@ -777,22 +780,22 @@ export default function MemberProfile() {
                   {[
                     {
                       key: 'aadhaar_front',
-                      title: 'Aadhaar Card (Front)',
+                      title: t("modal.member.docAadhaarFront", "Aadhaar Card (Front)"),
                       desc: 'Official UIDAI Photo Identity Document',
                     },
                     {
                       key: 'aadhaar_back',
-                      title: 'Aadhaar Card (Back)',
+                      title: t("modal.member.docAadhaarBack", "Aadhaar Card (Back)"),
                       desc: 'UIDAI Address & QR Code Side',
                     },
                     {
                       key: 'pan_image',
-                      title: 'PAN Card Copy',
+                      title: t("modal.member.docPan", "PAN Card Copy"),
                       desc: 'Income Tax Dept Permanent Account Number',
                     },
                     {
                       key: 'passbook_image',
-                      title: 'Bank Passbook / Cheque',
+                      title: t("modal.member.docPassbook", "Bank Passbook / Cheque"),
                       desc: 'Verified Account Holder & IFSC Credentials',
                     },
                   ].map((doc) => (
@@ -820,14 +823,14 @@ export default function MemberProfile() {
                           onClick={() => handleOpenDocument(doc.key, doc.title)}
                           disabled={docLoading[doc.key]}
                           className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-xl bg-white hover:bg-teal-50 text-teal-800 text-xs font-bold border border-teal-200 shadow-2xs transition-colors cursor-pointer disabled:opacity-50"
-                          title="View Document"
+                          title={t("branchManagerMembershipSettings.viewDocument", "View Document")}
                         >
                           {docLoading[doc.key] ? (
                             <Loader2 className="w-3.5 h-3.5 animate-spin text-teal-600" />
                           ) : (
                             <Eye className="w-3.5 h-3.5 text-teal-600" />
                           )}
-                          <span>View</span>
+                          <span>{t("common.view", "View")}</span>
                         </button>
 
                         <button
@@ -840,14 +843,14 @@ export default function MemberProfile() {
                           }
                           disabled={downloadingDoc[doc.key]}
                           className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-800 text-xs font-bold border border-teal-200/80 shadow-2xs transition-colors cursor-pointer disabled:opacity-50"
-                          title="Download Document"
+                          title={t("memberNominee.downloadDocument", "Download Document")}
                         >
                           {downloadingDoc[doc.key] ? (
                             <Loader2 className="w-3.5 h-3.5 animate-spin text-teal-600" />
                           ) : (
                             <Download className="w-3.5 h-3.5 text-teal-700" />
                           )}
-                          <span>Download</span>
+                          <span>{t("memberNominee.download", "Download")}</span>
                         </button>
                       </div>
                     </div>
@@ -865,24 +868,24 @@ export default function MemberProfile() {
                   </div>
                   <div>
                     <h3 className="text-base sm:text-lg font-black text-slate-900">
-                      Settlement Bank Account Records
+                      {t("memberProfile.settlementBankAccountRecords", "Settlement Bank Account Records")}
                     </h3>
                     <p className="text-xs text-slate-500 font-medium">
-                      Registered bank account used for society dividend &amp; maturity disbursements
+                      {t("memberProfile.registeredBankAccountUsedFor", "Registered bank account used for society dividend & maturity disbursements")}
                     </p>
                   </div>
                 </div>
 
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-100 text-slate-700 font-semibold text-xs rounded-full border border-slate-200">
                   <Lock className="w-3 h-3 text-slate-400" />
-                  <span>Masked for Privacy</span>
+                  <span>{t("memberProfile.maskedForPrivacy", "Masked for Privacy")}</span>
                 </span>
               </div>
 
               <div className="p-5 sm:p-7 grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
                 <div className="p-4 rounded-2xl bg-slate-50/70 border border-slate-100 space-y-1">
                   <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                    Bank Account Holder Name
+                    {t("memberProfile.bankAccountHolderName", "Bank Account Holder Name")}
                   </p>
                   <p className="text-sm font-extrabold text-slate-900">
                     {profile.bank_holder_name || profile.full_name || '—'}
@@ -891,7 +894,7 @@ export default function MemberProfile() {
 
                 <div className="p-4 rounded-2xl bg-slate-50/70 border border-slate-100 space-y-1">
                   <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                    Bank Account Number (Masked)
+                    {t("memberProfile.bankAccountNumberMasked", "Bank Account Number (Masked)")}
                   </p>
                   <p className="text-sm font-extrabold text-slate-900 font-mono">
                     {profile.bank_account_masked || '•••• •••• ••••'}
@@ -900,7 +903,7 @@ export default function MemberProfile() {
 
                 <div className="p-4 rounded-2xl bg-slate-50/70 border border-slate-100 space-y-1">
                   <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                    Bank IFSC Code
+                    {t("memberProfile.bankIfscCode", "Bank IFSC Code")}
                   </p>
                   <p className="text-sm font-extrabold text-teal-700 font-mono">
                     {profile.ifsc_code || '—'}
@@ -918,10 +921,10 @@ export default function MemberProfile() {
                   </div>
                   <div>
                     <h3 className="text-base sm:text-lg font-black text-slate-900">
-                      Cooperative Savings Deposit Accounts
+                      {t("memberProfile.cooperativeSavingsDepositAccounts", "Cooperative Savings Deposit Accounts")}
                     </h3>
                     <p className="text-xs text-slate-500 font-medium">
-                      Active member savings accounts registered with society branches
+                      {t("memberProfile.activeMemberSavingsAccountsRegistered", "Active member savings accounts registered with society branches")}
                     </p>
                   </div>
                 </div>
@@ -929,13 +932,13 @@ export default function MemberProfile() {
                 <div className="flex items-center gap-2">
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-800 font-bold text-xs rounded-full border border-emerald-200">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>{savingsAccounts.length} Active {savingsAccounts.length === 1 ? 'Folio' : 'Folios'}</span>
+                    <span>{savingsAccounts.length} {t("common.active", "Active")} {savingsAccounts.length === 1 ? t("dashboardModule.accountTransactions.folio", "Folio") : t("memberProfile.folios", "Folios")}</span>
                   </span>
                   <Link
                     to="/member/savings-schemes"
                     className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors"
                   >
-                    <span>Manage Savings</span>
+                    <span>{t("memberProfile.manageSavings", "Manage Savings")}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
@@ -947,10 +950,10 @@ export default function MemberProfile() {
                     <Wallet className="w-6 h-6" />
                   </div>
                   <p className="text-sm font-bold text-slate-700">
-                    No Cooperative Savings Accounts Opened
+                    {t("memberProfile.noCooperativeSavingsAccountsOpened", "No Cooperative Savings Accounts Opened")}
                   </p>
                   <p className="text-xs text-slate-500 max-w-md mx-auto">
-                    You currently have no active savings deposit folios in this branch. Apply for an approved savings scheme to start saving.
+                    {t("memberProfile.youCurrentlyHaveNoActive", "You currently have no active savings deposit folios in this branch. Apply for an approved savings scheme to start saving.")}
                   </p>
                   <div className="pt-2">
                     <Link
@@ -958,7 +961,7 @@ export default function MemberProfile() {
                       className="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-[#14b8a6] to-[#0f766e] text-white font-bold text-xs rounded-xl shadow-xs transition-all"
                     >
                       <PiggyBank className="w-3.5 h-3.5" />
-                      <span>Explore Savings Schemes</span>
+                      <span>{t("memberProfile.exploreSavingsSchemes", "Explore Savings Schemes")}</span>
                     </Link>
                   </div>
                 </div>
@@ -967,13 +970,13 @@ export default function MemberProfile() {
                   <table className="w-full text-left border-collapse min-w-[700px]">
                     <thead>
                       <tr className="border-b border-slate-100 bg-slate-50/75 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                        <th className="py-3.5 px-6">Account Number</th>
-                        <th className="py-3.5 px-6">Scheme</th>
-                        <th className="py-3.5 px-6">Branch</th>
-                        <th className="py-3.5 px-6">IFSC Code</th>
-                        <th className="py-3.5 px-6">Balance</th>
-                        <th className="py-3.5 px-6 text-center">Status</th>
-                        <th className="py-3.5 px-6">Opened On</th>
+                        <th className="py-3.5 px-6">{t("dashboard.accountNumber", "Account Number")}</th>
+                        <th className="py-3.5 px-6">{t("modal.member.scheme", "Scheme")}</th>
+                        <th className="py-3.5 px-6">{t("dashboard.branch", "Branch")}</th>
+                        <th className="py-3.5 px-6">{t("dashboardModule.accountTransactions.colIfscCode", "IFSC Code")}</th>
+                        <th className="py-3.5 px-6">{t("dashboardModule.productAccounts.balance", "Balance")}</th>
+                        <th className="py-3.5 px-6 text-center">{t("common.status", "Status")}</th>
+                        <th className="py-3.5 px-6">{t("memberProfile.openedOn", "Opened On")}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 text-sm">
@@ -988,7 +991,7 @@ export default function MemberProfile() {
                             </div>
                             {acc.scheme_code && (
                               <span className="font-mono text-[11px] text-slate-400 block font-normal mt-0.5">
-                                Code: {acc.scheme_code}
+                                {t("dashboardModule.productAccounts.codeLabel", "Code:")} {acc.scheme_code}
                               </span>
                             )}
                           </td>
@@ -998,7 +1001,7 @@ export default function MemberProfile() {
                             </div>
                             {acc.branch_code && (
                               <span className="text-[11px] text-slate-500 font-mono mt-0.5 block">
-                                Code: {acc.branch_code}
+                                {t("dashboardModule.productAccounts.codeLabel", "Code:")} {acc.branch_code}
                               </span>
                             )}
                           </td>
@@ -1037,10 +1040,10 @@ export default function MemberProfile() {
                   </div>
                   <div>
                     <h3 className="text-base sm:text-lg font-black text-slate-900">
-                      Cooperative Fixed Deposit &amp; MIS Accounts
+                      {t("memberProfile.cooperativeFixedDepositMisAccounts", "Cooperative Fixed Deposit & MIS Accounts")}
                     </h3>
                     <p className="text-xs text-slate-500 font-medium">
-                      Active term fixed deposits and monthly income schemes
+                      {t("memberProfile.activeTermFixedDepositsAnd", "Active term fixed deposits and monthly income schemes")}
                     </p>
                   </div>
                 </div>
@@ -1048,13 +1051,13 @@ export default function MemberProfile() {
                 <div className="flex items-center gap-2">
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-teal-50 text-teal-800 font-bold text-xs rounded-full border border-teal-200">
                     <CheckCircle2 className="w-3.5 h-3.5 text-teal-600" />
-                    <span>{fdAccounts.length} Active {fdAccounts.length === 1 ? 'Folio' : 'Folios'}</span>
+                    <span>{fdAccounts.length} {t("common.active", "Active")} {fdAccounts.length === 1 ? t("dashboardModule.accountTransactions.folio", "Folio") : t("memberProfile.folios", "Folios")}</span>
                   </span>
                   <Link
                     to="/member/fd-mis-schemes"
                     className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors"
                   >
-                    <span>Manage FD &amp; MIS</span>
+                    <span>{t("memberProfile.manageFdMis", "Manage FD & MIS")}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
@@ -1066,10 +1069,10 @@ export default function MemberProfile() {
                     <Coins className="w-6 h-6" />
                   </div>
                   <p className="text-sm font-bold text-slate-700">
-                    No Fixed Deposit or MIS Accounts Opened
+                    {t("memberProfile.noFixedDepositOrMis", "No Fixed Deposit or MIS Accounts Opened")}
                   </p>
                   <p className="text-xs text-slate-500 max-w-md mx-auto">
-                    You currently do not have any active term fixed deposits or MIS accounts. Explore high-yield deposit schemes to start earning guaranteed returns.
+                    {t("memberProfile.youCurrentlyDoNotHave", "You currently do not have any active term fixed deposits or MIS accounts. Explore high-yield deposit schemes to start earning guaranteed returns.")}
                   </p>
                   <div className="pt-2">
                     <Link
@@ -1077,7 +1080,7 @@ export default function MemberProfile() {
                       className="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-[#14b8a6] to-[#0f766e] text-white font-bold text-xs rounded-xl shadow-xs transition-all"
                     >
                       <Coins className="w-3.5 h-3.5" />
-                      <span>Explore FD &amp; MIS Schemes</span>
+                      <span>{t("memberProfile.exploreFdMisSchemes", "Explore FD & MIS Schemes")}</span>
                     </Link>
                   </div>
                 </div>
@@ -1086,13 +1089,13 @@ export default function MemberProfile() {
                   <table className="w-full text-left border-collapse min-w-[750px]">
                     <thead>
                       <tr className="border-b border-slate-100 bg-slate-50/75 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                        <th className="py-3.5 px-6">Account Number</th>
-                        <th className="py-3.5 px-6">Scheme</th>
-                        <th className="py-3.5 px-6">Branch</th>
-                        <th className="py-3.5 px-6">Principal Amount</th>
-                        <th className="py-3.5 px-6">Current Balance</th>
-                        <th className="py-3.5 px-6 text-center">Status</th>
-                        <th className="py-3.5 px-6">Opened On</th>
+                        <th className="py-3.5 px-6">{t("dashboard.accountNumber", "Account Number")}</th>
+                        <th className="py-3.5 px-6">{t("modal.member.scheme", "Scheme")}</th>
+                        <th className="py-3.5 px-6">{t("dashboard.branch", "Branch")}</th>
+                        <th className="py-3.5 px-6">{t("dashboardModule.productAccounts.principalAmount", "Principal Amount")}</th>
+                        <th className="py-3.5 px-6">{t("dashboardModule.productAccounts.currentBalance", "Current Balance")}</th>
+                        <th className="py-3.5 px-6 text-center">{t("common.status", "Status")}</th>
+                        <th className="py-3.5 px-6">{t("memberProfile.openedOn", "Opened On")}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 text-sm">
@@ -1107,7 +1110,7 @@ export default function MemberProfile() {
                             </div>
                             {acc.scheme_code && (
                               <span className="font-mono text-[11px] text-slate-400 block font-normal mt-0.5">
-                                Code: {acc.scheme_code}
+                                {t("dashboardModule.productAccounts.codeLabel", "Code:")} {acc.scheme_code}
                               </span>
                             )}
                           </td>
@@ -1117,7 +1120,7 @@ export default function MemberProfile() {
                             </div>
                             {acc.branch_id && (
                               <span className="text-[11px] text-slate-500 font-mono mt-0.5 block">
-                                Branch ID #{acc.branch_id}
+                                {t("memberProfile.branchId", "Branch ID #")}{acc.branch_id}
                               </span>
                             )}
                           </td>
@@ -1152,10 +1155,10 @@ export default function MemberProfile() {
                   </div>
                   <div>
                     <h3 className="text-base sm:text-lg font-black text-slate-900">
-                      Cooperative Recurring Investment Accounts
+                      {t("memberProfile.cooperativeRecurringInvestmentAccounts", "Cooperative Recurring Investment Accounts")}
                     </h3>
                     <p className="text-xs text-slate-500 font-medium">
-                      Active recurring daily, weekly, and monthly investment accounts
+                      {t("memberProfile.activeRecurringDailyWeeklyAnd", "Active recurring daily, weekly, and monthly investment accounts")}
                     </p>
                   </div>
                 </div>
@@ -1163,13 +1166,13 @@ export default function MemberProfile() {
                 <div className="flex items-center gap-2">
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-purple-50 text-purple-800 font-bold text-xs rounded-full border border-purple-200">
                     <CheckCircle2 className="w-3.5 h-3.5 text-purple-600" />
-                    <span>{investmentAccounts.length} Active {investmentAccounts.length === 1 ? 'Folio' : 'Folios'}</span>
+                    <span>{investmentAccounts.length} {t("common.active", "Active")} {investmentAccounts.length === 1 ? t("dashboardModule.accountTransactions.folio", "Folio") : t("memberProfile.folios", "Folios")}</span>
                   </span>
                   <Link
                     to="/member/investment-schemes"
                     className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors"
                   >
-                    <span>Manage Investments</span>
+                    <span>{t("memberProfile.manageInvestments", "Manage Investments")}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
@@ -1181,10 +1184,10 @@ export default function MemberProfile() {
                     <TrendingUp className="w-6 h-6" />
                   </div>
                   <p className="text-sm font-bold text-slate-700">
-                    No Recurring Investment Accounts Opened
+                    {t("memberProfile.noRecurringInvestmentAccountsOpened", "No Recurring Investment Accounts Opened")}
                   </p>
                   <p className="text-xs text-slate-500 max-w-md mx-auto">
-                    You currently do not have any active recurring investment accounts. Subscribe to flexible wealth creation schemes designed for cooperative members.
+                    {t("memberProfile.youCurrentlyDoNotHave2", "You currently do not have any active recurring investment accounts. Subscribe to flexible wealth creation schemes designed for cooperative members.")}
                   </p>
                   <div className="pt-2">
                     <Link
@@ -1192,7 +1195,7 @@ export default function MemberProfile() {
                       className="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold text-xs rounded-xl shadow-xs transition-all"
                     >
                       <TrendingUp className="w-3.5 h-3.5" />
-                      <span>Explore Investment Schemes</span>
+                      <span>{t("memberProfile.exploreInvestmentSchemes", "Explore Investment Schemes")}</span>
                     </Link>
                   </div>
                 </div>
@@ -1201,12 +1204,12 @@ export default function MemberProfile() {
                   <table className="w-full text-left border-collapse min-w-[700px]">
                     <thead>
                       <tr className="border-b border-slate-100 bg-slate-50/75 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                        <th className="py-3.5 px-6">Account Number</th>
-                        <th className="py-3.5 px-6">Scheme</th>
-                        <th className="py-3.5 px-6">Branch</th>
-                        <th className="py-3.5 px-6">Portfolio Balance</th>
-                        <th className="py-3.5 px-6 text-center">Status</th>
-                        <th className="py-3.5 px-6">Opened On</th>
+                        <th className="py-3.5 px-6">{t("dashboard.accountNumber", "Account Number")}</th>
+                        <th className="py-3.5 px-6">{t("modal.member.scheme", "Scheme")}</th>
+                        <th className="py-3.5 px-6">{t("dashboard.branch", "Branch")}</th>
+                        <th className="py-3.5 px-6">{t("modal.member.portfolioBalance", "Portfolio Balance")}</th>
+                        <th className="py-3.5 px-6 text-center">{t("common.status", "Status")}</th>
+                        <th className="py-3.5 px-6">{t("memberProfile.openedOn", "Opened On")}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 text-sm">
@@ -1221,7 +1224,7 @@ export default function MemberProfile() {
                             </div>
                             {acc.scheme_code && (
                               <span className="font-mono text-[11px] text-slate-400 block font-normal mt-0.5">
-                                Code: {acc.scheme_code}
+                                {t("dashboardModule.productAccounts.codeLabel", "Code:")} {acc.scheme_code}
                               </span>
                             )}
                           </td>
@@ -1231,7 +1234,7 @@ export default function MemberProfile() {
                             </div>
                             {acc.branch_id && (
                               <span className="text-[11px] text-slate-500 font-mono mt-0.5 block">
-                                Branch ID #{acc.branch_id}
+                                {t("memberProfile.branchId", "Branch ID #")}{acc.branch_id}
                               </span>
                             )}
                           </td>
@@ -1261,10 +1264,10 @@ export default function MemberProfile() {
                   </div>
                   <div>
                     <h3 className="text-base sm:text-lg font-black text-slate-900">
-                      Linked Beneficiary &amp; Nominee
+                      {t("memberProfile.linkedBeneficiaryNominee", "Linked Beneficiary & Nominee")}
                     </h3>
                     <p className="text-xs text-slate-500 font-medium">
-                      Designated nominee for savings deposits and member insurance settlements
+                      {t("memberProfile.designatedNomineeForSavingsDeposits", "Designated nominee for savings deposits and member insurance settlements")}
                     </p>
                   </div>
                 </div>
@@ -1273,7 +1276,7 @@ export default function MemberProfile() {
                   to="/member/nominee"
                   className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-800 font-bold text-xs rounded-xl border border-teal-200/80 transition-colors shadow-2xs"
                 >
-                  <span>Manage Nominee</span>
+                  <span>{t("memberProfile.manageNominee", "Manage Nominee")}</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
@@ -1282,7 +1285,7 @@ export default function MemberProfile() {
                 <div className="p-5 sm:p-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
                   <div className="p-4 rounded-2xl bg-slate-50/70 border border-slate-100 space-y-1">
                     <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                      Nominee Name
+                      {t("branchManagerNominees.nomineeName", "Nominee Name")}
                     </p>
                     <p className="text-sm font-extrabold text-slate-900">
                       {nominee.nominee_name}
@@ -1291,7 +1294,7 @@ export default function MemberProfile() {
 
                   <div className="p-4 rounded-2xl bg-slate-50/70 border border-slate-100 space-y-1">
                     <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                      Relationship
+                      {t("modal.nominee.relationship", "Relationship")}
                     </p>
                     <p className="text-sm font-extrabold text-slate-900">
                       {nominee.relationship_type || '—'}
@@ -1300,7 +1303,7 @@ export default function MemberProfile() {
 
                   <div className="p-4 rounded-2xl bg-slate-50/70 border border-slate-100 space-y-1">
                     <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                      Nominee DOB
+                      {t("memberProfile.nomineeDob", "Nominee DOB")}
                     </p>
                     <p className="text-sm font-extrabold text-slate-900">
                       {formatDate(nominee.date_of_birth)}
@@ -1309,15 +1312,15 @@ export default function MemberProfile() {
 
                   <div className="p-4 rounded-2xl bg-slate-50/70 border border-slate-100 space-y-1">
                     <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                      Nominee Status
+                      {t("memberNominee.nomineeStatus", "Nominee Status")}
                     </p>
                     <p className="text-sm font-extrabold">
                       {nomineeStatus === 'approved' ? (
-                        <span className="text-emerald-700">● Approved</span>
+                        <span className="text-emerald-700">{t("memberProfile.approved", "● Approved")}</span>
                       ) : nomineeStatus === 'rejected' ? (
-                        <span className="text-red-600">● Rejected</span>
+                        <span className="text-red-600">{t("memberProfile.rejected", "● Rejected")}</span>
                       ) : (
-                        <span className="text-amber-700">● Pending Verification</span>
+                        <span className="text-amber-700">{t("memberProfile.pendingVerification", "● Pending Verification")}</span>
                       )}
                     </p>
                   </div>
@@ -1325,10 +1328,10 @@ export default function MemberProfile() {
               ) : (
                 <div className="p-8 text-center space-y-2">
                   <p className="text-sm font-bold text-slate-700">
-                    No Nominee Registered Yet
+                    {t("memberProfile.noNomineeRegisteredYet", "No Nominee Registered Yet")}
                   </p>
                   <p className="text-xs text-slate-500 max-w-md mx-auto">
-                    You have not registered a nominee yet. Secure your deposits and cooperative holdings by adding your beneficiary.
+                    {t("memberProfile.youHaveNotRegisteredA", "You have not registered a nominee yet. Secure your deposits and cooperative holdings by adding your beneficiary.")}
                   </p>
                   <div className="pt-2">
                     <Link
@@ -1336,7 +1339,7 @@ export default function MemberProfile() {
                       className="inline-flex items-center gap-1.5 px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs rounded-xl shadow-sm transition-all"
                     >
                       <HeartHandshake className="w-3.5 h-3.5" />
-                      <span>Register Nominee Now</span>
+                      <span>{t("memberDashboard.registerNomineeNow", "Register Nominee Now")}</span>
                     </Link>
                   </div>
                 </div>
@@ -1352,10 +1355,10 @@ export default function MemberProfile() {
                   </div>
                   <div>
                     <h3 className="text-base sm:text-lg font-black text-slate-900">
-                      Security &amp; Recent Sign-in Activity
+                      {t("memberProfile.securityRecentSignInActivity", "Security & Recent Sign-in Activity")}
                     </h3>
                     <p className="text-xs text-slate-500 font-medium">
-                      Recent authentication events and access audits on your account
+                      {t("memberProfile.recentAuthenticationEventsAndAccess", "Recent authentication events and access audits on your account")}
                     </p>
                   </div>
                 </div>
@@ -1364,7 +1367,7 @@ export default function MemberProfile() {
                   to="/member/security"
                   className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-800 font-bold text-xs rounded-xl border border-teal-200/80 transition-colors shadow-2xs"
                 >
-                  <span>View Full Security Log</span>
+                  <span>{t("memberProfile.viewFullSecurityLog", "View Full Security Log")}</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
@@ -1380,11 +1383,11 @@ export default function MemberProfile() {
                           </span>
                           {ev.succeeded ? (
                             <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                              Success
+                              {t("branchManagerSecurityEvents.success", "Success")}
                             </span>
                           ) : (
                             <span className="text-[10px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200">
-                              Failed
+                              {t("branchManagerSecurityEvents.failed", "Failed")}
                             </span>
                           )}
                         </div>
@@ -1392,7 +1395,7 @@ export default function MemberProfile() {
                           {formatDateTime(ev.created_at)}
                         </p>
                         <p className="text-[10px] font-mono text-slate-400 truncate">
-                          IP: {ev.ip_address || '—'}
+                          {t("memberProfile.ip", "IP:")} {ev.ip_address || '—'}
                         </p>
                       </div>
                     ))}
@@ -1400,7 +1403,7 @@ export default function MemberProfile() {
                 </div>
               ) : (
                 <div className="p-6 text-center text-xs text-slate-400">
-                  <span>Sign-in activity log is recorded and protected by AurumFX Apex Security.</span>
+                  <span>{t("memberProfile.signInActivityLogIs", "Sign-in activity log is recorded and protected by AurumFX Apex Security.")}</span>
                 </div>
               )}
             </div>
@@ -1408,8 +1411,8 @@ export default function MemberProfile() {
             {/* 7. Change Password Section */}
             <div id="password-update">
               <PasswordUpdateCard
-                title="Update Member Password"
-                description="Change your login credentials to protect your cooperative accounts and membership assets."
+                title={t("memberProfile.updateMemberPassword", "Update Member Password")}
+                description={t("memberProfile.changeYourLoginCredentialsTo", "Change your login credentials to protect your cooperative accounts and membership assets.")}
                 role="member"
               />
             </div>
@@ -1439,7 +1442,7 @@ export default function MemberProfile() {
                   }
                   disabled={downloadingDoc[viewDoc.docType]}
                   className="p-1.5 rounded-lg text-slate-500 hover:text-teal-700 hover:bg-slate-100 transition-colors cursor-pointer"
-                  title="Download Document"
+                  title={t("memberNominee.downloadDocument", "Download Document")}
                 >
                   <Download className="w-4 h-4" />
                 </button>
@@ -1449,7 +1452,7 @@ export default function MemberProfile() {
                     target="_blank"
                     rel="noreferrer"
                     className="p-1.5 rounded-lg text-slate-400 hover:text-teal-700 hover:bg-slate-100 transition-colors"
-                    title="Open in new window"
+                    title={t("memberNominee.openInNewWindow", "Open in new window")}
                   >
                     <ExternalLink className="w-4 h-4" />
                   </a>
@@ -1489,7 +1492,7 @@ export default function MemberProfile() {
                       className="doc-fallback flex flex-col items-center justify-center p-8 text-center text-slate-500 gap-2"
                     >
                       <AlertCircle className="w-8 h-8 text-amber-500 mx-auto" />
-                      <p className="text-sm font-semibold">Image preview could not be displayed directly.</p>
+                      <p className="text-sm font-semibold">{t("memberNominee.imagePreviewCouldNotBe", "Image preview could not be displayed directly.")}</p>
                       <button
                         type="button"
                         onClick={() =>
@@ -1501,13 +1504,13 @@ export default function MemberProfile() {
                         className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-teal-600 text-white text-xs font-bold hover:bg-teal-700 transition-colors mt-2 cursor-pointer"
                       >
                         <Download className="w-4 h-4" />
-                        <span>Download Document</span>
+                        <span>{t("memberNominee.downloadDocument", "Download Document")}</span>
                       </button>
                     </div>
                   </div>
                 )
               ) : (
-                <p className="text-xs text-slate-400">Document preview unavailable.</p>
+                <p className="text-xs text-slate-400">{t("memberNominee.documentPreviewUnavailable", "Document preview unavailable.")}</p>
               )}
             </div>
           </div>

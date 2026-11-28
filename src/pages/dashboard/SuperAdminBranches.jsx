@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { i18n } from '../../i18n/index.js';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import { BranchFormModal, BranchDetailModal } from '../../components/dashboard/BranchModals';
@@ -63,6 +65,7 @@ function normalizeBranch(b) {
 }
 
 export default function SuperAdminBranches() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [branchSearch, setBranchSearch] = useState('');
   const [branches, setBranches] = useState([]);
@@ -149,14 +152,14 @@ export default function SuperAdminBranches() {
       if (branchModal.mode === 'create') {
         await branchService.createBranch(payload);
         setSuccessPopup({
-          title: 'Branch Created Successfully!',
+          title: i18n.t("superAdminBranches.branchCreatedSuccessfully", "Branch Created Successfully!"),
           message: `Branch "${formData.name}" has been registered and added to the network.`
         });
       } else {
         const branchId = branchModal.data.rawId || branchModal.data.id;
         await branchService.updateBranch(branchId, payload);
         setSuccessPopup({
-          title: 'Branch Updated Successfully!',
+          title: i18n.t("superAdminBranches.branchUpdatedSuccessfully", "Branch Updated Successfully!"),
           message: `Branch "${formData.name}" details have been updated.`
         });
       }
@@ -179,14 +182,14 @@ export default function SuperAdminBranches() {
       const branchId = br.rawId || br.id;
       await branchService.changeBranchStatus(branchId, newStatus);
       setSuccessPopup({
-        title: 'Branch Status Updated',
+        title: i18n.t("superAdminBranches.branchStatusUpdated", "Branch Status Updated"),
         message: `Branch "${br.name}" marked as ${newStatus ? 'Active' : 'Inactive'}.`
       });
       await fetchBranches();
     } catch (err) {
       console.error('Status toggle error:', err);
       setErrorPopup({
-        title: 'Status Update Failed',
+        title: i18n.t("branchManagerMembers.statusUpdateFailed", "Status Update Failed"),
         message: err.message || `Failed to update status for "${br.name}".`
       });
       await fetchBranches();
@@ -201,14 +204,14 @@ export default function SuperAdminBranches() {
       const branchId = br.rawId || br.id;
       await branchService.deleteBranch(branchId);
       setSuccessPopup({
-        title: 'Branch Deleted',
+        title: i18n.t("superAdminBranches.branchDeleted", "Branch Deleted"),
         message: `Branch "${br.name}" has been removed from the network.`
       });
       await fetchBranches();
     } catch (err) {
       console.error('Delete branch error:', err);
       setErrorPopup({
-        title: 'Delete Failed',
+        title: i18n.t("branchManagerStaff.deleteFailed", "Delete Failed"),
         message: err.message || `Failed to delete branch "${br.name}".`
       });
       await fetchBranches();
@@ -256,21 +259,21 @@ export default function SuperAdminBranches() {
             {/* Role Badge */}
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/90 backdrop-blur-xs text-xs font-semibold mb-3 border border-teal-200/60 shadow-2xs text-[#0f766e]">
               <Building2 className="w-3.5 h-3.5 text-[#00b4a7]" />
-              <span>Role: Super Admin &bull; Multi-State Branch Network Control</span>
+              <span>{t("superAdminBranches.roleSuperAdminMultiState", "Role: Super Admin • Multi-State Branch Network Control")}</span>
             </div>
 
             {/* Headline with Vertical Teal Accent Bar */}
             <div className="flex items-center gap-3 mt-1">
               <span className="w-1.5 h-8 sm:h-9 bg-[#00b4a7] rounded-full flex-shrink-0" />
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
-                <span>Multi-State Branch Network</span>
+                <span>{t("superAdminBranches.multiStateBranchNetwork", "Multi-State Branch Network")}</span>
                 <Building2 className="w-6 h-6 sm:w-7 sm:h-7 text-[#00b4a7] stroke-[2.2]" />
               </h1>
             </div>
 
             {/* Subtitle */}
             <p className="text-slate-600 text-xs sm:text-sm mt-2 font-medium leading-relaxed max-w-xl">
-              Central real-time oversight of operating branches across Kerala, Tamil Nadu, and regional expansion hubs with unified performance control.
+              {t("superAdminBranches.centralRealTimeOversightOf", "Central real-time oversight of operating branches across Kerala, Tamil Nadu, and regional expansion hubs with unified performance control.")}
             </p>
 
             {/* 3 Feature Pills */}
@@ -283,7 +286,7 @@ export default function SuperAdminBranches() {
                   <p className="text-xs font-bold text-slate-900 leading-tight">
                     {isLoadingBranches ? '...' : `${branches.length} Operating Branches`}
                   </p>
-                  <p className="text-[10px] text-slate-500 leading-tight">Kerala &bull; TN &bull; Karnataka</p>
+                  <p className="text-[10px] text-slate-500 leading-tight">{t("superAdminBranches.keralaTnKarnataka", "Kerala • TN • Karnataka")}</p>
                 </div>
               </div>
 
@@ -294,8 +297,8 @@ export default function SuperAdminBranches() {
                   <TrendingUp className="w-4 h-4 stroke-[2.2]" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-slate-900 leading-tight">100% Operational</p>
-                  <p className="text-[10px] text-slate-500 leading-tight">Active &amp; Reconciled</p>
+                  <p className="text-xs font-bold text-slate-900 leading-tight">{t("superAdminBranches.100Operational", "100% Operational")}</p>
+                  <p className="text-[10px] text-slate-500 leading-tight">{t("superAdminBranches.activeReconciled", "Active & Reconciled")}</p>
                 </div>
               </div>
 
@@ -306,8 +309,8 @@ export default function SuperAdminBranches() {
                   <ShieldCheck className="w-4 h-4 stroke-[2.2]" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-slate-900 leading-tight">₹42.8 Cr Reserves</p>
-                  <p className="text-[10px] text-slate-500 leading-tight">Branch Liquidity Pool</p>
+                  <p className="text-xs font-bold text-slate-900 leading-tight">{t("superAdminBranches.428CrReserves", "₹42.8 Cr Reserves")}</p>
+                  <p className="text-[10px] text-slate-500 leading-tight">{t("superAdminBranches.branchLiquidityPool", "Branch Liquidity Pool")}</p>
                 </div>
               </div>
             </div>
@@ -317,7 +320,7 @@ export default function SuperAdminBranches() {
           <div className="relative z-10 flex-shrink-0 flex items-center justify-center">
             <img
               src={branchMapScene}
-              alt="AurumFX Multi-State Branch Network and Map Pin"
+              alt={t("superAdminBranches.aurumfxMultiStateBranchNetwork", "AurumFX Multi-State Branch Network and Map Pin")}
               className="h-40 sm:h-48 md:h-52 lg:h-56 w-auto object-contain drop-shadow-md select-none pointer-events-none transform hover:scale-102 transition-transform duration-300"
             />
           </div>
@@ -329,13 +332,13 @@ export default function SuperAdminBranches() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div>
-              <h3 className="text-lg font-bold text-slate-900">Branch Network Directory</h3>
-              <p className="text-xs text-slate-500">Filter operational branches by name, location or jurisdiction</p>
+              <h3 className="text-lg font-bold text-slate-900">{t("superAdminBranches.branchNetworkDirectory", "Branch Network Directory")}</h3>
+              <p className="text-xs text-slate-500">{t("superAdminBranches.filterOperationalBranchesByName", "Filter operational branches by name, location or jurisdiction")}</p>
             </div>
             <button
               onClick={fetchBranches}
               disabled={isLoadingBranches}
-              title="Sync branches from API"
+              title={t("superAdminBranches.syncBranchesFromApi", "Sync branches from API")}
               className="p-2 text-slate-400 hover:text-[#00b4a7] hover:bg-teal-50 rounded-xl transition-all cursor-pointer disabled:opacity-50"
             >
               <RefreshCw className={`w-4 h-4 ${isLoadingBranches ? 'animate-spin text-[#00b4a7]' : ''}`} />
@@ -347,7 +350,7 @@ export default function SuperAdminBranches() {
               <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
-                placeholder="Search branches..."
+                placeholder={t("superAdminBranches.searchBranches", "Search branches...")}
                 value={branchSearch}
                 onChange={(e) => setBranchSearch(e.target.value)}
                 className="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 focus:outline-none focus:border-[#2dd4bf] shadow-xs"
@@ -358,7 +361,7 @@ export default function SuperAdminBranches() {
               className="px-4 py-2 bg-gradient-to-r from-[#14b8a6] to-[#2dd4bf] hover:from-[#0d9488] hover:to-[#14b8a6] text-white font-bold text-xs sm:text-sm rounded-xl shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap active:scale-95"
             >
               <PlusCircle className="w-4 h-4" />
-              <span>New Branch</span>
+              <span>{t("superAdminBranches.newBranch", "New Branch")}</span>
             </button>
           </div>
         </div>
@@ -367,19 +370,19 @@ export default function SuperAdminBranches() {
         {isLoadingBranches ? (
           <div className="bg-white rounded-3xl p-12 border border-slate-200/80 shadow-xs flex flex-col items-center justify-center text-center">
             <Loader2 className="w-8 h-8 text-[#00b4a7] animate-spin mb-3" />
-            <p className="text-sm font-bold text-slate-800">Loading branch network...</p>
-            <p className="text-xs text-slate-400 mt-1">Fetching live branches from the server</p>
+            <p className="text-sm font-bold text-slate-800">{t("superAdminBranches.loadingBranchNetwork", "Loading branch network...")}</p>
+            <p className="text-xs text-slate-400 mt-1">{t("superAdminBranches.fetchingLiveBranchesFromThe", "Fetching live branches from the server")}</p>
           </div>
         ) : branchError ? (
           <div className="bg-white rounded-3xl p-8 border border-rose-200 shadow-xs flex flex-col items-center justify-center text-center">
             <AlertCircle className="w-8 h-8 text-rose-500 mb-2" />
-            <p className="text-sm font-bold text-slate-900">Failed to load branches from server</p>
+            <p className="text-sm font-bold text-slate-900">{t("superAdminBranches.failedToLoadBranchesFrom", "Failed to load branches from server")}</p>
             <p className="text-xs text-rose-600 mt-1 max-w-md font-medium">{branchError}</p>
             <button
               onClick={fetchBranches}
               className="mt-4 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl transition-colors cursor-pointer"
             >
-              Retry Sync
+              {t("superAdminBranchAdmin.retrySync", "Retry Sync")}
             </button>
           </div>
         ) : filteredBranches.length === 0 ? (
@@ -388,12 +391,12 @@ export default function SuperAdminBranches() {
               <Building2 className="w-7 h-7 stroke-[1.8]" />
             </div>
             <h4 className="text-base font-bold text-slate-900">
-              {branchSearch ? 'No matching branches found' : 'No Branches Registered Yet'}
+              {branchSearch ? t("superAdminBranches.noMatchingBranchesFound", "No matching branches found") : t("superAdminBranches.noBranchesRegisteredYet", "No Branches Registered Yet")}
             </h4>
             <p className="text-xs text-slate-500 mt-1 max-w-sm">
               {branchSearch
                 ? `No operational branches matched "${branchSearch}". Try searching with another term.`
-                : 'There are currently no operating branches in the database. Click below to create your first branch.'}
+                : t("superAdminBranches.thereAreCurrentlyNoOperating", "There are currently no operating branches in the database. Click below to create your first branch.")}
             </p>
             {!branchSearch && (
               <button
@@ -401,7 +404,7 @@ export default function SuperAdminBranches() {
                 className="mt-5 px-5 py-2.5 bg-gradient-to-r from-[#14b8a6] to-[#2dd4bf] hover:from-[#0d9488] hover:to-[#14b8a6] text-white font-bold text-xs sm:text-sm rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer active:scale-95"
               >
                 <PlusCircle className="w-4 h-4" />
-                <span>Create Branch</span>
+                <span>{t("superAdminBranches.createBranch", "Create Branch")}</span>
               </button>
             )}
           </div>
@@ -436,7 +439,7 @@ export default function SuperAdminBranches() {
                         }`}
                       >
                         <CheckCircle2 className={`w-3 h-3 ${br.isActive ? 'text-emerald-600' : 'text-slate-400'}`} />
-                        <span>{br.isActive ? 'Active' : 'Inactive'}</span>
+                        <span>{br.isActive ? t("common.active", "Active") : t("common.inactive", "Inactive")}</span>
                       </span>
 
                       <button
@@ -444,7 +447,7 @@ export default function SuperAdminBranches() {
                         role="switch"
                         aria-checked={br.isActive}
                         onClick={() => handleToggleStatus(br)}
-                        title={br.isActive ? 'Click to deactivate branch' : 'Click to activate branch'}
+                        title={br.isActive ? t("superAdminBranches.clickToDeactivateBranch", "Click to deactivate branch") : t("superAdminBranches.clickToActivateBranch", "Click to activate branch")}
                         className={`relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
                           br.isActive ? 'bg-[#00b4a7]' : 'bg-slate-300'
                         }`}
@@ -477,21 +480,21 @@ export default function SuperAdminBranches() {
                     <div className="flex items-center gap-1 flex-shrink-0">
                       <button
                         onClick={() => setDetailModal({ isOpen: true, branch: br, isLoading: false })}
-                        title="View Branch Details"
+                        title={t("superAdminBranches.viewBranchDetails", "View Branch Details")}
                         className="p-1.5 text-slate-400 hover:text-[#00b4a7] hover:bg-teal-50 rounded-lg transition-colors cursor-pointer"
                       >
                         <Eye className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={() => handleOpenEditBranch(br)}
-                        title="Edit Branch (PUT)"
+                        title={t("superAdminBranches.editBranchPut", "Edit Branch (PUT)")}
                         className="p-1.5 text-slate-400 hover:text-[#00b4a7] hover:bg-teal-50 rounded-lg transition-colors cursor-pointer"
                       >
                         <Pencil className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={() => handleDeleteBranch(br)}
-                        title="Delete Branch (DELETE)"
+                        title={t("superAdminBranches.deleteBranchDelete", "Delete Branch (DELETE)")}
                         className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -502,25 +505,25 @@ export default function SuperAdminBranches() {
                   {/* Only Real Data available in the backend API */}
                   <div className="mt-4 pt-3 border-t border-slate-100 space-y-2 text-xs">
                     <div className="flex items-center justify-between">
-                      <span className="text-slate-400">Branch Code:</span>
+                      <span className="text-slate-400">{t("branchManagerCashTransactions.branchCode", "Branch Code:")}</span>
                       <span className="font-mono font-bold text-slate-800">#{br.branch_code || 'N/A'}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-slate-400">IFSC Code:</span>
+                      <span className="text-slate-400">{t("superAdminBranches.ifscCode", "IFSC Code:")}</span>
                       <span className="font-mono font-bold text-[#0f766e] bg-teal-50/80 px-2 py-0.5 rounded border border-teal-100">
                         {br.ifsc_code || 'N/A'}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-slate-400">City:</span>
+                      <span className="text-slate-400">{t("superAdminBranches.city", "City:")}</span>
                       <span className="font-bold text-slate-800">{br.city || 'N/A'}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-slate-400">State:</span>
+                      <span className="text-slate-400">{t("modal.member.state", "State:")}</span>
                       <span className="font-bold text-slate-800">{br.state || 'N/A'}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-slate-400">Created At:</span>
+                      <span className="text-slate-400">{t("superAdminBranches.createdAt", "Created At:")}</span>
                       <span className="font-semibold text-slate-700">
                         {formatDateTime(br.created_at || br.opening_date)}
                       </span>
@@ -571,7 +574,7 @@ export default function SuperAdminBranches() {
 
             <div>
               <h3 className="text-xl font-black text-slate-900 tracking-tight">
-                {typeof errorPopup === 'object' ? (errorPopup.title || 'Action Error') : 'Notice'}
+                {typeof errorPopup === 'object' ? (errorPopup.title || 'Action Error') : t("modal.member.notice", "Notice")}
               </h3>
               <p className="text-xs sm:text-sm text-rose-900 mt-2.5 leading-relaxed bg-rose-50/70 p-4 rounded-2xl border border-rose-200/80 font-medium break-words text-left">
                 {typeof errorPopup === 'object' ? (errorPopup.message || JSON.stringify(errorPopup)) : String(errorPopup)}
@@ -584,7 +587,7 @@ export default function SuperAdminBranches() {
                 onClick={() => setErrorPopup(null)}
                 className="w-full h-11 px-5 bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 text-white font-bold text-sm rounded-xl shadow-md transition-all cursor-pointer"
               >
-                Okay, Got It
+                {t("modal.branchAdmin.okayGotIt", "Okay, Got It")}
               </button>
             </div>
           </div>
@@ -601,7 +604,7 @@ export default function SuperAdminBranches() {
 
             <div>
               <h3 className="text-xl sm:text-2xl font-black text-slate-900">
-                {typeof successPopup === 'object' ? (successPopup.title || 'Action Successful!') : 'Success!'}
+                {typeof successPopup === 'object' ? (successPopup.title || 'Action Successful!') : t("modal.member.success", "Success!")}
               </h3>
               <p className="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
                 {typeof successPopup === 'object' ? successPopup.message : String(successPopup)}
@@ -614,7 +617,7 @@ export default function SuperAdminBranches() {
                 onClick={() => setSuccessPopup(null)}
                 className="w-full h-11 px-5 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-bold text-sm rounded-xl shadow-md transition-all cursor-pointer"
               >
-                Okay, Got It
+                {t("modal.branchAdmin.okayGotIt", "Okay, Got It")}
               </button>
             </div>
           </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import StatCard from '../../components/dashboard/StatCard';
 import {
@@ -57,6 +58,7 @@ function formatCurrency(val) {
 }
 
 export default function BranchManagerInvestmentSchemes({ embedded = false }) {
+  const { t } = useTranslation();
   const [schemes, setSchemes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -177,26 +179,26 @@ export default function BranchManagerInvestmentSchemes({ embedded = false }) {
           <div className="inline-flex flex-wrap items-center gap-x-2 gap-y-1 px-3 sm:px-3.5 py-1.5 rounded-2xl sm:rounded-full bg-white/95 backdrop-blur-xs text-[11px] sm:text-xs font-semibold border border-teal-200/80 shadow-2xs text-[#0f766e] mb-3 max-w-full">
             <span className="inline-flex items-center gap-1.5 flex-shrink-0">
               <CheckCircle2 className="w-3.5 h-3.5 text-[#00b4a7]" />
-              <span>Role: <strong className="font-bold text-teal-950">Branch Manager</strong></span>
+              <span>{t("dashboardModule.monthlyTargets.roleLabel", "Role:")} <strong className="font-bold text-teal-950">{t("nav.branchManager", "Branch Manager")}</strong></span>
             </span>
             <span className="text-teal-300 hidden sm:inline">•</span>
             <span className="text-slate-600 sm:text-[#0f766e]">{managerUser.branch_name}</span>
             <span className="text-teal-300 hidden sm:inline">•</span>
             <span className="inline-flex items-center gap-1.5 font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full text-[10px] sm:text-xs flex-shrink-0">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-              Active
+              {t("common.active", "Active")}
             </span>
           </div>
 
           <div className="flex items-center gap-2.5 sm:gap-3">
             <span className="w-1.5 h-7 sm:h-9 bg-[#00b4a7] rounded-full flex-shrink-0" />
             <h1 className="text-xl sm:text-3xl lg:text-4xl font-serif font-bold text-slate-900 tracking-tight">
-              Branch Investment Schemes
+              {t("branchManagerInvestmentSchemes.branchInvestmentSchemes", "Branch Investment Schemes")}
             </h1>
           </div>
 
           <p className="text-slate-600 text-xs sm:text-sm mt-2 sm:mt-2.5 font-medium leading-relaxed max-w-xl">
-            Review authorized recurring investment deposit plans available for enrollment across <strong className="text-slate-800">{managerUser.branch_name}</strong>. Members can enroll in daily, weekly, or monthly contribution schemes with guaranteed cooperative interest.
+            {t("branchManagerInvestmentSchemes.reviewAuthorizedRecurringInvestmentDeposit", "Review authorized recurring investment deposit plans available for enrollment across")} <strong className="text-slate-800">{managerUser.branch_name}</strong>{t("branchManagerInvestmentSchemes.membersCanEnrollInDaily", ". Members can enroll in daily, weekly, or monthly contribution schemes with guaranteed cooperative interest.")}
           </p>
         </div>
 
@@ -208,7 +210,7 @@ export default function BranchManagerInvestmentSchemes({ embedded = false }) {
             className="px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs sm:text-sm border border-teal-200/80 shadow-2xs transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
           >
             <RefreshCw className={`w-4 h-4 text-[#00b4a7] ${refreshing ? 'animate-spin' : ''}`} />
-            <span>Refresh Catalogue</span>
+            <span>{t("branchManagerInvestmentSchemes.refreshCatalogue", "Refresh Catalogue")}</span>
           </button>
         </div>
 
@@ -223,32 +225,32 @@ export default function BranchManagerInvestmentSchemes({ embedded = false }) {
       {/* Statistics */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
-          title="Active Schemes"
+          title={t("branchManagerFdMisSchemes.activeSchemes", "Active Schemes")}
           value={stats.total}
           icon={TrendingUp}
           variant="emerald"
-          subtitle="Branch approved schemes"
+          subtitle={t("branchManagerInvestmentSchemes.branchApprovedSchemes", "Branch approved schemes")}
         />
         <StatCard
-          title="Daily Schemes"
+          title={t("branchManagerInvestmentSchemes.dailySchemes", "Daily Schemes")}
           value={stats.daily}
           icon={Coins}
           variant="teal"
-          subtitle="Micro deposit plans"
+          subtitle={t("branchManagerInvestmentSchemes.microDepositPlans", "Micro deposit plans")}
         />
         <StatCard
-          title="Weekly Schemes"
+          title={t("branchManagerInvestmentSchemes.weeklySchemes", "Weekly Schemes")}
           value={stats.weekly}
           icon={Calendar}
           variant="blue"
-          subtitle="7-day recurring plans"
+          subtitle={t("branchManagerInvestmentSchemes.7DayRecurringPlans", "7-day recurring plans")}
         />
         <StatCard
-          title="Monthly Schemes"
+          title={t("branchManagerInvestmentSchemes.monthlySchemes", "Monthly Schemes")}
           value={stats.monthly}
           icon={PiggyBank}
           variant="purple"
-          subtitle="Monthly periodic plans"
+          subtitle={t("branchManagerInvestmentSchemes.monthlyPeriodicPlans", "Monthly periodic plans")}
         />
       </div>
 
@@ -264,7 +266,7 @@ export default function BranchManagerInvestmentSchemes({ embedded = false }) {
                 setSearchQuery(e.target.value);
                 setCurrentPage(1);
               }}
-              placeholder="Search investment schemes by title, code or terms..."
+              placeholder={t("branchManagerInvestmentSchemes.searchInvestmentSchemesByTitle", "Search investment schemes by title, code or terms...")}
               className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200/80 text-xs sm:text-sm font-medium focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none transition-all"
             />
           </div>
@@ -273,13 +275,13 @@ export default function BranchManagerInvestmentSchemes({ embedded = false }) {
         {/* Frequency Filter Pills */}
         <div className="flex items-center gap-2 pt-2 border-t border-slate-100 overflow-x-auto no-scrollbar">
           <span className="text-xs font-bold text-slate-400 uppercase tracking-wider mr-1">
-            Frequency:
+            {t("branchManagerInvestmentSchemes.frequency", "Frequency:")}
           </span>
           {[
-            { id: 'all', label: 'All Frequencies' },
-            { id: 'daily', label: 'Daily' },
-            { id: 'weekly', label: 'Weekly' },
-            { id: 'monthly', label: 'Monthly' },
+            { id: 'all', label: t("branchManagerInvestmentSchemes.allFrequencies", "All Frequencies") },
+            { id: 'daily', label: t("branchManagerInvestmentSchemes.daily", "Daily") },
+            { id: 'weekly', label: t("branchManagerInvestmentSchemes.weekly", "Weekly") },
+            { id: 'monthly', label: t("dashboardModule.monthlyTargets.periodMonthly", "Monthly") },
           ].map((f) => {
             const isActive = frequencyFilter === f.id;
             return (
@@ -314,7 +316,7 @@ export default function BranchManagerInvestmentSchemes({ embedded = false }) {
             onClick={() => fetchSchemes()}
             className="font-bold underline text-rose-900 cursor-pointer"
           >
-            Retry
+            {t("common.retry", "Retry")}
           </button>
         </div>
       )}
@@ -324,10 +326,10 @@ export default function BranchManagerInvestmentSchemes({ embedded = false }) {
         <div className="p-5 border-b border-slate-100 flex items-center justify-between">
           <div>
             <h3 className="font-serif font-black text-slate-900 text-base">
-              Authorized Investment Schemes
+              {t("branchManagerInvestmentSchemes.authorizedInvestmentSchemes", "Authorized Investment Schemes")}
             </h3>
             <p className="text-xs text-slate-500 font-medium">
-              Showing {filteredSchemes.length} of {schemes.length} schemes
+              {t("common.showing", "Showing")} {filteredSchemes.length} {t("common.of", "of")} {schemes.length} {t("branchManagerFdMisSchemes.schemes", "schemes")}
             </p>
           </div>
         </div>
@@ -335,18 +337,18 @@ export default function BranchManagerInvestmentSchemes({ embedded = false }) {
         {loading ? (
           <div className="p-12 text-center">
             <RefreshCw className="w-8 h-8 text-emerald-600 animate-spin mx-auto mb-3" />
-            <p className="text-xs font-bold text-slate-600">Loading branch investment schemes...</p>
+            <p className="text-xs font-bold text-slate-600">{t("branchManagerInvestmentSchemes.loadingBranchInvestmentSchemes", "Loading branch investment schemes...")}</p>
           </div>
         ) : filteredSchemes.length === 0 ? (
           <div className="p-12 text-center">
             <div className="w-14 h-14 rounded-3xl bg-slate-50 text-slate-400 flex items-center justify-center mx-auto mb-3 border border-slate-200">
               <TrendingUp className="w-6 h-6" />
             </div>
-            <h4 className="text-sm font-bold text-slate-800 mb-1">No Investment Schemes Available</h4>
+            <h4 className="text-sm font-bold text-slate-800 mb-1">{t("branchManagerInvestmentSchemes.noInvestmentSchemesAvailable", "No Investment Schemes Available")}</h4>
             <p className="text-xs text-slate-500 max-w-sm mx-auto">
               {searchQuery || frequencyFilter !== 'all'
-                ? 'No schemes matched your active filter. Try resetting search or frequency filters.'
-                : 'No active investment schemes are currently authorized for this branch.'}
+                ? t("branchManagerInvestmentSchemes.noSchemesMatchedYourActive", "No schemes matched your active filter. Try resetting search or frequency filters.")
+                : t("branchManagerInvestmentSchemes.noActiveInvestmentSchemesAre", "No active investment schemes are currently authorized for this branch.")}
             </p>
           </div>
         ) : (
@@ -355,19 +357,20 @@ export default function BranchManagerInvestmentSchemes({ embedded = false }) {
               <table className="w-full text-left text-xs">
                 <thead className="bg-slate-50/70 border-b border-slate-100 text-slate-400 font-bold uppercase tracking-wider text-[10px]">
                   <tr>
-                    <th className="py-3 px-4">Scheme Name</th>
-                    <th className="py-3 px-4">Scheme Code</th>
-                    <th className="py-3 px-4">Frequency</th>
-                    <th className="py-3 px-4">Installment</th>
-                    <th className="py-3 px-4">Investment Duration</th>
-                    <th className="py-3 px-4">Annual Interest Rate</th>
-                    <th className="py-3 px-4">Est. Total Principal</th>
-                    <th className="py-3 px-4 text-center">Status</th>
-                    <th className="py-3 px-4 text-right">Action</th>
+                    <th className="py-3 px-4">{t("dashboardModule.productAccounts.schemeName", "Scheme Name")}</th>
+                    <th className="py-3 px-4">{t("dashboardModule.productAccounts.schemeCode", "Scheme Code")}</th>
+                    <th className="py-3 px-4">{t("branchManagerInvestmentSchemes.frequency2", "Frequency")}</th>
+                    <th className="py-3 px-4">{t("branchManagerInvestmentSchemes.installment", "Installment")}</th>
+                    <th className="py-3 px-4">{t("branchManagerInvestmentSchemes.investmentDuration", "Investment Duration")}</th>
+                    <th className="py-3 px-4">{t("branchManagerInvestmentSchemes.annualInterestRate", "Annual Interest Rate")}</th>
+                    <th className="py-3 px-4">{t("branchManagerInvestmentSchemes.estTotalPrincipal", "Est. Total Principal")}</th>
+                    <th className="py-3 px-4 text-center">{t("common.status", "Status")}</th>
+                    <th className="py-3 px-4 text-right">{t("dashboardModule.branchOverview.colAction", "Action")}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {paginatedSchemes.map((scheme) => {
+  const { t } = useTranslation();
                     const schemeId = scheme.id || scheme.scheme_id;
                     const freq = String(scheme.contribution_frequency || 'daily').toLowerCase();
                     const estTotal =
@@ -405,7 +408,7 @@ export default function BranchManagerInvestmentSchemes({ embedded = false }) {
                         <td className="py-3.5 px-4 font-semibold text-slate-700">
                           {scheme.tenure_installments}{' '}
                           <span className="text-[10px] text-slate-400 font-medium">
-                            {freq === 'daily' ? 'Days' : freq === 'weekly' ? 'Weeks' : freq === 'monthly' ? 'Months' : 'Days'}
+                            {freq === 'daily' ? t("branchManagerInvestmentSchemes.days", "Days") : freq === 'weekly' ? t("branchManagerInvestmentSchemes.weeks", "Weeks") : freq === 'monthly' ? t("branchManagerInvestmentSchemes.months", "Months") : t("branchManagerInvestmentSchemes.days", "Days")}
                           </span>
                         </td>
                         <td className="py-3.5 px-4 font-black text-emerald-600">
@@ -427,7 +430,7 @@ export default function BranchManagerInvestmentSchemes({ embedded = false }) {
                                 scheme.is_active !== false ? 'bg-emerald-500' : 'bg-slate-400'
                               }`}
                             />
-                            <span>{scheme.is_active !== false ? 'Active' : 'Inactive'}</span>
+                            <span>{scheme.is_active !== false ? t("common.active", "Active") : t("common.inactive", "Inactive")}</span>
                           </span>
                         </td>
                         <td className="py-3.5 px-4 text-right">
@@ -437,7 +440,7 @@ export default function BranchManagerInvestmentSchemes({ embedded = false }) {
                             className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer"
                           >
                             <Eye className="w-3.5 h-3.5" />
-                            <span>View</span>
+                            <span>{t("common.view", "View")}</span>
                           </button>
                         </td>
                       </tr>
@@ -451,7 +454,7 @@ export default function BranchManagerInvestmentSchemes({ embedded = false }) {
             {totalPages > 1 && (
               <div className="p-4 border-t border-slate-100 flex items-center justify-between text-xs">
                 <span className="text-slate-500">
-                  Page {currentPage} of {totalPages}
+                  {t("branchManagerInvestmentSchemes.page", "Page")} {currentPage} {t("common.of", "of")} {totalPages}
                 </span>
                 <div className="flex items-center gap-1.5">
                   <button
@@ -460,7 +463,7 @@ export default function BranchManagerInvestmentSchemes({ embedded = false }) {
                     disabled={currentPage === 1}
                     className="px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed font-bold cursor-pointer"
                   >
-                    Previous
+                    {t("branchManagerFdMisSchemes.previous", "Previous")}
                   </button>
                   <button
                     type="button"
@@ -468,7 +471,7 @@ export default function BranchManagerInvestmentSchemes({ embedded = false }) {
                     disabled={currentPage === totalPages}
                     className="px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed font-bold cursor-pointer"
                   >
-                    Next
+                    {t("branchManagerFdMisSchemes.next", "Next")}
                   </button>
                 </div>
               </div>

@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { i18n } from '../../i18n/index.js';
+import { useTranslation } from 'react-i18next';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import StatCard from '../../components/dashboard/StatCard';
 import {
@@ -47,6 +49,7 @@ function formatDateTime(isoString) {
 }
 
 export default function SuperAdminAnnouncements() {
+  const { t } = useTranslation();
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -133,7 +136,7 @@ export default function SuperAdminAnnouncements() {
         const res = await announcementService.createAnnouncement(formData);
         setFormModal({ isOpen: false, mode: 'create', data: null, isSubmitting: false });
         setSuccessPopup({
-          title: 'Announcement Published',
+          title: i18n.t("superAdminAnnouncements.announcementPublished", "Announcement Published"),
           message: `Notice "${res?.title || formData.title}" was published successfully.`
         });
       } else {
@@ -141,7 +144,7 @@ export default function SuperAdminAnnouncements() {
         const res = await announcementService.updateAnnouncement(id, formData);
         setFormModal({ isOpen: false, mode: 'edit', data: null, isSubmitting: false });
         setSuccessPopup({
-          title: 'Announcement Updated',
+          title: i18n.t("superAdminAnnouncements.announcementUpdated", "Announcement Updated"),
           message: `Notice #${id} ("${res?.title || formData.title}") was updated successfully.`
         });
       }
@@ -164,14 +167,14 @@ export default function SuperAdminAnnouncements() {
       setAnnouncements((prev) => prev.filter((a) => a.id !== announcementId));
       setDeleteModal({ isOpen: false, announcement: null, isDeleting: false });
       setSuccessPopup({
-        title: 'Announcement Deleted',
+        title: i18n.t("superAdminAnnouncements.announcementDeleted", "Announcement Deleted"),
         message: `Notice #${announcementId} was deleted successfully.`
       });
     } catch (err) {
       console.error('Delete announcement error:', err);
       setDeleteModal({ isOpen: false, announcement: null, isDeleting: false });
       setErrorPopup({
-        title: 'Deletion Failed',
+        title: i18n.t("superAdminAnnouncements.deletionFailed", "Deletion Failed"),
         message: err.message || 'Could not delete announcement.'
       });
     }
@@ -187,13 +190,13 @@ export default function SuperAdminAnnouncements() {
         prev.map((a) => (a.id === item.id ? { ...a, is_active: newStatus } : a))
       );
       setSuccessPopup({
-        title: 'Status Updated',
+        title: i18n.t("branchManagerMembers.statusUpdated", "Status Updated"),
         message: `Notice "${item.title}" is now ${newStatus ? 'ACTIVE' : 'INACTIVE'}.`
       });
     } catch (err) {
       console.error('Toggle status error:', err);
       setErrorPopup({
-        title: 'Status Update Failed',
+        title: i18n.t("branchManagerMembers.statusUpdateFailed", "Status Update Failed"),
         message: err.message || 'Could not change announcement status.'
       });
       await fetchAnnouncementsList(true);
@@ -261,33 +264,33 @@ export default function SuperAdminAnnouncements() {
             <div className="inline-flex flex-wrap items-center gap-x-2 gap-y-1 px-3 sm:px-3.5 py-1.5 rounded-2xl sm:rounded-full bg-white/95 backdrop-blur-xs text-[11px] sm:text-xs font-semibold border border-teal-200/80 shadow-2xs text-[#0f766e] mb-3 max-w-full">
               <span className="inline-flex items-center gap-1.5 flex-shrink-0">
                 <Megaphone className="w-3.5 h-3.5 text-[#00b4a7]" />
-                <span>Role: <strong className="font-bold text-teal-950">Super Admin</strong></span>
+                <span>{t("dashboardModule.monthlyTargets.roleLabel", "Role:")} <strong className="font-bold text-teal-950">{t("login.superAdmin.portalTitleLine1", "Super Admin")}</strong></span>
               </span>
               <span className="text-teal-300 hidden sm:inline">•</span>
-              <span className="text-slate-600 sm:text-[#0f766e]">Broadcast &amp; Notice Board</span>
+              <span className="text-slate-600 sm:text-[#0f766e]">{t("superAdminAnnouncements.broadcastNoticeBoard", "Broadcast & Notice Board")}</span>
               <span className="text-teal-300 hidden sm:inline">•</span>
               <span className="inline-flex items-center gap-1.5 font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full text-[10px] sm:text-xs flex-shrink-0">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                Live Broadcast
+                {t("superAdminAnnouncements.liveBroadcast", "Live Broadcast")}
               </span>
             </div>
 
             <div className="flex items-center gap-2.5 sm:gap-3">
               <span className="w-1.5 h-7 sm:h-9 bg-[#00b4a7] rounded-full flex-shrink-0" />
               <h1 className="text-xl sm:text-3xl lg:text-4xl font-serif font-bold text-slate-900 tracking-tight">
-                Society Announcements &amp; Notices
+                {t("superAdminAnnouncements.societyAnnouncementsNotices", "Society Announcements & Notices")}
               </h1>
             </div>
 
             <p className="text-slate-600 text-xs sm:text-sm mt-2 sm:mt-2.5 font-medium leading-relaxed max-w-xl">
-              Broadcast administrative circulars, holiday schedules, regulatory updates, and notifications across branch portals and member dashboards.
+              {t("superAdminAnnouncements.broadcastAdministrativeCircularsHolidaySchedules", "Broadcast administrative circulars, holiday schedules, regulatory updates, and notifications across branch portals and member dashboards.")}
             </p>
           </div>
 
           <div className="relative z-10 flex justify-center md:justify-end pointer-events-none -my-2 sm:-my-5 lg:-my-6 flex-shrink-0 w-full md:w-auto">
             <img
               src={announcementIllustration}
-              alt="Announcements Broadcast Illustration"
+              alt={t("superAdminAnnouncements.announcementsBroadcastIllustration", "Announcements Broadcast Illustration")}
               className="h-32 sm:h-44 lg:h-52 max-w-full w-auto object-contain drop-shadow-md select-none pointer-events-none transform hover:scale-102 transition-transform duration-300 mx-auto md:mx-0"
             />
           </div>
@@ -303,25 +306,25 @@ export default function SuperAdminAnnouncements() {
         {/* 3 Summary Stat Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
           <StatCard
-            title="Total Announcements"
+            title={t("superAdminAnnouncements.totalAnnouncements", "Total Announcements")}
             value={totalCount.toString()}
-            subtitle="Registered Notices"
+            subtitle={t("superAdminAnnouncements.registeredNotices", "Registered Notices")}
             icon={Megaphone}
             trend={`${activeCount} active`}
             trendType="up"
           />
           <StatCard
-            title="Active Announcements"
+            title={t("superAdminAnnouncements.activeAnnouncements", "Active Announcements")}
             value={activeCount.toString()}
-            subtitle="Live Across Portals"
+            subtitle={t("superAdminAnnouncements.liveAcrossPortals", "Live Across Portals")}
             icon={CheckCircle2}
             trend={totalCount > 0 ? `${Math.round((activeCount / totalCount) * 100)}% active` : '100%'}
             trendType="up"
           />
           <StatCard
-            title="Inactive Notices"
+            title={t("superAdminAnnouncements.inactiveNotices", "Inactive Notices")}
             value={inactiveCount.toString()}
-            subtitle="Archived / Disabled"
+            subtitle={t("superAdminAnnouncements.archivedDisabled", "Archived / Disabled")}
             icon={Clock}
           />
         </div>
@@ -337,11 +340,11 @@ export default function SuperAdminAnnouncements() {
                   <Megaphone className="w-4 h-4 text-[#00b4a7]" />
                 </div>
                 <h3 className="font-serif font-bold text-slate-900 text-lg">
-                  Noticeboard Directory
+                  {t("superAdminAnnouncements.noticeboardDirectory", "Noticeboard Directory")}
                 </h3>
               </div>
               <p className="text-xs text-slate-500 mt-1 font-medium">
-                Manage administrative notices, publish updates, and regulate broadcast visibility
+                {t("superAdminAnnouncements.manageAdministrativeNoticesPublishUpdates", "Manage administrative notices, publish updates, and regulate broadcast visibility")}
               </p>
             </div>
 
@@ -352,7 +355,7 @@ export default function SuperAdminAnnouncements() {
                 <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
                   type="text"
-                  placeholder="Search announcements by title or message..."
+                  placeholder={t("superAdminAnnouncements.searchAnnouncementsByTitleOr", "Search announcements by title or message...")}
                   value={searchQuery}
                   onChange={(e) => {
                     setSearchQuery(e.target.value);
@@ -383,9 +386,9 @@ export default function SuperAdminAnnouncements() {
                   }}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-sm text-slate-700 font-semibold focus:outline-none focus:ring-2 focus:ring-teal-100 focus:border-teal-500 transition-all cursor-pointer"
                 >
-                  <option value="all">All Statuses</option>
-                  <option value="active">Active Only</option>
-                  <option value="inactive">Inactive Only</option>
+                  <option value="all">{t("branchManagerFdMisSchemes.allStatuses", "All Statuses")}</option>
+                  <option value="active">{t("branchManagerFdMisSchemes.activeOnly", "Active Only")}</option>
+                  <option value="inactive">{t("branchManagerFdMisSchemes.inactiveOnly", "Inactive Only")}</option>
                 </select>
               </div>
 
@@ -393,7 +396,7 @@ export default function SuperAdminAnnouncements() {
               <button
                 onClick={() => fetchAnnouncementsList(true)}
                 disabled={refreshing}
-                title="Refresh announcements"
+                title={t("dashboardModule.announcements.refreshTooltip", "Refresh announcements")}
                 className="p-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-800 transition-colors cursor-pointer disabled:opacity-50 flex-shrink-0"
               >
                 <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin text-teal-600' : ''}`} />
@@ -412,7 +415,7 @@ export default function SuperAdminAnnouncements() {
                 className="inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#00b4a7] to-[#0f766e] text-white text-xs sm:text-sm font-bold shadow-md shadow-teal-500/20 hover:from-[#00a296] hover:to-[#0c625c] transition-all cursor-pointer whitespace-nowrap active:scale-95 flex-shrink-0"
               >
                 <PlusCircle className="w-4 h-4" />
-                <span>New Announcement</span>
+                <span>{t("superAdminAnnouncements.newAnnouncement", "New Announcement")}</span>
               </button>
             </div>
           </div>
@@ -423,7 +426,7 @@ export default function SuperAdminAnnouncements() {
               <div className="flex items-start gap-2.5">
                 <AlertCircle className="w-5 h-5 flex-shrink-0 text-red-600 mt-0.5" />
                 <div>
-                  <p className="text-sm font-bold text-red-900">Failed to load announcements</p>
+                  <p className="text-sm font-bold text-red-900">{t("memberAnnouncements.failedToLoadAnnouncements", "Failed to load announcements")}</p>
                   <p className="text-xs text-red-700 mt-0.5">{error}</p>
                 </div>
               </div>
@@ -431,7 +434,7 @@ export default function SuperAdminAnnouncements() {
                 onClick={() => fetchAnnouncementsList()}
                 className="text-xs font-bold text-red-700 hover:text-red-900 underline cursor-pointer flex-shrink-0"
               >
-                Retry
+                {t("common.retry", "Retry")}
               </button>
             </div>
           )}
@@ -441,7 +444,7 @@ export default function SuperAdminAnnouncements() {
             {loading ? (
               <div className="py-20 text-center space-y-3">
                 <div className="w-10 h-10 border-3 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto" />
-                <p className="text-sm text-slate-500 font-medium">Loading announcements from central server...</p>
+                <p className="text-sm text-slate-500 font-medium">{t("superAdminAnnouncements.loadingAnnouncementsFromCentralServer", "Loading announcements from central server...")}</p>
               </div>
             ) : filteredAnnouncements.length === 0 ? (
               <div className="py-20 text-center space-y-4 max-w-sm mx-auto p-4">
@@ -450,12 +453,12 @@ export default function SuperAdminAnnouncements() {
                 </div>
                 <div>
                   <p className="text-base font-bold text-slate-800">
-                    {searchQuery ? 'No matching announcements found' : 'No announcements published yet'}
+                    {searchQuery ? t("dashboardModule.announcements.noMatchingTitle", "No matching announcements found") : t("dashboardModule.announcements.emptyTitle", "No announcements published yet")}
                   </p>
                   <p className="text-xs text-slate-500 mt-1 font-medium leading-relaxed">
                     {searchQuery
-                      ? 'Try adjusting your search query or clear the filter.'
-                      : 'Publish administrative notices, holiday calendars, or policy updates to broadcast to all users.'}
+                      ? t("branchManagerFdMisSchemes.tryAdjustingYourSearchQuery", "Try adjusting your search query or clear the filter.")
+                      : t("superAdminAnnouncements.publishAdministrativeNoticesHolidayCalendars", "Publish administrative notices, holiday calendars, or policy updates to broadcast to all users.")}
                   </p>
                 </div>
                 {!searchQuery && (
@@ -471,7 +474,7 @@ export default function SuperAdminAnnouncements() {
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold transition-colors cursor-pointer shadow-sm"
                   >
                     <PlusCircle className="w-4 h-4" />
-                    Publish First Announcement
+                    {t("superAdminAnnouncements.publishFirstAnnouncement", "Publish First Announcement")}
                   </button>
                 )}
               </div>
@@ -479,16 +482,17 @@ export default function SuperAdminAnnouncements() {
               <table className="w-full text-left border-collapse min-w-[1000px]">
                 <thead>
                   <tr className="border-b border-slate-100 bg-slate-50/75 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                    <th className="py-3.5 px-6">Notice Title</th>
-                    <th className="py-3.5 px-6">Message Preview</th>
-                    <th className="py-3.5 px-6">Target Audience</th>
-                    <th className="py-3.5 px-6">Published At</th>
-                    <th className="py-3.5 px-6 text-center">Status</th>
-                    <th className="py-3.5 px-6 text-right">Actions</th>
+                    <th className="py-3.5 px-6">{t("staffAnnouncements.noticeTitle", "Notice Title")}</th>
+                    <th className="py-3.5 px-6">{t("dashboardModule.branchOverview.colMessagePreview", "Message Preview")}</th>
+                    <th className="py-3.5 px-6">{t("superAdminAnnouncements.targetAudience", "Target Audience")}</th>
+                    <th className="py-3.5 px-6">{t("staffAnnouncements.publishedAt", "Published At")}</th>
+                    <th className="py-3.5 px-6 text-center">{t("common.status", "Status")}</th>
+                    <th className="py-3.5 px-6 text-right">{t("common.actions", "Actions")}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-sm">
                   {paginatedAnnouncements.map((item) => {
+  const { t } = useTranslation();
                     const isActive = item.is_active !== false;
                     const isActing = actionLoadingId === item.id;
 
@@ -530,7 +534,7 @@ export default function SuperAdminAnnouncements() {
                                   key={r}
                                   className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200/80"
                                 >
-                                  {r === 'branch_admin' ? 'Branch Admin' : r === 'member' ? 'Members' : r}
+                                  {r === 'branch_admin' ? t("superAdminAnnouncements.branchAdmin", "Branch Admin") : r === 'member' ? t("dashboardModule.branchOverview.tabMembers", "Members") : r}
                                 </span>
                               ))
                             ) : null}
@@ -549,7 +553,7 @@ export default function SuperAdminAnnouncements() {
                             {(!item.target_account_roles || item.target_account_roles.length === 0) &&
                               (!item.target_staff_role_ids || item.target_staff_role_ids.length === 0) && (
                                 <span className="text-[10px] font-medium text-slate-400 italic">
-                                  All Audiences
+                                  {t("superAdminAnnouncements.allAudiences", "All Audiences")}
                                 </span>
                               )}
                           </div>
@@ -570,7 +574,7 @@ export default function SuperAdminAnnouncements() {
                             className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
                               isActive ? 'bg-emerald-500' : 'bg-slate-300'
                             } ${isActing ? 'opacity-50 cursor-wait' : ''}`}
-                            title={`Click to ${isActive ? 'deactivate' : 'activate'} this announcement`}
+                            title={`Click to ${isActive ? t("branchManagerMembers.deactivate", "deactivate") : t("branchManagerMembers.activate", "activate")} this announcement`}
                           >
                             <span
                               aria-hidden="true"
@@ -581,9 +585,9 @@ export default function SuperAdminAnnouncements() {
                           </button>
                           <div className="text-[10px] font-bold mt-1">
                             {isActive ? (
-                              <span className="text-emerald-700">Active</span>
+                              <span className="text-emerald-700">{t("common.active", "Active")}</span>
                             ) : (
-                              <span className="text-slate-400">Inactive</span>
+                              <span className="text-slate-400">{t("common.inactive", "Inactive")}</span>
                             )}
                           </div>
                         </td>
@@ -599,7 +603,7 @@ export default function SuperAdminAnnouncements() {
                                   announcement: item
                                 })
                               }
-                              title="View Announcement Details"
+                              title={t("superAdminAnnouncements.viewAnnouncementDetails", "View Announcement Details")}
                               className="p-2 rounded-lg text-slate-400 hover:text-teal-700 hover:bg-teal-50 transition-colors cursor-pointer"
                             >
                               <Eye className="w-4 h-4" />
@@ -615,7 +619,7 @@ export default function SuperAdminAnnouncements() {
                                   isSubmitting: false
                                 })
                               }
-                              title="Edit Announcement"
+                              title={t("superAdminAnnouncements.editAnnouncement", "Edit Announcement")}
                               className="p-2 rounded-lg text-slate-400 hover:text-teal-700 hover:bg-teal-50 transition-colors cursor-pointer"
                             >
                               <Pencil className="w-4 h-4" />
@@ -630,7 +634,7 @@ export default function SuperAdminAnnouncements() {
                                   isDeleting: false
                                 })
                               }
-                              title="Delete Announcement"
+                              title={t("superAdminAnnouncements.deleteAnnouncement", "Delete Announcement")}
                               className="p-2 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
                             >
                               <Trash2 className="w-4 h-4" />
@@ -648,8 +652,8 @@ export default function SuperAdminAnnouncements() {
             {!loading && filteredAnnouncements.length > itemsPerPage && (
               <div className="px-6 py-4 border-t border-slate-100 flex items-center justify-between">
                 <span className="text-xs text-slate-500 font-medium">
-                  Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
-                  {Math.min(currentPage * itemsPerPage, filteredAnnouncements.length)} of {filteredAnnouncements.length} notices
+                  {t("common.showing", "Showing")} {(currentPage - 1) * itemsPerPage + 1} {t("common.to", "to")}{' '}
+                  {Math.min(currentPage * itemsPerPage, filteredAnnouncements.length)} {t("common.of", "of")} {filteredAnnouncements.length} {t("dashboardModule.announcements.noticesUnit", "notices")}
                 </span>
                 <div className="flex items-center gap-2">
                   <button
@@ -657,7 +661,7 @@ export default function SuperAdminAnnouncements() {
                     disabled={currentPage === 1}
                     className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed font-semibold text-xs text-slate-700 transition-colors cursor-pointer"
                   >
-                    Previous
+                    {t("branchManagerFdMisSchemes.previous", "Previous")}
                   </button>
                   <span className="text-xs font-bold text-slate-700 px-2">
                     {currentPage} / {totalPages}
@@ -667,7 +671,7 @@ export default function SuperAdminAnnouncements() {
                     disabled={currentPage === totalPages}
                     className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed font-semibold text-xs text-slate-700 transition-colors cursor-pointer"
                   >
-                    Next
+                    {t("branchManagerFdMisSchemes.next", "Next")}
                   </button>
                 </div>
               </div>
@@ -732,7 +736,7 @@ export default function SuperAdminAnnouncements() {
               onClick={() => setSuccessPopup(null)}
               className="mt-5 w-full py-2.5 bg-gradient-to-r from-[#00b4a7] to-[#0f766e] text-white rounded-xl text-xs font-bold shadow-md shadow-teal-500/20 cursor-pointer"
             >
-              Continue
+              {t("branchManagerMembershipSettings.continue", "Continue")}
             </button>
           </div>
         </div>
@@ -751,7 +755,7 @@ export default function SuperAdminAnnouncements() {
               onClick={() => setErrorPopup(null)}
               className="mt-5 w-full py-2.5 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 cursor-pointer"
             >
-              Dismiss
+              {t("branchManagerMemberPasswordUpdate.dismiss", "Dismiss")}
             </button>
           </div>
         </div>

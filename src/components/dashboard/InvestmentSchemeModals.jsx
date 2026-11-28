@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { i18n } from '../../i18n/index.js';
+import { useTranslation } from 'react-i18next';
 import {
   X,
   TrendingUp,
@@ -23,9 +25,9 @@ import {
 } from 'lucide-react';
 
 export const CONTRIBUTION_FREQUENCY_OPTIONS = [
-  { value: 'daily', label: 'Daily', unit: 'Days' },
-  { value: 'weekly', label: 'Weekly', unit: 'Weeks' },
-  { value: 'monthly', label: 'Monthly', unit: 'Months' },
+  { value: 'daily', label: i18n.t("branchManagerInvestmentSchemes.daily", "Daily"), unit: 'Days' },
+  { value: 'weekly', label: i18n.t("branchManagerInvestmentSchemes.weekly", "Weekly"), unit: 'Weeks' },
+  { value: 'monthly', label: i18n.t("dashboardModule.monthlyTargets.periodMonthly", "Monthly"), unit: 'Months' },
 ];
 
 const INITIAL_FORM_STATE = {
@@ -81,6 +83,7 @@ export function InvestmentSchemeFormModal({
   onClose,
   onSubmit,
 }) {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState(INITIAL_FORM_STATE);
   const [errors, setErrors] = useState({});
 
@@ -195,11 +198,11 @@ export function InvestmentSchemeFormModal({
             </div>
             <div>
               <h2 className="text-lg font-serif font-black text-slate-900">
-                {mode === 'create' ? 'Create Investment Scheme' : 'Edit Investment Scheme'}
+                {mode === 'create' ? t("superAdminInvestmentSchemes.createInvestmentScheme", "Create Investment Scheme") : t("investmentSchemeModals.editInvestmentScheme", "Edit Investment Scheme")}
               </h2>
               <p className="text-xs text-slate-500 font-medium">
                 {mode === 'create'
-                  ? 'Configure a recurring deposit investment scheme with installment parameters'
+                  ? t("investmentSchemeModals.configureARecurringDepositInvestment", "Configure a recurring deposit investment scheme with installment parameters")
                   : `Update terms for ${initialData?.scheme_name || 'Scheme'}`}
               </p>
             </div>
@@ -220,14 +223,14 @@ export function InvestmentSchemeFormModal({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                Scheme Name <span className="text-rose-500">*</span>
+                {t("dashboardModule.productAccounts.schemeName", "Scheme Name")} <span className="text-rose-500">*</span>
               </label>
               <input
                 type="text"
                 name="scheme_name"
                 value={formData.scheme_name}
                 onChange={handleChange}
-                placeholder="e.g. Daily Kisan Micro-Investment"
+                placeholder={t("investmentSchemeModals.eGDailyKisanMicro", "e.g. Daily Kisan Micro-Investment")}
                 className={`w-full px-4 py-2.5 rounded-xl border text-sm font-semibold transition-all outline-none ${
                   errors.scheme_name
                     ? 'border-rose-300 bg-rose-50/30 text-rose-900 focus:ring-2 focus:ring-rose-400'
@@ -241,14 +244,14 @@ export function InvestmentSchemeFormModal({
 
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                Scheme Code <span className="text-rose-500">*</span>
+                {t("dashboardModule.productAccounts.schemeCode", "Scheme Code")} <span className="text-rose-500">*</span>
               </label>
               <input
                 type="text"
                 name="scheme_code"
                 value={formData.scheme_code}
                 onChange={handleChange}
-                placeholder="e.g. INV-DLY-01"
+                placeholder={t("investmentSchemeModals.eGInvDly01", "e.g. INV-DLY-01")}
                 className={`w-full px-4 py-2.5 rounded-xl border text-sm font-bold uppercase transition-all outline-none ${
                   errors.scheme_code
                     ? 'border-rose-300 bg-rose-50/30 text-rose-900 focus:ring-2 focus:ring-rose-400'
@@ -265,7 +268,7 @@ export function InvestmentSchemeFormModal({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                Contribution Frequency <span className="text-rose-500">*</span>
+                {t("investmentSchemeModals.contributionFrequency", "Contribution Frequency")} <span className="text-rose-500">*</span>
               </label>
               <select
                 name="contribution_frequency"
@@ -280,13 +283,13 @@ export function InvestmentSchemeFormModal({
                 ))}
               </select>
               <span className="text-[11px] text-slate-500 mt-1 block">
-                Installment deposit cycle for participating members
+                {t("investmentSchemeModals.installmentDepositCycleForParticipating", "Installment deposit cycle for participating members")}
               </span>
             </div>
 
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                Installment Amount (₹) <span className="text-rose-500">*</span>
+                {t("investmentSchemeModals.installmentAmount", "Installment Amount (₹)")} <span className="text-rose-500">*</span>
               </label>
               <div className="relative">
                 <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-400">
@@ -311,7 +314,7 @@ export function InvestmentSchemeFormModal({
                 <p className="text-xs text-rose-500 font-semibold mt-1">{errors.installment_amount}</p>
               ) : (
                 <span className="text-[11px] text-slate-500 mt-1 block">
-                  Amount per {selectedFreqObj.label.toLowerCase()} installment
+                  {t("investmentSchemeModals.amountPer", "Amount per")} {selectedFreqObj.label.toLowerCase()} {t("investmentSchemeModals.installment", "installment")}
                 </span>
               )}
             </div>
@@ -321,7 +324,7 @@ export function InvestmentSchemeFormModal({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                Investment Duration ({selectedFreqObj.unit}) <span className="text-rose-500">*</span>
+                {t("investmentSchemeModals.investmentDuration", "Investment Duration (")}{selectedFreqObj.unit}) <span className="text-rose-500">*</span>
               </label>
               <input
                 type="number"
@@ -341,14 +344,14 @@ export function InvestmentSchemeFormModal({
                 <p className="text-xs text-rose-500 font-semibold mt-1">{errors.tenure_installments}</p>
               ) : (
                 <span className="text-[11px] text-slate-500 mt-1 block">
-                  Total duration in {selectedFreqObj.unit.toLowerCase()} for this investment plan
+                  {t("investmentSchemeModals.totalDurationIn", "Total duration in")} {selectedFreqObj.unit.toLowerCase()} {t("investmentSchemeModals.forThisInvestmentPlan", "for this investment plan")}
                 </span>
               )}
             </div>
 
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                Annual Interest Rate (%) <span className="text-rose-500">*</span>
+                {t("fdMisSchemeModals.annualInterestRate", "Annual Interest Rate (%)")} <span className="text-rose-500">*</span>
               </label>
               <div className="relative">
                 <input
@@ -374,7 +377,7 @@ export function InvestmentSchemeFormModal({
                 <p className="text-xs text-rose-500 font-semibold mt-1">{errors.annual_interest_rate}</p>
               ) : (
                 <span className="text-[11px] text-slate-500 mt-1 block">
-                  Annual yield percentage on maturity
+                  {t("investmentSchemeModals.annualYieldPercentageOnMaturity", "Annual yield percentage on maturity")}
                 </span>
               )}
             </div>
@@ -385,27 +388,27 @@ export function InvestmentSchemeFormModal({
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-bold text-emerald-950 flex items-center gap-1.5">
                 <Calculator className="w-4 h-4 text-emerald-600" />
-                Scheme Contribution Projection
+                {t("investmentSchemeModals.schemeContributionProjection", "Scheme Contribution Projection")}
               </span>
               <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-800 font-bold uppercase tracking-wider">
-                {selectedFreqObj.label} Cycle
+                {selectedFreqObj.label} {t("investmentSchemeModals.cycle", "Cycle")}
               </span>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-1">
               <div>
-                <span className="text-[10px] uppercase font-bold text-slate-500 block">Per Installment</span>
+                <span className="text-[10px] uppercase font-bold text-slate-500 block">{t("investmentSchemeModals.perInstallment", "Per Installment")}</span>
                 <span className="text-sm font-black text-slate-900">
                   {formatCurrency(formData.installment_amount)}
                 </span>
               </div>
               <div>
-                <span className="text-[10px] uppercase font-bold text-slate-500 block">Investment Duration</span>
+                <span className="text-[10px] uppercase font-bold text-slate-500 block">{t("branchManagerInvestmentSchemes.investmentDuration", "Investment Duration")}</span>
                 <span className="text-sm font-black text-slate-900">
                   {formData.tenure_installments || 0} {selectedFreqObj.unit}
                 </span>
               </div>
               <div className="col-span-2 sm:col-span-1">
-                <span className="text-[10px] uppercase font-bold text-emerald-700 block">Expected Principal Base</span>
+                <span className="text-[10px] uppercase font-bold text-emerald-700 block">{t("investmentSchemeModals.expectedPrincipalBase", "Expected Principal Base")}</span>
                 <span className="text-sm font-black text-emerald-700">
                   {formatCurrency(totalBaseContribution)}
                 </span>
@@ -416,14 +419,14 @@ export function InvestmentSchemeFormModal({
           {/* Row 4: Description */}
           <div>
             <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-              Description / Terms Note
+              {t("investmentSchemeModals.descriptionTermsNote", "Description / Terms Note")}
             </label>
             <textarea
               name="description"
               rows={3}
               value={formData.description}
               onChange={handleChange}
-              placeholder="e.g. Specially designed daily recurring scheme for local vendors and daily wage members with guaranteed annual bonus yield."
+              placeholder={t("investmentSchemeModals.eGSpeciallyDesignedDaily", "e.g. Specially designed daily recurring scheme for local vendors and daily wage members with guaranteed annual bonus yield.")}
               className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 text-xs leading-relaxed focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none transition-all"
             />
           </div>
@@ -433,9 +436,9 @@ export function InvestmentSchemeFormModal({
             <div className="flex items-center gap-2.5">
               <ShieldCheck className="w-5 h-5 text-emerald-600" />
               <div>
-                <span className="text-xs font-bold text-slate-800 block">Scheme Active Status</span>
+                <span className="text-xs font-bold text-slate-800 block">{t("investmentSchemeModals.schemeActiveStatus", "Scheme Active Status")}</span>
                 <span className="text-[11px] text-slate-500">
-                  Active schemes are immediately visible to Branch Admins and Members
+                  {t("investmentSchemeModals.activeSchemesAreImmediatelyVisible", "Active schemes are immediately visible to Branch Admins and Members")}
                 </span>
               </div>
             </div>
@@ -459,7 +462,7 @@ export function InvestmentSchemeFormModal({
               disabled={isSubmitting}
               className="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-100 text-xs font-bold transition-all cursor-pointer disabled:opacity-50"
             >
-              Cancel
+              {t("common.cancel", "Cancel")}
             </button>
             <button
               type="submit"
@@ -467,7 +470,7 @@ export function InvestmentSchemeFormModal({
               className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-xs font-bold shadow-md shadow-emerald-600/20 flex items-center gap-2 transition-all cursor-pointer disabled:opacity-50"
             >
               {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
-              <span>{mode === 'create' ? 'Create Investment Scheme' : 'Save Changes'}</span>
+              <span>{mode === 'create' ? t("superAdminInvestmentSchemes.createInvestmentScheme", "Create Investment Scheme") : t("memberNominee.saveChanges", "Save Changes")}</span>
             </button>
           </div>
         </form>
@@ -480,6 +483,7 @@ export function InvestmentSchemeFormModal({
  * Modal for Viewing Investment Scheme Details
  */
 export function InvestmentSchemeDetailModal({ isOpen, scheme, onClose, onApplyClick }) {
+  const { t } = useTranslation();
   if (!isOpen || !scheme) return null;
 
   const freq = String(scheme.contribution_frequency || 'daily').toLowerCase();
@@ -512,11 +516,11 @@ export function InvestmentSchemeDetailModal({ isOpen, scheme, onClose, onApplyCl
                       : 'bg-rose-100 text-rose-800'
                   }`}
                 >
-                  {scheme.is_active ? 'Active' : 'Inactive'}
+                  {scheme.is_active ? t("common.active", "Active") : t("common.inactive", "Inactive")}
                 </span>
               </div>
               <p className="text-xs text-slate-500 font-mono font-bold mt-0.5">
-                Scheme Code: {scheme.scheme_code}
+                {t("applyProductAccountModal.schemeCode", "Scheme Code:")} {scheme.scheme_code}
               </p>
             </div>
           </div>
@@ -535,7 +539,7 @@ export function InvestmentSchemeDetailModal({ isOpen, scheme, onClose, onApplyCl
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
-                Frequency
+                {t("branchManagerInvestmentSchemes.frequency2", "Frequency")}
               </span>
               <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-teal-50 text-teal-700 text-xs font-bold capitalize">
                 {freqObj.label} ({freqObj.unit})
@@ -544,7 +548,7 @@ export function InvestmentSchemeDetailModal({ isOpen, scheme, onClose, onApplyCl
 
             <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
-                Installment Amount
+                {t("investmentSchemeModals.installmentAmount2", "Installment Amount")}
               </span>
               <span className="text-sm font-black text-slate-900">
                 {formatCurrency(scheme.installment_amount)}
@@ -553,7 +557,7 @@ export function InvestmentSchemeDetailModal({ isOpen, scheme, onClose, onApplyCl
 
             <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
-                Investment Duration
+                {t("branchManagerInvestmentSchemes.investmentDuration", "Investment Duration")}
               </span>
               <span className="text-sm font-black text-slate-900">
                 {scheme.tenure_installments} {freqObj.unit}
@@ -562,7 +566,7 @@ export function InvestmentSchemeDetailModal({ isOpen, scheme, onClose, onApplyCl
 
             <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
-                Annual Interest Rate
+                {t("branchManagerInvestmentSchemes.annualInterestRate", "Annual Interest Rate")}
               </span>
               <span className="text-sm font-black text-emerald-600">
                 {formatInterestRate(scheme.annual_interest_rate)} p.a.
@@ -571,7 +575,7 @@ export function InvestmentSchemeDetailModal({ isOpen, scheme, onClose, onApplyCl
 
             <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-100 col-span-2">
               <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 block mb-1">
-                Expected Total Principal
+                {t("investmentSchemeModals.expectedTotalPrincipal", "Expected Total Principal")}
               </span>
               <span className="text-sm font-black text-emerald-900">
                 {formatCurrency(totalBaseContribution)}
@@ -583,7 +587,7 @@ export function InvestmentSchemeDetailModal({ isOpen, scheme, onClose, onApplyCl
           {scheme.description && (
             <div>
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
-                Scheme Description & Highlights
+                {t("investmentSchemeModals.schemeDescriptionHighlights", "Scheme Description & Highlights")}
               </span>
               <p className="text-xs text-slate-700 bg-slate-50 p-3 rounded-xl border border-slate-100 leading-relaxed whitespace-pre-line">
                 {scheme.description}
@@ -593,8 +597,8 @@ export function InvestmentSchemeDetailModal({ isOpen, scheme, onClose, onApplyCl
 
           {/* Metadata */}
           <div className="p-3 rounded-xl bg-slate-50/60 border border-slate-100 text-[11px] text-slate-500 flex items-center justify-between">
-            <span>Scheme ID: #{scheme.id || scheme.scheme_id}</span>
-            {scheme.created_at && <span>Created: {formatDate(scheme.created_at)}</span>}
+            <span>{t("investmentSchemeModals.schemeId", "Scheme ID: #")}{scheme.id || scheme.scheme_id}</span>
+            {scheme.created_at && <span>{t("investmentSchemeModals.created", "Created:")} {formatDate(scheme.created_at)}</span>}
           </div>
         </div>
 
@@ -605,7 +609,7 @@ export function InvestmentSchemeDetailModal({ isOpen, scheme, onClose, onApplyCl
             onClick={onClose}
             className="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 text-xs font-bold hover:bg-slate-100 transition-all cursor-pointer"
           >
-            Close
+            {t("common.close", "Close")}
           </button>
           {onApplyClick && (
             <button
@@ -617,7 +621,7 @@ export function InvestmentSchemeDetailModal({ isOpen, scheme, onClose, onApplyCl
               className="px-5 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold shadow-md shadow-teal-600/20 transition-all cursor-pointer inline-flex items-center gap-1.5"
             >
               <PlusCircle className="w-4 h-4" />
-              <span>Apply Scheme</span>
+              <span>{t("fdMisSchemeModals.applyScheme", "Apply Scheme")}</span>
             </button>
           )}
         </div>
@@ -636,6 +640,7 @@ export function InvestmentSchemeDeleteModal({
   onClose,
   onConfirm,
 }) {
+  const { t } = useTranslation();
   if (!isOpen || !scheme) return null;
 
   return (
@@ -646,13 +651,12 @@ export function InvestmentSchemeDeleteModal({
         </div>
 
         <h3 className="text-base font-serif font-black text-slate-900 mb-1">
-          Delete Investment Scheme?
+          {t("investmentSchemeModals.deleteInvestmentScheme", "Delete Investment Scheme?")}
         </h3>
         <p className="text-xs text-slate-600 leading-relaxed mb-4">
-          Are you sure you want to soft-delete the scheme{' '}
+          {t("investmentSchemeModals.areYouSureYouWant", "Are you sure you want to soft-delete the scheme")}{' '}
           <strong className="text-slate-900">{scheme.scheme_name}</strong> (
-          <span className="font-mono">{scheme.scheme_code}</span>)? It will no longer be available
-          for new subscriptions.
+          <span className="font-mono">{scheme.scheme_code}</span>{t("investmentSchemeModals.itWillNoLongerBe", ")? It will no longer be available for new subscriptions.")}
         </p>
 
         <div className="flex items-center justify-end gap-3 pt-2">
@@ -662,7 +666,7 @@ export function InvestmentSchemeDeleteModal({
             disabled={isDeleting}
             className="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-bold transition-all cursor-pointer disabled:opacity-50"
           >
-            Cancel
+            {t("common.cancel", "Cancel")}
           </button>
           <button
             type="button"
@@ -671,7 +675,7 @@ export function InvestmentSchemeDeleteModal({
             className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md shadow-rose-600/20 flex items-center gap-2 transition-all cursor-pointer disabled:opacity-50"
           >
             {isDeleting && <Loader2 className="w-4 h-4 animate-spin" />}
-            <span>Delete Scheme</span>
+            <span>{t("superAdminFdMisSchemes.deleteScheme", "Delete Scheme")}</span>
           </button>
         </div>
       </div>

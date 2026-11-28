@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 export default function StatsBanner({
   amount = '₹2',
@@ -7,6 +8,7 @@ export default function StatsBanner({
   count = '25,000+',
   countSubtext = 'Happy members today'
 }) {
+  const { t } = useTranslation();
   return (
     <section className="relative py-20 lg:py-24 overflow-hidden select-none bg-[#009e90]">
       
@@ -14,7 +16,7 @@ export default function StatsBanner({
       <div className="absolute inset-y-0 left-0 w-64 sm:w-80 md:w-96 lg:w-[400px] overflow-hidden pointer-events-none z-0">
         <img
           src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&crop=faces&w=800&h=800&q=80"
-          alt="Satisfied Banking Member"
+          alt={t("statsBanner.satisfiedBankingMember", "Satisfied Banking Member")}
           className="w-full h-full object-cover object-[center_20%] grayscale contrast-125 brightness-100 opacity-70 mix-blend-luminosity"
         />
         {/* Horizontal gradient fade into solid teal before reaching the text content */}

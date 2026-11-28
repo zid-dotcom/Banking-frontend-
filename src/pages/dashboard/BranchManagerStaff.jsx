@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { i18n } from '../../i18n/index.js';
+import { useTranslation } from 'react-i18next';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import StatCard from '../../components/dashboard/StatCard';
 import {
@@ -73,6 +75,7 @@ function formatDateTime(isoString) {
 }
 
 export default function BranchManagerStaff({ embedded = false }) {
+  const { t } = useTranslation();
   const [staffList, setStaffList] = useState([]);
   const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -204,7 +207,7 @@ export default function BranchManagerStaff({ embedded = false }) {
         const res = await branchStaffService.createBranchStaff(formData);
         setFormModal({ isOpen: false, mode: 'create', data: null, isSubmitting: false });
         setSuccessPopup({
-          title: 'Staff Member Created',
+          title: i18n.t("branchManagerStaff.staffMemberCreated", "Staff Member Created"),
           message: `Staff member "${res?.full_name || formData.full_name}" has been registered successfully with code ${res?.staff_code || 'newly assigned'}.`
         });
       } else {
@@ -212,7 +215,7 @@ export default function BranchManagerStaff({ embedded = false }) {
         const res = await branchStaffService.updateBranchStaff(staffId, formData);
         setFormModal({ isOpen: false, mode: 'edit', data: null, isSubmitting: false });
         setSuccessPopup({
-          title: 'Staff Profile Updated',
+          title: i18n.t("branchManagerStaff.staffProfileUpdated", "Staff Profile Updated"),
           message: `Staff member "${res?.full_name || formData.full_name}" details updated successfully.`
         });
       }
@@ -237,13 +240,13 @@ export default function BranchManagerStaff({ embedded = false }) {
         prev.map((s) => (s.id === staff.id ? { ...s, is_active: newStatus } : s))
       );
       setSuccessPopup({
-        title: 'Status Updated',
+        title: i18n.t("branchManagerMembers.statusUpdated", "Status Updated"),
         message: `Staff member "${staff.full_name}" is now ${newStatus ? 'Active' : 'Inactive'}.`
       });
     } catch (err) {
       console.error('Failed to change staff status:', err);
       setErrorPopup({
-        title: 'Status Change Failed',
+        title: i18n.t("branchManagerStaff.statusChangeFailed", "Status Change Failed"),
         message: err.message || 'Unable to update staff active status.'
       });
     } finally {
@@ -259,13 +262,13 @@ export default function BranchManagerStaff({ embedded = false }) {
       setDeleteModal({ isOpen: false, staff: null, isDeleting: false });
       setStaffList((prev) => prev.filter((s) => s.id !== staff.id));
       setSuccessPopup({
-        title: 'Staff Member Removed',
+        title: i18n.t("branchManagerStaff.staffMemberRemoved", "Staff Member Removed"),
         message: `Staff member "${staff.full_name}" (${staff.staff_code}) was removed from this branch.`
       });
     } catch (err) {
       console.error('Failed to delete staff member:', err);
       setErrorPopup({
-        title: 'Delete Failed',
+        title: i18n.t("branchManagerStaff.deleteFailed", "Delete Failed"),
         message: err.message || 'Unable to delete staff member from registry.'
       });
       setDeleteModal((prev) => ({ ...prev, isDeleting: false }));
@@ -319,7 +322,7 @@ export default function BranchManagerStaff({ embedded = false }) {
                 <span className="w-4 h-4 rounded-full bg-teal-500/15 flex items-center justify-center text-[#00b4a7]">
                   <User className="w-2.5 h-2.5 stroke-[2.5]" />
                 </span>
-                <span>Role: <strong className="font-bold text-teal-950">Branch Manager</strong></span>
+                <span>{t("dashboardModule.monthlyTargets.roleLabel", "Role:")} <strong className="font-bold text-teal-950">{t("nav.branchManager", "Branch Manager")}</strong></span>
               </span>
               <span className="text-teal-300 hidden sm:inline">•</span>
               <span className="inline-flex items-center gap-1 text-slate-700 sm:text-[#0f766e] font-semibold">
@@ -329,26 +332,26 @@ export default function BranchManagerStaff({ embedded = false }) {
               <span className="text-teal-300 hidden sm:inline">•</span>
               <span className="inline-flex items-center gap-1.5 font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full text-[10px] sm:text-xs flex-shrink-0">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                Active
+                {t("common.active", "Active")}
               </span>
             </div>
 
             <div className="flex items-center gap-2.5 sm:gap-3">
               <span className="w-1.5 h-7 sm:h-9 bg-[#00b4a7] rounded-full flex-shrink-0" />
               <h1 className="text-xl sm:text-3xl lg:text-4xl font-serif font-bold text-slate-900 tracking-tight">
-                Branch Staff Registry
+                {t("branchManagerStaff.branchStaffRegistry", "Branch Staff Registry")}
               </h1>
             </div>
 
             <p className="text-slate-600 text-xs sm:text-sm mt-2 sm:mt-2.5 font-medium leading-relaxed max-w-xl">
-              Register branch employees, assign operational roles, oversee account credentials, and regulate service privileges.
+              {t("branchManagerStaff.registerBranchEmployeesAssignOperational", "Register branch employees, assign operational roles, oversee account credentials, and regulate service privileges.")}
             </p>
           </div>
 
           <div className="relative z-10 flex justify-center md:justify-end items-center pointer-events-none -my-2 sm:-my-4 lg:-my-5 flex-shrink-0 w-full md:w-auto">
             <img
               src={hrIllustration}
-              alt="Branch Staff Registry"
+              alt={t("branchManagerStaff.branchStaffRegistry", "Branch Staff Registry")}
               className="h-28 sm:h-36 lg:h-44 max-w-full w-auto object-contain select-none pointer-events-none transform hover:scale-102 transition-transform duration-300 mx-auto md:mx-0 drop-shadow-xs"
             />
           </div>
@@ -364,33 +367,33 @@ export default function BranchManagerStaff({ embedded = false }) {
         {/* 4 Summary Metric Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <StatCard
-            title="Total Branch Staff"
+            title={t("branchManagerStaff.totalBranchStaff", "Total Branch Staff")}
             value={totalCount.toString()}
-            subtitle="Registered Employees"
+            subtitle={t("branchManagerStaff.registeredEmployees", "Registered Employees")}
             icon={Users}
             trend={`${activeCount} active`}
             trendType="up"
           />
           <StatCard
-            title="Active Personnel"
+            title={t("branchManagerStaff.activePersonnel", "Active Personnel")}
             value={activeCount.toString()}
-            subtitle="On-Duty in Branch"
+            subtitle={t("branchManagerStaff.onDutyInBranch", "On-Duty in Branch")}
             icon={UserCheck}
             trend={totalCount > 0 ? `${Math.round((activeCount / totalCount) * 100)}% on duty` : '100%'}
             trendType="up"
           />
           <StatCard
-            title="Inactive / On-Leave"
+            title={t("branchManagerStaff.inactiveOnLeave", "Inactive / On-Leave")}
             value={inactiveCount.toString()}
-            subtitle="Suspended or On-Leave"
+            subtitle={t("branchManagerStaff.suspendedOrOnLeave", "Suspended or On-Leave")}
             icon={UserX}
             trend={inactiveCount > 0 ? `${inactiveCount} offline` : 'None'}
             trendType="neutral"
           />
           <StatCard
-            title="Roles Represented"
+            title={t("branchManagerStaff.rolesRepresented", "Roles Represented")}
             value={uniqueRolesCount.toString()}
-            subtitle="Designated Staff Roles"
+            subtitle={t("branchManagerStaff.designatedStaffRoles", "Designated Staff Roles")}
             icon={Briefcase}
             trend="Operational"
             trendType="neutral"
@@ -404,10 +407,10 @@ export default function BranchManagerStaff({ embedded = false }) {
           <div className="p-4 sm:p-6 border-b border-slate-100 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>
               <h2 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight">
-                Branch Staff Directory
+                {t("branchManagerStaff.branchStaffDirectory", "Branch Staff Directory")}
               </h2>
               <p className="text-xs text-slate-500 font-medium">
-                Comprehensive directory of staff members stationed at this branch
+                {t("branchManagerStaff.comprehensiveDirectoryOfStaffMembers", "Comprehensive directory of staff members stationed at this branch")}
               </p>
             </div>
 
@@ -417,7 +420,7 @@ export default function BranchManagerStaff({ embedded = false }) {
                 <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
-                  placeholder="Search name, code, or email..."
+                  placeholder={t("branchManagerStaff.searchNameCodeOrEmail", "Search name, code, or email...")}
                   value={searchQuery}
                   onChange={(e) => {
                     setSearchQuery(e.target.value);
@@ -436,9 +439,9 @@ export default function BranchManagerStaff({ embedded = false }) {
                 }}
                 className="px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-700 focus:outline-none focus:border-teal-500 cursor-pointer"
               >
-                <option value="all">All Status</option>
-                <option value="active">Active Only</option>
-                <option value="inactive">Inactive Only</option>
+                <option value="all">{t("branchManagerLoanSchemes.allStatus", "All Status")}</option>
+                <option value="active">{t("branchManagerFdMisSchemes.activeOnly", "Active Only")}</option>
+                <option value="inactive">{t("branchManagerFdMisSchemes.inactiveOnly", "Inactive Only")}</option>
               </select>
 
               {/* Role Filter */}
@@ -450,7 +453,7 @@ export default function BranchManagerStaff({ embedded = false }) {
                 }}
                 className="px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-700 focus:outline-none focus:border-teal-500 cursor-pointer"
               >
-                <option value="all">All Roles</option>
+                <option value="all">{t("branchManagerSecurityEvents.allRoles", "All Roles")}</option>
                 {roles.map((r) => (
                   <option key={r.id} value={r.id}>
                     {r.name}
@@ -462,7 +465,7 @@ export default function BranchManagerStaff({ embedded = false }) {
               <button
                 onClick={() => fetchStaff(true)}
                 disabled={refreshing}
-                title="Refresh staff list"
+                title={t("branchManagerStaff.refreshStaffList", "Refresh staff list")}
                 className="p-2 sm:px-3 sm:py-2 text-slate-600 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl font-semibold text-xs transition-colors cursor-pointer disabled:opacity-50"
               >
                 <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin text-teal-600' : ''}`} />
@@ -474,7 +477,7 @@ export default function BranchManagerStaff({ embedded = false }) {
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#00b4a7] to-[#0f766e] text-white text-sm font-bold shadow-md shadow-teal-500/20 hover:from-[#00a296] hover:to-[#0c625c] transition-all cursor-pointer"
               >
                 <PlusCircle className="w-4 h-4" />
-                <span>Register Staff</span>
+                <span>{t("branchManagerStaff.registerStaff", "Register Staff")}</span>
               </button>
             </div>
           </div>
@@ -485,7 +488,7 @@ export default function BranchManagerStaff({ embedded = false }) {
               <div className="flex items-start gap-2.5">
                 <AlertCircle className="w-5 h-5 flex-shrink-0 text-red-600 mt-0.5" />
                 <div>
-                  <p className="text-sm font-bold text-red-900">Failed to load branch staff</p>
+                  <p className="text-sm font-bold text-red-900">{t("branchManagerStaff.failedToLoadBranchStaff", "Failed to load branch staff")}</p>
                   <p className="text-xs text-red-700 mt-0.5">{error}</p>
                 </div>
               </div>
@@ -493,7 +496,7 @@ export default function BranchManagerStaff({ embedded = false }) {
                 onClick={() => fetchStaff()}
                 className="text-xs font-bold text-red-700 hover:text-red-900 underline cursor-pointer flex-shrink-0"
               >
-                Retry
+                {t("common.retry", "Retry")}
               </button>
             </div>
           )}
@@ -503,7 +506,7 @@ export default function BranchManagerStaff({ embedded = false }) {
             {loading ? (
               <div className="py-20 text-center space-y-3">
                 <div className="w-10 h-10 border-3 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto" />
-                <p className="text-sm text-slate-500 font-medium">Loading branch staff from server...</p>
+                <p className="text-sm text-slate-500 font-medium">{t("branchManagerStaff.loadingBranchStaffFromServer", "Loading branch staff from server...")}</p>
               </div>
             ) : filteredStaff.length === 0 ? (
               <div className="py-20 text-center space-y-4 max-w-sm mx-auto p-4">
@@ -511,11 +514,11 @@ export default function BranchManagerStaff({ embedded = false }) {
                   <Users className="w-7 h-7" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-800">No Staff Members Found</h3>
+                  <h3 className="text-base font-bold text-slate-800">{t("branchManagerStaff.noStaffMembersFound", "No Staff Members Found")}</h3>
                   <p className="text-xs text-slate-500 mt-1">
                     {searchQuery || statusFilter !== 'all' || roleFilter !== 'all'
-                      ? 'No staff members match the selected filter or search criteria.'
-                      : 'No employees registered under this branch yet. Click below to add one.'}
+                      ? t("branchManagerStaff.noStaffMembersMatchThe", "No staff members match the selected filter or search criteria.")
+                      : t("branchManagerStaff.noEmployeesRegisteredUnderThis", "No employees registered under this branch yet. Click below to add one.")}
                   </p>
                 </div>
                 {!searchQuery && (
@@ -524,7 +527,7 @@ export default function BranchManagerStaff({ embedded = false }) {
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold transition-colors cursor-pointer shadow-sm"
                   >
                     <PlusCircle className="w-4 h-4" />
-                    Register First Staff
+                    {t("branchManagerStaff.registerFirstStaff", "Register First Staff")}
                   </button>
                 )}
               </div>
@@ -532,14 +535,14 @@ export default function BranchManagerStaff({ embedded = false }) {
               <table className="w-full text-left border-collapse min-w-[1100px]">
                 <thead>
                   <tr className="border-b border-slate-100 bg-slate-50/75 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                    <th className="py-3.5 px-6">Staff Code</th>
-                    <th className="py-3.5 px-6">Staff Name</th>
-                    <th className="py-3.5 px-6">Role</th>
-                    <th className="py-3.5 px-6">Official Email</th>
-                    <th className="py-3.5 px-6">Contact Number</th>
-                    <th className="py-3.5 px-6">Created At</th>
-                    <th className="py-3.5 px-6 text-center">Status</th>
-                    <th className="py-3.5 px-6 text-right">Actions</th>
+                    <th className="py-3.5 px-6">{t("branchManagerStaff.staffCode", "Staff Code")}</th>
+                    <th className="py-3.5 px-6">{t("branchManagerStaff.staffName", "Staff Name")}</th>
+                    <th className="py-3.5 px-6">{t("branchManagerSecurityEvents.role", "Role")}</th>
+                    <th className="py-3.5 px-6">{t("branchManagerStaff.officialEmail", "Official Email")}</th>
+                    <th className="py-3.5 px-6">{t("modal.branchAdmin.contactNumberLabel", "Contact Number")}</th>
+                    <th className="py-3.5 px-6">{t("dashboardModule.emergency.table.createdAt", "Created At")}</th>
+                    <th className="py-3.5 px-6 text-center">{t("common.status", "Status")}</th>
+                    <th className="py-3.5 px-6 text-right">{t("common.actions", "Actions")}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-sm">
@@ -566,7 +569,7 @@ export default function BranchManagerStaff({ embedded = false }) {
                               {staff.full_name}
                             </div>
                             <div className="text-xs text-slate-400 font-medium">
-                              ID: #{staff.id}
+                              {t("branchManagerStaff.id", "ID: #")}{staff.id}
                             </div>
                           </div>
                         </div>
@@ -579,7 +582,7 @@ export default function BranchManagerStaff({ embedded = false }) {
                           <span>
                             {staff.staff_role_name ||
                               roles.find((r) => Number(r.id) === Number(staff.staff_role_id))?.name ||
-                              (staff.staff_role_id ? `Role #${staff.staff_role_id}` : 'Branch Staff')}
+                              (staff.staff_role_id ? `Role #${staff.staff_role_id}` : t("dashboardModule.passwordUpdate.fallbackBranchStaff", "Branch Staff"))}
                           </span>
                         </span>
                       </td>
@@ -615,7 +618,7 @@ export default function BranchManagerStaff({ embedded = false }) {
                           className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
                             staff.is_active ? 'bg-emerald-500' : 'bg-slate-300'
                           } ${actionLoadingId === staff.id ? 'opacity-50 cursor-wait' : ''}`}
-                          title={`Click to ${staff.is_active ? 'deactivate' : 'activate'} this staff member`}
+                          title={`Click to ${staff.is_active ? t("branchManagerMembers.deactivate", "deactivate") : t("branchManagerMembers.activate", "activate")} this staff member`}
                         >
                           <span
                             aria-hidden="true"
@@ -631,21 +634,21 @@ export default function BranchManagerStaff({ embedded = false }) {
                         <div className="flex items-center justify-end gap-1">
                           <button
                             onClick={() => setDetailModal({ isOpen: true, staff })}
-                            title="View Staff Details"
+                            title={t("branchManagerStaff.viewStaffDetails", "View Staff Details")}
                             className="p-1.5 text-slate-400 hover:text-teal-600 hover:bg-teal-50 rounded-lg transition-colors cursor-pointer"
                           >
                             <Eye className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => setFormModal({ isOpen: true, mode: 'edit', data: staff, isSubmitting: false })}
-                            title="Edit Staff Member"
+                            title={t("branchManagerStaff.editStaffMember", "Edit Staff Member")}
                             className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
                           >
                             <Pencil className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => setDeleteModal({ isOpen: true, staff, isDeleting: false })}
-                            title="Delete Staff Member"
+                            title={t("branchManagerStaff.deleteStaffMember", "Delete Staff Member")}
                             className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -663,8 +666,8 @@ export default function BranchManagerStaff({ embedded = false }) {
           {!loading && filteredStaff.length > 0 && (
             <div className="px-6 py-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 font-medium bg-slate-50/50">
               <span>
-                Showing <strong className="text-slate-700">{paginatedStaff.length}</strong> of{' '}
-                <strong className="text-slate-700">{filteredStaff.length}</strong> staff members
+                {t("common.showing", "Showing")} <strong className="text-slate-700">{paginatedStaff.length}</strong> {t("common.of", "of")}{' '}
+                <strong className="text-slate-700">{filteredStaff.length}</strong> {t("branchManagerStaff.staffMembers", "staff members")}
               </span>
 
               {totalPages > 1 && (
@@ -674,17 +677,17 @@ export default function BranchManagerStaff({ embedded = false }) {
                     disabled={currentPage === 1}
                     className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed font-semibold text-slate-700 transition-colors cursor-pointer"
                   >
-                    Previous
+                    {t("branchManagerFdMisSchemes.previous", "Previous")}
                   </button>
                   <span className="px-2 font-bold text-slate-700">
-                    Page {currentPage} of {totalPages}
+                    {t("branchManagerInvestmentSchemes.page", "Page")} {currentPage} {t("common.of", "of")} {totalPages}
                   </span>
                   <button
                     onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                     disabled={currentPage === totalPages}
                     className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed font-semibold text-slate-700 transition-colors cursor-pointer"
                   >
-                    Next
+                    {t("branchManagerFdMisSchemes.next", "Next")}
                   </button>
                 </div>
               )}
@@ -738,7 +741,7 @@ export default function BranchManagerStaff({ embedded = false }) {
               onClick={() => setSuccessPopup(null)}
               className="w-full py-2.5 rounded-xl bg-gradient-to-r from-[#00b4a7] to-[#0f766e] text-white text-xs sm:text-sm font-bold shadow-md shadow-teal-500/20 hover:from-[#00a296] hover:to-[#0c625c] transition-all cursor-pointer"
             >
-              Continue
+              {t("branchManagerMembershipSettings.continue", "Continue")}
             </button>
           </div>
         </div>
@@ -759,7 +762,7 @@ export default function BranchManagerStaff({ embedded = false }) {
               onClick={() => setErrorPopup(null)}
               className="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs sm:text-sm font-bold transition-all cursor-pointer"
             >
-              Dismiss
+              {t("branchManagerMemberPasswordUpdate.dismiss", "Dismiss")}
             </button>
           </div>
         </div>

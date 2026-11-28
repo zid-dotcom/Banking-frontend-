@@ -1,5 +1,25 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { ArrowUpRight, ArrowDownRight } from 'lucide-react';
+
+const METRIC_MESSAGES = {
+  'dashboard.totalMembers': { id: 'dashboard.totalMembers', message: 'Total Members' },
+  'dashboard.activeAccounts': { id: 'dashboard.activeAccounts', message: 'Active Accounts' },
+  'dashboard.totalDeposits': { id: 'dashboard.totalDeposits', message: 'Total Deposits' },
+  'dashboard.activeLoans': { id: 'dashboard.activeLoans', message: 'Active Loans' },
+  'dashboard.availableBalance': { id: 'dashboard.availableBalance', message: 'Available Balance' },
+  'sidebar.branchMembers': { id: 'sidebar.branchMembers', message: 'Branch Members' },
+  'sidebar.branchStaff': { id: 'sidebar.branchStaff', message: 'Branch Staff' },
+  'sidebar.monthlyTargets': { id: 'sidebar.monthlyTargets', message: 'Monthly Targets' },
+  'sidebar.staffMembers': { id: 'sidebar.staffMembers', message: 'Staff Members' },
+  'sidebar.branches': { id: 'sidebar.branches', message: 'Branches' },
+  'sidebar.savingsSchemes': { id: 'sidebar.savingsSchemes', message: 'Savings Schemes' },
+  'sidebar.fdMisSchemes': { id: 'sidebar.fdMisSchemes', message: 'FD / MIS Schemes' },
+  'sidebar.investmentSchemes': { id: 'sidebar.investmentSchemes', message: 'Investment Schemes' },
+  'sidebar.loanSchemes': { id: 'sidebar.loanSchemes', message: 'Loan Schemes' },
+  'sidebar.serviceRequests': { id: 'sidebar.serviceRequests', message: 'Service Requests' },
+  'sidebar.emergencyCases': { id: 'sidebar.emergencyCases', message: 'Emergency Cases' },
+};
 
 export default function StatCard({
   title,
@@ -14,7 +34,35 @@ export default function StatCard({
   valueClassName,
   className = ''
 }) {
-  const displayTitle = title || label;
+  const { t, i18n } = useTranslation();
+  const rawTitle = title || label || '';
+  
+  // Dynamic mapping helper for common dashboard metric titles
+  const getMappedTitle = (raw) => {
+    if (!raw) return '';
+    const metricMap = {
+      'Total Members': 'dashboard.totalMembers',
+      'Active Accounts': 'dashboard.activeAccounts',
+      'Total Deposits': 'dashboard.totalDeposits',
+      'Active Loans': 'dashboard.activeLoans',
+      'Available Balance': 'dashboard.availableBalance',
+      'Branch Members': 'sidebar.branchMembers',
+      'Branch Staff': 'sidebar.branchStaff',
+      'Monthly Targets': 'sidebar.monthlyTargets',
+      'Staff Members': 'sidebar.staffMembers',
+      'Branches': 'sidebar.branches',
+      'Savings Schemes': 'sidebar.savingsSchemes',
+      'FD / MIS Schemes': 'sidebar.fdMisSchemes',
+      'Investment Schemes': 'sidebar.investmentSchemes',
+      'Loan Schemes': 'sidebar.loanSchemes',
+      'Service Requests': 'sidebar.serviceRequests',
+      'Emergency Cases': 'sidebar.emergencyCases'
+    };
+    const key = metricMap[raw];
+    return key ? t(METRIC_MESSAGES[key].id, METRIC_MESSAGES[key].message) : raw;
+  };
+
+  const displayTitle = getMappedTitle(rawTitle);
   const trendText = typeof trend === 'object' && trend !== null ? trend.text : trend;
   const effectiveTrendType =
     typeof trend === 'object' && trend !== null && trend.isPositive !== undefined

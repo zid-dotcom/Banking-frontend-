@@ -1,32 +1,35 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
-const FEATURES = [
-  {
-    text: "Checking your rates won't affect your credit score",
-    isHighlighted: true
-  },
-  {
-    text: "Our rates are often lower than the banks",
-    isHighlighted: false
-  },
-  {
-    text: "We have simple online application",
-    isHighlighted: true
-  },
-  {
-    text: "No early repayment fees, no hidden charges",
-    isHighlighted: false
-  }
-];
 
-export default function ExperienceBanner() {
+export default function ExperienceBanner({ onOpenEnquiry }) {
+  const { t } = useTranslation();
+
+  const FEATURES = [
+    {
+      text: t("experience.featureCreditScore", "Checking your rates won't affect your credit score"),
+      isHighlighted: true
+    },
+    {
+      text: t("experience.featureLowerRates", "Our rates are often lower than the banks"),
+      isHighlighted: false
+    },
+    {
+      text: t("experience.featureSimpleApplication", "We have simple online application"),
+      isHighlighted: true
+    },
+    {
+      text: t("experience.featureNoHiddenCharges", "No early repayment fees, no hidden charges"),
+      isHighlighted: false
+    }
+  ];
   return (
     <section className="relative py-28 sm:py-36 lg:py-44 min-h-[460px] sm:min-h-[520px] lg:min-h-[580px] flex items-center overflow-hidden select-none">
       
       {/* Background Photographic Image with Laughing Team Members Clearly Visible */}
       <img
         src="https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=1920&q=80"
-        alt="Personalized Banking Experience"
+        alt={t("experienceBanner.personalizedBankingExperience", "Personalized Banking Experience")}
         className="absolute inset-0 w-full h-full object-cover object-[35%_center]"
       />
 
@@ -44,11 +47,11 @@ export default function ExperienceBanner() {
           {/* Left Column: Heading & Subtitle */}
           <div className="lg:col-span-6 space-y-4">
             <span className="text-[#ffd166] font-semibold text-sm sm:text-base tracking-wide block">
-              Personal finance that fits you
+              {t("personalLoans.subtitle", "Building a brighter financial future")}
             </span>
 
             <h2 className="text-3xl sm:text-4xl lg:text-[48px] font-serif font-bold text-white leading-[1.16] tracking-tight max-w-lg drop-shadow-xs">
-              We've built a secure &amp; personalized experience
+              {t("experience.title", "We make getting a personal loan fast, easy and convenient.")}
             </h2>
           </div>
 

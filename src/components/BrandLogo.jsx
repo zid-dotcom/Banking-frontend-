@@ -1,6 +1,8 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 export default function BrandLogo({ size = 'default', showBadge = true, light = false }) {
+  const { t } = useTranslation();
   const isLarge = size === 'large';
   const isSmall = size === 'small';
 
@@ -17,15 +19,15 @@ export default function BrandLogo({ size = 'default', showBadge = true, light = 
       
       {/* Brand Name with Capital 'A' */}
       <span className={`${textSize} font-black tracking-tight flex items-baseline drop-shadow-xs leading-none`}>
-        <span className="text-[#ffba00]">Aurum</span>
-        <span className={light ? 'text-slate-900' : 'text-white'}>FX</span>
+        <span className="text-[#ffba00]">{t("branchAdminLogin.aurum", "Aurum")}</span>
+        <span className={light ? 'text-slate-900' : 'text-white'}>{t("branchAdminLogin.fx", "FX")}</span>
       </span>
 
       {/* Refined Classical Banking Emblem Badge */}
       {showBadge && (
         <div 
           className={`${badgeSize} rounded-lg bg-gradient-to-b from-[#ffc21a] to-[#f0a800] flex items-center justify-center text-slate-950 shadow-md border border-amber-200/50 transform group-hover:scale-105 transition-all duration-200 flex-shrink-0`}
-          title="Aurumfx Multi State Agro Co-operative Society Limited"
+          title={t("common.appName", "Aurumfx Multi State Agro Co-operative Society Limited")}
         >
           {/* Classical Neoclassical Bank / Treasury Architecture SVG */}
           <svg 

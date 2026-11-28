@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   X,
   ShieldCheck,
@@ -26,6 +27,7 @@ export function StaffRoleCreateModal({
   onSubmit,
   isSubmitting = false
 }) {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -95,10 +97,10 @@ export function StaffRoleCreateModal({
             </div>
             <div>
               <h2 className="text-lg font-bold text-slate-900 tracking-tight">
-                Create New Staff Role
+                {t("staffRoleModals.createNewStaffRole", "Create New Staff Role")}
               </h2>
               <p className="text-xs text-slate-500 font-medium">
-                Define designated authority and role title for staff members
+                {t("staffRoleModals.defineDesignatedAuthorityAndRole", "Define designated authority and role title for staff members")}
               </p>
             </div>
           </div>
@@ -117,14 +119,14 @@ export function StaffRoleCreateModal({
           <div>
             <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">
               <Briefcase className="w-3.5 h-3.5 text-teal-600" />
-              Role Name <span className="text-red-500">*</span>
+              {t("staffRoleModals.roleName", "Role Name")} <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               name="name"
               value={formData.name}
               onChange={handleChange}
-              placeholder="e.g. Loan Officer, Cashier, Field Agent"
+              placeholder={t("staffRoleModals.eGLoanOfficerCashier", "e.g. Loan Officer, Cashier, Field Agent")}
               maxLength={50}
               autoFocus
               className={`w-full px-4 py-2.5 rounded-xl border text-sm transition-all focus:outline-none focus:ring-2 font-medium ${
@@ -140,7 +142,7 @@ export function StaffRoleCreateModal({
               </p>
             ) : (
               <p className="text-[11px] text-slate-400 mt-1">
-                Between 2 and 50 characters (e.g. Accountant, Branch Assistant)
+                {t("staffRoleModals.between2And50Characters", "Between 2 and 50 characters (e.g. Accountant, Branch Assistant)")}
               </p>
             )}
           </div>
@@ -150,7 +152,7 @@ export function StaffRoleCreateModal({
             <div className="flex items-center justify-between mb-2">
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
                 <AlignLeft className="w-3.5 h-3.5 text-teal-600" />
-                Description
+                {t("staffRoleModals.description", "Description")}
               </label>
               <span className="text-[11px] text-slate-400">
                 {formData.description.length}/255
@@ -162,7 +164,7 @@ export function StaffRoleCreateModal({
               onChange={handleChange}
               rows={4}
               maxLength={255}
-              placeholder="Describe the operational responsibilities, counter functions, or permissions assigned to this staff role..."
+              placeholder={t("staffRoleModals.describeTheOperationalResponsibilitiesCounter", "Describe the operational responsibilities, counter functions, or permissions assigned to this staff role...")}
               className={`w-full px-4 py-2.5 rounded-xl border text-sm transition-all focus:outline-none focus:ring-2 font-medium resize-none ${
                 formErrors.description
                   ? 'border-red-300 focus:border-red-500 focus:ring-red-100 bg-red-50/30'
@@ -180,7 +182,7 @@ export function StaffRoleCreateModal({
           {/* Quick presets helper */}
           <div>
             <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-2">
-              Suggested Common Roles:
+              {t("staffRoleModals.suggestedCommonRoles", "Suggested Common Roles:")}
             </span>
             <div className="flex flex-wrap gap-2">
               {[
@@ -212,7 +214,7 @@ export function StaffRoleCreateModal({
               disabled={isSubmitting}
               className="px-5 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-800 transition-colors cursor-pointer"
             >
-              Cancel
+              {t("common.cancel", "Cancel")}
             </button>
             <button
               type="submit"
@@ -222,12 +224,12 @@ export function StaffRoleCreateModal({
               {isSubmitting ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  Creating Role...
+                  {t("staffRoleModals.creatingRole", "Creating Role...")}
                 </>
               ) : (
                 <>
                   <ShieldCheck className="w-4 h-4" />
-                  Create Staff Role
+                  {t("superAdminStaffRoles.createStaffRole", "Create Staff Role")}
                 </>
               )}
             </button>
@@ -247,6 +249,7 @@ export function StaffRoleDetailModal({
   onClose,
   onDeleteClick
 }) {
+  const { t } = useTranslation();
   if (!isOpen || !role) return null;
 
   const formatDate = (isoString) => {
@@ -282,11 +285,11 @@ export function StaffRoleDetailModal({
                   {role.name}
                 </h2>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-100/70 text-[#0f766e]">
-                  ID #{role.id}
+                  {t("staffRoleModals.id", "ID #")}{role.id}
                 </span>
               </div>
               <p className="text-xs text-slate-500 font-medium">
-                Society Staff Role Designation
+                {t("staffRoleModals.societyStaffRoleDesignation", "Society Staff Role Designation")}
               </p>
             </div>
           </div>
@@ -303,7 +306,7 @@ export function StaffRoleDetailModal({
           <div className="bg-slate-50/70 rounded-2xl p-4 border border-slate-200/70 space-y-3">
             <div>
               <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
-                Role Title / Designation
+                {t("staffRoleModals.roleTitleDesignation", "Role Title / Designation")}
               </span>
               <p className="text-base font-bold text-slate-800">
                 {role.name}
@@ -312,7 +315,7 @@ export function StaffRoleDetailModal({
 
             <div>
               <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
-                Description & Responsibilities
+                {t("staffRoleModals.descriptionResponsibilities", "Description & Responsibilities")}
               </span>
               <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium bg-white p-3 rounded-xl border border-slate-100">
                 {role.description || 'No detailed description provided for this staff role.'}
@@ -322,7 +325,7 @@ export function StaffRoleDetailModal({
             <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-200/60">
               <div>
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">
-                  System Role ID
+                  {t("staffRoleModals.systemRoleId", "System Role ID")}
                 </span>
                 <span className="font-mono text-xs font-bold text-teal-800">
                   #{role.id}
@@ -330,7 +333,7 @@ export function StaffRoleDetailModal({
               </div>
               <div>
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">
-                  Created On
+                  {t("memberHelpdesk.createdOn", "Created On")}
                 </span>
                 <span className="text-xs font-semibold text-slate-700 flex items-center gap-1">
                   <Calendar className="w-3.5 h-3.5 text-teal-600" />
@@ -350,13 +353,13 @@ export function StaffRoleDetailModal({
               className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-red-600 hover:bg-red-50 text-xs font-bold transition-colors cursor-pointer border border-transparent hover:border-red-200"
             >
               <Trash2 className="w-3.5 h-3.5" />
-              Delete Role
+              {t("staffRoleModals.deleteRole", "Delete Role")}
             </button>
             <button
               onClick={onClose}
               className="px-5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors cursor-pointer"
             >
-              Close
+              {t("common.close", "Close")}
             </button>
           </div>
         </div>
@@ -375,6 +378,7 @@ export function StaffRoleDeleteConfirmModal({
   onConfirm,
   isDeleting = false
 }) {
+  const { t } = useTranslation();
   if (!isOpen || !role) return null;
 
   return (
@@ -389,11 +393,11 @@ export function StaffRoleDeleteConfirmModal({
 
           <div>
             <h3 className="text-lg font-bold text-slate-900">
-              Delete Staff Role?
+              {t("staffRoleModals.deleteStaffRole", "Delete Staff Role?")}
             </h3>
             <p className="text-xs sm:text-sm text-slate-500 mt-1.5 leading-relaxed font-medium">
-              Are you sure you want to permanently delete the staff role{' '}
-              <strong className="text-slate-800 font-bold">"{role.name}"</strong> (ID #{role.id})?
+              {t("staffRoleModals.areYouSureYouWant", "Are you sure you want to permanently delete the staff role")}{' '}
+              <strong className="text-slate-800 font-bold">"{role.name}"</strong> {t("staffRoleModals.id2", "(ID #")}{role.id})?
             </p>
           </div>
 
@@ -401,7 +405,7 @@ export function StaffRoleDeleteConfirmModal({
             <p className="text-xs text-amber-800 flex items-start gap-2 font-medium">
               <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
               <span>
-                If any branch staff members are currently assigned to this role, the backend may reject the deletion until staff are reassigned.
+                {t("staffRoleModals.ifAnyBranchStaffMembers", "If any branch staff members are currently assigned to this role, the backend may reject the deletion until staff are reassigned.")}
               </span>
             </p>
           </div>
@@ -413,7 +417,7 @@ export function StaffRoleDeleteConfirmModal({
               disabled={isDeleting}
               className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
             >
-              Cancel
+              {t("common.cancel", "Cancel")}
             </button>
             <button
               onClick={() => onConfirm(role)}
@@ -423,12 +427,12 @@ export function StaffRoleDeleteConfirmModal({
               {isDeleting ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  Deleting...
+                  {t("branchStaffModals.deleting", "Deleting...")}
                 </>
               ) : (
                 <>
                   <Trash2 className="w-4 h-4" />
-                  Yes, Delete
+                  {t("branchStaffModals.yesDelete", "Yes, Delete")}
                 </>
               )}
             </button>

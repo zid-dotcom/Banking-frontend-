@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import StaffCustomerServiceView from '../../components/dashboard/StaffCustomerServiceView';
 import { getStaffMe } from '../../services/branchStaffService';
 import { AlertOctagon, ArrowRight } from 'lucide-react';
 
+
 export default function StaffServiceRequests() {
+  const { t } = useTranslation();
   const [staffData, setStaffData] = useState(() => {
     try {
       const cached = localStorage.getItem('staff_user');
@@ -39,9 +42,9 @@ export default function StaffServiceRequests() {
     roleStr.includes('support') ||
     (roleStr.includes('service') && !roleStr.includes('cashier'));
 
-  const staffName = staffData?.full_name || staffData?.name || 'Customer Service Staff';
-  const roleName = staffData?.staff_role?.name || staffData?.account_role || (isCustomerService ? 'Customer Service Officer' : 'Branch Staff');
-  const branchName = staffData?.branch?.name || staffData?.branch_name || 'Branch Hub';
+  const staffName = staffData?.full_name || staffData?.name || t("dashboardModule.serviceRequests.defaultStaffName", "Customer Service Staff");
+  const roleName = staffData?.staff_role?.name || staffData?.account_role || (isCustomerService ? t("dashboardModule.serviceRequests.customerServiceOfficer", "Customer Service Officer") : t("dashboardModule.serviceRequests.branchStaff", "Branch Staff"));
+  const branchName = staffData?.branch?.name || staffData?.branch_name || t("dashboardModule.serviceRequests.defaultBranchName", "Branch Hub");
   const branchCode = staffData?.branch?.branch_code || '—';
 
   const userForSidebar = {
@@ -73,17 +76,17 @@ export default function StaffServiceRequests() {
             <AlertOctagon className="w-7 h-7" />
           </div>
           <h3 className="text-xl font-serif font-bold text-slate-900">
-            Restricted to Customer Service Officers
+            {t("dashboardModule.serviceRequests.restrictedTitle", "Restricted to Customer Service Officers")}
           </h3>
           <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
-            You are signed in as <strong>{roleName}</strong>. Member service request handling and helpdesk replies are reserved for Customer Service Officers.
+            {t("dashboardModule.serviceRequests.signedInAs", "You are signed in as")} <strong>{roleName}</strong>. {t("dashboardModule.serviceRequests.restrictedDescription", "Member service request handling and helpdesk replies are reserved for Customer Service Officers.")}
           </p>
           <div className="pt-2">
             <Link
               to="/staff/dashboard"
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#14b8a6] to-[#0f766e] text-white font-bold text-xs shadow-xs hover:shadow-md transition-all cursor-pointer"
             >
-              <span>Return to Staff Dashboard</span>
+              <span>{t("dashboardModule.serviceRequests.returnToStaffDashboard", "Return to Staff Dashboard")}</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>

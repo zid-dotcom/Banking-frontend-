@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { i18n } from '../../i18n/index.js';
+import { useTranslation } from 'react-i18next';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import StatCard from '../../components/dashboard/StatCard';
 import MemberDetailModal from '../../components/dashboard/MemberDetailModal';
@@ -57,6 +59,7 @@ function parseBranchInfo(obj = {}) {
 }
 
 export default function BranchManagerMembers({ embedded = false }) {
+  const { t } = useTranslation();
   const [members, setMembers] = useState([]);
   const [savingsAccounts, setSavingsAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -247,7 +250,7 @@ export default function BranchManagerMembers({ embedded = false }) {
       setRejectModal({ isOpen: false, member: null, reason: '' });
     } catch (err) {
       setErrorPopup({
-        title: 'Review Action Failed',
+        title: i18n.t("modal.member.reviewActionFailed", "Review Action Failed"),
         message: err.message || 'Failed to update member status.'
       });
     } finally {
@@ -262,13 +265,13 @@ export default function BranchManagerMembers({ embedded = false }) {
     try {
       await changeBranchAdminMemberActive(member.id, targetState);
       setSuccessPopup({
-        title: 'Status Updated',
+        title: i18n.t("branchManagerMembers.statusUpdated", "Status Updated"),
         message: `Member ${member.full_name} is now ${targetState ? 'Active' : 'Inactive'}.`
       });
       setMembers(prev => prev.map(m => m.id === member.id ? { ...m, is_active: targetState } : m));
     } catch (err) {
       setErrorPopup({
-        title: 'Status Update Failed',
+        title: i18n.t("branchManagerMembers.statusUpdateFailed", "Status Update Failed"),
         message: err.message || 'Failed to update member status.'
       });
     } finally {
@@ -282,12 +285,12 @@ export default function BranchManagerMembers({ embedded = false }) {
     try {
       await unlockBranchAdminMember(member.id);
       setSuccessPopup({
-        title: 'Account Unlocked!',
+        title: i18n.t("branchManagerMembers.accountUnlocked", "Account Unlocked!"),
         message: `Member account ${member.full_name} (${member.member_code || member.id}) has been unlocked successfully.`
       });
     } catch (err) {
       setErrorPopup({
-        title: 'Unlock Failed',
+        title: i18n.t("branchManagerMembers.unlockFailed", "Unlock Failed"),
         message: err.message || 'Failed to unlock member account.'
       });
     } finally {
@@ -301,7 +304,7 @@ export default function BranchManagerMembers({ embedded = false }) {
     if (!passwordModal.member) return;
     if (!passwordModal.newPassword || passwordModal.newPassword.length < 8) {
       setErrorPopup({
-        title: 'Invalid Password',
+        title: i18n.t("branchManagerMembers.invalidPassword", "Invalid Password"),
         message: 'Password must be at least 8 characters long.'
       });
       return;
@@ -313,12 +316,12 @@ export default function BranchManagerMembers({ embedded = false }) {
       const memberName = passwordModal.member.full_name;
       setPasswordModal({ isOpen: false, member: null, newPassword: '' });
       setSuccessPopup({
-        title: 'Password Reset Successful!',
+        title: i18n.t("branchManagerMembers.passwordResetSuccessful", "Password Reset Successful!"),
         message: `Password for ${memberName} has been reset successfully.`
       });
     } catch (err) {
       setErrorPopup({
-        title: 'Password Reset Failed',
+        title: i18n.t("branchManagerMembers.passwordResetFailed", "Password Reset Failed"),
         message: err.message || 'Failed to reset member password.'
       });
     } finally {
@@ -417,31 +420,31 @@ export default function BranchManagerMembers({ embedded = false }) {
             {/* Role & Branch Code Single Pill Badge */}
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-xs text-xs font-semibold border border-teal-200/80 shadow-2xs text-[#0f766e] mb-3.5">
               <Building2 className="w-3.5 h-3.5 text-[#00b4a7]" />
-              <span>Role: <strong className="font-bold text-teal-900">Branch Manager</strong></span>
+              <span>{t("dashboardModule.monthlyTargets.roleLabel", "Role:")} <strong className="font-bold text-teal-900">{t("nav.branchManager", "Branch Manager")}</strong></span>
               <span className="text-teal-300">•</span>
-              <span>Branch Code: <strong className="font-mono font-bold text-teal-900">{branchCodeDisplay}</strong></span>
+              <span>{t("branchManagerCashTransactions.branchCode", "Branch Code:")} <strong className="font-mono font-bold text-teal-900">{branchCodeDisplay}</strong></span>
               <span className="text-teal-300">•</span>
               <span className="font-bold text-emerald-700">
-                {managerUser.is_active !== false ? 'Active' : 'Inactive'}
+                {managerUser.is_active !== false ? t("common.active", "Active") : t("common.inactive", "Inactive")}
               </span>
             </div>
 
             <div className="flex items-center gap-3">
               <span className="w-1.5 h-8 sm:h-9 bg-[#00b4a7] rounded-full flex-shrink-0" />
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold text-slate-900 tracking-tight">
-                Branch Members Registry
+                {t("branchManagerMembers.branchMembersRegistry", "Branch Members Registry")}
               </h1>
             </div>
 
             <p className="text-slate-600 text-xs sm:text-sm mt-2.5 font-medium leading-relaxed">
-              Manage and view all <strong className="font-bold text-slate-900">branch members</strong> with ease, keeping your branch organized and up to date.
+              {t("branchManagerMembers.manageAndViewAll", "Manage and view all")} <strong className="font-bold text-slate-900">{t("branchManagerMembers.branchMembers", "branch members")}</strong> {t("branchManagerMembers.withEaseKeepingYourBranch", "with ease, keeping your branch organized and up to date.")}
             </p>
           </div>
 
           <div className="relative z-10 flex justify-end pointer-events-none -my-3 sm:-my-5">
             <img
               src={branchMemberRegistryIllustration}
-              alt="Branch Members Registry"
+              alt={t("branchManagerMembers.branchMembersRegistry", "Branch Members Registry")}
               className="h-36 sm:h-44 lg:h-52 w-auto object-contain drop-shadow-md select-none"
             />
           </div>
@@ -453,33 +456,33 @@ export default function BranchManagerMembers({ embedded = false }) {
         {/* 4 Summary Metric Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <StatCard
-            title="Total Members"
+            title={t("dashboard.totalMembers", "Total Members")}
             value={totalCount.toString()}
             subtitle={`${branchName} Folio`}
             icon={Users}
           />
 
           <StatCard
-            title="Approved Members"
+            title={t("branchManagerMembers.approvedMembers", "Approved Members")}
             value={approvedMembers.length.toString()}
-            subtitle="KYC Verified & Admitted"
+            subtitle={t("branchManagerMembers.kycVerifiedAdmitted", "KYC Verified & Admitted")}
             icon={CheckCircle2}
             badge={`${totalCount > 0 ? Math.round((approvedMembers.length / totalCount) * 100) : 0}% Approved`}
           />
 
           <StatCard
-            title="Pending Approvals"
+            title={t("branchManagerMembers.pendingApprovals", "Pending Approvals")}
             value={pendingMembers.length.toString()}
-            subtitle="Awaiting manager sign-off"
+            subtitle={t("branchManagerDashboard.awaitingManagerSignOff", "Awaiting manager sign-off")}
             icon={Clock}
             badge={pendingMembers.length > 0 ? 'Urgent Queue' : 'Clear'}
             trendType={pendingMembers.length > 0 ? 'up' : 'down'}
           />
 
           <StatCard
-            title="Rejected"
+            title={t("common.rejected", "Rejected")}
             value={rejectedMembers.length.toString()}
-            subtitle="Declined applications"
+            subtitle={t("dashboardModule.productAccounts.declinedApplications", "Declined applications")}
             icon={AlertCircle}
           />
         </div>
@@ -491,10 +494,10 @@ export default function BranchManagerMembers({ embedded = false }) {
             <div>
               <h3 className="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
                 <Users className="w-5 h-5 text-teal-600" />
-                <span>All Branch Members</span>
+                <span>{t("branchManagerMembers.allBranchMembers", "All Branch Members")}</span>
               </h3>
               <p className="text-xs text-slate-500 mt-0.5">
-                Showing {filteredMembers.length} of {totalCount} registered members
+                {t("common.showing", "Showing")} {filteredMembers.length} {t("common.of", "of")} {totalCount} {t("branchManagerMembers.registeredMembers", "registered members")}
               </p>
             </div>
 
@@ -510,7 +513,7 @@ export default function BranchManagerMembers({ embedded = false }) {
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  All ({totalCount})
+                  {t("branchManagerCashReconciliation.all", "All (")}{totalCount})
                 </button>
                 <button
                   onClick={() => setStatusTab('pending')}
@@ -520,7 +523,7 @@ export default function BranchManagerMembers({ embedded = false }) {
                       : 'text-slate-600 hover:text-amber-700'
                   }`}
                 >
-                  <span>Pending</span>
+                  <span>{t("common.pending", "Pending")}</span>
                   <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${
                     statusTab === 'pending' ? 'bg-amber-600 text-white' : 'bg-amber-100 text-amber-800'
                   }`}>
@@ -535,7 +538,7 @@ export default function BranchManagerMembers({ embedded = false }) {
                       : 'text-slate-600 hover:text-emerald-700'
                   }`}
                 >
-                  Approved ({approvedMembers.length})
+                  {t("branchManagerMembers.approved", "Approved (")}{approvedMembers.length})
                 </button>
                 <button
                   onClick={() => setStatusTab('rejected')}
@@ -545,7 +548,7 @@ export default function BranchManagerMembers({ embedded = false }) {
                       : 'text-slate-600 hover:text-rose-700'
                   }`}
                 >
-                  Rejected ({rejectedMembers.length})
+                  {t("branchManagerMembers.rejected", "Rejected (")}{rejectedMembers.length})
                 </button>
               </div>
 
@@ -557,9 +560,9 @@ export default function BranchManagerMembers({ embedded = false }) {
                   onChange={(e) => setActiveFilter(e.target.value)}
                   className="bg-transparent text-xs font-bold text-slate-800 focus:outline-none cursor-pointer"
                 >
-                  <option value="all">All Accounts</option>
-                  <option value="active">Active Only</option>
-                  <option value="inactive">Inactive Only</option>
+                  <option value="all">{t("branchManagerMembers.allAccounts", "All Accounts")}</option>
+                  <option value="active">{t("branchManagerFdMisSchemes.activeOnly", "Active Only")}</option>
+                  <option value="inactive">{t("branchManagerFdMisSchemes.inactiveOnly", "Inactive Only")}</option>
                 </select>
               </div>
 
@@ -568,7 +571,7 @@ export default function BranchManagerMembers({ embedded = false }) {
                 <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
-                  placeholder="Search name, code, phone, savings A/C..."
+                  placeholder={t("branchManagerMembers.searchNameCodePhoneSavings", "Search name, code, phone, savings A/C...")}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-teal-500 shadow-2xs"
@@ -580,7 +583,7 @@ export default function BranchManagerMembers({ embedded = false }) {
                 onClick={handleRefresh}
                 disabled={loading || refreshing}
                 className="p-2.5 border border-slate-200 hover:border-teal-400 text-slate-600 hover:text-teal-700 bg-white hover:bg-teal-50/50 rounded-xl transition-all cursor-pointer shadow-2xs"
-                title="Refresh Member Data"
+                title={t("branchManagerMembers.refreshMemberData", "Refresh Member Data")}
               >
                 <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin text-teal-600' : ''}`} />
               </button>
@@ -598,7 +601,7 @@ export default function BranchManagerMembers({ embedded = false }) {
                 onClick={handleRefresh}
                 className="px-3 py-1 bg-rose-600 text-white rounded-lg font-bold hover:bg-rose-700 transition-colors cursor-pointer"
               >
-                Retry
+                {t("common.retry", "Retry")}
               </button>
             </div>
           )}
@@ -608,16 +611,16 @@ export default function BranchManagerMembers({ embedded = false }) {
             <table className="w-full text-left text-sm">
               <thead className="bg-slate-50 text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">
                 <tr>
-                  <th className="py-3.5 px-5">Member Code</th>
-                  <th className="py-3.5 px-5">Member Name</th>
-                  <th className="py-3.5 px-5">Contact Details</th>
-                  <th className="py-3.5 px-5">City / Location</th>
-                  <th className="py-3.5 px-5">KYC Status</th>
-                  <th className="py-3.5 px-5">Account Status</th>
-                  <th className="py-3.5 px-4 text-center">Unlock</th>
-                  <th className="py-3.5 px-4 text-center">Password</th>
-                  <th className="py-3.5 px-5">Registered At</th>
-                  <th className="py-3.5 px-5 text-right">Actions</th>
+                  <th className="py-3.5 px-5">{t("modal.member.memberCode", "Member Code")}</th>
+                  <th className="py-3.5 px-5">{t("dashboardModule.productAccounts.memberName", "Member Name")}</th>
+                  <th className="py-3.5 px-5">{t("branchManagerMembers.contactDetails", "Contact Details")}</th>
+                  <th className="py-3.5 px-5">{t("branchManagerMembers.cityLocation", "City / Location")}</th>
+                  <th className="py-3.5 px-5">{t("branchManagerMembers.kycStatus", "KYC Status")}</th>
+                  <th className="py-3.5 px-5">{t("branchManagerMembers.accountStatus", "Account Status")}</th>
+                  <th className="py-3.5 px-4 text-center">{t("branchManagerMembers.unlock", "Unlock")}</th>
+                  <th className="py-3.5 px-4 text-center">{t("login.branchAdmin.passwordLabel", "Password")}</th>
+                  <th className="py-3.5 px-5">{t("branchManagerMembers.registeredAt", "Registered At")}</th>
+                  <th className="py-3.5 px-5 text-right">{t("common.actions", "Actions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-slate-700 text-xs sm:text-sm">
@@ -626,7 +629,7 @@ export default function BranchManagerMembers({ embedded = false }) {
                     <td colSpan={10} className="py-12 text-center text-slate-400">
                       <div className="inline-flex items-center gap-2 font-medium">
                         <RefreshCw className="w-4 h-4 animate-spin text-teal-600" />
-                        <span>Loading branch members from registry...</span>
+                        <span>{t("branchManagerMembers.loadingBranchMembersFromRegistry", "Loading branch members from registry...")}</span>
                       </div>
                     </td>
                   </tr>
@@ -635,17 +638,18 @@ export default function BranchManagerMembers({ embedded = false }) {
                     <td colSpan={10} className="py-12 text-center text-slate-400">
                       <div className="max-w-xs mx-auto space-y-1">
                         <Users className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-                        <p className="font-bold text-slate-700">No Members Found</p>
+                        <p className="font-bold text-slate-700">{t("branchManagerMembers.noMembersFound", "No Members Found")}</p>
                         <p className="text-xs text-slate-400">
                           {searchQuery || statusTab !== 'all' || activeFilter !== 'all'
-                            ? 'Try clearing your search or status filters.'
-                            : 'No members are currently enrolled under this branch.'}
+                            ? t("branchManagerMembers.tryClearingYourSearchOr", "Try clearing your search or status filters.")
+                            : t("branchManagerMembers.noMembersAreCurrentlyEnrolled", "No members are currently enrolled under this branch.")}
                         </p>
                       </div>
                     </td>
                   </tr>
                 ) : (
                   filteredMembers.map((member) => {
+  const { t } = useTranslation();
                     const isPending = (member.status || '').toLowerCase() === 'pending';
                     const isApproved = (member.status || '').toLowerCase() === 'approved';
                     const isRejected = (member.status || '').toLowerCase() === 'rejected';
@@ -670,7 +674,7 @@ export default function BranchManagerMembers({ embedded = false }) {
                               <p className="font-bold text-slate-900 leading-snug">{member.full_name}</p>
                               {member.nominee?.nominee_name && (
                                 <p className="text-[10px] text-slate-400 truncate">
-                                  Nominee: {member.nominee.nominee_name}
+                                  {t("branchManagerMembers.nominee", "Nominee:")} {member.nominee.nominee_name}
                                 </p>
                               )}
                             </div>
@@ -698,19 +702,19 @@ export default function BranchManagerMembers({ embedded = false }) {
                           {isApproved && (
                             <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
                               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                              Approved
+                              {t("common.approved", "Approved")}
                             </span>
                           )}
                           {isPending && (
                             <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-full border border-amber-200">
                               <Clock className="w-3.5 h-3.5 text-amber-600" />
-                              Pending Review
+                              {t("branchManagerMembers.pendingReview", "Pending Review")}
                             </span>
                           )}
                           {isRejected && (
                             <span className="inline-flex items-center gap-1 text-[11px] font-bold text-rose-700 bg-rose-50 px-2.5 py-1 rounded-full border border-rose-200">
                               <AlertCircle className="w-3.5 h-3.5 text-rose-600" />
-                              Rejected
+                              {t("common.rejected", "Rejected")}
                             </span>
                           )}
                         </td>
@@ -724,12 +728,12 @@ export default function BranchManagerMembers({ embedded = false }) {
                               aria-checked={member.is_active !== false}
                               onClick={() => handleToggleActive(member)}
                               disabled={isLoadingThis}
-                              title={`Click to ${member.is_active !== false ? 'deactivate' : 'activate'} this member`}
+                              title={`Click to ${member.is_active !== false ? t("branchManagerMembers.deactivate", "deactivate") : t("branchManagerMembers.activate", "activate")} this member`}
                               className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 ${
                                 member.is_active !== false ? 'bg-emerald-500' : 'bg-slate-300'
                               } ${isLoadingThis ? 'opacity-50 cursor-wait' : ''}`}
                             >
-                              <span className="sr-only">Toggle Member Status</span>
+                              <span className="sr-only">{t("branchManagerMembers.toggleMemberStatus", "Toggle Member Status")}</span>
                               <span
                                 aria-hidden="true"
                                 className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
@@ -742,7 +746,7 @@ export default function BranchManagerMembers({ embedded = false }) {
                                 member.is_active !== false ? 'text-emerald-700' : 'text-slate-400'
                               }`}
                             >
-                              {member.is_active !== false ? 'Active' : 'Inactive'}
+                              {member.is_active !== false ? t("common.active", "Active") : t("common.inactive", "Inactive")}
                             </span>
                           </div>
                         </td>
@@ -752,7 +756,7 @@ export default function BranchManagerMembers({ embedded = false }) {
                           <button
                             onClick={() => handleUnlock(member)}
                             disabled={isLoadingThis}
-                            title="Unlock Member Account"
+                            title={t("branchManagerMembers.unlockMemberAccount", "Unlock Member Account")}
                             className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-amber-50 text-slate-600 hover:text-amber-700 transition-colors cursor-pointer shadow-2xs inline-flex items-center justify-center"
                           >
                             <Unlock className="w-3.5 h-3.5 text-amber-600" />
@@ -764,7 +768,7 @@ export default function BranchManagerMembers({ embedded = false }) {
                           <button
                             onClick={() => setPasswordModal({ isOpen: true, member, newPassword: '' })}
                             disabled={isLoadingThis}
-                            title="Reset Password"
+                            title={t("branchManagerMemberPasswordUpdate.resetPassword", "Reset Password")}
                             className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-teal-50 text-slate-600 hover:text-teal-700 transition-colors cursor-pointer shadow-2xs inline-flex items-center justify-center"
                           >
                             <KeyRound className="w-3.5 h-3.5 text-teal-600" />
@@ -794,20 +798,20 @@ export default function BranchManagerMembers({ embedded = false }) {
                                 <button
                                   onClick={() => handleReview(member.id, 'approved')}
                                   disabled={isLoadingThis}
-                                  title="Approve Member"
+                                  title={t("modal.member.approveMember", "Approve Member")}
                                   className="px-2.5 py-1 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-xs font-bold rounded-lg shadow-xs transition-colors cursor-pointer flex items-center gap-1 active:scale-95"
                                 >
                                   <CheckCircle2 className="w-3 h-3" />
-                                  <span>Approve</span>
+                                  <span>{t("branchManagerMembers.approve", "Approve")}</span>
                                 </button>
                                 <button
                                   onClick={() => setRejectModal({ isOpen: true, member, reason: '' })}
                                   disabled={isLoadingThis}
-                                  title="Reject Member"
+                                  title={t("modal.member.rejectMember", "Reject Member")}
                                   className="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 text-xs font-bold rounded-lg transition-colors cursor-pointer flex items-center gap-1"
                                 >
                                   <XCircle className="w-3 h-3" />
-                                  <span>Reject</span>
+                                  <span>{t("modal.nominee.reject", "Reject")}</span>
                                 </button>
                               </>
                             )}
@@ -818,17 +822,17 @@ export default function BranchManagerMembers({ embedded = false }) {
                               className="px-3 py-1 bg-teal-50 hover:bg-teal-100 text-[#0f766e] border border-teal-200 text-xs font-bold rounded-lg transition-colors cursor-pointer flex items-center gap-1 shadow-2xs whitespace-nowrap"
                             >
                               <Eye className="w-3.5 h-3.5" />
-                              <span>View Details</span>
+                              <span>{t("branchManagerFdMisSchemes.viewDetails", "View Details")}</span>
                             </button>
 
                             {/* View Transactions Button */}
                             <button
                               onClick={() => handleViewTransactions(member)}
                               className="px-3 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold rounded-lg transition-colors cursor-pointer flex items-center gap-1 shadow-2xs whitespace-nowrap"
-                              title="View member counter cash transactions history"
+                              title={t("branchManagerMembers.viewMemberCounterCashTransactions", "View member counter cash transactions history")}
                             >
                               <Receipt className="w-3.5 h-3.5 text-emerald-700" />
-                              <span>View Transactions</span>
+                              <span>{t("branchManagerMembers.viewTransactions", "View Transactions")}</span>
                             </button>
                           </div>
                         </td>
@@ -867,14 +871,14 @@ export default function BranchManagerMembers({ embedded = false }) {
           <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100">
             <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
               <AlertCircle className="w-5 h-5 text-rose-600" />
-              <span>Reject Member Application</span>
+              <span>{t("branchManagerMembers.rejectMemberApplication", "Reject Member Application")}</span>
             </h3>
             <p className="text-xs text-slate-500 mt-1">
-              Please enter the official reason for rejecting {rejectModal.member?.full_name}.
+              {t("branchManagerMembers.pleaseEnterTheOfficialReason", "Please enter the official reason for rejecting")} {rejectModal.member?.full_name}.
             </p>
             <textarea
               rows={3}
-              placeholder="e.g. Incomplete KYC documentation or unverified Aadhaar."
+              placeholder={t("branchManagerMembers.eGIncompleteKycDocumentation", "e.g. Incomplete KYC documentation or unverified Aadhaar.")}
               value={rejectModal.reason}
               onChange={(e) => setRejectModal(prev => ({ ...prev, reason: e.target.value }))}
               className="w-full mt-3 p-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-rose-500 text-slate-800"
@@ -884,14 +888,14 @@ export default function BranchManagerMembers({ embedded = false }) {
                 onClick={() => setRejectModal({ isOpen: false, member: null, reason: '' })}
                 className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800 cursor-pointer"
               >
-                Cancel
+                {t("common.cancel", "Cancel")}
               </button>
               <button
                 onClick={() => handleReview(rejectModal.member.id, 'rejected', rejectModal.reason)}
                 disabled={!rejectModal.reason.trim()}
                 className="px-4 py-2 bg-rose-600 hover:bg-rose-700 disabled:opacity-50 text-white text-xs font-bold rounded-xl cursor-pointer shadow-xs"
               >
-                Confirm Rejection
+                {t("modal.nominee.confirmRejection", "Confirm Rejection")}
               </button>
             </div>
           </div>
@@ -907,20 +911,20 @@ export default function BranchManagerMembers({ embedded = false }) {
           >
             <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
               <KeyRound className="w-5 h-5 text-teal-600" />
-              <span>Reset Member Password</span>
+              <span>{t("branchManagerMemberPasswordUpdate.resetMemberPassword", "Reset Member Password")}</span>
             </h3>
             <p className="text-xs text-slate-500 mt-1">
-              Set a temporary/new password for <strong className="text-slate-800">{passwordModal.member?.full_name}</strong> ({passwordModal.member?.member_code}).
+              {t("branchManagerMembers.setATemporaryNewPassword", "Set a temporary/new password for")} <strong className="text-slate-800">{passwordModal.member?.full_name}</strong> ({passwordModal.member?.member_code}).
             </p>
             <div className="mt-3">
               <label className="text-xs font-semibold text-slate-700 block mb-1">
-                New Password (minimum 8 characters)
+                {t("branchManagerMembers.newPasswordMinimum8Characters", "New Password (minimum 8 characters)")}
               </label>
               <input
                 type="password"
                 required
                 minLength={8}
-                placeholder="Enter new password..."
+                placeholder={t("branchManagerMembers.enterNewPassword", "Enter new password...")}
                 value={passwordModal.newPassword}
                 onChange={(e) => setPasswordModal(prev => ({ ...prev, newPassword: e.target.value }))}
                 className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 text-slate-800"
@@ -932,14 +936,14 @@ export default function BranchManagerMembers({ embedded = false }) {
                 onClick={() => setPasswordModal({ isOpen: false, member: null, newPassword: '' })}
                 className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800 cursor-pointer"
               >
-                Cancel
+                {t("common.cancel", "Cancel")}
               </button>
               <button
                 type="submit"
                 disabled={!passwordModal.newPassword || passwordModal.newPassword.length < 8}
                 className="px-4 py-2 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 disabled:opacity-50 text-white text-xs font-bold rounded-xl cursor-pointer shadow-xs"
               >
-                Update Password
+                {t("dashboardModule.passwordUpdate.updatePassword", "Update Password")}
               </button>
             </div>
           </form>
@@ -956,7 +960,7 @@ export default function BranchManagerMembers({ embedded = false }) {
 
             <div>
               <h3 className="text-xl font-black text-slate-900 tracking-tight">
-                {typeof errorPopup === 'object' ? (errorPopup.title || 'Action Error') : 'Notice'}
+                {typeof errorPopup === 'object' ? (errorPopup.title || 'Action Error') : t("modal.member.notice", "Notice")}
               </h3>
               <p className="text-xs sm:text-sm text-rose-900 mt-2.5 leading-relaxed bg-rose-50/70 p-4 rounded-2xl border border-rose-200/80 font-medium break-words text-left">
                 {typeof errorPopup === 'object' ? (errorPopup.message || JSON.stringify(errorPopup)) : String(errorPopup)}
@@ -969,7 +973,7 @@ export default function BranchManagerMembers({ embedded = false }) {
                 onClick={() => setErrorPopup(null)}
                 className="w-full h-11 px-5 bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 text-white font-bold text-sm rounded-xl shadow-md transition-all cursor-pointer"
               >
-                Okay, Got It
+                {t("modal.branchAdmin.okayGotIt", "Okay, Got It")}
               </button>
             </div>
           </div>
@@ -986,7 +990,7 @@ export default function BranchManagerMembers({ embedded = false }) {
 
             <div>
               <h3 className="text-xl sm:text-2xl font-black text-slate-900">
-                {typeof successPopup === 'object' ? (successPopup.title || 'Success!') : 'Success!'}
+                {typeof successPopup === 'object' ? (successPopup.title || 'Success!') : t("modal.member.success", "Success!")}
               </h3>
               <p className="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
                 {typeof successPopup === 'object' ? successPopup.message : String(successPopup)}
@@ -999,7 +1003,7 @@ export default function BranchManagerMembers({ embedded = false }) {
                 onClick={() => setSuccessPopup(null)}
                 className="w-full h-11 px-5 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-bold text-sm rounded-xl shadow-md transition-all cursor-pointer"
               >
-                Okay, Got It
+                {t("modal.branchAdmin.okayGotIt", "Okay, Got It")}
               </button>
             </div>
           </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Target,
   RefreshCw,
@@ -29,7 +30,9 @@ import {
   getCurrentMonthTargetString,
 } from '../../components/dashboard/MonthlyTargetModals';
 
+
 export default function BranchManagerMonthlyTargets() {
+  const { t } = useTranslation();
   const [targets, setTargets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -65,7 +68,7 @@ export default function BranchManagerMonthlyTargets() {
       }
     } catch (err) {
       console.error('Failed to fetch branch monthly targets:', err);
-      setError(err.message || 'Unable to retrieve branch monthly targets.');
+      setError(err.message || t("dashboardModule.monthlyTargets.errorRetrieve", "Unable to retrieve branch monthly targets."));
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -80,13 +83,13 @@ export default function BranchManagerMonthlyTargets() {
     setIsSubmitting(true);
     try {
       await monthlyTargetService.createBranchAdminStaffTarget(payload);
-      setSuccessMessage('Staff target quota and incentive ladder assigned successfully!');
+      setSuccessMessage(t("dashboardModule.monthlyTargets.assignSuccess", "Staff target quota and incentive ladder assigned successfully!"));
       setTimeout(() => setSuccessMessage(null), 4000);
       setCreateModalOpen(false);
       fetchTargets(true);
     } catch (err) {
       console.error('Failed to assign staff target:', err);
-      setErrorMessage(err.message || 'Failed to assign staff target.');
+      setErrorMessage(err.message || t("dashboardModule.monthlyTargets.assignError", "Failed to assign staff target."));
       setTimeout(() => setErrorMessage(null), 5000);
     } finally {
       setIsSubmitting(false);
@@ -125,26 +128,26 @@ export default function BranchManagerMonthlyTargets() {
             <div className="inline-flex flex-wrap items-center gap-x-2 gap-y-1 px-3 sm:px-3.5 py-1.5 rounded-2xl sm:rounded-full bg-white/95 backdrop-blur-xs text-[11px] sm:text-xs font-semibold border border-teal-200/80 shadow-2xs text-[#0f766e] mb-3 max-w-full">
               <span className="inline-flex items-center gap-1.5 flex-shrink-0">
                 <CheckCircle2 className="w-3.5 h-3.5 text-[#00b4a7]" />
-                <span>Role: <strong className="font-bold text-teal-950">Branch Manager</strong></span>
+                <span>{t("dashboardModule.monthlyTargets.roleLabel", "Role:")} <strong className="font-bold text-teal-950">{t("nav.branchManager", "Branch Manager")}</strong></span>
               </span>
               <span className="text-teal-300 hidden sm:inline">•</span>
-              <span className="text-slate-600 sm:text-[#0f766e]">Branch Performance &amp; Quotas</span>
+              <span className="text-slate-600 sm:text-[#0f766e]">{t("dashboardModule.monthlyTargets.branchPerformanceQuotas", "Branch Performance & Quotas")}</span>
               <span className="text-teal-300 hidden sm:inline">•</span>
               <span className="inline-flex items-center gap-1.5 font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full text-[10px] sm:text-xs flex-shrink-0">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                Active Directives
+                {t("dashboardModule.monthlyTargets.activeDirectives", "Active Directives")}
               </span>
             </div>
 
             <div className="flex items-center gap-2.5 sm:gap-3">
               <span className="w-1.5 h-7 sm:h-9 bg-[#00b4a7] rounded-full flex-shrink-0" />
               <h1 className="text-xl sm:text-3xl lg:text-4xl font-serif font-bold text-slate-900 tracking-tight">
-                Monthly Targets &amp; Incentives
+                {t("dashboardModule.monthlyTargets.pageTitle", "Monthly Targets & Incentives")}
               </h1>
             </div>
 
             <p className="text-slate-600 text-xs sm:text-sm mt-2 sm:mt-2.5 font-medium leading-relaxed max-w-xl">
-              View your branch's quota directives and assign individual monthly targets and tiered incentive commissions to branch staff &amp; collection agents.
+              {t("dashboardModule.monthlyTargets.branchBannerDesc", "View your branch's quota directives and assign individual monthly targets and tiered incentive commissions to branch staff & collection agents.")}
             </p>
           </div>
 
@@ -156,13 +159,13 @@ export default function BranchManagerMonthlyTargets() {
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#00b4a7] to-[#0f766e] text-white text-xs sm:text-sm font-bold shadow-md shadow-teal-500/20 hover:from-[#00a296] hover:to-[#0c625c] transition-all cursor-pointer"
             >
               <PlusCircle className="w-4 h-4" />
-              <span>Assign Staff Target</span>
+              <span>{t("dashboardModule.monthlyTargets.assignStaffTarget", "Assign Staff Target")}</span>
             </button>
 
             {/* Month Picker */}
             <div className="flex items-center gap-2 bg-white/95 px-3.5 py-2 rounded-xl border border-teal-200/80 shadow-2xs">
               <Calendar className="w-4 h-4 text-[#00b4a7]" />
-              <span className="text-xs font-bold text-slate-600">Month:</span>
+              <span className="text-xs font-bold text-slate-600">{t("dashboardModule.monthlyTargets.monthLabel", "Month:")}</span>
               <input
                 type="month"
                 value={selectedMonth ? selectedMonth.substring(0, 7) : ''}
@@ -184,7 +187,7 @@ export default function BranchManagerMonthlyTargets() {
               className="px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs sm:text-sm border border-teal-200/80 shadow-2xs transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
             >
               <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin text-[#00b4a7]' : 'text-slate-500'}`} />
-              <span className="hidden sm:inline">Refresh</span>
+              <span className="hidden sm:inline">{t("common.refresh", "Refresh")}</span>
             </button>
           </div>
         </div>
@@ -206,34 +209,34 @@ export default function BranchManagerMonthlyTargets() {
         {/* Summary Stat Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
           <StatCard
-            title="Total Targets"
-            label="Total Targets"
+            title={t("dashboardModule.monthlyTargets.totalTargets", "Total Targets")}
+            label={t("dashboardModule.monthlyTargets.totalTargets", "Total Targets")}
             value={stats.count}
-            subtext="Assigned monthly quotas"
+            subtext={t("dashboardModule.monthlyTargets.assignedMonthlyQuotas", "Assigned monthly quotas")}
             icon={Target}
             color="teal"
           />
           <StatCard
-            title="Total Quota Value"
-            label="Total Quota Value"
+            title={t("dashboardModule.monthlyTargets.totalQuotaValue", "Total Quota Value")}
+            label={t("dashboardModule.monthlyTargets.totalQuotaValue", "Total Quota Value")}
             value={formatCurrency(stats.totalAmount)}
-            subtext="Monthly target volume"
+            subtext={t("dashboardModule.monthlyTargets.monthlyTargetVolume", "Monthly target volume")}
             icon={Coins}
             color="emerald"
           />
           <StatCard
-            title="Partial Threshold"
-            label="Partial Threshold"
+            title={t("dashboardModule.monthlyTargets.partialThreshold", "Partial Threshold")}
+            label={t("dashboardModule.monthlyTargets.partialThreshold", "Partial Threshold")}
             value={formatPercentValue(stats.avgThreshold)}
-            subtext="Minimum tier eligibility"
+            subtext={t("dashboardModule.monthlyTargets.minimumTierEligibility", "Minimum tier eligibility")}
             icon={Percent}
             color="amber"
           />
           <StatCard
-            title="Top Incentive Rate"
-            label="Top Incentive Rate"
+            title={t("dashboardModule.monthlyTargets.topIncentiveRate", "Top Incentive Rate")}
+            label={t("dashboardModule.monthlyTargets.topIncentiveRate", "Top Incentive Rate")}
             value={formatPercentValue(stats.maxIncentive)}
-            subtext="Performance overflow tier"
+            subtext={t("dashboardModule.monthlyTargets.performanceOverflowTier", "Performance overflow tier")}
             icon={Zap}
             color="purple"
           />
@@ -244,10 +247,10 @@ export default function BranchManagerMonthlyTargets() {
           <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between">
             <div>
               <h2 className="text-base sm:text-lg font-bold text-slate-900 font-serif">
-                Monthly Target Directives
+                {t("dashboardModule.monthlyTargets.monthlyTargetDirectives", "Monthly Target Directives")}
               </h2>
               <p className="text-xs text-slate-500 mt-0.5">
-                Target period: {formatMonthDisplay(selectedMonth)} • Showing {targets.length} targets
+                {t("dashboardModule.monthlyTargets.targetPeriodSummary", "Target period: {period} • Showing {count} targets", { period: formatMonthDisplay(selectedMonth), count: targets.length })}
               </p>
             </div>
             <button
@@ -256,14 +259,14 @@ export default function BranchManagerMonthlyTargets() {
               className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold transition-all cursor-pointer shadow-xs"
             >
               <PlusCircle className="w-3.5 h-3.5" />
-              <span>Assign Staff Target</span>
+              <span>{t("dashboardModule.monthlyTargets.assignStaffTarget", "Assign Staff Target")}</span>
             </button>
           </div>
 
           {loading ? (
             <div className="py-16 text-center text-slate-400">
               <RefreshCw className="w-8 h-8 animate-spin mx-auto text-teal-600 mb-3" />
-              <p className="text-xs sm:text-sm font-semibold text-slate-600">Loading branch targets...</p>
+              <p className="text-xs sm:text-sm font-semibold text-slate-600">{t("dashboardModule.monthlyTargets.loadingBranchTargets", "Loading branch targets...")}</p>
             </div>
           ) : error ? (
             <div className="py-16 text-center text-rose-500 px-4">
@@ -273,7 +276,7 @@ export default function BranchManagerMonthlyTargets() {
                 onClick={() => fetchTargets()}
                 className="mt-4 px-4 py-2 bg-slate-900 text-white text-xs font-bold rounded-xl cursor-pointer"
               >
-                Retry
+                {t("common.retry", "Retry")}
               </button>
             </div>
           ) : targets.length === 0 ? (
@@ -281,9 +284,9 @@ export default function BranchManagerMonthlyTargets() {
               <div className="w-14 h-14 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center mx-auto mb-3 border border-teal-100">
                 <Target className="w-7 h-7" />
               </div>
-              <p className="text-sm font-bold text-slate-700 mb-1">No monthly target assigned</p>
+              <p className="text-sm font-bold text-slate-700 mb-1">{t("dashboardModule.monthlyTargets.noTargetAssigned", "No monthly target assigned")}</p>
               <p className="text-xs text-slate-500 max-w-sm mx-auto mb-4">
-                No monthly quota has been assigned for {formatMonthDisplay(selectedMonth)}. You can assign targets to staff or wait for Super Admin directives.
+                {t("dashboardModule.monthlyTargets.noTargetAssignedDesc", "No monthly quota has been assigned for {month}. You can assign targets to staff or wait for Super Admin directives.", { month: formatMonthDisplay(selectedMonth) })}
               </p>
               <button
                 type="button"
@@ -291,7 +294,7 @@ export default function BranchManagerMonthlyTargets() {
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold shadow-xs transition-all cursor-pointer"
               >
                 <PlusCircle className="w-3.5 h-3.5" />
-                <span>Assign Staff Target</span>
+                <span>{t("dashboardModule.monthlyTargets.assignStaffTarget", "Assign Staff Target")}</span>
               </button>
             </div>
           ) : (
@@ -299,16 +302,16 @@ export default function BranchManagerMonthlyTargets() {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-slate-50/80 text-[11px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-100 whitespace-nowrap">
-                    <th className="py-3.5 px-4 sm:px-5">Target Assigned To</th>
-                    <th className="py-3.5 px-4">Role / Scope</th>
-                    <th className="py-3.5 px-4">Period / Month</th>
-                    <th className="py-3.5 px-4">Target Amount</th>
-                    <th className="py-3.5 px-4 text-center">Threshold</th>
-                    <th className="py-3.5 px-4 text-center">Below Target</th>
-                    <th className="py-3.5 px-4 text-center">Partially Achieved</th>
-                    <th className="py-3.5 px-4 text-center">Target Achieved</th>
-                    <th className="py-3.5 px-4 text-center">Exceeded Target</th>
-                    <th className="py-3.5 px-4 text-right">Actions</th>
+                    <th className="py-3.5 px-4 sm:px-5">{t("dashboardModule.monthlyTargets.colTargetAssignedTo", "Target Assigned To")}</th>
+                    <th className="py-3.5 px-4">{t("dashboardModule.monthlyTargets.colRoleScope", "Role / Scope")}</th>
+                    <th className="py-3.5 px-4">{t("dashboardModule.monthlyTargets.colPeriodMonth", "Period / Month")}</th>
+                    <th className="py-3.5 px-4">{t("dashboardModule.monthlyTargets.colTargetAmount", "Target Amount")}</th>
+                    <th className="py-3.5 px-4 text-center">{t("dashboardModule.monthlyTargets.colThreshold", "Threshold")}</th>
+                    <th className="py-3.5 px-4 text-center">{t("dashboardModule.monthlyTargets.colBelowTarget", "Below Target")}</th>
+                    <th className="py-3.5 px-4 text-center">{t("dashboardModule.monthlyTargets.colPartiallyAchieved", "Partially Achieved")}</th>
+                    <th className="py-3.5 px-4 text-center">{t("dashboardModule.monthlyTargets.colTargetAchieved", "Target Achieved")}</th>
+                    <th className="py-3.5 px-4 text-center">{t("dashboardModule.monthlyTargets.colExceededTarget", "Exceeded Target")}</th>
+                    <th className="py-3.5 px-4 text-right">{t("common.actions", "Actions")}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-xs font-medium text-slate-700 whitespace-nowrap">
@@ -317,7 +320,7 @@ export default function BranchManagerMonthlyTargets() {
                     const targetName =
                       item.target_user_name ||
                       item.role_name ||
-                      (isBm ? 'Branch Manager' : 'Staff Target');
+                      (isBm ? t("nav.branchManager", "Branch Manager") : t("dashboardModule.monthlyTargets.staffTarget", "Staff Target"));
 
                     return (
                       <tr key={item.id || idx} className="hover:bg-teal-50/20 transition-colors">
@@ -337,7 +340,7 @@ export default function BranchManagerMonthlyTargets() {
                                 {targetName}
                               </div>
                               <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">
-                                {item.role_name || (isBm ? 'Branch Manager' : 'Staff Member')}
+                                {item.role_name || (isBm ? t("nav.branchManager", "Branch Manager") : t("dashboardModule.monthlyTargets.staffMember", "Staff Member"))}
                               </span>
                             </div>
                           </div>
@@ -351,7 +354,7 @@ export default function BranchManagerMonthlyTargets() {
                                 : 'bg-teal-50 text-teal-800 border border-teal-200/60'
                             }`}
                           >
-                            {item.target_scope || (isBm ? 'Branch' : 'Individual')}
+                            {item.target_scope || (isBm ? t("dashboard.branch", "Branch") : t("dashboardModule.monthlyTargets.scopeIndividual", "Individual"))}
                           </span>
                         </td>
 
@@ -360,7 +363,7 @@ export default function BranchManagerMonthlyTargets() {
                             {formatMonthDisplay(item.target_month)}
                           </div>
                           <span className="text-[10px] font-bold uppercase tracking-wider text-teal-600">
-                            {item.target_period || 'Monthly'}
+                            {item.target_period || t("dashboardModule.monthlyTargets.periodMonthly", "Monthly")}
                           </span>
                         </td>
 
@@ -411,7 +414,7 @@ export default function BranchManagerMonthlyTargets() {
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-teal-50 text-slate-700 hover:text-teal-700 font-bold text-xs transition-colors cursor-pointer"
                           >
                             <Eye className="w-3.5 h-3.5" />
-                            <span>Details</span>
+                            <span>{t("dashboardModule.monthlyTargets.details", "Details")}</span>
                           </button>
                         </td>
                       </tr>

@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { i18n } from '../../i18n/index.js';
+import { useTranslation } from 'react-i18next';
 import { useSearchParams, Navigate, useNavigate } from 'react-router-dom';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import StatCard from '../../components/dashboard/StatCard';
@@ -24,6 +26,7 @@ import {
 import { getMemberBranches } from '../../services/memberService';
 import { getBranchAdminCashTransactions } from '../../services/cashTransactionService';
 
+
 function parseBranchInfo(obj = {}) {
   const b = obj.branch;
   const isObj = b && typeof b === 'object';
@@ -47,6 +50,7 @@ function parseBranchInfo(obj = {}) {
 }
 
 export default function BranchManagerDashboard() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [modalConfig, setModalConfig] = useState({ isOpen: false });
 
@@ -229,37 +233,37 @@ export default function BranchManagerDashboard() {
     if (type === 'new_member') {
       setModalConfig({
         isOpen: true,
-        title: 'New Member Admission',
-        description: 'Issue official society membership folio and allocate shares.',
+        title: i18n.t("branchManagerDashboard.newMemberAdmission", "New Member Admission"),
+        description: i18n.t("branchManagerDashboard.issueOfficialSocietyMembershipFolio", "Issue official society membership folio and allocate shares."),
         actionLabel: 'Register Member',
         fields: [
-          { name: 'name', label: 'Full Applicant Name', placeholder: 'e.g. Ananthu Krishnan' },
-          { name: 'aadhaar', label: 'Aadhaar / Voter ID Number', placeholder: 'xxxx-xxxx-xxxx' },
-          { name: 'shareCount', label: 'Share Capital Subscription', type: 'select', options: ['100 Shares (₹10,000)', '250 Shares (₹25,000)', '500 Shares (₹50,000)'] },
-          { name: 'farmingActivity', label: 'Primary Occupation', placeholder: 'e.g. Dairy Farmer / Organic Cultivator' }
+          { name: 'name', label: i18n.t("branchManagerDashboard.fullApplicantName", "Full Applicant Name"), placeholder: i18n.t("branchManagerDashboard.eGAnanthuKrishnan", "e.g. Ananthu Krishnan") },
+          { name: 'aadhaar', label: i18n.t("branchManagerDashboard.aadhaarVoterIdNumber", "Aadhaar / Voter ID Number"), placeholder: 'xxxx-xxxx-xxxx' },
+          { name: 'shareCount', label: i18n.t("branchManagerDashboard.shareCapitalSubscription", "Share Capital Subscription"), type: 'select', options: ['100 Shares (₹10,000)', '250 Shares (₹25,000)', '500 Shares (₹50,000)'] },
+          { name: 'farmingActivity', label: i18n.t("branchManagerDashboard.primaryOccupation", "Primary Occupation"), placeholder: i18n.t("branchManagerDashboard.eGDairyFarmerOrganic", "e.g. Dairy Farmer / Organic Cultivator") }
         ]
       });
     } else if (type === 'disburse') {
       setModalConfig({
         isOpen: true,
-        title: 'Quick Loan Disbursement',
-        description: 'Authorize branch fund release to member savings folio.',
+        title: i18n.t("branchManagerDashboard.quickLoanDisbursement", "Quick Loan Disbursement"),
+        description: i18n.t("branchManagerDashboard.authorizeBranchFundReleaseTo", "Authorize branch fund release to member savings folio."),
         actionLabel: 'Execute Disbursement',
         fields: [
-          { name: 'loanRef', label: 'Sanction Order Number', placeholder: 'e.g. SNC-2026-8812' },
-          { name: 'memberFolio', label: 'Member Folio Number', placeholder: 'e.g. AFX-MEM-8842' },
-          { name: 'amount', label: 'Disbursement Amount (₹)', type: 'number', placeholder: 'e.g. 250000' }
+          { name: 'loanRef', label: i18n.t("branchManagerDashboard.sanctionOrderNumber", "Sanction Order Number"), placeholder: i18n.t("branchManagerDashboard.eGSnc20268812", "e.g. SNC-2026-8812") },
+          { name: 'memberFolio', label: i18n.t("branchManagerDashboard.memberFolioNumber", "Member Folio Number"), placeholder: i18n.t("branchManagerDashboard.eGAfxMem8842", "e.g. AFX-MEM-8842") },
+          { name: 'amount', label: i18n.t("branchManagerDashboard.disbursementAmount", "Disbursement Amount (₹)"), type: 'number', placeholder: 'e.g. 250000' }
         ]
       });
     } else if (type === 'day_end') {
       setModalConfig({
         isOpen: true,
-        title: 'Day-End Vault & Cash Closure',
-        description: 'Reconcile daily cash vouchers, digital UPI collections, and safe balance.',
+        title: i18n.t("branchManagerDashboard.dayEndVaultCashClosure", "Day-End Vault & Cash Closure"),
+        description: i18n.t("branchManagerDashboard.reconcileDailyCashVouchersDigital", "Reconcile daily cash vouchers, digital UPI collections, and safe balance."),
         actionLabel: 'Sign & Lock Day Ledger',
         fields: [
-          { name: 'physicalCash', label: 'Verified Physical Safe Balance (₹)', type: 'number', placeholder: 'e.g. 2480000' },
-          { name: 'notes', label: 'Manager Sign-off Remarks', placeholder: 'e.g. All vouchers verified against tokens.' }
+          { name: 'physicalCash', label: i18n.t("branchManagerDashboard.verifiedPhysicalSafeBalance", "Verified Physical Safe Balance (₹)"), type: 'number', placeholder: 'e.g. 2480000' },
+          { name: 'notes', label: i18n.t("branchManagerDashboard.managerSignOffRemarks", "Manager Sign-off Remarks"), placeholder: i18n.t("branchManagerDashboard.eGAllVouchersVerified", "e.g. All vouchers verified against tokens.") }
         ]
       });
     }
@@ -301,24 +305,24 @@ export default function BranchManagerDashboard() {
             <div className="flex flex-wrap items-center gap-2 mb-3.5">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur-xs text-xs font-semibold border border-teal-200/80 shadow-2xs text-[#0f766e]">
                 <Landmark className="w-3.5 h-3.5 text-[#00b4a7]" />
-                <span>Role: Branch Manager</span>
+                <span>{t("dashboardModule.announcements.roleBadge", "Role: Branch Manager")}</span>
               </div>
 
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur-xs text-xs font-semibold border border-teal-200/80 shadow-2xs text-slate-700">
                 <Building2 className="w-3.5 h-3.5 text-teal-600" />
-                <span>Branch Code: <span className="font-mono text-teal-800 font-bold">{branchCodeDisplay}</span></span>
+                <span>{t("branchManagerCashTransactions.branchCode", "Branch Code:")} <span className="font-mono text-teal-800 font-bold">{branchCodeDisplay}</span></span>
               </div>
 
               <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50/95 backdrop-blur-xs text-xs font-semibold border border-emerald-200 shadow-2xs text-emerald-700">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span>{managerUser.is_active !== false ? 'Active' : 'Inactive'}</span>
+                <span>{managerUser.is_active !== false ? t("common.active", "Active") : t("common.inactive", "Inactive")}</span>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
               <span className="w-1.5 h-8 sm:h-9 bg-[#00b4a7] rounded-full flex-shrink-0" />
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
-                <span>Welcome, Branch Manager</span>
+                <span>{t("common.welcomeBack", "Welcome back")}{t("branchManagerDashboard.branchManager", ", Branch Manager")}</span>
                 <span className="inline-block text-2xl sm:text-3xl">👋</span>
               </h1>
             </div>
@@ -328,13 +332,13 @@ export default function BranchManagerDashboard() {
               {/* Logged in as */}
               <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/90 border border-teal-200/70 shadow-2xs text-xs text-slate-700 backdrop-blur-xs">
                 <User className="w-3.5 h-3.5 text-teal-600" />
-                <span className="text-slate-500 font-medium">Logged in as:</span>
+                <span className="text-slate-500 font-medium">{t("branchManagerCashTransactions.loggedInAs", "Logged in as:")}</span>
                 <span className="text-slate-900 font-bold capitalize">{managerUser.full_name || managerUser.name || 'Branch Manager'}</span>
               </div>
 
               {/* User ID */}
               <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/90 border border-teal-200/70 shadow-2xs text-xs text-slate-700 backdrop-blur-xs">
-                <span className="text-slate-500 font-medium">User ID:</span>
+                <span className="text-slate-500 font-medium">{t("branchManagerDashboard.userId", "User ID:")}</span>
                 <span className="font-mono font-bold text-teal-800 bg-teal-50 px-1.5 py-0.5 rounded border border-teal-200/60">
                   {managerUser.user_code || managerUser.id}
                 </span>
@@ -343,7 +347,7 @@ export default function BranchManagerDashboard() {
               {/* Branch Name */}
               <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/90 border border-teal-200/70 shadow-2xs text-xs text-slate-700 backdrop-blur-xs">
                 <Building2 className="w-3.5 h-3.5 text-teal-600" />
-                <span className="text-slate-500 font-medium">Branch Name:</span>
+                <span className="text-slate-500 font-medium">{t("branchManagerDashboard.branchName", "Branch Name:")}</span>
                 <span className="text-slate-900 font-bold">{branchName}</span>
               </div>
 
@@ -351,7 +355,7 @@ export default function BranchManagerDashboard() {
               {branchLocation ? (
                 <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/90 border border-teal-200/70 shadow-2xs text-xs text-slate-700 backdrop-blur-xs">
                   <MapPin className="w-3.5 h-3.5 text-emerald-600" />
-                  <span className="text-slate-500 font-medium">Location:</span>
+                  <span className="text-slate-500 font-medium">{t("branchManagerCashTransactions.location", "Location:")}</span>
                   <span className="text-slate-800 font-semibold capitalize">{branchLocation}</span>
                 </div>
               ) : null}
@@ -362,7 +366,7 @@ export default function BranchManagerDashboard() {
           <div className="relative z-10 my-[-10px] sm:my-[-20px] lg:my-[-30px] flex justify-end pointer-events-none">
             <img
               src={modernFinanceWorkspace}
-              alt="Branch Manager Workspace"
+              alt={t("branchManagerDashboard.branchManagerWorkspace", "Branch Manager Workspace")}
               className="h-44 sm:h-52 lg:h-64 w-auto object-contain drop-shadow-md select-none"
             />
           </div>
@@ -382,7 +386,7 @@ export default function BranchManagerDashboard() {
               <div>
                 <div className="flex items-center gap-2">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-teal-800 bg-teal-100/80 px-2 py-0.5 rounded-md">
-                    Central Society Notice
+                    {t("branchManagerDashboard.centralSocietyNotice", "Central Society Notice")}
                   </span>
                   <span className="text-xs sm:text-sm font-black text-slate-900 line-clamp-1">
                     {announcements[0]?.title}
@@ -397,7 +401,7 @@ export default function BranchManagerDashboard() {
               onClick={() => navigate('/branch-manager/announcements')}
               className="text-xs font-bold text-teal-700 hover:text-teal-900 bg-white/80 hover:bg-white px-3 py-1.5 rounded-xl border border-teal-200/70 transition-all flex items-center gap-1.5 self-end sm:self-auto cursor-pointer shadow-2xs flex-shrink-0"
             >
-              <span>View Notice Board</span>
+              <span>{t("branchManagerDashboard.viewNoticeBoard", "View Notice Board")}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -406,32 +410,32 @@ export default function BranchManagerDashboard() {
         {/* 4 Branch Metrics */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <StatCard
-            title="Today's Vault Cash"
+            title={t("branchManagerDashboard.todaySVaultCash", "Today's Vault Cash")}
             value="₹24,80,000"
-            subtitle="Verified in physical safe"
+            subtitle={t("branchManagerDashboard.verifiedInPhysicalSafe", "Verified in physical safe")}
             icon={Landmark}
             trend="+₹2.8L Inflow today"
             trendType="up"
           />
 
           <StatCard
-            title="Active Branch Loans"
+            title={t("branchManagerDashboard.activeBranchLoans", "Active Branch Loans")}
             value="₹4.85 Cr"
-            subtitle="240 Active Member Accounts"
+            subtitle={t("branchManagerDashboard.240ActiveMemberAccounts", "240 Active Member Accounts")}
             icon={CreditCard}
             badge="Recovery 98.4%"
           />
 
           <StatCard
-            title="Pending Applications"
+            title={t("branchManagerDashboard.pendingApplications", "Pending Applications")}
             value={pendingMembers.length.toString()}
-            subtitle="Awaiting manager sign-off"
+            subtitle={t("branchManagerDashboard.awaitingManagerSignOff", "Awaiting manager sign-off")}
             icon={Clock}
             badge="Urgent Queue"
           />
 
           <StatCard
-            title="Total Members"
+            title={t("dashboard.totalMembers", "Total Members")}
             value={members.length.toString()}
             subtitle={`${branchName} Jurisdiction`}
             icon={Users}
@@ -441,7 +445,7 @@ export default function BranchManagerDashboard() {
         </div>
 
         <RecentTransactionsTable
-          title="Daily Branch Cash &amp; Settlement Ledger"
+          title={t("branchManagerDashboard.dailyBranchCashSettlementLedger", "Daily Branch Cash & Settlement Ledger")}
           subtitle={`Real-time register for ${branchName}`}
           transactions={branchTransactions}
         />

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import {
   Building2,
@@ -39,6 +40,7 @@ import SuperAdminCashTransactions from './SuperAdminCashTransactions';
 import SuperAdminCashReconciliation from './SuperAdminCashReconciliation';
 import SuperAdminStaff from './SuperAdminStaff';
 import SuperAdminSecurityEvents from './SuperAdminSecurityEvents';
+
 
 function formatCurrency(val) {
   const num = Number(val || 0);
@@ -85,15 +87,16 @@ function formatDateTime(isoString) {
 }
 
 export default function SuperAdminBranchOverview() {
+  const { t } = useTranslation();
   const [currentUser] = useState(() => {
     try {
       const cached = localStorage.getItem('superadmin_user') || localStorage.getItem('user');
       if (cached) return JSON.parse(cached);
     } catch {}
     return {
-      name: 'Super Admin',
-      full_name: 'Super Admin',
-      role: 'Super Admin',
+      name: t("nav.superAdmin", "Super Admin"),
+      full_name: t("nav.superAdmin", "Super Admin"),
+      role: t("nav.superAdmin", "Super Admin"),
     };
   });
 
@@ -180,7 +183,7 @@ export default function SuperAdminBranchOverview() {
       setOverviewList(Array.isArray(data) ? data : (data ? [data] : []));
     } catch (err) {
       console.error('Failed to load superadmin branch overview:', err);
-      setError(err.message || 'Unable to retrieve branch overview.');
+      setError(err.message || t("dashboardModule.branchOverview.fetchError", "Unable to retrieve branch overview."));
     } finally {
       setLoading(false);
     }
@@ -252,10 +255,10 @@ export default function SuperAdminBranchOverview() {
                 onChange={(e) => setSelectedBranchId(e.target.value)}
                 className="text-xs font-bold text-slate-800 bg-transparent focus:outline-none cursor-pointer"
               >
-                <option value="all">All Branches (Apex Network)</option>
+                <option value="all">{t("dashboardModule.branchOverview.allBranchesApex", "All Branches (Apex Network)")}</option>
                 {branches.map((b) => (
                   <option key={b.id} value={b.id}>
-                    {b.name || `Branch #${b.branch_code || b.id}`} ({b.city || 'Kerala'})
+                    {b.name || `${t("dashboard.branch", "Branch")} #${b.branch_code || b.id}`} ({b.city || t("dashboardModule.branchOverview.defaultCity", "Kerala")})
                   </option>
                 ))}
               </select>
@@ -266,9 +269,9 @@ export default function SuperAdminBranchOverview() {
                 type="button"
                 onClick={() => setSelectedBranchId('all')}
                 className="px-2.5 py-1 rounded-lg bg-teal-50 hover:bg-teal-100 text-teal-800 text-[11px] font-bold border border-teal-200 transition-colors cursor-pointer"
-                title="View All Branches"
+                title={t("dashboardModule.branchOverview.viewAllBranches", "View All Branches")}
               >
-                Clear Branch Filter
+                {t("dashboardModule.branchOverview.clearBranchFilter", "Clear Branch Filter")}
               </button>
             )}
           </div>
@@ -276,7 +279,7 @@ export default function SuperAdminBranchOverview() {
           {/* Right: Date Filtering Only & Refresh */}
           <div className="flex flex-wrap items-center gap-2">
             <div className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1.5 rounded-xl border border-slate-200">
-              <span className="text-[10px] font-bold text-slate-400 uppercase">From</span>
+              <span className="text-[10px] font-bold text-slate-400 uppercase">{t("dashboardModule.branchOverview.from", "From")}</span>
               <input
                 type="date"
                 value={fromDate}
@@ -285,7 +288,7 @@ export default function SuperAdminBranchOverview() {
               />
             </div>
             <div className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1.5 rounded-xl border border-slate-200">
-              <span className="text-[10px] font-bold text-slate-400 uppercase">To</span>
+              <span className="text-[10px] font-bold text-slate-400 uppercase">{t("dashboardModule.branchOverview.to", "To")}</span>
               <input
                 type="date"
                 value={toDate}
@@ -302,9 +305,9 @@ export default function SuperAdminBranchOverview() {
                   setToDate('');
                 }}
                 className="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold transition-all cursor-pointer"
-                title="Clear Dates"
+                title={t("dashboardModule.branchOverview.clearDates", "Clear Dates")}
               >
-                Clear
+                {t("dashboardModule.branchOverview.clear", "Clear")}
               </button>
             )}
 
@@ -313,10 +316,10 @@ export default function SuperAdminBranchOverview() {
               onClick={() => fetchOverview()}
               disabled={loading}
               className="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 shadow-2xs text-xs font-bold text-slate-700 hover:text-slate-900 transition-all cursor-pointer disabled:opacity-50 flex items-center gap-1.5 active:scale-95"
-              title="Refresh Overview"
+              title={t("dashboardModule.branchOverview.refreshOverview", "Refresh Overview")}
             >
               <RefreshCw className={`w-3.5 h-3.5 text-[#00b4a7] ${loading ? 'animate-spin' : ''}`} />
-              <span>{loading ? 'Refreshing...' : 'Refresh'}</span>
+              <span>{loading ? t("dashboardModule.branchOverview.refreshing", "Refreshing...") : t("common.refresh", "Refresh")}</span>
             </button>
           </div>
         </div>
@@ -325,12 +328,12 @@ export default function SuperAdminBranchOverview() {
         <div className="bg-white rounded-2xl sm:rounded-3xl p-1.5 sm:p-2 border border-slate-200/80 shadow-xs overflow-x-auto no-scrollbar">
           <div className="flex items-center gap-1.5 min-w-max">
             {[
-              { id: 'overview', label: 'Overview', icon: FileBarChart },
-              { id: 'members', label: 'Members', icon: Users },
-              { id: 'cash_transactions', label: 'Cash Transactions', icon: Coins },
-              { id: 'cash_reconciliation', label: 'Cash Reconciliation', icon: Scale },
-              { id: 'staff', label: 'Staff', icon: UserCheck },
-              { id: 'security_events', label: 'Security Events', icon: ShieldAlert },
+              { id: 'overview', label: t("dashboard.overview", "Overview"), icon: FileBarChart },
+              { id: 'members', label: t("dashboardModule.branchOverview.tabMembers", "Members"), icon: Users },
+              { id: 'cash_transactions', label: t("dashboardModule.branchOverview.tabCashTransactions", "Cash Transactions"), icon: Coins },
+              { id: 'cash_reconciliation', label: t("dashboardModule.branchOverview.tabCashReconciliation", "Cash Reconciliation"), icon: Scale },
+              { id: 'staff', label: t("dashboardModule.branchOverview.tabStaff", "Staff"), icon: UserCheck },
+              { id: 'security_events', label: t("sidebar.securityEvents", "Security Events"), icon: ShieldAlert },
             ].map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -367,7 +370,7 @@ export default function SuperAdminBranchOverview() {
                   onClick={() => fetchOverview()}
                   className="font-bold underline text-amber-900 cursor-pointer"
                 >
-                  Retry
+                  {t("dashboardModule.branchOverview.retry", "Retry")}
                 </button>
               </div>
             )}
@@ -377,34 +380,36 @@ export default function SuperAdminBranchOverview() {
           <div className="flex items-center gap-2 mb-3">
             <Layers className="w-4 h-4 text-[#00b4a7]" />
             <h3 className="font-serif font-bold text-slate-900 text-base sm:text-lg">
-              {isSingleBranch ? `${singleBranch?.branch_name || 'Branch'} Foundation` : 'Apex Society Foundations'}
+              {isSingleBranch
+                ? t("dashboardModule.branchOverview.branchFoundation", "{{branch}} Foundation", { branch: singleBranch?.branch_name || t("dashboard.branch", "Branch") })
+                : t("dashboardModule.branchOverview.apexSocietyFoundations", "Apex Society Foundations")}
             </h3>
-            <span className="text-xs font-medium text-slate-400">&bull; Lifetime active records</span>
+            <span className="text-xs font-medium text-slate-400">&bull; {t("dashboardModule.branchOverview.lifetimeActiveRecords", "Lifetime active records")}</span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
             <StatCard
-              title="Total Enrolled Members"
+              title={t("dashboardModule.branchOverview.totalEnrolledMembers", "Total Enrolled Members")}
               value={loading ? '...' : totalMembers.toLocaleString()}
-              subtitle={isSingleBranch ? 'Branch member folio' : 'Society-wide member base'}
+              subtitle={isSingleBranch ? t("dashboardModule.branchOverview.branchMemberFolio", "Branch member folio") : t("dashboardModule.branchOverview.societyWideMemberBase", "Society-wide member base")}
               icon={Users}
-              trend="Society Members"
+              trend={t("dashboardModule.branchOverview.societyMembers", "Society Members")}
               trendType="up"
             />
             <StatCard
-              title="Members With Accounts"
+              title={t("dashboardModule.branchOverview.membersWithAccounts", "Members With Accounts")}
               value={loading ? '...' : membersWithAccs.toLocaleString()}
-              subtitle={`${adoptionRate}% membership account penetration`}
+              subtitle={t("dashboardModule.branchOverview.membershipAccountPenetration", "{rate}% membership account penetration", { rate: adoptionRate })}
               icon={UserCheck}
-              trend={`${adoptionRate}% Active`}
+              trend={t("dashboardModule.branchOverview.percentActive", "{rate}% Active", { rate: adoptionRate })}
               trendType={adoptionRate >= 50 ? 'up' : 'neutral'}
             />
             <StatCard
-              title="Total Active Bank Accounts"
+              title={t("dashboardModule.branchOverview.totalActiveBankAccounts", "Total Active Bank Accounts")}
               value={loading ? '...' : totalAccounts.toLocaleString()}
-              subtitle="Savings & scheme accounts"
+              subtitle={t("dashboardModule.branchOverview.savingsAndSchemeAccounts", "Savings & scheme accounts")}
               icon={Wallet}
-              trend="Bank Portfolios"
+              trend={t("dashboardModule.branchOverview.bankPortfolios", "Bank Portfolios")}
               trendType="neutral"
             />
           </div>
@@ -416,48 +421,48 @@ export default function SuperAdminBranchOverview() {
             <div className="flex items-center gap-2">
               <Calendar className="w-4 h-4 text-[#00b4a7]" />
               <h3 className="font-serif font-bold text-slate-900 text-base sm:text-lg">
-                Period Operations &amp; Cash Flow
+                {t("dashboardModule.branchOverview.periodOperationsCashFlow", "Period Operations & Cash Flow")}
               </h3>
               <span className="text-xs font-medium text-slate-400">
                 &bull;{' '}
                 {fromDate && toDate
                   ? `${formatDate(fromDate)} – ${formatDate(toDate)}`
-                  : 'Today'}
+                  : t("dashboardModule.branchOverview.today", "Today")}
               </span>
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
             <StatCard
-              title="New Members"
+              title={t("dashboardModule.branchOverview.newMembers", "New Members")}
               value={loading ? '...' : membersRegisteredInPeriod.toLocaleString()}
-              subtitle="Registered in period"
+              subtitle={t("dashboardModule.branchOverview.registeredInPeriod", "Registered in period")}
               icon={Users}
-              trend="New Registrations"
+              trend={t("dashboardModule.branchOverview.newRegistrations", "New Registrations")}
               trendType="up"
             />
             <StatCard
-              title="Accounts Opened"
+              title={t("dashboardModule.branchOverview.accountsOpened", "Accounts Opened")}
               value={loading ? '...' : accountsOpenedInPeriod.toLocaleString()}
-              subtitle="Opened in period"
+              subtitle={t("dashboardModule.branchOverview.openedInPeriod", "Opened in period")}
               icon={Wallet}
-              trend="New Passbooks"
+              trend={t("dashboardModule.branchOverview.newPassbooks", "New Passbooks")}
               trendType="up"
             />
             <StatCard
-              title="Counter Cash Deposits"
+              title={t("dashboardModule.branchOverview.counterCashDeposits", "Counter Cash Deposits")}
               value={loading ? '...' : formatCurrency(totalDepositAmt)}
-              subtitle={`${totalDepositCount} cash inflows`}
+              subtitle={t("dashboardModule.branchOverview.cashInflowsCount", "{count} cash inflows", { count: totalDepositCount })}
               icon={ArrowDownLeft}
-              trend="Inflow"
+              trend={t("dashboardModule.branchOverview.inflow", "Inflow")}
               trendType="up"
             />
             <StatCard
-              title="Counter Cash Withdrawals"
+              title={t("dashboardModule.branchOverview.counterCashWithdrawals", "Counter Cash Withdrawals")}
               value={loading ? '...' : formatCurrency(totalWithdrawalAmt)}
-              subtitle={`${totalWithdrawalCount} cash outflows`}
+              subtitle={t("dashboardModule.branchOverview.cashOutflowsCount", "{count} cash outflows", { count: totalWithdrawalCount })}
               icon={ArrowUpRight}
-              trend="Outflow"
+              trend={t("dashboardModule.branchOverview.outflow", "Outflow")}
               trendType="down"
             />
           </div>
@@ -471,14 +476,14 @@ export default function SuperAdminBranchOverview() {
                 <div className="flex items-center gap-2">
                   <Building2 className="w-5 h-5 text-[#00b4a7]" />
                   <h3 className="font-serif font-bold text-slate-900 text-lg sm:text-xl">
-                    Society Branches Portfolio Performance
+                    {t("dashboardModule.branchOverview.societyBranchesPortfolio", "Society Branches Portfolio Performance")}
                   </h3>
                   <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-teal-50 text-teal-800 border border-teal-200">
-                    {overviewList.length} Operating Hubs
+                    {t("dashboardModule.branchOverview.operatingHubsCount", "{count} Operating Hubs", { count: overviewList.length })}
                   </span>
                 </div>
                 <p className="text-xs text-slate-500 font-medium mt-1">
-                  Cross-branch operational comparisons for the selected period.
+                  {t("dashboardModule.branchOverview.crossBranchComparisons", "Cross-branch operational comparisons for the selected period.")}
                 </p>
               </div>
             </div>
@@ -487,14 +492,14 @@ export default function SuperAdminBranchOverview() {
               <table className="w-full text-left border-collapse min-w-[800px]">
                 <thead>
                   <tr className="border-b border-slate-200 bg-slate-50/80 text-[11px] font-bold uppercase tracking-wider text-slate-500 select-none">
-                    <th className="py-3.5 px-5">Branch Hub</th>
-                    <th className="py-3.5 px-4 text-center">Status</th>
-                    <th className="py-3.5 px-4 text-right">Total Members</th>
-                    <th className="py-3.5 px-4 text-right">Active Accounts</th>
-                    <th className="py-3.5 px-4 text-right">Deposits</th>
-                    <th className="py-3.5 px-4 text-right">Withdrawals</th>
-                    <th className="py-3.5 px-4 text-right">Net Flow</th>
-                    <th className="py-3.5 px-5 text-center">Enquiries</th>
+                    <th className="py-3.5 px-5">{t("dashboardModule.branchOverview.colBranchHub", "Branch Hub")}</th>
+                    <th className="py-3.5 px-4 text-center">{t("common.status", "Status")}</th>
+                    <th className="py-3.5 px-4 text-right">{t("dashboard.totalMembers", "Total Members")}</th>
+                    <th className="py-3.5 px-4 text-right">{t("dashboard.activeAccounts", "Active Accounts")}</th>
+                    <th className="py-3.5 px-4 text-right">{t("dashboardModule.branchOverview.colDeposits", "Deposits")}</th>
+                    <th className="py-3.5 px-4 text-right">{t("dashboardModule.branchOverview.colWithdrawals", "Withdrawals")}</th>
+                    <th className="py-3.5 px-4 text-right">{t("dashboardModule.branchOverview.colNetFlow", "Net Flow")}</th>
+                    <th className="py-3.5 px-5 text-center">{t("dashboardModule.branchOverview.colEnquiries", "Enquiries")}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-xs font-medium text-slate-700">
@@ -518,7 +523,7 @@ export default function SuperAdminBranchOverview() {
                             className={`inline-block w-2 h-2 rounded-full ${
                               branch.branch_is_active !== false ? 'bg-emerald-500' : 'bg-slate-300'
                             }`}
-                            title={branch.branch_is_active !== false ? 'Active' : 'Inactive'}
+                            title={branch.branch_is_active !== false ? t("common.active", "Active") : t("common.inactive", "Inactive")}
                           />
                         </td>
                         <td className="py-3.5 px-4 text-right font-semibold text-slate-800">
@@ -559,14 +564,16 @@ export default function SuperAdminBranchOverview() {
                   <HelpCircle className="w-4 h-4 text-[#00b4a7]" />
                 </div>
                 <h3 className="font-serif font-bold text-slate-900 text-lg sm:text-xl">
-                  {isSingleBranch ? `${singleBranch?.branch_name || 'Branch'} Enquiries` : 'Society Enquiries Feed'}
+                  {isSingleBranch
+                    ? t("dashboardModule.branchOverview.branchEnquiriesTitle", "{{branch}} Enquiries", { branch: singleBranch?.branch_name || t("dashboard.branch", "Branch") })
+                    : t("dashboardModule.branchOverview.societyEnquiriesFeed", "Society Enquiries Feed")}
                 </h3>
                 <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-teal-50 text-teal-800 border border-teal-200">
-                  {totalEnquiriesCount} Total
+                  {t("dashboardModule.branchOverview.totalEnquiriesBadge", "{count} Total", { count: totalEnquiriesCount })}
                 </span>
               </div>
               <p className="text-xs text-slate-500 font-medium mt-1">
-                Helpdesk tickets and member inquiries submitted during this operational window.
+                {t("dashboardModule.branchOverview.enquiriesFeedDesc", "Helpdesk tickets and member inquiries submitted during this operational window.")}
               </p>
             </div>
 
@@ -576,7 +583,7 @@ export default function SuperAdminBranchOverview() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search ticket, member..."
+                placeholder={t("dashboardModule.branchOverview.searchEnquiriesPlaceholder", "Search ticket, member...")}
                 className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#00b4a7] focus:ring-2 focus:ring-teal-100 transition-all"
               />
             </div>
@@ -586,14 +593,14 @@ export default function SuperAdminBranchOverview() {
             <table className="w-full text-left border-collapse min-w-[850px]">
               <thead>
                 <tr className="border-b border-slate-200 bg-slate-50/80 text-[11px] font-bold uppercase tracking-wider text-slate-500 select-none">
-                  <th className="py-3.5 px-5">Ticket ID</th>
-                  {!isSingleBranch && <th className="py-3.5 px-5">Branch</th>}
-                  <th className="py-3.5 px-5">Member</th>
-                  <th className="py-3.5 px-5">Subject</th>
-                  <th className="py-3.5 px-5">Message Preview</th>
-                  <th className="py-3.5 px-5 text-center">Status</th>
-                  <th className="py-3.5 px-5">Submitted At</th>
-                  <th className="py-3.5 px-5 text-center">Action</th>
+                  <th className="py-3.5 px-5">{t("dashboardModule.branchOverview.colTicketId", "Ticket ID")}</th>
+                  {!isSingleBranch && <th className="py-3.5 px-5">{t("dashboard.branch", "Branch")}</th>}
+                  <th className="py-3.5 px-5">{t("dashboardModule.branchOverview.colMember", "Member")}</th>
+                  <th className="py-3.5 px-5">{t("contact.subject", "Subject")}</th>
+                  <th className="py-3.5 px-5">{t("dashboardModule.branchOverview.colMessagePreview", "Message Preview")}</th>
+                  <th className="py-3.5 px-5 text-center">{t("common.status", "Status")}</th>
+                  <th className="py-3.5 px-5">{t("dashboardModule.branchOverview.colSubmittedAt", "Submitted At")}</th>
+                  <th className="py-3.5 px-5 text-center">{t("dashboardModule.branchOverview.colAction", "Action")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-xs font-medium text-slate-700">
@@ -602,7 +609,7 @@ export default function SuperAdminBranchOverview() {
                     <td colSpan={isSingleBranch ? 7 : 8} className="py-12 text-center text-slate-400">
                       <div className="flex flex-col items-center justify-center gap-2">
                         <Loader2 className="w-6 h-6 animate-spin text-[#00b4a7]" />
-                        <span>Loading submitted enquiries...</span>
+                        <span>{t("dashboardModule.branchOverview.loadingEnquiries", "Loading submitted enquiries...")}</span>
                       </div>
                     </td>
                   </tr>
@@ -611,17 +618,18 @@ export default function SuperAdminBranchOverview() {
                     <td colSpan={isSingleBranch ? 7 : 8} className="py-12 text-center text-slate-400">
                       <div className="max-w-xs mx-auto space-y-1">
                         <HelpCircle className="w-8 h-8 text-slate-300 mx-auto" />
-                        <p className="font-bold text-slate-700 text-sm">No enquiries found</p>
+                        <p className="font-bold text-slate-700 text-sm">{t("dashboardModule.branchOverview.noEnquiriesFound", "No enquiries found")}</p>
                         <p className="text-[11px] text-slate-400">
                           {searchQuery
-                            ? 'No enquiries match your search query.'
-                            : 'No customer service enquiries submitted for this period.'}
+                            ? t("dashboardModule.branchOverview.noEnquiriesMatch", "No enquiries match your search query.")
+                            : t("dashboardModule.branchOverview.noEnquiriesPeriod", "No customer service enquiries submitted for this period.")}
                         </p>
                       </div>
                     </td>
                   </tr>
                 ) : (
                   filteredEnquiries.map((enq) => {
+  const { t } = useTranslation();
                     const statusStr = String(enq.status || 'pending').toLowerCase();
                     const isSolved = statusStr === 'solved' || statusStr === 'resolved' || statusStr === 'closed';
                     const isInProgress = statusStr === 'in_progress';
@@ -629,15 +637,15 @@ export default function SuperAdminBranchOverview() {
                     return (
                       <tr key={enq.id} className="hover:bg-slate-50/70 transition-colors">
                         <td className="py-3.5 px-5 font-mono font-bold text-teal-800 whitespace-nowrap">
-                          #ENQ-{enq.id}
+                          {t("branchManagerOverview.enq", "#ENQ-")}{enq.id}
                         </td>
                         {!isSingleBranch && (
                           <td className="py-3.5 px-5 whitespace-nowrap font-semibold text-slate-800">
-                            {enq.branch_name || 'Branch'}
+                            {enq.branch_name || t("dashboard.branch", "Branch")}
                           </td>
                         )}
                         <td className="py-3.5 px-5 whitespace-nowrap">
-                          <div className="font-bold text-slate-900">{enq.member_name || 'Member'}</div>
+                          <div className="font-bold text-slate-900">{enq.member_name || t("dashboardModule.branchOverview.colMember", "Member")}</div>
                           {enq.member_code && (
                             <span className="text-[10px] text-slate-400 font-mono">
                               #{enq.member_code}
@@ -645,7 +653,7 @@ export default function SuperAdminBranchOverview() {
                           )}
                         </td>
                         <td className="py-3.5 px-5 font-semibold text-slate-800 max-w-xs truncate" title={enq.subject}>
-                          {enq.subject || 'Assistance Request'}
+                          {enq.subject || t("dashboardModule.branchOverview.assistanceRequest", "Assistance Request")}
                         </td>
                         <td className="py-3.5 px-5 text-slate-600 max-w-sm truncate" title={enq.message}>
                           {enq.message || '—'}
@@ -654,16 +662,16 @@ export default function SuperAdminBranchOverview() {
                           {isSolved ? (
                             <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
                               <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                              <span>Solved</span>
+                              <span>{t("dashboardModule.branchOverview.statusSolved", "Solved")}</span>
                             </span>
                           ) : isInProgress ? (
                             <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-800 border border-blue-200">
                               <Clock className="w-3 h-3 text-blue-600" />
-                              <span>In Progress</span>
+                              <span>{t("dashboardModule.branchOverview.statusInProgress", "In Progress")}</span>
                             </span>
                           ) : (
                             <span className="inline-block text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
-                              Pending
+                              {t("common.pending", "Pending")}
                             </span>
                           )}
                         </td>
@@ -675,10 +683,10 @@ export default function SuperAdminBranchOverview() {
                             type="button"
                             onClick={() => setSelectedEnquiry(enq)}
                             className="px-2.5 py-1 rounded-lg bg-teal-50 hover:bg-teal-100 text-teal-800 text-xs font-bold transition-all cursor-pointer flex items-center gap-1 border border-teal-200 mx-auto"
-                            title="Read enquiry message"
+                            title={t("dashboardModule.branchOverview.readEnquiryTitle", "Read enquiry message")}
                           >
                             <Eye className="w-3 h-3 text-teal-600" />
-                            <span>Read</span>
+                            <span>{t("dashboardModule.branchOverview.read", "Read")}</span>
                           </button>
                         </td>
                       </tr>
@@ -729,10 +737,10 @@ export default function SuperAdminBranchOverview() {
                 </div>
                 <div>
                   <h3 className="font-serif font-black text-slate-900 text-base">
-                    Enquiry #ENQ-{selectedEnquiry.id}
+                    {t("dashboardModule.branchOverview.enquiryLabel", "Enquiry")} {t("branchManagerOverview.enq", "#ENQ-")}{selectedEnquiry.id}
                   </h3>
                   <span className="text-[11px] text-slate-500 font-medium">
-                    {selectedEnquiry.branch_name ? `${selectedEnquiry.branch_name} &bull; ` : ''}From {selectedEnquiry.member_name} ({selectedEnquiry.member_code ? `#${selectedEnquiry.member_code}` : `Member #${selectedEnquiry.member_id}`})
+                    {selectedEnquiry.branch_name ? <>{selectedEnquiry.branch_name} &bull; </> : ''}{t("dashboardModule.branchOverview.fromSender", "From")} {selectedEnquiry.member_name} ({selectedEnquiry.member_code ? `#${selectedEnquiry.member_code}` : `${t("dashboardModule.branchOverview.colMember", "Member")} #${selectedEnquiry.member_id}`})
                   </span>
                 </div>
               </div>
@@ -748,7 +756,7 @@ export default function SuperAdminBranchOverview() {
             <div className="p-5 space-y-4">
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
-                  Subject
+                  {t("contact.subject", "Subject")}
                 </span>
                 <p className="text-sm font-bold text-slate-900 bg-slate-50 p-3 rounded-xl border border-slate-100">
                   {selectedEnquiry.subject}
@@ -757,7 +765,7 @@ export default function SuperAdminBranchOverview() {
 
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
-                  Inquiry Message
+                  {t("dashboardModule.branchOverview.inquiryMessage", "Inquiry Message")}
                 </span>
                 <div className="text-xs sm:text-sm text-slate-700 bg-slate-50 p-3.5 rounded-xl border border-slate-100 whitespace-pre-wrap leading-relaxed">
                   {selectedEnquiry.message}
@@ -766,11 +774,11 @@ export default function SuperAdminBranchOverview() {
 
               <div className="grid grid-cols-2 gap-3 text-xs pt-1">
                 <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Status</span>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">{t("common.status", "Status")}</span>
                   <span className="font-bold text-slate-800 capitalize mt-0.5 block">{selectedEnquiry.status}</span>
                 </div>
                 <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Submitted On</span>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">{t("dashboardModule.branchOverview.submittedOn", "Submitted On")}</span>
                   <span className="font-bold text-slate-800 mt-0.5 block">{formatDateTime(selectedEnquiry.submitted_at)}</span>
                 </div>
               </div>
@@ -782,7 +790,7 @@ export default function SuperAdminBranchOverview() {
                 onClick={() => setSelectedEnquiry(null)}
                 className="px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-all cursor-pointer"
               >
-                Close
+                {t("common.close", "Close")}
               </button>
             </div>
           </div>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import ProductAccountsDirectoryView from '../../components/dashboard/ProductAccountsDirectoryView';
 import {
@@ -11,6 +12,7 @@ import {
 } from 'lucide-react';
 
 export default function AccountantProductAccounts() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('fd_mis'); // 'fd_mis' | 'investment'
 
   return (
@@ -23,26 +25,26 @@ export default function AccountantProductAccounts() {
             <div className="inline-flex flex-wrap items-center gap-x-2 gap-y-1 px-3 sm:px-3.5 py-1.5 rounded-2xl sm:rounded-full bg-white/95 backdrop-blur-xs text-[11px] sm:text-xs font-semibold border border-teal-200/80 shadow-2xs text-[#0f766e] mb-3 max-w-full">
               <span className="inline-flex items-center gap-1.5 flex-shrink-0">
                 <Calculator className="w-3.5 h-3.5 text-[#00b4a7]" />
-                <span>Role: <strong className="font-bold text-teal-950">Accountant</strong></span>
+                <span>{t("dashboardModule.monthlyTargets.roleLabel", "Role:")} <strong className="font-bold text-teal-950">{t("accountantProductAccounts.accountant", "Accountant")}</strong></span>
               </span>
               <span className="text-teal-300 hidden sm:inline">•</span>
-              <span className="text-slate-600 sm:text-[#0f766e]">Financial Auditing &amp; Ledgers</span>
+              <span className="text-slate-600 sm:text-[#0f766e]">{t("accountantProductAccounts.financialAuditingLedgers", "Financial Auditing & Ledgers")}</span>
               <span className="text-teal-300 hidden sm:inline">•</span>
               <span className="inline-flex items-center gap-1.5 font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full text-[10px] sm:text-xs flex-shrink-0">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                Auditor Access
+                {t("accountantProductAccounts.auditorAccess", "Auditor Access")}
               </span>
             </div>
 
             <div className="flex items-center gap-2.5 sm:gap-3">
               <span className="w-1.5 h-7 sm:h-9 bg-[#00b4a7] rounded-full flex-shrink-0" />
               <h1 className="text-xl sm:text-3xl lg:text-4xl font-serif font-bold text-slate-900 tracking-tight">
-                Deposit &amp; Investment Accounts
+                {t("accountantProductAccounts.depositInvestmentAccounts", "Deposit & Investment Accounts")}
               </h1>
             </div>
 
             <p className="text-slate-600 text-xs sm:text-sm mt-2 sm:mt-2.5 font-medium leading-relaxed max-w-xl">
-              Inspect opened term fixed deposits, monthly income schemes (MIS), and recurring investment accounts across branch folios.
+              {t("accountantProductAccounts.inspectOpenedTermFixedDeposits", "Inspect opened term fixed deposits, monthly income schemes (MIS), and recurring investment accounts across branch folios.")}
             </p>
           </div>
 
@@ -72,7 +74,7 @@ export default function AccountantProductAccounts() {
             }`}
           >
             <Coins className="w-4 h-4" />
-            <span>FD &amp; MIS Accounts</span>
+            <span>{t("dashboardModule.productAccounts.fdMisAccounts", "FD & MIS Accounts")}</span>
           </button>
 
           <button
@@ -85,7 +87,7 @@ export default function AccountantProductAccounts() {
             }`}
           >
             <TrendingUp className="w-4 h-4" />
-            <span>Investment Accounts</span>
+            <span>{t("modal.member.tabInvestmentAccounts", "Investment Accounts")}</span>
           </button>
         </div>
 
@@ -94,13 +96,13 @@ export default function AccountantProductAccounts() {
           <ProductAccountsDirectoryView
             role="accountant"
             productType="fd_mis"
-            title="Branch FD &amp; MIS Accounts"
+            title={t("accountantProductAccounts.branchFdMisAccounts", "Branch FD & MIS Accounts")}
           />
         ) : (
           <ProductAccountsDirectoryView
             role="accountant"
             productType="investment"
-            title="Branch Investment Accounts"
+            title={t("accountantProductAccounts.branchInvestmentAccounts", "Branch Investment Accounts")}
           />
         )}
       </div>

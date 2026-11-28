@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { i18n } from '../../i18n/index.js';
+import { useTranslation } from 'react-i18next';
 import {
   X,
   Landmark,
@@ -64,6 +66,7 @@ export function LoanSchemeFormModal({
   onSubmit,
   isSubmitting = false
 }) {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState(DEFAULT_SCHEME_FORM);
   const [activeSection, setActiveSection] = useState('general'); // 'general' | 'fees' | 'operations'
   const [errorPopup, setErrorPopup] = useState(null);
@@ -127,35 +130,35 @@ export function LoanSchemeFormModal({
     if (activeSection === 'general') {
       if (!formData.scheme_name.trim()) {
         setErrorPopup({
-          title: 'Validation Error',
+          title: i18n.t("modal.branchAdmin.validationError", "Validation Error"),
           message: 'Scheme name is required.'
         });
         return;
       }
       if (!formData.scheme_code.trim()) {
         setErrorPopup({
-          title: 'Validation Error',
+          title: i18n.t("modal.branchAdmin.validationError", "Validation Error"),
           message: 'Scheme code is required (e.g. SCH-AGRO-01).'
         });
         return;
       }
       if (!formData.max_loan_amount || Number(formData.max_loan_amount) <= 0) {
         setErrorPopup({
-          title: 'Validation Error',
+          title: i18n.t("modal.branchAdmin.validationError", "Validation Error"),
           message: 'Maximum loan amount must be greater than zero.'
         });
         return;
       }
       if (!formData.max_tenure_months || Number(formData.max_tenure_months) <= 0) {
         setErrorPopup({
-          title: 'Validation Error',
+          title: i18n.t("modal.branchAdmin.validationError", "Validation Error"),
           message: 'Maximum tenure must be at least 1 month.'
         });
         return;
       }
       if (formData.annual_interest_rate === '' || Number(formData.annual_interest_rate) < 0) {
         setErrorPopup({
-          title: 'Validation Error',
+          title: i18n.t("modal.branchAdmin.validationError", "Validation Error"),
           message: 'Annual interest rate is required.'
         });
         return;
@@ -163,26 +166,26 @@ export function LoanSchemeFormModal({
       setActiveSection('fees');
     } else if (activeSection === 'fees') {
       const percentFields = [
-        { key: 'processing_fee', label: 'Processing Fee' },
-        { key: 'stamp_duty_charge', label: 'Stamp Duty Charge' },
-        { key: 'insurance_fee', label: 'Insurance Fee' },
-        { key: 'documentation_fee', label: 'Documentation Fee' },
-        { key: 'foreclosure_charges', label: 'Foreclosure Charges' },
-        { key: 'penalty_charges', label: 'Penalty Charges' }
+        { key: 'processing_fee', label: i18n.t("branchManagerLoanSchemes.processingFee", "Processing Fee") },
+        { key: 'stamp_duty_charge', label: i18n.t("loanSchemeModals.stampDutyCharge", "Stamp Duty Charge") },
+        { key: 'insurance_fee', label: i18n.t("branchManagerLoanSchemes.insuranceFee", "Insurance Fee") },
+        { key: 'documentation_fee', label: i18n.t("loanSchemeModals.documentationFee", "Documentation Fee") },
+        { key: 'foreclosure_charges', label: i18n.t("loanSchemeModals.foreclosureCharges", "Foreclosure Charges") },
+        { key: 'penalty_charges', label: i18n.t("loanSchemeModals.penaltyCharges", "Penalty Charges") }
       ];
 
       for (const field of percentFields) {
         const val = Number(formData[field.key]) || 0;
         if (val > 100) {
           setErrorPopup({
-            title: 'Percentage Limit (0% - 100%)',
+            title: i18n.t("loanSchemeModals.percentageLimit0100", "Percentage Limit (0% - 100%)"),
             message: `${field.label} cannot exceed 100% since its type is fixed to percentage (% of loan). Please enter a percentage value between 0 and 100 (e.g. 1 for 1%, 2.5 for 2.5%). Current entered value is ${val}%.`
           });
           return;
         }
         if (val < 0) {
           setErrorPopup({
-            title: 'Validation Error',
+            title: i18n.t("modal.branchAdmin.validationError", "Validation Error"),
             message: `${field.label} cannot be negative.`
           });
           return;
@@ -199,7 +202,7 @@ export function LoanSchemeFormModal({
     if (!formData.scheme_name.trim()) {
       setActiveSection('general');
       setErrorPopup({
-        title: 'Validation Error',
+        title: i18n.t("modal.branchAdmin.validationError", "Validation Error"),
         message: 'Scheme name is required.'
       });
       return;
@@ -208,7 +211,7 @@ export function LoanSchemeFormModal({
     if (!formData.scheme_code.trim()) {
       setActiveSection('general');
       setErrorPopup({
-        title: 'Validation Error',
+        title: i18n.t("modal.branchAdmin.validationError", "Validation Error"),
         message: 'Scheme code is required (e.g. SCH-AGRO-01).'
       });
       return;
@@ -217,7 +220,7 @@ export function LoanSchemeFormModal({
     if (Number(formData.max_loan_amount) <= 0) {
       setActiveSection('general');
       setErrorPopup({
-        title: 'Validation Error',
+        title: i18n.t("modal.branchAdmin.validationError", "Validation Error"),
         message: 'Maximum loan amount must be greater than zero.'
       });
       return;
@@ -226,7 +229,7 @@ export function LoanSchemeFormModal({
     if (Number(formData.max_tenure_months) <= 0) {
       setActiveSection('general');
       setErrorPopup({
-        title: 'Validation Error',
+        title: i18n.t("modal.branchAdmin.validationError", "Validation Error"),
         message: 'Maximum tenure in months must be at least 1 month.'
       });
       return;
@@ -235,19 +238,19 @@ export function LoanSchemeFormModal({
     if (Number(formData.annual_interest_rate) < 0) {
       setActiveSection('general');
       setErrorPopup({
-        title: 'Validation Error',
+        title: i18n.t("modal.branchAdmin.validationError", "Validation Error"),
         message: 'Annual interest rate cannot be negative.'
       });
       return;
     }
 
     const percentFields = [
-      { key: 'processing_fee', label: 'Processing Fee' },
-      { key: 'stamp_duty_charge', label: 'Stamp Duty Charge' },
-      { key: 'insurance_fee', label: 'Insurance Fee' },
-      { key: 'documentation_fee', label: 'Documentation Fee' },
-      { key: 'foreclosure_charges', label: 'Foreclosure Charges' },
-      { key: 'penalty_charges', label: 'Penalty Charges' }
+      { key: 'processing_fee', label: i18n.t("branchManagerLoanSchemes.processingFee", "Processing Fee") },
+      { key: 'stamp_duty_charge', label: i18n.t("loanSchemeModals.stampDutyCharge", "Stamp Duty Charge") },
+      { key: 'insurance_fee', label: i18n.t("branchManagerLoanSchemes.insuranceFee", "Insurance Fee") },
+      { key: 'documentation_fee', label: i18n.t("loanSchemeModals.documentationFee", "Documentation Fee") },
+      { key: 'foreclosure_charges', label: i18n.t("loanSchemeModals.foreclosureCharges", "Foreclosure Charges") },
+      { key: 'penalty_charges', label: i18n.t("loanSchemeModals.penaltyCharges", "Penalty Charges") }
     ];
 
     for (const field of percentFields) {
@@ -255,7 +258,7 @@ export function LoanSchemeFormModal({
       if (val > 100) {
         setActiveSection('fees');
         setErrorPopup({
-          title: 'Percentage Limit (0% - 100%)',
+          title: i18n.t("loanSchemeModals.percentageLimit0100", "Percentage Limit (0% - 100%)"),
           message: `${field.label} cannot exceed 100% since its type is fixed to percentage (% of loan). Please enter a percentage value between 0 and 100 (e.g. 1 for 1%, 2.5 for 2.5%). Current entered value is ${val}%.`
         });
         return;
@@ -263,7 +266,7 @@ export function LoanSchemeFormModal({
       if (val < 0) {
         setActiveSection('fees');
         setErrorPopup({
-          title: 'Validation Error',
+          title: i18n.t("modal.branchAdmin.validationError", "Validation Error"),
           message: `${field.label} cannot be negative.`
         });
         return;
@@ -331,12 +334,12 @@ export function LoanSchemeFormModal({
             </div>
             <div>
               <h3 className="text-lg sm:text-xl font-bold text-slate-900">
-                {isEdit ? 'Update Loan Scheme' : 'Create New Loan Scheme'}
+                {isEdit ? t("loanSchemeModals.updateLoanScheme", "Update Loan Scheme") : t("loanSchemeModals.createNewLoanScheme", "Create New Loan Scheme")}
               </h3>
               <p className="text-xs text-slate-500 mt-0.5">
                 {isEdit
                   ? `Modifying scheme "${initialData?.scheme_name || initialData?.scheme_code || 'Product'}"`
-                  : 'Define lending rates, tenures, processing fees, and per-EMI charges'}
+                  : t("loanSchemeModals.defineLendingRatesTenuresProcessing", "Define lending rates, tenures, processing fees, and per-EMI charges")}
               </p>
             </div>
           </div>
@@ -361,7 +364,7 @@ export function LoanSchemeFormModal({
             }`}
           >
             <Tag className="w-3.5 h-3.5" />
-            <span>1. Identity & Lending Terms</span>
+            <span>{t("loanSchemeModals.1IdentityLendingTerms", "1. Identity & Lending Terms")}</span>
           </button>
           <button
             type="button"
@@ -373,7 +376,7 @@ export function LoanSchemeFormModal({
             }`}
           >
             <Receipt className="w-3.5 h-3.5" />
-            <span>2. Upfront & Default Fees</span>
+            <span>{t("loanSchemeModals.2UpfrontDefaultFees", "2. Upfront & Default Fees")}</span>
           </button>
           <button
             type="button"
@@ -385,7 +388,7 @@ export function LoanSchemeFormModal({
             }`}
           >
             <Coins className="w-3.5 h-3.5" />
-            <span>3. Per-EMI & Operational Levies</span>
+            <span>{t("loanSchemeModals.3PerEmiOperationalLevies", "3. Per-EMI & Operational Levies")}</span>
           </button>
         </div>
 
@@ -411,12 +414,12 @@ export function LoanSchemeFormModal({
               <div className="bg-slate-50/70 p-4 rounded-2xl border border-slate-200/80">
                 <h4 className="text-xs font-bold text-teal-800 uppercase tracking-wider mb-3 flex items-center gap-2">
                   <Tag className="w-4 h-4 text-teal-600" />
-                  <span>Scheme Identification</span>
+                  <span>{t("fdMisSchemeModals.schemeIdentification", "Scheme Identification")}</span>
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      Scheme Name <span className="text-rose-500">*</span>
+                      {t("dashboardModule.productAccounts.schemeName", "Scheme Name")} <span className="text-rose-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -424,14 +427,14 @@ export function LoanSchemeFormModal({
                       required
                       value={formData.scheme_name}
                       onChange={handleChange}
-                      placeholder="e.g. Agro Gold Harvest Credit"
+                      placeholder={t("loanSchemeModals.eGAgroGoldHarvest", "e.g. Agro Gold Harvest Credit")}
                       className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 focus:outline-none focus:border-[#008f85]"
                     />
                   </div>
 
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      Scheme Code <span className="text-rose-500">*</span>
+                      {t("dashboardModule.productAccounts.schemeCode", "Scheme Code")} <span className="text-rose-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -439,7 +442,7 @@ export function LoanSchemeFormModal({
                       required
                       value={formData.scheme_code}
                       onChange={handleChange}
-                      placeholder="e.g. SCH-AGRO-01"
+                      placeholder={t("loanSchemeModals.eGSchAgro01", "e.g. SCH-AGRO-01")}
                       className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs sm:text-sm font-mono uppercase text-slate-800 focus:outline-none focus:border-[#008f85]"
                     />
                   </div>
@@ -450,12 +453,12 @@ export function LoanSchemeFormModal({
               <div className="bg-slate-50/70 p-4 rounded-2xl border border-slate-200/80">
                 <h4 className="text-xs font-bold text-teal-800 uppercase tracking-wider mb-3 flex items-center gap-2">
                   <Percent className="w-4 h-4 text-teal-600" />
-                  <span>Loan Caps & Annual Interest Rates</span>
+                  <span>{t("loanSchemeModals.loanCapsAnnualInterestRates", "Loan Caps & Annual Interest Rates")}</span>
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      Max Loan Amount (₹) <span className="text-rose-500">*</span>
+                      {t("loanSchemeModals.maxLoanAmount", "Max Loan Amount (₹)")} <span className="text-rose-500">*</span>
                     </label>
                     <input
                       type="number"
@@ -471,7 +474,7 @@ export function LoanSchemeFormModal({
 
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      Max Tenure (Months) <span className="text-rose-500">*</span>
+                      {t("loanSchemeModals.maxTenureMonths", "Max Tenure (Months)")} <span className="text-rose-500">*</span>
                     </label>
                     <input
                       type="number"
@@ -487,7 +490,7 @@ export function LoanSchemeFormModal({
 
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      Annual Interest Rate (%) <span className="text-rose-500">*</span>
+                      {t("fdMisSchemeModals.annualInterestRate", "Annual Interest Rate (%)")} <span className="text-rose-500">*</span>
                     </label>
                     <input
                       type="number"
@@ -504,7 +507,7 @@ export function LoanSchemeFormModal({
 
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      Overdue Interest Rate (%)
+                      {t("loanSchemeModals.overdueInterestRate", "Overdue Interest Rate (%)")}
                     </label>
                     <input
                       type="number"
@@ -516,12 +519,12 @@ export function LoanSchemeFormModal({
                       placeholder="e.g. 2"
                       className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 focus:outline-none focus:border-[#008f85]"
                     />
-                    <p className="text-[10px] text-slate-400 mt-0.5">Penal interest on late EMI amounts</p>
+                    <p className="text-[10px] text-slate-400 mt-0.5">{t("loanSchemeModals.penalInterestOnLateEmi", "Penal interest on late EMI amounts")}</p>
                   </div>
 
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      Credit Period Grace (Days)
+                      {t("loanSchemeModals.creditPeriodGraceDays", "Credit Period Grace (Days)")}
                     </label>
                     <input
                       type="number"
@@ -532,7 +535,7 @@ export function LoanSchemeFormModal({
                       placeholder="e.g. 7"
                       className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 focus:outline-none focus:border-[#008f85]"
                     />
-                    <p className="text-[10px] text-slate-400 mt-0.5">Grace period before default penalty triggers</p>
+                    <p className="text-[10px] text-slate-400 mt-0.5">{t("loanSchemeModals.gracePeriodBeforeDefaultPenalty", "Grace period before default penalty triggers")}</p>
                   </div>
                 </div>
               </div>
@@ -546,16 +549,16 @@ export function LoanSchemeFormModal({
                 <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
                   <h4 className="text-xs font-bold text-teal-800 uppercase tracking-wider flex items-center gap-2">
                     <Receipt className="w-4 h-4 text-teal-600" />
-                    <span>Sanction & Loan Documentation Fees</span>
+                    <span>{t("loanSchemeModals.sanctionLoanDocumentationFees", "Sanction & Loan Documentation Fees")}</span>
                   </h4>
                   <span className="text-[11px] font-semibold text-teal-700 bg-teal-100/70 border border-teal-200/80 px-2.5 py-0.5 rounded-full">
-                    Percentage values: 0% – 100%
+                    {t("loanSchemeModals.percentageValues0100", "Percentage values: 0% – 100%")}
                   </span>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Processing Fee */}
                   <div className="p-3 bg-white rounded-xl border border-slate-200">
-                    <label className="block text-xs font-semibold text-slate-800 mb-1">Processing Fee</label>
+                    <label className="block text-xs font-semibold text-slate-800 mb-1">{t("branchManagerLoanSchemes.processingFee", "Processing Fee")}</label>
                     <div className="flex items-center gap-2">
                       <input
                         type="number"
@@ -576,7 +579,7 @@ export function LoanSchemeFormModal({
 
                   {/* Stamp Duty */}
                   <div className="p-3 bg-white rounded-xl border border-slate-200">
-                    <label className="block text-xs font-semibold text-slate-800 mb-1">Stamp Duty Charge</label>
+                    <label className="block text-xs font-semibold text-slate-800 mb-1">{t("loanSchemeModals.stampDutyCharge", "Stamp Duty Charge")}</label>
                     <div className="flex items-center gap-2">
                       <input
                         type="number"
@@ -597,7 +600,7 @@ export function LoanSchemeFormModal({
 
                   {/* Insurance Fee */}
                   <div className="p-3 bg-white rounded-xl border border-slate-200">
-                    <label className="block text-xs font-semibold text-slate-800 mb-1">Insurance Fee</label>
+                    <label className="block text-xs font-semibold text-slate-800 mb-1">{t("branchManagerLoanSchemes.insuranceFee", "Insurance Fee")}</label>
                     <div className="flex items-center gap-2">
                       <input
                         type="number"
@@ -618,7 +621,7 @@ export function LoanSchemeFormModal({
 
                   {/* Documentation Fee */}
                   <div className="p-3 bg-white rounded-xl border border-slate-200">
-                    <label className="block text-xs font-semibold text-slate-800 mb-1">Documentation Fee</label>
+                    <label className="block text-xs font-semibold text-slate-800 mb-1">{t("loanSchemeModals.documentationFee", "Documentation Fee")}</label>
                     <div className="flex items-center gap-2">
                       <input
                         type="number"
@@ -644,16 +647,16 @@ export function LoanSchemeFormModal({
                 <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
                   <h4 className="text-xs font-bold text-rose-800 uppercase tracking-wider flex items-center gap-2">
                     <ShieldCheck className="w-4 h-4 text-rose-600" />
-                    <span>Penalty & Early Foreclosure Charges</span>
+                    <span>{t("loanSchemeModals.penaltyEarlyForeclosureCharges", "Penalty & Early Foreclosure Charges")}</span>
                   </h4>
                   <span className="text-[11px] font-semibold text-rose-700 bg-rose-100/70 border border-rose-200/80 px-2.5 py-0.5 rounded-full">
-                    Percentage values: 0% – 100%
+                    {t("loanSchemeModals.percentageValues0100", "Percentage values: 0% – 100%")}
                   </span>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Foreclosure Charges */}
                   <div className="p-3 bg-white rounded-xl border border-slate-200">
-                    <label className="block text-xs font-semibold text-slate-800 mb-1">Foreclosure Charges</label>
+                    <label className="block text-xs font-semibold text-slate-800 mb-1">{t("loanSchemeModals.foreclosureCharges", "Foreclosure Charges")}</label>
                     <div className="flex items-center gap-2">
                       <input
                         type="number"
@@ -674,7 +677,7 @@ export function LoanSchemeFormModal({
 
                   {/* Penalty Charges */}
                   <div className="p-3 bg-white rounded-xl border border-slate-200">
-                    <label className="block text-xs font-semibold text-slate-800 mb-1">Penalty Charges</label>
+                    <label className="block text-xs font-semibold text-slate-800 mb-1">{t("loanSchemeModals.penaltyCharges", "Penalty Charges")}</label>
                     <div className="flex items-center gap-2">
                       <input
                         type="number"
@@ -704,14 +707,14 @@ export function LoanSchemeFormModal({
                 <div className="mb-3">
                   <h4 className="text-xs font-bold text-teal-800 uppercase tracking-wider flex items-center gap-2">
                     <Coins className="w-4 h-4 text-teal-600" />
-                    <span>Recurring Per-EMI Operational Levies</span>
+                    <span>{t("loanSchemeModals.recurringPerEmiOperationalLevies", "Recurring Per-EMI Operational Levies")}</span>
                   </h4>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
                   {/* SMS Charges */}
                   <div className="p-3 bg-white rounded-xl border border-slate-200">
-                    <label className="block text-xs font-semibold text-slate-800 mb-1">SMS Notification Fee</label>
+                    <label className="block text-xs font-semibold text-slate-800 mb-1">{t("loanSchemeModals.smsNotificationFee", "SMS Notification Fee")}</label>
                     <div className="flex items-center gap-2">
                       <input
                         type="number"
@@ -730,7 +733,7 @@ export function LoanSchemeFormModal({
 
                   {/* Stationary Charges */}
                   <div className="p-3 bg-white rounded-xl border border-slate-200">
-                    <label className="block text-xs font-semibold text-slate-800 mb-1">Stationery &amp; Administrative Fee</label>
+                    <label className="block text-xs font-semibold text-slate-800 mb-1">{t("loanSchemeModals.stationeryAdministrativeFee", "Stationery & Administrative Fee")}</label>
                     <div className="flex items-center gap-2">
                       <input
                         type="number"
@@ -749,7 +752,7 @@ export function LoanSchemeFormModal({
 
                   {/* Fuel Charges */}
                   <div className="p-3 bg-white rounded-xl border border-slate-200">
-                    <label className="block text-xs font-semibold text-slate-800 mb-1">Field Visit &amp; Travel Fee</label>
+                    <label className="block text-xs font-semibold text-slate-800 mb-1">{t("loanSchemeModals.fieldVisitTravelFee", "Field Visit & Travel Fee")}</label>
                     <div className="flex items-center gap-2">
                       <input
                         type="number"
@@ -768,7 +771,7 @@ export function LoanSchemeFormModal({
 
                   {/* Maintenance Charges */}
                   <div className="p-3 bg-white rounded-xl border border-slate-200">
-                    <label className="block text-xs font-semibold text-slate-800 mb-1">Maintenance Fee</label>
+                    <label className="block text-xs font-semibold text-slate-800 mb-1">{t("memberLoanSchemes.maintenanceFee", "Maintenance Fee")}</label>
                     <div className="flex items-center gap-2">
                       <input
                         type="number"
@@ -787,7 +790,7 @@ export function LoanSchemeFormModal({
 
                   {/* Collection Charges */}
                   <div className="p-3 bg-white rounded-xl border border-slate-200">
-                    <label className="block text-xs font-semibold text-slate-800 mb-1">Doorstep Collection Fee</label>
+                    <label className="block text-xs font-semibold text-slate-800 mb-1">{t("loanSchemeModals.doorstepCollectionFee", "Doorstep Collection Fee")}</label>
                     <div className="flex items-center gap-2">
                       <input
                         type="number"
@@ -814,10 +817,10 @@ export function LoanSchemeFormModal({
               {activeSection !== 'general' && (
                 <button
                   type="button"
-                  onClick={() => setActiveSection(activeSection === 'operations' ? 'fees' : 'general')}
+                  onClick={() => setActiveSection(activeSection === 'operations' ? i18n.t("loanSchemeModals.fees", "fees") : i18n.t("loanSchemeModals.general", "general"))}
                   className="px-4 py-2 text-xs sm:text-sm font-bold text-slate-600 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors cursor-pointer"
                 >
-                  ← Back
+                  {t("loanSchemeModals.back", "← Back")}
                 </button>
               )}
             </div>
@@ -829,7 +832,7 @@ export function LoanSchemeFormModal({
                 disabled={isSubmitting}
                 className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm rounded-xl transition-colors cursor-pointer"
               >
-                Cancel
+                {t("common.cancel", "Cancel")}
               </button>
 
               {activeSection !== 'operations' && (
@@ -842,7 +845,7 @@ export function LoanSchemeFormModal({
                       : 'bg-gradient-to-r from-[#008f85] to-[#00a89c] hover:from-[#00786f] hover:to-[#008f85] text-white shadow-md'
                   }`}
                 >
-                  <span>Fill Next →</span>
+                  <span>{t("loanSchemeModals.fillNext", "Fill Next →")}</span>
                 </button>
               )}
 
@@ -858,7 +861,7 @@ export function LoanSchemeFormModal({
                   ) : (
                     <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   )}
-                  <span>{isEdit ? 'Save Changes' : 'Create Scheme'}</span>
+                  <span>{isEdit ? t("memberNominee.saveChanges", "Save Changes") : t("fdMisSchemeModals.createScheme", "Create Scheme")}</span>
                 </button>
               )}
             </div>
@@ -876,7 +879,7 @@ export function LoanSchemeFormModal({
 
             <div>
               <h3 className="text-xl font-black text-slate-900 tracking-tight">
-                {typeof errorPopup === 'object' ? (errorPopup.title || 'Validation Error') : 'Submission Error'}
+                {typeof errorPopup === 'object' ? (errorPopup.title || 'Validation Error') : t("modal.branchAdmin.submissionError", "Submission Error")}
               </h3>
               <p className="text-xs sm:text-sm text-rose-900 mt-2.5 leading-relaxed bg-rose-50/70 p-4 rounded-2xl border border-rose-200/80 font-medium break-words text-left">
                 {typeof errorPopup === 'object' ? (errorPopup.message || JSON.stringify(errorPopup)) : String(errorPopup)}
@@ -889,7 +892,7 @@ export function LoanSchemeFormModal({
                 onClick={() => setErrorPopup(null)}
                 className="w-full h-11 px-5 bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 text-white font-bold text-sm rounded-xl shadow-md transition-all cursor-pointer"
               >
-                Okay, Got It
+                {t("modal.branchAdmin.okayGotIt", "Okay, Got It")}
               </button>
             </div>
           </div>
@@ -908,6 +911,7 @@ export function LoanSchemeDetailModal({
   scheme = null,
   onEdit = null
 }) {
+  const { t } = useTranslation();
   if (!isOpen || !scheme) return null;
 
   const formatCurrency = (val) => {
@@ -963,11 +967,11 @@ export function LoanSchemeDetailModal({
                     ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                     : 'bg-slate-100 text-slate-500 border border-slate-200'
                 }`}>
-                  {scheme.is_active !== false ? '● Active' : '○ Inactive'}
+                  {scheme.is_active !== false ? t("announcementModals.active", "● Active") : t("announcementModals.inactive", "○ Inactive")}
                 </span>
               </div>
               <p className="text-xs text-slate-500 mt-1">
-                Interest Method: <strong className="text-slate-800 capitalize">{(scheme.interest_type || 'reducing_emi').replace('_', ' ')}</strong>
+                {t("loanSchemeModals.interestMethod", "Interest Method:")} <strong className="text-slate-800 capitalize">{(scheme.interest_type || 'reducing_emi').replace('_', ' ')}</strong>
               </p>
             </div>
           </div>
@@ -986,19 +990,19 @@ export function LoanSchemeDetailModal({
           {/* Key Metric Highlights */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <div className="p-3.5 bg-slate-50 border border-slate-100 rounded-2xl">
-              <span className="text-[11px] text-slate-400 uppercase font-bold tracking-wider">Max Amount</span>
+              <span className="text-[11px] text-slate-400 uppercase font-bold tracking-wider">{t("loanSchemeModals.maxAmount", "Max Amount")}</span>
               <p className="text-lg font-black text-slate-900 mt-1">{formatCurrency(scheme.max_loan_amount)}</p>
             </div>
             <div className="p-3.5 bg-slate-50 border border-slate-100 rounded-2xl">
-              <span className="text-[11px] text-slate-400 uppercase font-bold tracking-wider">Max Tenure</span>
-              <p className="text-lg font-black text-slate-900 mt-1">{scheme.max_tenure_months || 0} Months</p>
+              <span className="text-[11px] text-slate-400 uppercase font-bold tracking-wider">{t("loanSchemeModals.maxTenure", "Max Tenure")}</span>
+              <p className="text-lg font-black text-slate-900 mt-1">{scheme.max_tenure_months || 0} {t("branchManagerInvestmentSchemes.months", "Months")}</p>
             </div>
             <div className="p-3.5 bg-teal-50/70 border border-teal-100 rounded-2xl">
-              <span className="text-[11px] text-teal-700 uppercase font-bold tracking-wider">Annual Interest</span>
+              <span className="text-[11px] text-teal-700 uppercase font-bold tracking-wider">{t("loanSchemeModals.annualInterest", "Annual Interest")}</span>
               <p className="text-lg font-black text-teal-900 mt-1">{scheme.annual_interest_rate ?? 0}% p.a.</p>
             </div>
             <div className="p-3.5 bg-amber-50/70 border border-amber-100 rounded-2xl">
-              <span className="text-[11px] text-amber-700 uppercase font-bold tracking-wider">Overdue Rate</span>
+              <span className="text-[11px] text-amber-700 uppercase font-bold tracking-wider">{t("branchManagerLoanSchemes.overdueRate", "Overdue Rate")}</span>
               <p className="text-lg font-black text-amber-900 mt-1">{scheme.overdue_interest_rate ?? 0}% p.a.</p>
             </div>
           </div>
@@ -1007,41 +1011,41 @@ export function LoanSchemeDetailModal({
           <div className="border border-slate-100 rounded-2xl p-4 bg-white shadow-2xs">
             <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-3 flex items-center gap-2">
               <Receipt className="w-4 h-4 text-teal-600" />
-              <span>Upfront Application & Documentation Charges</span>
+              <span>{t("loanSchemeModals.upfrontApplicationDocumentationCharges", "Upfront Application & Documentation Charges")}</span>
             </h4>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
               <div className="p-2.5 bg-slate-50 rounded-xl">
-                <span className="text-slate-500 block">Processing Fee</span>
+                <span className="text-slate-500 block">{t("branchManagerLoanSchemes.processingFee", "Processing Fee")}</span>
                 <span className="font-bold text-slate-900 text-sm mt-0.5 block">
                   {formatCharge(scheme.processing_fee, scheme.processing_fee_type)}
                 </span>
               </div>
               <div className="p-2.5 bg-slate-50 rounded-xl">
-                <span className="text-slate-500 block">Stamp Duty Charge</span>
+                <span className="text-slate-500 block">{t("loanSchemeModals.stampDutyCharge", "Stamp Duty Charge")}</span>
                 <span className="font-bold text-slate-900 text-sm mt-0.5 block">
                   {formatCharge(scheme.stamp_duty_charge, scheme.stamp_duty_charge_type)}
                 </span>
               </div>
               <div className="p-2.5 bg-slate-50 rounded-xl">
-                <span className="text-slate-500 block">Insurance Fee</span>
+                <span className="text-slate-500 block">{t("branchManagerLoanSchemes.insuranceFee", "Insurance Fee")}</span>
                 <span className="font-bold text-slate-900 text-sm mt-0.5 block">
                   {formatCharge(scheme.insurance_fee, scheme.insurance_fee_type)}
                 </span>
               </div>
               <div className="p-2.5 bg-slate-50 rounded-xl">
-                <span className="text-slate-500 block">Documentation Fee</span>
+                <span className="text-slate-500 block">{t("loanSchemeModals.documentationFee", "Documentation Fee")}</span>
                 <span className="font-bold text-slate-900 text-sm mt-0.5 block">
                   {formatCharge(scheme.documentation_fee, scheme.documentation_fee_type)}
                 </span>
               </div>
               <div className="p-2.5 bg-slate-50 rounded-xl">
-                <span className="text-slate-500 block">Foreclosure Charges</span>
+                <span className="text-slate-500 block">{t("loanSchemeModals.foreclosureCharges", "Foreclosure Charges")}</span>
                 <span className="font-bold text-slate-900 text-sm mt-0.5 block">
                   {formatCharge(scheme.foreclosure_charges, scheme.foreclosure_charges_type)}
                 </span>
               </div>
               <div className="p-2.5 bg-slate-50 rounded-xl">
-                <span className="text-slate-500 block">Penalty Charges</span>
+                <span className="text-slate-500 block">{t("loanSchemeModals.penaltyCharges", "Penalty Charges")}</span>
                 <span className="font-bold text-rose-700 text-sm mt-0.5 block">
                   {formatCharge(scheme.penalty_charges, scheme.penalty_charges_type)}
                 </span>
@@ -1053,35 +1057,35 @@ export function LoanSchemeDetailModal({
           <div className="border border-slate-100 rounded-2xl p-4 bg-white shadow-2xs">
             <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-3 flex items-center gap-2">
               <Coins className="w-4 h-4 text-teal-600" />
-              <span>Per-EMI Operational Charges</span>
+              <span>{t("loanSchemeModals.perEmiOperationalCharges", "Per-EMI Operational Charges")}</span>
             </h4>
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 text-xs">
               <div className="p-2.5 bg-slate-50 rounded-xl text-center">
-                <span className="text-slate-500 block text-[11px]">SMS Notification Fee</span>
+                <span className="text-slate-500 block text-[11px]">{t("loanSchemeModals.smsNotificationFee", "SMS Notification Fee")}</span>
                 <span className="font-bold text-slate-900 mt-1 block">
                   {formatCharge(scheme.sms_charges, scheme.sms_charges_type)}
                 </span>
               </div>
               <div className="p-2.5 bg-slate-50 rounded-xl text-center">
-                <span className="text-slate-500 block text-[11px]">Stationery &amp; Admin</span>
+                <span className="text-slate-500 block text-[11px]">{t("loanSchemeModals.stationeryAdmin", "Stationery & Admin")}</span>
                 <span className="font-bold text-slate-900 mt-1 block">
                   {formatCharge(scheme.stationary_charges, scheme.stationary_charges_type)}
                 </span>
               </div>
               <div className="p-2.5 bg-slate-50 rounded-xl text-center">
-                <span className="text-slate-500 block text-[11px]">Field &amp; Travel Fee</span>
+                <span className="text-slate-500 block text-[11px]">{t("loanSchemeModals.fieldTravelFee", "Field & Travel Fee")}</span>
                 <span className="font-bold text-slate-900 mt-1 block">
                   {formatCharge(scheme.fuel_charges, scheme.fuel_charges_type)}
                 </span>
               </div>
               <div className="p-2.5 bg-slate-50 rounded-xl text-center">
-                <span className="text-slate-500 block text-[11px]">Maintenance Fee</span>
+                <span className="text-slate-500 block text-[11px]">{t("memberLoanSchemes.maintenanceFee", "Maintenance Fee")}</span>
                 <span className="font-bold text-slate-900 mt-1 block">
                   {formatCharge(scheme.maintenance_charges, scheme.maintenance_charges_type)}
                 </span>
               </div>
               <div className="p-2.5 bg-slate-50 rounded-xl text-center">
-                <span className="text-slate-500 block text-[11px]">Doorstep Collection Fee</span>
+                <span className="text-slate-500 block text-[11px]">{t("loanSchemeModals.doorstepCollectionFee", "Doorstep Collection Fee")}</span>
                 <span className="font-bold text-slate-900 mt-1 block">
                   {formatCharge(scheme.collection_charges, scheme.collection_charges_type)}
                 </span>
@@ -1092,11 +1096,11 @@ export function LoanSchemeDetailModal({
           {/* Audit & Additional Policy Info */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="p-3.5 bg-slate-50 border border-slate-100 rounded-2xl">
-              <span className="text-[11px] text-slate-400 uppercase font-bold tracking-wider">Credit Grace Period</span>
-              <p className="text-sm font-bold text-slate-800 mt-1">{scheme.credit_period_days || 0} Days</p>
+              <span className="text-[11px] text-slate-400 uppercase font-bold tracking-wider">{t("loanSchemeModals.creditGracePeriod", "Credit Grace Period")}</span>
+              <p className="text-sm font-bold text-slate-800 mt-1">{scheme.credit_period_days || 0} {t("branchManagerInvestmentSchemes.days", "Days")}</p>
             </div>
             <div className="p-3.5 bg-slate-50 border border-slate-100 rounded-2xl">
-              <span className="text-[11px] text-slate-400 uppercase font-bold tracking-wider">Created At</span>
+              <span className="text-[11px] text-slate-400 uppercase font-bold tracking-wider">{t("dashboardModule.emergency.table.createdAt", "Created At")}</span>
               <p className="text-sm font-bold text-slate-800 mt-1">{formatDateTime(scheme.created_at)}</p>
             </div>
           </div>
@@ -1105,7 +1109,7 @@ export function LoanSchemeDetailModal({
         {/* Footer */}
         <div className="pt-3 flex items-center justify-between border-t border-slate-100 flex-shrink-0">
           <div className="text-[11px] text-slate-400">
-            Created: <strong className="text-slate-700">{formatDateTime(scheme.created_at)}</strong>
+            {t("investmentSchemeModals.created", "Created:")} <strong className="text-slate-700">{formatDateTime(scheme.created_at)}</strong>
           </div>
           <div className="flex items-center gap-2">
             {onEdit && (
@@ -1117,7 +1121,7 @@ export function LoanSchemeDetailModal({
                 }}
                 className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors cursor-pointer"
               >
-                Edit Scheme
+                {t("superAdminFdMisSchemes.editScheme", "Edit Scheme")}
               </button>
             )}
             <button
@@ -1125,7 +1129,7 @@ export function LoanSchemeDetailModal({
               onClick={onClose}
               className="px-5 py-2 bg-[#008f85] hover:bg-[#00786f] text-white font-bold text-xs rounded-xl shadow-xs transition-colors cursor-pointer"
             >
-              Done
+              {t("branchManagerMemberPasswordUpdate.done", "Done")}
             </button>
           </div>
         </div>

@@ -1,6 +1,9 @@
 import React, { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+
 
 export default function LoanCalculator({ onOpenEnquiry }) {
+  const { t } = useTranslation();
   const [amount, setAmount] = useState(18000);
   const [tenureMonths, setTenureMonths] = useState(6);
 
@@ -28,14 +31,12 @@ export default function LoanCalculator({ onOpenEnquiry }) {
         
         {/* Subtle Eyebrow Label */}
         <span className="text-sm sm:text-base text-slate-400 font-normal tracking-wide block mb-3 sm:mb-4">
-          A quick &amp; transparent process
+          {t("loans.eyebrow", "A quick & transparent process")}
         </span>
 
         {/* Signature Bold Serif Headline */}
         <h2 className="text-4xl sm:text-5xl lg:text-[54px] xl:text-[58px] font-serif font-bold text-slate-900 leading-[1.08] tracking-tight mb-10 sm:mb-12">
-          We have<br />
-          a simple online<br />
-          application:
+          {t("loans.heading", "We have a simple online application:")}
         </h2>
 
         {/* 3 Numbered Steps with Golden Circular Badges */}
@@ -48,10 +49,10 @@ export default function LoanCalculator({ onOpenEnquiry }) {
             </div>
             <div>
               <h3 className="font-serif font-bold text-slate-900 text-lg sm:text-[19px] mb-1.5 leading-snug">
-                Check your rates
+                {t("loans.step1Title", "Apply online in minutes")}
               </h3>
               <p className="text-slate-500 text-sm sm:text-[14.5px] leading-relaxed">
-                It takes just a few minutes to provide us with your information.
+                {t("loans.step1Desc", "Complete our simple online application and find out if you're approved instantly.")}
               </p>
             </div>
           </div>
@@ -63,10 +64,10 @@ export default function LoanCalculator({ onOpenEnquiry }) {
             </div>
             <div>
               <h3 className="font-serif font-bold text-slate-900 text-lg sm:text-[19px] mb-1.5 leading-snug">
-                Sign your contract online
+                {t("loans.step2Title", "Select loan amount & term")}
               </h3>
               <p className="text-slate-500 text-sm sm:text-[14.5px] leading-relaxed">
-                Using our secure application, you can e-sign your contract if pre-approved. Trust &amp; security is our #1 priority.
+                {t("loans.step2Desc", "Choose your loan amount and repayment period that fits your budget.")}
               </p>
             </div>
           </div>
@@ -78,10 +79,10 @@ export default function LoanCalculator({ onOpenEnquiry }) {
             </div>
             <div>
               <h3 className="font-serif font-bold text-slate-900 text-lg sm:text-[19px] mb-1.5 leading-snug">
-                Funds as soon as tomorrow
+                {t("loans.step3Title", "Funds as soon as tomorrow")}
               </h3>
               <p className="text-slate-500 text-sm sm:text-[14.5px] leading-relaxed">
-                Money can be directly deposited into your bank account as soon as the next business day.
+                {t("loans.step3Desc", "Money can be directly deposited into your bank account as soon as the next business day.")}
               </p>
             </div>
           </div>
@@ -100,7 +101,7 @@ export default function LoanCalculator({ onOpenEnquiry }) {
           
           {/* Card Title */}
           <h3 className="text-3xl sm:text-4xl lg:text-[42px] font-serif font-bold text-white text-center mb-10 sm:mb-12 tracking-tight">
-            Calculate Your Rate
+            {t("loans.calculatorTitle", "Calculate Your Rate")}
           </h3>
 
           <div className="space-y-8">
@@ -147,11 +148,11 @@ export default function LoanCalculator({ onOpenEnquiry }) {
             {/* Slider 2: Months */}
             <div>
               <div className="flex justify-between items-baseline mb-3">
-                <span className="text-sm sm:text-base font-medium text-white">1 months</span>
+                <span className="text-sm sm:text-base font-medium text-white">{t("loanCalculator.1Months", "1 months")}</span>
                 <span className="text-base sm:text-lg font-bold text-[#fccb34] tracking-tight">
-                  {tenureMonths} months
+                  {tenureMonths} {t("loanCalculator.months", "months")}
                 </span>
-                <span className="text-sm sm:text-base font-medium text-white">12 months</span>
+                <span className="text-sm sm:text-base font-medium text-white">{t("loanCalculator.12Months", "12 months")}</span>
               </div>
               
               <div className="relative flex items-center">
@@ -188,12 +189,12 @@ export default function LoanCalculator({ onOpenEnquiry }) {
           {/* Repayment Summary Breakdown */}
           <div className="mt-10 sm:mt-12 space-y-4 pt-2">
             <div className="flex justify-between items-center text-white">
-              <span className="text-base sm:text-[17px] font-normal tracking-wide">Borrowing:</span>
+              <span className="text-base sm:text-[17px] font-normal tracking-wide">{t("loans.monthlyPayment", "Monthly Payment")}:</span>
               <span className="text-base sm:text-[18px] font-bold tracking-tight">${monthlyPayment.toLocaleString()}</span>
             </div>
             
             <div className="flex justify-between items-center">
-              <span className="text-base sm:text-[17px] font-normal text-white tracking-wide">Total you will Pay:</span>
+              <span className="text-base sm:text-[17px] font-normal text-white tracking-wide">{t("loans.totalPayable", "Total Payable")}:</span>
               <span className="text-2xl sm:text-3xl font-bold text-[#fccb34] tracking-tight">${totalPayable.toLocaleString()}</span>
             </div>
           </div>
@@ -204,7 +205,7 @@ export default function LoanCalculator({ onOpenEnquiry }) {
             onClick={() => onOpenEnquiry && onOpenEnquiry(`Loan Estimate: $${amount.toLocaleString()} for ${tenureMonths} Months`)}
             className="w-full mt-8 bg-[#0cbeab] hover:bg-[#0aa896] text-white py-4 px-6 text-sm sm:text-[15px] font-semibold tracking-wider text-center transition-all duration-200 cursor-pointer rounded-[2px] shadow-xs hover:shadow-md"
           >
-            Apply Now
+            {t("common.applyNow", "Apply Now")}
           </button>
 
         </div>

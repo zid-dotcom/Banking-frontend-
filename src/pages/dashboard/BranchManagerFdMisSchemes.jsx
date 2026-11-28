@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import StatCard from '../../components/dashboard/StatCard';
 import { FdMisSchemeDetailModal } from '../../components/dashboard/FdMisSchemeModals';
@@ -74,6 +75,7 @@ function formatDateTime(isoString) {
 }
 
 export default function BranchManagerFdMisSchemes() {
+  const { t } = useTranslation();
   const [schemes, setSchemes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -203,7 +205,7 @@ export default function BranchManagerFdMisSchemes() {
             <div className="inline-flex flex-wrap items-center justify-center md:justify-start gap-x-2 gap-y-1 px-3 sm:px-3.5 py-1.5 rounded-2xl sm:rounded-full bg-white/95 backdrop-blur-xs text-[11px] sm:text-xs font-semibold border border-teal-200/80 shadow-2xs text-[#0f766e] mb-3 max-w-full">
               <span className="inline-flex items-center gap-1.5 flex-shrink-0">
                 <Coins className="w-3.5 h-3.5 text-[#00b4a7]" />
-                <span>Role: <strong className="font-bold text-teal-950">Branch Manager</strong></span>
+                <span>{t("dashboardModule.monthlyTargets.roleLabel", "Role:")} <strong className="font-bold text-teal-950">{t("nav.branchManager", "Branch Manager")}</strong></span>
               </span>
               <span className="text-teal-300 hidden sm:inline">•</span>
               <span className="text-slate-600 sm:text-[#0f766e]">
@@ -212,26 +214,26 @@ export default function BranchManagerFdMisSchemes() {
               <span className="text-teal-300 hidden sm:inline">•</span>
               <span className="inline-flex items-center gap-1.5 font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full text-[10px] sm:text-xs flex-shrink-0">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                Active Schemes
+                {t("branchManagerFdMisSchemes.activeSchemes", "Active Schemes")}
               </span>
             </div>
 
             <div className="flex items-center justify-center md:justify-start gap-2.5 sm:gap-3">
               <span className="w-1.5 h-7 sm:h-9 bg-[#00b4a7] rounded-full flex-shrink-0" />
               <h1 className="text-xl sm:text-3xl lg:text-4xl font-serif font-bold text-slate-900 tracking-tight">
-                Available FD &amp; MIS Schemes
+                {t("branchManagerFdMisSchemes.availableFdMisSchemes", "Available FD & MIS Schemes")}
               </h1>
             </div>
 
             <p className="text-slate-600 text-xs sm:text-sm mt-2 sm:mt-2.5 font-medium leading-relaxed max-w-xl mx-auto md:mx-0">
-              Catalogue of term fixed deposit and monthly income schemes approved by Apex Administration. Review lock-in durations, yield formulas, and payout structures.
+              {t("branchManagerFdMisSchemes.catalogueOfTermFixedDeposit", "Catalogue of term fixed deposit and monthly income schemes approved by Apex Administration. Review lock-in durations, yield formulas, and payout structures.")}
             </p>
           </div>
 
           <div className="relative z-10 flex justify-center md:justify-end pointer-events-none -my-2 sm:-my-5 lg:-my-6 flex-shrink-0 w-full md:w-auto">
             <img
               src={mintFdMisIllustration}
-              alt="Available FD & MIS Schemes Illustration"
+              alt={t("branchManagerFdMisSchemes.availableFdMisSchemesIllustration", "Available FD & MIS Schemes Illustration")}
               className="h-32 sm:h-44 lg:h-52 max-w-full w-auto object-contain drop-shadow-md select-none pointer-events-none transform hover:scale-102 transition-transform duration-300 mx-auto md:mx-0"
             />
           </div>
@@ -247,33 +249,33 @@ export default function BranchManagerFdMisSchemes() {
         {/* 4 Summary Metric Cards (Identical to Super Admin) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <StatCard
-            title="Total FD / MIS Schemes"
+            title={t("branchManagerFdMisSchemes.totalFdMisSchemes", "Total FD / MIS Schemes")}
             value={totalCount.toString()}
-            subtitle="Registered Term Products"
+            subtitle={t("branchManagerFdMisSchemes.registeredTermProducts", "Registered Term Products")}
             icon={Coins}
             trend={`${activeCount} active`}
             trendType="up"
           />
           <StatCard
-            title="Active Deposit Schemes"
+            title={t("branchManagerFdMisSchemes.activeDepositSchemes", "Active Deposit Schemes")}
             value={activeCount.toString()}
-            subtitle="Ready for Members"
+            subtitle={t("branchManagerFdMisSchemes.readyForMembers", "Ready for Members")}
             icon={CheckCircle2}
             trend={totalCount > 0 ? `${Math.round((activeCount / totalCount) * 100)}% active` : '100%'}
             trendType="up"
           />
           <StatCard
-            title="Max Annual Yield"
+            title={t("branchManagerFdMisSchemes.maxAnnualYield", "Max Annual Yield")}
             value={`${maxInterest}%`}
-            subtitle="Highest Term Yield p.a."
+            subtitle={t("branchManagerFdMisSchemes.highestTermYieldPA", "Highest Term Yield p.a.")}
             icon={TrendingUp}
             trend="Per Annum"
             trendType="neutral"
           />
           <StatCard
-            title="Min Investment Scheme"
+            title={t("branchManagerFdMisSchemes.minInvestmentScheme", "Min Investment Scheme")}
             value={minDeposit !== null ? formatCurrency(minDeposit) : '₹0'}
-            subtitle="Minimum Opening Deposit"
+            subtitle={t("branchManagerFdMisSchemes.minimumOpeningDeposit", "Minimum Opening Deposit")}
             icon={PiggyBank}
             trend="Base Entry"
             trendType="neutral"
@@ -292,7 +294,7 @@ export default function BranchManagerFdMisSchemes() {
                 <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
                   type="text"
-                  placeholder="Search FD / MIS scheme by name or code..."
+                  placeholder={t("branchManagerFdMisSchemes.searchFdMisSchemeBy", "Search FD / MIS scheme by name or code...")}
                   value={searchQuery}
                   onChange={(e) => {
                     setSearchQuery(e.target.value);
@@ -323,9 +325,9 @@ export default function BranchManagerFdMisSchemes() {
                   }}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-xs sm:text-sm text-slate-700 font-semibold focus:outline-none focus:ring-2 focus:ring-teal-100 focus:border-teal-500 transition-all cursor-pointer"
                 >
-                  <option value="all">All Statuses</option>
-                  <option value="active">Active Only</option>
-                  <option value="inactive">Inactive Only</option>
+                  <option value="all">{t("branchManagerFdMisSchemes.allStatuses", "All Statuses")}</option>
+                  <option value="active">{t("branchManagerFdMisSchemes.activeOnly", "Active Only")}</option>
+                  <option value="inactive">{t("branchManagerFdMisSchemes.inactiveOnly", "Inactive Only")}</option>
                 </select>
               </div>
             </div>
@@ -335,7 +337,7 @@ export default function BranchManagerFdMisSchemes() {
               <button
                 onClick={() => fetchFdMisSchemes(true)}
                 disabled={refreshing}
-                title="Refresh FD / MIS schemes"
+                title={t("branchManagerFdMisSchemes.refreshFdMisSchemes", "Refresh FD / MIS schemes")}
                 className="p-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-800 transition-colors cursor-pointer disabled:opacity-50"
               >
                 <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin text-teal-600' : ''}`} />
@@ -349,7 +351,7 @@ export default function BranchManagerFdMisSchemes() {
               <div className="flex items-start gap-2.5">
                 <AlertCircle className="w-5 h-5 flex-shrink-0 text-red-600 mt-0.5" />
                 <div>
-                  <p className="text-sm font-bold text-red-900">Failed to load FD/MIS schemes</p>
+                  <p className="text-sm font-bold text-red-900">{t("branchManagerFdMisSchemes.failedToLoadFdMis", "Failed to load FD/MIS schemes")}</p>
                   <p className="text-xs text-red-700 mt-0.5">{error}</p>
                 </div>
               </div>
@@ -357,7 +359,7 @@ export default function BranchManagerFdMisSchemes() {
                 onClick={() => fetchFdMisSchemes()}
                 className="text-xs font-bold text-red-700 hover:text-red-900 underline cursor-pointer flex-shrink-0"
               >
-                Retry
+                {t("common.retry", "Retry")}
               </button>
             </div>
           )}
@@ -367,7 +369,7 @@ export default function BranchManagerFdMisSchemes() {
             {loading ? (
               <div className="py-20 text-center space-y-3">
                 <div className="w-10 h-10 border-3 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto" />
-                <p className="text-sm text-slate-500 font-medium">Loading FD / MIS schemes from registry...</p>
+                <p className="text-sm text-slate-500 font-medium">{t("branchManagerFdMisSchemes.loadingFdMisSchemesFrom", "Loading FD / MIS schemes from registry...")}</p>
               </div>
             ) : filteredSchemes.length === 0 ? (
               /* Empty State */
@@ -377,12 +379,12 @@ export default function BranchManagerFdMisSchemes() {
                 </div>
                 <div>
                   <p className="text-base font-bold text-slate-800">
-                    {searchQuery ? 'No matching schemes found' : 'No FD / MIS schemes available'}
+                    {searchQuery ? t("branchManagerFdMisSchemes.noMatchingSchemesFound", "No matching schemes found") : t("branchManagerFdMisSchemes.noFdMisSchemesAvailable", "No FD / MIS schemes available")}
                   </p>
                   <p className="text-xs text-slate-500 mt-1 font-medium leading-relaxed">
                     {searchQuery
-                      ? 'Try adjusting your search query or clear the filter.'
-                      : 'No term deposit products currently provisioned by apex administration.'}
+                      ? t("branchManagerFdMisSchemes.tryAdjustingYourSearchQuery", "Try adjusting your search query or clear the filter.")
+                      : t("branchManagerFdMisSchemes.noTermDepositProductsCurrently", "No term deposit products currently provisioned by apex administration.")}
                   </p>
                 </div>
               </div>
@@ -390,20 +392,21 @@ export default function BranchManagerFdMisSchemes() {
               <table className="w-full text-left border-collapse min-w-[1100px]">
                 <thead>
                   <tr className="border-b border-slate-100 bg-slate-50/75 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                    <th className="py-3.5 px-6">Scheme Name</th>
-                    <th className="py-3.5 px-6">Scheme Code</th>
-                    <th className="py-3.5 px-6">Duration</th>
-                    <th className="py-3.5 px-6">Annual Yield</th>
-                    <th className="py-3.5 px-6">Min Deposit</th>
-                    <th className="py-3.5 px-6">Payout Frequency</th>
-                    <th className="py-3.5 px-6 whitespace-nowrap">Minimum Deposit Period</th>
-                    <th className="py-3.5 px-6">Created At</th>
-                    <th className="py-3.5 px-6 text-center">Status</th>
-                    <th className="py-3.5 px-6 text-right">Actions</th>
+                    <th className="py-3.5 px-6">{t("dashboardModule.productAccounts.schemeName", "Scheme Name")}</th>
+                    <th className="py-3.5 px-6">{t("dashboardModule.productAccounts.schemeCode", "Scheme Code")}</th>
+                    <th className="py-3.5 px-6">{t("branchManagerFdMisSchemes.duration", "Duration")}</th>
+                    <th className="py-3.5 px-6">{t("branchManagerFdMisSchemes.annualYield", "Annual Yield")}</th>
+                    <th className="py-3.5 px-6">{t("branchManagerFdMisSchemes.minDeposit", "Min Deposit")}</th>
+                    <th className="py-3.5 px-6">{t("branchManagerFdMisSchemes.payoutFrequency", "Payout Frequency")}</th>
+                    <th className="py-3.5 px-6 whitespace-nowrap">{t("branchManagerFdMisSchemes.minimumDepositPeriod", "Minimum Deposit Period")}</th>
+                    <th className="py-3.5 px-6">{t("dashboardModule.emergency.table.createdAt", "Created At")}</th>
+                    <th className="py-3.5 px-6 text-center">{t("common.status", "Status")}</th>
+                    <th className="py-3.5 px-6 text-right">{t("common.actions", "Actions")}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-sm">
                   {paginatedSchemes.map((scheme) => {
+  const { t } = useTranslation();
                     const isActive = scheme.is_active !== false;
 
                     return (
@@ -456,7 +459,7 @@ export default function BranchManagerFdMisSchemes() {
 
                         {/* Minimum Deposit Period */}
                         <td className="py-4 px-6 whitespace-nowrap text-xs font-bold text-slate-700">
-                          {scheme.fd_mis_lock_in_period_months ? `${scheme.fd_mis_lock_in_period_months} Months` : 'None'}
+                          {scheme.fd_mis_lock_in_period_months ? `${scheme.fd_mis_lock_in_period_months} Months` : t("branchManagerFdMisSchemes.none", "None")}
                         </td>
 
                         {/* Created At */}
@@ -480,7 +483,7 @@ export default function BranchManagerFdMisSchemes() {
                                 isActive ? 'bg-emerald-500' : 'bg-slate-400'
                               }`}
                             />
-                            {isActive ? 'Active' : 'Inactive'}
+                            {isActive ? t("common.active", "Active") : t("common.inactive", "Inactive")}
                           </span>
                         </td>
 
@@ -488,11 +491,11 @@ export default function BranchManagerFdMisSchemes() {
                         <td className="py-4 px-6 text-right whitespace-nowrap">
                           <button
                             onClick={() => setDetailModal({ isOpen: true, scheme })}
-                            title="View Scheme Details"
+                            title={t("branchManagerFdMisSchemes.viewSchemeDetails", "View Scheme Details")}
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-800 font-bold text-xs rounded-xl border border-teal-200/80 transition-all cursor-pointer active:scale-95"
                           >
                             <Eye className="w-3.5 h-3.5" />
-                            <span>View Details</span>
+                            <span>{t("branchManagerFdMisSchemes.viewDetails", "View Details")}</span>
                           </button>
                         </td>
                       </tr>
@@ -507,8 +510,8 @@ export default function BranchManagerFdMisSchemes() {
           {!loading && filteredSchemes.length > itemsPerPage && (
             <div className="px-4 sm:px-6 py-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
               <span className="text-xs text-slate-500 font-medium text-center sm:text-left">
-                Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
-                {Math.min(currentPage * itemsPerPage, filteredSchemes.length)} of {filteredSchemes.length} schemes
+                {t("common.showing", "Showing")} {(currentPage - 1) * itemsPerPage + 1} {t("common.to", "to")}{' '}
+                {Math.min(currentPage * itemsPerPage, filteredSchemes.length)} {t("common.of", "of")} {filteredSchemes.length} {t("branchManagerFdMisSchemes.schemes", "schemes")}
               </span>
               <div className="flex items-center gap-2">
                 <button
@@ -516,7 +519,7 @@ export default function BranchManagerFdMisSchemes() {
                   disabled={currentPage === 1}
                   className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed font-semibold text-xs text-slate-700 transition-colors cursor-pointer"
                 >
-                  Previous
+                  {t("branchManagerFdMisSchemes.previous", "Previous")}
                 </button>
                 <span className="text-xs font-bold text-slate-700 px-2">
                   {currentPage} / {totalPages}
@@ -526,7 +529,7 @@ export default function BranchManagerFdMisSchemes() {
                   disabled={currentPage === totalPages}
                   className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed font-semibold text-xs text-slate-700 transition-colors cursor-pointer"
                 >
-                  Next
+                  {t("branchManagerFdMisSchemes.next", "Next")}
                 </button>
               </div>
             </div>

@@ -1,0 +1,612 @@
+// Comprehensive In-Memory / LocalStorage Mock Database for Offline Demo Mode
+
+function getStorage(key, fallback) {
+  try {
+    const item = localStorage.getItem(`aurumfx_demo_${key}`);
+    return item ? JSON.parse(item) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function setStorage(key, value) {
+  try {
+    localStorage.setItem(`aurumfx_demo_${key}`, JSON.stringify(value));
+  } catch {}
+}
+
+export const initialBranches = [
+  {
+    id: 1,
+    branch_name: 'Kozhikode North Agro Hub',
+    name: 'Kozhikode North Agro Hub',
+    branch_code: 'KN-01',
+    address: 'Near Agro Market, Mavoor Road',
+    city: 'Kozhikode',
+    state: 'Kerala',
+    pincode: '673001',
+    phone: '+91 495 272 1090',
+    email: 'kozhikode@aurumfx.com',
+    is_active: true,
+    total_members: 420,
+    created_at: '2025-01-10T10:00:00Z',
+  },
+  {
+    id: 2,
+    branch_name: 'Wayanad Hills Cooperative Hub',
+    name: 'Wayanad Hills Cooperative Hub',
+    branch_code: 'WH-02',
+    address: 'Kalpetta Main Bypass',
+    city: 'Kalpetta',
+    state: 'Kerala',
+    pincode: '673121',
+    phone: '+91 493 620 4488',
+    email: 'wayanad@aurumfx.com',
+    is_active: true,
+    total_members: 310,
+    created_at: '2025-02-15T10:00:00Z',
+  },
+  {
+    id: 3,
+    branch_name: 'Ernakulam City Agro Center',
+    name: 'Ernakulam City Agro Center',
+    branch_code: 'EKM-03',
+    address: 'MG Road, Marine Drive',
+    city: 'Kochi',
+    state: 'Kerala',
+    pincode: '682011',
+    phone: '+91 484 235 6012',
+    email: 'ernakulam@aurumfx.com',
+    is_active: true,
+    total_members: 580,
+    created_at: '2025-03-01T10:00:00Z',
+  },
+  {
+    id: 4,
+    branch_name: 'Palakkad Grain Vault Branch',
+    name: 'Palakkad Grain Vault Branch',
+    branch_code: 'PKD-04',
+    address: 'TB Road, Near Fort Maidan',
+    city: 'Palakkad',
+    state: 'Kerala',
+    pincode: '678001',
+    phone: '+91 491 253 9100',
+    email: 'palakkad@aurumfx.com',
+    is_active: true,
+    total_members: 275,
+    created_at: '2025-04-12T10:00:00Z',
+  },
+];
+
+export const initialSavingsSchemes = [
+  {
+    id: 1,
+    scheme_name: 'Regular Member Savings Deposit',
+    name: 'Regular Member Savings Deposit',
+    scheme_code: 'SCH01254',
+    code: 'SCH01254',
+    min_opening_balance: 500,
+    min_monthly_avg_balance: 1000,
+    annual_interest_rate: 4.5,
+    senior_citizen_addon_interest_rate: 0.5,
+    interest_payout_type: 'monthly',
+    lock_in_amount: 500,
+    min_monthly_avg_balance_charge: 50,
+    service_charge_frequency: 'monthly',
+    service_charges: 100,
+    sms_charge_frequency: 'monthly',
+    sms_charges: 25,
+    is_active: true,
+    created_at: '2025-01-01T00:00:00Z',
+  },
+  {
+    id: 2,
+    scheme_name: 'High-Yield Agro Farmer Reserve',
+    name: 'High-Yield Agro Farmer Reserve',
+    scheme_code: 'SCH01255',
+    code: 'SCH01255',
+    min_opening_balance: 2000,
+    min_monthly_avg_balance: 3000,
+    annual_interest_rate: 6.0,
+    senior_citizen_addon_interest_rate: 0.75,
+    interest_payout_type: 'monthly',
+    lock_in_amount: 1000,
+    min_monthly_avg_balance_charge: 75,
+    service_charge_frequency: 'quarterly',
+    service_charges: 150,
+    sms_charge_frequency: 'monthly',
+    sms_charges: 25,
+    is_active: true,
+    created_at: '2025-02-01T00:00:00Z',
+  },
+  {
+    id: 3,
+    scheme_name: 'Senior Citizen Nidhi Deposit',
+    name: 'Senior Citizen Nidhi Deposit',
+    scheme_code: 'SCH01256',
+    code: 'SCH01256',
+    min_opening_balance: 5000,
+    min_monthly_avg_balance: 5000,
+    annual_interest_rate: 7.25,
+    senior_citizen_addon_interest_rate: 1.0,
+    interest_payout_type: 'quarterly',
+    lock_in_amount: 2500,
+    min_monthly_avg_balance_charge: 0,
+    service_charge_frequency: 'yearly',
+    service_charges: 0,
+    sms_charge_frequency: 'monthly',
+    sms_charges: 15,
+    is_active: true,
+    created_at: '2025-03-01T00:00:00Z',
+  },
+];
+
+export const initialFdMisSchemes = [
+  {
+    id: 1,
+    scheme_name: '1-Year Kisan Samriddhi Fixed Deposit',
+    name: '1-Year Kisan Samriddhi Fixed Deposit',
+    scheme_code: 'FD-001',
+    code: 'FD-001',
+    scheme_type: 'fd',
+    minimum_fd_mis_amount: 10000,
+    tenure_months: 12,
+    annual_interest_rate: 7.5,
+    senior_citizen_addon_rate: 0.5,
+    payout_frequency: 'maturity',
+    description: 'Guaranteed high yield term deposit for agricultural members.',
+    is_active: true,
+    created_at: '2025-01-01T00:00:00Z',
+  },
+  {
+    id: 2,
+    scheme_name: 'Agro Monthly Income Scheme (MIS)',
+    name: 'Agro Monthly Income Scheme (MIS)',
+    scheme_code: 'MIS-002',
+    code: 'MIS-002',
+    scheme_type: 'mis',
+    minimum_fd_mis_amount: 25000,
+    tenure_months: 36,
+    annual_interest_rate: 8.2,
+    senior_citizen_addon_rate: 0.5,
+    payout_frequency: 'monthly',
+    description: 'Reliable monthly interest crediting into member savings account.',
+    is_active: true,
+    created_at: '2025-02-01T00:00:00Z',
+  },
+  {
+    id: 3,
+    scheme_name: '5-Year High Growth Cumulative Deposit',
+    name: '5-Year High Growth Cumulative Deposit',
+    scheme_code: 'FD-003',
+    code: 'FD-003',
+    scheme_type: 'fd',
+    minimum_fd_mis_amount: 50000,
+    tenure_months: 60,
+    annual_interest_rate: 8.75,
+    senior_citizen_addon_rate: 0.75,
+    payout_frequency: 'maturity',
+    description: 'Long-term compound interest term certificate for society families.',
+    is_active: true,
+    created_at: '2025-03-01T00:00:00Z',
+  },
+];
+
+export const initialInvestmentSchemes = [
+  {
+    id: 1,
+    scheme_name: 'Daily Micro Piggy Plan',
+    name: 'Daily Micro Piggy Plan',
+    scheme_code: 'INV-D100',
+    code: 'INV-D100',
+    contribution_frequency: 'daily',
+    installment_amount: 100,
+    tenure_installments: 100,
+    annual_interest_rate: 6.5,
+    description: 'Daily doorstep micro contribution plan with compound returns.',
+    is_active: true,
+    created_at: '2025-01-01T00:00:00Z',
+  },
+  {
+    id: 2,
+    scheme_name: 'Weekly Kisan Recurring Plan',
+    name: 'Weekly Kisan Recurring Plan',
+    scheme_code: 'INV-W500',
+    code: 'INV-W500',
+    contribution_frequency: 'weekly',
+    installment_amount: 500,
+    tenure_installments: 52,
+    annual_interest_rate: 7.0,
+    description: 'Weekly 52-week recurring harvest reserve savings fund.',
+    is_active: true,
+    created_at: '2025-02-01T00:00:00Z',
+  },
+  {
+    id: 3,
+    scheme_name: 'Monthly Cooperative Wealth Plan',
+    name: 'Monthly Cooperative Wealth Plan',
+    scheme_code: 'INV-M1000',
+    code: 'INV-M1000',
+    contribution_frequency: 'monthly',
+    installment_amount: 1000,
+    tenure_installments: 36,
+    annual_interest_rate: 8.0,
+    description: '36-month high yield recurring wealth creation instrument.',
+    is_active: true,
+    created_at: '2025-03-01T00:00:00Z',
+  },
+];
+
+export const initialLoanSchemes = [
+  {
+    id: 1,
+    scheme_name: 'Kisan Agro Equipment Loan',
+    name: 'Kisan Agro Equipment Loan',
+    scheme_code: 'LN-AGR-01',
+    code: 'LN-AGR-01',
+    interest_rate: 8.5,
+    min_amount: 25000,
+    max_amount: 500000,
+    min_tenure_months: 6,
+    max_tenure_months: 36,
+    processing_fee_percent: 1.0,
+    description: 'Subsidized loan facility for agricultural machinery, tractors, and irrigation.',
+    is_active: true,
+    created_at: '2025-01-01T00:00:00Z',
+  },
+  {
+    id: 2,
+    scheme_name: 'Crop Cultivation Micro Credit',
+    name: 'Crop Cultivation Micro Credit',
+    scheme_code: 'LN-CRP-02',
+    code: 'LN-CRP-02',
+    interest_rate: 6.0,
+    min_amount: 10000,
+    max_amount: 100000,
+    min_tenure_months: 3,
+    max_tenure_months: 12,
+    processing_fee_percent: 0.5,
+    description: 'Seasonal short-term financing for seeds, fertilizers, and crop maintenance.',
+    is_active: true,
+    created_at: '2025-02-01T00:00:00Z',
+  },
+  {
+    id: 3,
+    scheme_name: 'Dairy & Livestock Enterprise Loan',
+    name: 'Dairy & Livestock Enterprise Loan',
+    scheme_code: 'LN-DRY-03',
+    code: 'LN-DRY-03',
+    interest_rate: 7.5,
+    min_amount: 50000,
+    max_amount: 1000000,
+    min_tenure_months: 12,
+    max_tenure_months: 48,
+    processing_fee_percent: 1.25,
+    description: 'Support for dairy farm expansion, cattle procurement, and cold storage.',
+    is_active: true,
+    created_at: '2025-03-01T00:00:00Z',
+  },
+];
+
+export const initialMembers = [
+  {
+    id: 183188,
+    user_code: 'MEM-183188',
+    member_code: '183188',
+    full_name: 'Manu Sharma',
+    name: 'Manu Sharma',
+    phone: '9876543210',
+    email: 'manu@aurumfx.com',
+    branch_id: 1,
+    branch_name: 'Kozhikode North Agro Hub',
+    branch_code: 'KN-01',
+    status: 'approved',
+    is_active: true,
+    membership_fee_status: 'paid',
+    created_at: '2025-01-15T10:00:00Z',
+  },
+  {
+    id: 183189,
+    user_code: 'MEM-183189',
+    member_code: '183189',
+    full_name: 'Rajesh Kumar',
+    name: 'Rajesh Kumar',
+    phone: '9876543211',
+    email: 'rajesh@aurumfx.com',
+    branch_id: 1,
+    branch_name: 'Kozhikode North Agro Hub',
+    branch_code: 'KN-01',
+    status: 'approved',
+    is_active: true,
+    membership_fee_status: 'paid',
+    created_at: '2025-01-20T11:00:00Z',
+  },
+  {
+    id: 183190,
+    user_code: 'MEM-183190',
+    member_code: '183190',
+    full_name: 'Priya Nair',
+    name: 'Priya Nair',
+    phone: '9876543212',
+    email: 'priya@aurumfx.com',
+    branch_id: 2,
+    branch_name: 'Wayanad Hills Cooperative Hub',
+    branch_code: 'WH-02',
+    status: 'approved',
+    is_active: true,
+    membership_fee_status: 'paid',
+    created_at: '2025-02-10T09:30:00Z',
+  },
+  {
+    id: 183191,
+    user_code: 'MEM-183191',
+    member_code: '183191',
+    full_name: 'Suresh Babu',
+    name: 'Suresh Babu',
+    phone: '9876543213',
+    email: 'suresh@aurumfx.com',
+    branch_id: 3,
+    branch_name: 'Ernakulam City Agro Center',
+    branch_code: 'EKM-03',
+    status: 'approved',
+    is_active: true,
+    membership_fee_status: 'paid',
+    created_at: '2025-03-05T14:15:00Z',
+  },
+];
+
+export const initialBranchAdmins = [
+  {
+    id: 1,
+    user_code: 'MGR-001',
+    name: 'Anand V',
+    full_name: 'Anand V',
+    email: 'anand.bm@aurumfx.com',
+    phone: '+91 94471 23456',
+    role: 'branch_manager',
+    branch_id: 1,
+    branch_name: 'Kozhikode North Agro Hub',
+    branch_code: 'KN-01',
+    is_active: true,
+  },
+  {
+    id: 2,
+    user_code: 'MGR-002',
+    name: 'Meera Krishnan',
+    full_name: 'Meera Krishnan',
+    email: 'meera.bm@aurumfx.com',
+    phone: '+91 94472 34567',
+    role: 'branch_manager',
+    branch_id: 2,
+    branch_name: 'Wayanad Hills Cooperative Hub',
+    branch_code: 'WH-02',
+    is_active: true,
+  },
+  {
+    id: 3,
+    user_code: 'MGR-003',
+    name: 'Harikrishnan P',
+    full_name: 'Harikrishnan P',
+    email: 'hari.bm@aurumfx.com',
+    phone: '+91 94473 45678',
+    role: 'branch_manager',
+    branch_id: 3,
+    branch_name: 'Ernakulam City Agro Center',
+    branch_code: 'EKM-03',
+    is_active: true,
+  },
+];
+
+export const initialStaffRoles = [
+  { id: 1, name: 'Cashier & Teller', role_name: 'Cashier & Teller', slug: 'cashier', description: 'Handles cash deposits, counter transactions, and daily drawer reconciliation.' },
+  { id: 2, name: 'Customer Service Representative', role_name: 'Customer Service Representative', slug: 'customer_service', description: 'Assists members with service tickets, passbooks, and onboarding.' },
+  { id: 3, name: 'Loan Processing Officer', role_name: 'Loan Processing Officer', slug: 'loan_officer', description: 'Appraises agricultural loans, KYC verifications, and credit memos.' },
+  { id: 4, name: 'Field Collection Agent', role_name: 'Field Collection Agent', slug: 'collection_agent', description: 'Coordinates daily deposit collections and doorstep recovery.' },
+];
+
+export const initialStaffMembers = [
+  {
+    id: 1,
+    user_code: 'STF-001',
+    staff_code: 'STF-001',
+    full_name: 'Rahul Nair',
+    name: 'Rahul Nair',
+    email: 'rahul.staff@aurumfx.com',
+    phone: '+91 98470 11223',
+    branch_id: 1,
+    branch_name: 'Kozhikode North Agro Hub',
+    role_id: 1,
+    staff_role: { id: 1, name: 'Cashier & Teller', role_name: 'Cashier & Teller' },
+    is_active: true,
+  },
+  {
+    id: 2,
+    user_code: 'STF-002',
+    staff_code: 'STF-002',
+    full_name: 'Sneha Menon',
+    name: 'Sneha Menon',
+    email: 'sneha.staff@aurumfx.com',
+    phone: '+91 98470 22334',
+    branch_id: 1,
+    branch_name: 'Kozhikode North Agro Hub',
+    role_id: 2,
+    staff_role: { id: 2, name: 'Customer Service Representative', role_name: 'Customer Service Representative' },
+    is_active: true,
+  },
+];
+
+export const initialAnnouncements = [
+  {
+    id: 1,
+    title: '52nd Annual General Body Meeting Notice',
+    content: 'The 52nd AGM of AurumFX Multi State Agro Co-operative Society will be held on December 20, 2026. All eligible members are invited.',
+    audience: 'all',
+    status: 'published',
+    is_active: true,
+    published_at: '2026-11-20T10:00:00Z',
+    created_at: '2026-11-20T10:00:00Z',
+  },
+  {
+    id: 2,
+    title: 'Special High-Yield Agro Term Deposit Incentive',
+    content: 'Members booking term deposits above ₹50,000 this month receive an additional 0.50% p.a. yield bonus for agricultural initiatives.',
+    audience: 'members',
+    status: 'published',
+    is_active: true,
+    published_at: '2026-11-22T09:00:00Z',
+    created_at: '2026-11-22T09:00:00Z',
+  },
+];
+
+export const initialServiceRequests = [
+  {
+    id: 8901,
+    request_number: 'SR-8901',
+    member_id: 183188,
+    member_name: 'Manu Sharma',
+    subject: 'Passbook Replacement & Statement Request',
+    category: 'passbook',
+    status: 'in_progress',
+    priority: 'medium',
+    description: 'Kindly issue a replacement passbook for account KN-01-SB-183188 as the current one is completed.',
+    created_at: '2026-11-24T11:20:00Z',
+    replies: [
+      { id: 1, author: 'Customer Service', message: 'Request acknowledged. New passbook is being printed at counter.', created_at: '2026-11-24T14:00:00Z' }
+    ]
+  },
+  {
+    id: 8902,
+    request_number: 'SR-8902',
+    member_id: 183189,
+    member_name: 'Rajesh Kumar',
+    subject: 'KYC Address Verification Update',
+    category: 'kyc',
+    status: 'resolved',
+    priority: 'low',
+    description: 'Updated Aadhaar copy submitted for postal address change.',
+    created_at: '2026-11-20T15:45:00Z',
+    replies: [
+      { id: 1, author: 'Branch Manager', message: 'Address records updated in society registry.', created_at: '2026-11-21T10:00:00Z' }
+    ]
+  }
+];
+
+export const initialNotifications = [
+  {
+    id: 1,
+    title: 'Welcome to AurumFX Cooperative Banking',
+    message: 'Your account is active. Explore savings, fixed deposits, and agro loans with attractive society yields.',
+    is_read: false,
+    created_at: '2026-11-25T10:00:00Z',
+  },
+  {
+    id: 2,
+    title: 'Monthly Interest Credited',
+    message: 'Monthly interest for your savings account has been calculated and credited successfully.',
+    is_read: false,
+    created_at: '2026-11-26T08:00:00Z',
+  },
+];
+
+export const initialMonthlyTargets = [
+  {
+    id: 1,
+    title: 'Q4 Agricultural Deposit Mobilization',
+    branch_id: 1,
+    branch_name: 'Kozhikode North Agro Hub',
+    target_amount: 5000000,
+    achieved_amount: 3850000,
+    month: 'November 2026',
+    status: 'in_progress',
+  },
+  {
+    id: 2,
+    title: 'Farmer Member Enrollment Drive',
+    branch_id: 1,
+    branch_name: 'Kozhikode North Agro Hub',
+    target_count: 100,
+    achieved_count: 84,
+    month: 'November 2026',
+    status: 'in_progress',
+  },
+];
+
+export const initialSecurityEvents = [
+  {
+    id: 1,
+    event_type: 'login_success',
+    user_type: 'super_admin',
+    user_name: 'Apex Super Admin',
+    ip_address: '192.168.1.100',
+    device: 'Chrome on Windows 11',
+    created_at: '2026-11-28T09:30:00Z',
+  },
+  {
+    id: 2,
+    event_type: 'login_success',
+    user_type: 'branch_manager',
+    user_name: 'Anand V',
+    ip_address: '192.168.1.105',
+    device: 'Edge on Windows 11',
+    created_at: '2026-11-28T09:45:00Z',
+  },
+];
+
+export const initialEmergencyCases = [
+  {
+    id: 1,
+    case_number: 'EC-101',
+    title: 'Cash Counter Discrepancy Reconciliation Audit',
+    branch_id: 1,
+    branch_name: 'Kozhikode North Agro Hub',
+    severity: 'low',
+    status: 'resolved',
+    description: 'Minor variance resolved during daily balancing.',
+    created_at: '2026-11-25T17:30:00Z',
+  },
+];
+
+// Helper database manager
+export const mockDb = {
+  getBranches: () => getStorage('branches', initialBranches),
+  saveBranches: (items) => setStorage('branches', items),
+
+  getSavingsSchemes: () => getStorage('savings_schemes', initialSavingsSchemes),
+  saveSavingsSchemes: (items) => setStorage('savings_schemes', items),
+
+  getFdMisSchemes: () => getStorage('fd_mis_schemes', initialFdMisSchemes),
+  saveFdMisSchemes: (items) => setStorage('fd_mis_schemes', items),
+
+  getInvestmentSchemes: () => getStorage('investment_schemes', initialInvestmentSchemes),
+  saveInvestmentSchemes: (items) => setStorage('investment_schemes', items),
+
+  getLoanSchemes: () => getStorage('loan_schemes', initialLoanSchemes),
+  saveLoanSchemes: (items) => setStorage('loan_schemes', items),
+
+  getMembers: () => getStorage('members', initialMembers),
+  saveMembers: (items) => setStorage('members', items),
+
+  getBranchAdmins: () => getStorage('branch_admins', initialBranchAdmins),
+  saveBranchAdmins: (items) => setStorage('branch_admins', items),
+
+  getStaffRoles: () => getStorage('staff_roles', initialStaffRoles),
+  saveStaffRoles: (items) => setStorage('staff_roles', items),
+
+  getStaffMembers: () => getStorage('staff_members', initialStaffMembers),
+  saveStaffMembers: (items) => setStorage('staff_members', items),
+
+  getAnnouncements: () => getStorage('announcements', initialAnnouncements),
+  saveAnnouncements: (items) => setStorage('announcements', items),
+
+  getServiceRequests: () => getStorage('service_requests', initialServiceRequests),
+  saveServiceRequests: (items) => setStorage('service_requests', items),
+
+  getNotifications: () => getStorage('notifications', initialNotifications),
+  saveNotifications: (items) => setStorage('notifications', items),
+
+  getMonthlyTargets: () => getStorage('monthly_targets', initialMonthlyTargets),
+  saveMonthlyTargets: (items) => setStorage('monthly_targets', items),
+
+  getSecurityEvents: () => getStorage('security_events', initialSecurityEvents),
+  getEmergencyCases: () => getStorage('emergency_cases', initialEmergencyCases),
+};

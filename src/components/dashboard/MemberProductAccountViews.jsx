@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Clock,
   CheckCircle2,
@@ -25,6 +26,7 @@ import {
   getMemberProductAccounts
 } from '../../services/productAccountService';
 
+
 function formatCurrency(val) {
   if (val === undefined || val === null || isNaN(val)) return '₹0';
   return new Intl.NumberFormat('en-IN', {
@@ -34,8 +36,8 @@ function formatCurrency(val) {
   }).format(val);
 }
 
-function formatDateTime(isoString) {
-  if (!isoString) return 'N/A';
+function formatDateTime(isoString, naLabel = 'N/A') {
+  if (!isoString) return naLabel;
   try {
     const d = new Date(isoString);
     if (isNaN(d.getTime())) return isoString;
@@ -52,8 +54,8 @@ function formatDateTime(isoString) {
   }
 }
 
-function formatDate(isoString) {
-  if (!isoString) return 'N/A';
+function formatDate(isoString, naLabel = 'N/A') {
+  if (!isoString) return naLabel;
   try {
     const d = new Date(isoString);
     if (isNaN(d.getTime())) return isoString;
@@ -74,6 +76,7 @@ export function MemberProductAccountRequestsTab({
   productType = 'fd_mis', // 'fd_mis' | 'investment'
   onApplyNew = null,
 }) {
+  const { t } = useTranslation();
   const isInvestment = productType === 'investment';
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -104,7 +107,7 @@ export function MemberProductAccountRequestsTab({
       setRequests(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error('Failed to load member product requests:', err);
-      setError(err.message || 'Failed to load your applications.');
+      setError(err.message || t("dashboardModule.productAccounts.loadApplicationsError", "Failed to load your applications."));
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -179,46 +182,46 @@ export function MemberProductAccountRequestsTab({
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
         <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-2xs">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Total Applied</span>
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{t("dashboardModule.productAccounts.totalApplied", "Total Applied")}</span>
             <div className="w-7 h-7 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center">
               <FileText className="w-3.5 h-3.5" />
             </div>
           </div>
           <h4 className="text-xl font-black text-slate-900 mt-1">{scopedRequests.length}</h4>
-          <p className="text-[10px] text-slate-400 mt-0.5">Submitted scheme folios</p>
+          <p className="text-[10px] text-slate-400 mt-0.5">{t("dashboardModule.productAccounts.submittedSchemeFolios", "Submitted scheme folios")}</p>
         </div>
 
         <div className="bg-white rounded-2xl p-4 border border-amber-200/80 shadow-2xs bg-amber-50/20">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold text-amber-700 uppercase tracking-wider">Pending</span>
+            <span className="text-[10px] font-bold text-amber-700 uppercase tracking-wider">{t("common.pending", "Pending")}</span>
             <div className="w-7 h-7 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center">
               <Clock className="w-3.5 h-3.5" />
             </div>
           </div>
           <h4 className="text-xl font-black text-amber-900 mt-1">{pendingCount}</h4>
-          <p className="text-[10px] text-amber-600 mt-0.5">Awaiting branch decision</p>
+          <p className="text-[10px] text-amber-600 mt-0.5">{t("dashboardModule.productAccounts.awaitingBranchDecision", "Awaiting branch decision")}</p>
         </div>
 
         <div className="bg-white rounded-2xl p-4 border border-emerald-200/80 shadow-2xs bg-emerald-50/20">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider">Approved</span>
+            <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider">{t("common.approved", "Approved")}</span>
             <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
               <CheckCircle2 className="w-3.5 h-3.5" />
             </div>
           </div>
           <h4 className="text-xl font-black text-emerald-900 mt-1">{approvedCount}</h4>
-          <p className="text-[10px] text-emerald-600 mt-0.5">Active opened folios</p>
+          <p className="text-[10px] text-emerald-600 mt-0.5">{t("dashboardModule.productAccounts.activeOpenedFolios", "Active opened folios")}</p>
         </div>
 
         <div className="bg-white rounded-2xl p-4 border border-rose-200/80 shadow-2xs bg-rose-50/20">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold text-rose-700 uppercase tracking-wider">Rejected</span>
+            <span className="text-[10px] font-bold text-rose-700 uppercase tracking-wider">{t("common.rejected", "Rejected")}</span>
             <div className="w-7 h-7 rounded-lg bg-rose-100 text-rose-700 flex items-center justify-center">
               <XCircle className="w-3.5 h-3.5" />
             </div>
           </div>
           <h4 className="text-xl font-black text-rose-900 mt-1">{rejectedCount}</h4>
-          <p className="text-[10px] text-rose-600 mt-0.5">Declined applications</p>
+          <p className="text-[10px] text-rose-600 mt-0.5">{t("dashboardModule.productAccounts.declinedApplications", "Declined applications")}</p>
         </div>
       </div>
 
@@ -228,28 +231,35 @@ export function MemberProductAccountRequestsTab({
         <div className="p-4 sm:p-5 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h3 className="text-base font-bold text-slate-900">
-              My {isInvestment ? 'Investment' : 'FD & MIS'} Applications
+              {isInvestment
+                ? t("dashboardModule.productAccounts.myInvestmentApplications", "My Investment Applications")
+                : t("dashboardModule.productAccounts.myFdMisApplications", "My FD & MIS Applications")}
             </h3>
             <p className="text-xs text-slate-500 mt-0.5">
-              Track real-time status and review decisions for your submitted scheme applications
+              {t("dashboardModule.productAccounts.trackApplicationsDesc", "Track real-time status and review decisions for your submitted scheme applications")}
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
             {/* Status Pills */}
             <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
-              {['all', 'pending', 'approved', 'rejected'].map((st) => (
+              {[
+                { id: 'all', label: t("dashboardModule.productAccounts.all", "All") },
+                { id: 'pending', label: t("common.pending", "Pending") },
+                { id: 'approved', label: t("common.approved", "Approved") },
+                { id: 'rejected', label: t("common.rejected", "Rejected") },
+              ].map((st) => (
                 <button
-                  key={st}
+                  key={st.id}
                   type="button"
-                  onClick={() => setStatusFilter(st)}
+                  onClick={() => setStatusFilter(st.id)}
                   className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all capitalize cursor-pointer ${
-                    statusFilter === st
+                    statusFilter === st.id
                       ? 'bg-white text-slate-900 shadow-2xs'
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  {st}
+                  {st.label}
                 </button>
               ))}
             </div>
@@ -261,7 +271,7 @@ export function MemberProductAccountRequestsTab({
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search scheme name or code..."
+                placeholder={t("dashboardModule.productAccounts.searchSchemePlaceholder", "Search scheme name or code...")}
                 className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-teal-500 shadow-2xs font-medium"
               />
             </div>
@@ -272,7 +282,7 @@ export function MemberProductAccountRequestsTab({
               onClick={() => fetchRequests(true)}
               disabled={loading || refreshing}
               className="p-2.5 border border-slate-200 hover:border-teal-400 text-slate-600 hover:text-teal-700 bg-white hover:bg-teal-50/50 rounded-xl transition-all cursor-pointer shadow-2xs"
-              title="Refresh applications"
+              title={t("dashboardModule.productAccounts.refreshApplications", "Refresh applications")}
             >
               <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin text-teal-600' : ''}`} />
             </button>
@@ -283,7 +293,7 @@ export function MemberProductAccountRequestsTab({
         {loading ? (
           <div className="py-16 text-center text-slate-400">
             <RefreshCw className="w-8 h-8 animate-spin mx-auto text-teal-600 mb-3" />
-            <p className="text-xs sm:text-sm font-semibold text-slate-600">Loading your applications...</p>
+            <p className="text-xs sm:text-sm font-semibold text-slate-600">{t("dashboardModule.productAccounts.loadingApplications", "Loading your applications...")}</p>
           </div>
         ) : error ? (
           <div className="py-12 text-center text-rose-500 px-4">
@@ -293,7 +303,7 @@ export function MemberProductAccountRequestsTab({
               onClick={() => fetchRequests()}
               className="mt-3 px-4 py-2 bg-slate-900 text-white text-xs font-bold rounded-xl cursor-pointer"
             >
-              Retry
+              {t("dashboardModule.productAccounts.retry", "Retry")}
             </button>
           </div>
         ) : filteredRequests.length === 0 ? (
@@ -301,11 +311,13 @@ export function MemberProductAccountRequestsTab({
             <div className="w-12 h-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center mx-auto mb-3">
               <FileText className="w-6 h-6" />
             </div>
-            <p className="text-sm font-bold text-slate-700 mb-1">No Applications Found</p>
+            <p className="text-sm font-bold text-slate-700 mb-1">{t("dashboardModule.productAccounts.noApplicationsFound", "No Applications Found")}</p>
             <p className="text-xs text-slate-500 max-w-sm mx-auto mb-4">
               {searchQuery || statusFilter !== 'all'
-                ? 'Try clearing your search query or status filter.'
-                : `You haven't submitted any ${isInvestment ? 'investment' : 'FD / MIS'} applications yet.`}
+                ? t("dashboardModule.productAccounts.clearFilterHint", "Try clearing your search query or status filter.")
+                : isInvestment
+                ? t("dashboardModule.productAccounts.noInvestmentApplications", "You haven't submitted any investment applications yet.")
+                : t("dashboardModule.productAccounts.noFdMisApplications", "You haven't submitted any FD / MIS applications yet.")}
             </p>
             {onApplyNew && (
               <button
@@ -314,7 +326,7 @@ export function MemberProductAccountRequestsTab({
                 className="px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold inline-flex items-center gap-1.5 shadow-sm shadow-teal-600/20 cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
-                <span>Apply for a Scheme</span>
+                <span>{t("dashboardModule.productAccounts.applyForScheme", "Apply for a Scheme")}</span>
               </button>
             )}
           </div>
@@ -324,18 +336,18 @@ export function MemberProductAccountRequestsTab({
               <thead>
                 <tr className="border-b border-slate-100 bg-slate-50/75 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                   <th className="py-3.5 px-4 text-center w-12">#</th>
-                  <th className="py-3.5 px-4">Scheme Code</th>
-                  <th className="py-3.5 px-4">Scheme Name</th>
-                  <th className="py-3.5 px-4">Account Number</th>
+                  <th className="py-3.5 px-4">{t("dashboardModule.productAccounts.schemeCode", "Scheme Code")}</th>
+                  <th className="py-3.5 px-4">{t("dashboardModule.productAccounts.schemeName", "Scheme Name")}</th>
+                  <th className="py-3.5 px-4">{t("dashboard.accountNumber", "Account Number")}</th>
                   {!isInvestment && (
                     <>
-                      <th className="py-3.5 px-4">Type</th>
-                      <th className="py-3.5 px-4">Principal Amount</th>
+                      <th className="py-3.5 px-4">{t("dashboardModule.productAccounts.type", "Type")}</th>
+                      <th className="py-3.5 px-4">{t("dashboardModule.productAccounts.principalAmount", "Principal Amount")}</th>
                     </>
                   )}
-                  <th className="py-3.5 px-4">Submitted Date</th>
-                  <th className="py-3.5 px-4 text-center">Status</th>
-                  <th className="py-3.5 px-4 text-right">Action</th>
+                  <th className="py-3.5 px-4">{t("dashboardModule.productAccounts.submittedDate", "Submitted Date")}</th>
+                  <th className="py-3.5 px-4 text-center">{t("common.status", "Status")}</th>
+                  <th className="py-3.5 px-4 text-right">{t("dashboardModule.productAccounts.action", "Action")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-xs">
@@ -371,7 +383,7 @@ export function MemberProductAccountRequestsTab({
                             <TrendingUp className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
                           )}
                           <span className="font-bold text-slate-900 block">
-                            {req.scheme_name || 'Scheme'}
+                            {req.scheme_name || t("dashboardModule.productAccounts.schemeFallback", "Scheme")}
                           </span>
                         </div>
                       </td>
@@ -392,7 +404,7 @@ export function MemberProductAccountRequestsTab({
                           {/* Type */}
                           <td className="py-4 px-4 whitespace-nowrap">
                             <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-700 inline-block">
-                              {isFd ? 'FD / MIS Term' : 'Recurring Investment'}
+                              {isFd ? t("dashboardModule.productAccounts.fdMisTerm", "FD / MIS Term") : t("dashboardModule.productAccounts.recurringInvestment", "Recurring Investment")}
                             </span>
                           </td>
 
@@ -407,7 +419,7 @@ export function MemberProductAccountRequestsTab({
 
                       {/* Submitted Date */}
                       <td className="py-4 px-4 whitespace-nowrap text-slate-500">
-                        {formatDateTime(req.created_at)}
+                        {formatDateTime(req.created_at, t("dashboardModule.productAccounts.na", "N/A"))}
                       </td>
 
                       {/* Status */}
@@ -426,7 +438,7 @@ export function MemberProductAccountRequestsTab({
                               isPending ? 'bg-amber-500 animate-pulse' : isApproved ? 'bg-emerald-500' : 'bg-rose-500'
                             }`}
                           />
-                          {isPending ? 'Pending' : isApproved ? 'Approved' : 'Rejected'}
+                          {isPending ? t("common.pending", "Pending") : isApproved ? t("common.approved", "Approved") : t("common.rejected", "Rejected")}
                         </span>
                       </td>
 
@@ -438,7 +450,7 @@ export function MemberProductAccountRequestsTab({
                           className="px-3 py-1.5 rounded-xl border border-slate-200 text-slate-700 hover:text-teal-700 hover:bg-teal-50 hover:border-teal-300 font-bold text-xs inline-flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
                         >
                           <Eye className="w-3.5 h-3.5" />
-                          <span>View</span>
+                          <span>{t("common.view", "View")}</span>
                         </button>
                       </td>
                     </tr>
@@ -457,7 +469,7 @@ export function MemberProductAccountRequestsTab({
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-teal-700 bg-teal-50 px-2.5 py-0.5 rounded-full">
-                  Application Folio #{detailModal.request.id}
+                  {t("dashboardModule.productAccounts.applicationFolio", "Application Folio #{id}", { id: detailModal.request.id })}
                 </span>
                 <h4 className="font-serif font-bold text-slate-900 text-lg mt-1">
                   {detailModal.request.scheme_name}
@@ -492,16 +504,26 @@ export function MemberProductAccountRequestsTab({
                   )}
                   <div>
                     <span className="font-bold capitalize block">
-                      Application {detailModal.request.status}
+                      {detailModal.request.status === 'approved'
+                        ? t("dashboardModule.productAccounts.applicationApproved", "Application approved")
+                        : detailModal.request.status === 'rejected'
+                        ? t("dashboardModule.productAccounts.applicationRejected", "Application rejected")
+                        : detailModal.request.status === 'pending' || !detailModal.request.status
+                        ? t("dashboardModule.productAccounts.applicationPending", "Application pending")
+                        : t("dashboardModule.productAccounts.applicationStatus", "Application {status}", { status: detailModal.request.status })}
                     </span>
                     <span className="text-[10px] opacity-80">
-                      Submitted on {formatDateTime(detailModal.request.created_at)}
+                      {t("dashboardModule.productAccounts.submittedOn", "Submitted on {date}", {
+                        date: formatDateTime(detailModal.request.created_at, t("dashboardModule.productAccounts.na", "N/A")),
+                      })}
                     </span>
                   </div>
                 </div>
                 {detailModal.request.reviewed_at && (
                   <span className="text-[10px] font-mono opacity-80">
-                    Reviewed: {formatDate(detailModal.request.reviewed_at)}
+                    {t("dashboardModule.productAccounts.reviewedOn", "Reviewed: {date}", {
+                      date: formatDate(detailModal.request.reviewed_at, t("dashboardModule.productAccounts.na", "N/A")),
+                    })}
                   </span>
                 )}
               </div>
@@ -512,14 +534,14 @@ export function MemberProductAccountRequestsTab({
                   <div className="flex items-center justify-between">
                     <div>
                       <span className="text-[10px] uppercase font-bold text-teal-700 block">
-                        Active Account Generated
+                        {t("dashboardModule.productAccounts.activeAccountGenerated", "Active Account Generated")}
                       </span>
                       <span className="font-mono font-bold text-base text-teal-950">
                         {detailModal.request.account.account_number}
                       </span>
                     </div>
                     <div className="text-right">
-                      <span className="text-[10px] uppercase font-bold text-teal-700 block">Current Balance</span>
+                      <span className="text-[10px] uppercase font-bold text-teal-700 block">{t("dashboardModule.productAccounts.currentBalance", "Current Balance")}</span>
                       <span className="font-bold text-sm text-teal-950">
                         {formatCurrency(Number(detailModal.request.account.balance || 0))}
                       </span>
@@ -531,7 +553,7 @@ export function MemberProductAccountRequestsTab({
               {/* Rejection Reason (if rejected) */}
               {detailModal.request.rejection_reason && (
                 <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800">
-                  <span className="font-bold block text-[10px] uppercase">Reason for Rejection:</span>
+                  <span className="font-bold block text-[10px] uppercase">{t("dashboardModule.productAccounts.reasonForRejection", "Reason for Rejection:")}</span>
                   <p className="mt-1 font-medium">{detailModal.request.rejection_reason}</p>
                 </div>
               )}
@@ -539,26 +561,28 @@ export function MemberProductAccountRequestsTab({
               {/* Scheme Details Grid */}
               <div className="grid grid-cols-2 gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-200">
                 <div>
-                  <span className="text-slate-400 block text-[10px] uppercase font-bold">Scheme Code</span>
+                  <span className="text-slate-400 block text-[10px] uppercase font-bold">{t("dashboardModule.productAccounts.schemeCode", "Scheme Code")}</span>
                   <span className="font-mono font-bold text-teal-900 text-xs">
                     {detailModal.request.scheme_code}
                   </span>
                 </div>
                 <div>
-                  <span className="text-slate-400 block text-[10px] uppercase font-bold">Product Category</span>
+                  <span className="text-slate-400 block text-[10px] uppercase font-bold">{t("dashboardModule.productAccounts.productCategory", "Product Category")}</span>
                   <span className="font-bold text-slate-800 uppercase">
-                    {detailModal.request.product_type === 'investment' ? 'Investment Scheme' : 'FD / MIS Term'}
+                    {detailModal.request.product_type === 'investment'
+                      ? t("dashboardModule.productAccounts.investmentScheme", "Investment Scheme")
+                      : t("dashboardModule.productAccounts.fdMisTerm", "FD / MIS Term")}
                   </span>
                 </div>
                 <div>
-                  <span className="text-slate-400 block text-[10px] uppercase font-bold">Debit Savings A/C</span>
+                  <span className="text-slate-400 block text-[10px] uppercase font-bold">{t("dashboardModule.productAccounts.debitSavingsAc", "Debit Savings A/C")}</span>
                   <span className="font-mono font-bold text-slate-900">
-                    Account #{detailModal.request.savings_account_id}
+                    {t("dashboardModule.productAccounts.accountNumberWithId", "Account #{id}", { id: detailModal.request.savings_account_id })}
                   </span>
                 </div>
                 {!isInvestment && (
                   <div>
-                    <span className="text-slate-400 block text-[10px] uppercase font-bold">Requested Deposit</span>
+                    <span className="text-slate-400 block text-[10px] uppercase font-bold">{t("dashboardModule.productAccounts.requestedDeposit", "Requested Deposit")}</span>
                     <span className="font-bold text-slate-900">
                       {detailModal.request.requested_principal
                         ? formatCurrency(Number(detailModal.request.requested_principal))
@@ -575,7 +599,7 @@ export function MemberProductAccountRequestsTab({
                 onClick={() => setDetailModal({ isOpen: false, loading: false, request: null, error: null })}
                 className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-colors cursor-pointer"
               >
-                Close
+                {t("common.close", "Close")}
               </button>
             </div>
           </div>
@@ -612,7 +636,7 @@ export function MemberProductAccountsTab({
       setAccounts(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error('Failed to load member product accounts:', err);
-      setError(err.message || 'Failed to load your accounts.');
+      setError(err.message || t("dashboardModule.productAccounts.loadAccountsError", "Failed to load your accounts."));
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -658,37 +682,39 @@ export function MemberProductAccountsTab({
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
         <div className="bg-white rounded-2xl p-4 border border-teal-200/80 shadow-2xs bg-teal-50/20">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold text-teal-800 uppercase tracking-wider">Active Folios</span>
+            <span className="text-[10px] font-bold text-teal-800 uppercase tracking-wider">{t("dashboardModule.productAccounts.activeFolios", "Active Folios")}</span>
             <div className="w-7 h-7 rounded-lg bg-teal-100 text-teal-700 flex items-center justify-center">
               <Landmark className="w-3.5 h-3.5" />
             </div>
           </div>
           <h4 className="text-xl font-black text-teal-950 mt-1">{scopedAccounts.length}</h4>
-          <p className="text-[10px] text-teal-600 mt-0.5">Approved &amp; active in branch</p>
+          <p className="text-[10px] text-teal-600 mt-0.5">{t("dashboardModule.productAccounts.approvedActiveInBranch", "Approved & active in branch")}</p>
         </div>
 
         <div className="bg-white rounded-2xl p-4 border border-emerald-200/80 shadow-2xs bg-emerald-50/20">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider">Total Portfolio Balance</span>
+            <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider">{t("dashboardModule.productAccounts.totalPortfolioBalance", "Total Portfolio Balance")}</span>
             <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
               <Wallet className="w-3.5 h-3.5" />
             </div>
           </div>
           <h4 className="text-xl font-black text-emerald-950 mt-1">{formatCurrency(totalBalance)}</h4>
-          <p className="text-[10px] text-emerald-600 mt-0.5">Aggregated holding value</p>
+          <p className="text-[10px] text-emerald-600 mt-0.5">{t("dashboardModule.productAccounts.aggregatedHoldingValue", "Aggregated holding value")}</p>
         </div>
 
         <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-2xs">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Product Scope</span>
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{t("dashboardModule.productAccounts.productScope", "Product Scope")}</span>
             <div className="w-7 h-7 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center">
               <ShieldCheck className="w-3.5 h-3.5" />
             </div>
           </div>
           <h4 className="text-xl font-black text-slate-900 mt-1 capitalize">
-            {isInvestment ? 'Investment Plans' : 'FD & MIS Deposits'}
+            {isInvestment
+              ? t("dashboardModule.productAccounts.investmentPlans", "Investment Plans")
+              : t("dashboardModule.productAccounts.fdMisDeposits", "FD & MIS Deposits")}
           </h4>
-          <p className="text-[10px] text-slate-400 mt-0.5">Society verified folios</p>
+          <p className="text-[10px] text-slate-400 mt-0.5">{t("dashboardModule.productAccounts.societyVerifiedFolios", "Society verified folios")}</p>
         </div>
       </div>
 
@@ -698,10 +724,12 @@ export function MemberProductAccountsTab({
         <div className="p-4 sm:p-5 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h3 className="text-base font-bold text-slate-900">
-              Active {isInvestment ? 'Investment' : 'FD & MIS'} Accounts
+              {isInvestment
+                ? t("dashboardModule.productAccounts.activeInvestmentAccounts", "Active Investment Accounts")
+                : t("dashboardModule.productAccounts.activeFdMisAccounts", "Active FD & MIS Accounts")}
             </h3>
             <p className="text-xs text-slate-500 mt-0.5">
-              Review your approved accounts, folios, balances, and servicing branch records
+              {t("dashboardModule.productAccounts.activeAccountsDesc", "Review your approved accounts, folios, balances, and servicing branch records")}
             </p>
           </div>
 
@@ -713,7 +741,7 @@ export function MemberProductAccountsTab({
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search account #, scheme, branch..."
+                placeholder={t("dashboardModule.productAccounts.searchAccountPlaceholder", "Search account #, scheme, branch...")}
                 className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-teal-500 shadow-2xs font-medium"
               />
             </div>
@@ -724,7 +752,7 @@ export function MemberProductAccountsTab({
               onClick={() => fetchAccounts(true)}
               disabled={loading || refreshing}
               className="p-2.5 border border-slate-200 hover:border-teal-400 text-slate-600 hover:text-teal-700 bg-white hover:bg-teal-50/50 rounded-xl transition-all cursor-pointer shadow-2xs"
-              title="Refresh accounts"
+              title={t("dashboardModule.productAccounts.refreshAccounts", "Refresh accounts")}
             >
               <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin text-teal-600' : ''}`} />
             </button>
@@ -735,7 +763,7 @@ export function MemberProductAccountsTab({
         {loading ? (
           <div className="py-16 text-center text-slate-400">
             <RefreshCw className="w-8 h-8 animate-spin mx-auto text-teal-600 mb-3" />
-            <p className="text-xs sm:text-sm font-semibold text-slate-600">Loading active accounts...</p>
+            <p className="text-xs sm:text-sm font-semibold text-slate-600">{t("dashboardModule.productAccounts.loadingAccounts", "Loading active accounts...")}</p>
           </div>
         ) : error ? (
           <div className="py-12 text-center text-rose-500 px-4">
@@ -745,7 +773,7 @@ export function MemberProductAccountsTab({
               onClick={() => fetchAccounts()}
               className="mt-3 px-4 py-2 bg-slate-900 text-white text-xs font-bold rounded-xl cursor-pointer"
             >
-              Retry
+              {t("dashboardModule.productAccounts.retry", "Retry")}
             </button>
           </div>
         ) : filteredAccounts.length === 0 ? (
@@ -753,11 +781,13 @@ export function MemberProductAccountsTab({
             <div className="w-12 h-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center mx-auto mb-3">
               <Landmark className="w-6 h-6" />
             </div>
-            <p className="text-sm font-bold text-slate-700 mb-1">No Active Accounts</p>
+            <p className="text-sm font-bold text-slate-700 mb-1">{t("dashboardModule.productAccounts.noActiveAccounts", "No Active Accounts")}</p>
             <p className="text-xs text-slate-500 max-w-sm mx-auto mb-4">
               {searchQuery
-                ? 'No matching accounts found for your search query.'
-                : `You do not have any active ${isInvestment ? 'investment' : 'FD / MIS'} accounts yet. Submit an application from the schemes catalogue.`}
+                ? t("dashboardModule.productAccounts.noMatchingAccounts", "No matching accounts found for your search query.")
+                : isInvestment
+                ? t("dashboardModule.productAccounts.noInvestmentAccountsYet", "You do not have any active investment accounts yet. Submit an application from the schemes catalogue.")
+                : t("dashboardModule.productAccounts.noFdMisAccountsYet", "You do not have any active FD / MIS accounts yet. Submit an application from the schemes catalogue.")}
             </p>
             {onApplyNew && (
               <button
@@ -766,7 +796,7 @@ export function MemberProductAccountsTab({
                 className="px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold inline-flex items-center gap-1.5 shadow-sm shadow-teal-600/20 cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
-                <span>Apply for a Scheme</span>
+                <span>{t("dashboardModule.productAccounts.applyForScheme", "Apply for a Scheme")}</span>
               </button>
             )}
           </div>
@@ -776,14 +806,18 @@ export function MemberProductAccountsTab({
               <thead>
                 <tr className="border-b border-slate-100 bg-slate-50/75 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                   <th className="py-3.5 px-4 text-center w-12">#</th>
-                  <th className="py-3.5 px-4">Account Number</th>
-                  <th className="py-3.5 px-4">Scheme Code</th>
-                  <th className="py-3.5 px-4">Scheme Name</th>
-                  <th className="py-3.5 px-4">Branch</th>
-                  <th className="py-3.5 px-4">{isInvestment ? 'Balance' : 'Principal / Balance'}</th>
-                  <th className="py-3.5 px-4">Opened Date</th>
-                  <th className="py-3.5 px-4 text-center">Status</th>
-                  <th className="py-3.5 px-4 text-right">Action</th>
+                  <th className="py-3.5 px-4">{t("dashboard.accountNumber", "Account Number")}</th>
+                  <th className="py-3.5 px-4">{t("dashboardModule.productAccounts.schemeCode", "Scheme Code")}</th>
+                  <th className="py-3.5 px-4">{t("dashboardModule.productAccounts.schemeName", "Scheme Name")}</th>
+                  <th className="py-3.5 px-4">{t("dashboard.branch", "Branch")}</th>
+                  <th className="py-3.5 px-4">
+                    {isInvestment
+                      ? t("dashboardModule.productAccounts.balance", "Balance")
+                      : t("dashboardModule.productAccounts.principalBalance", "Principal / Balance")}
+                  </th>
+                  <th className="py-3.5 px-4">{t("dashboardModule.productAccounts.openedDate", "Opened Date")}</th>
+                  <th className="py-3.5 px-4 text-center">{t("common.status", "Status")}</th>
+                  <th className="py-3.5 px-4 text-right">{t("dashboardModule.productAccounts.action", "Action")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-xs">
@@ -823,7 +857,7 @@ export function MemberProductAccountsTab({
                             <TrendingUp className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
                           )}
                           <span className="font-bold text-slate-900 block">
-                            {acc.scheme_name || 'Scheme'}
+                            {acc.scheme_name || t("dashboardModule.productAccounts.schemeFallback", "Scheme")}
                           </span>
                         </div>
                       </td>
@@ -832,7 +866,7 @@ export function MemberProductAccountsTab({
                       <td className="py-4 px-4 whitespace-nowrap text-slate-600">
                         <div className="flex items-center gap-1.5">
                           <Building2 className="w-3.5 h-3.5 text-slate-400" />
-                          <span>{acc.branch_name || `Branch #${acc.branch_id}`}</span>
+                          <span>{acc.branch_name || t("dashboardModule.productAccounts.branchWithId", "Branch #{id}", { id: acc.branch_id })}</span>
                         </div>
                       </td>
 
@@ -843,14 +877,20 @@ export function MemberProductAccountsTab({
 
                       {/* Opened Date */}
                       <td className="py-4 px-4 whitespace-nowrap text-slate-500">
-                        {formatDateTime(acc.opened_at)}
+                        {formatDateTime(acc.opened_at, t("dashboardModule.productAccounts.na", "N/A"))}
                       </td>
 
                       {/* Status */}
                       <td className="py-4 px-4 text-center whitespace-nowrap">
                         <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                          <span className="capitalize">{acc.status || 'Active'}</span>
+                          <span className="capitalize">
+                            {!acc.status || acc.status.toLowerCase() === 'active'
+                              ? t("common.active", "Active")
+                              : acc.status.toLowerCase() === 'inactive'
+                              ? t("common.inactive", "Inactive")
+                              : acc.status}
+                          </span>
                         </span>
                       </td>
 
@@ -862,7 +902,7 @@ export function MemberProductAccountsTab({
                           className="px-3 py-1.5 rounded-xl border border-slate-200 text-slate-700 hover:text-teal-700 hover:bg-teal-50 hover:border-teal-300 font-bold text-xs inline-flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
                         >
                           <Eye className="w-3.5 h-3.5" />
-                          <span>Details</span>
+                          <span>{t("dashboardModule.productAccounts.details", "Details")}</span>
                         </button>
                       </td>
                     </tr>
@@ -881,7 +921,7 @@ export function MemberProductAccountsTab({
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-teal-700 bg-teal-50 px-2.5 py-0.5 rounded-full">
-                  Account Folio
+                  {t("dashboardModule.productAccounts.accountFolio", "Account Folio")}
                 </span>
                 <h4 className="font-serif font-bold text-slate-900 text-lg mt-1 font-mono">
                   {selectedAccount.account_number}
@@ -898,41 +938,47 @@ export function MemberProductAccountsTab({
             <div className="space-y-3.5 text-xs">
               <div className="p-4 rounded-2xl bg-teal-50/70 border border-teal-200 text-teal-950 flex items-center justify-between">
                 <div>
-                  <span className="text-[10px] uppercase font-bold text-teal-700 block">Total Balance</span>
+                  <span className="text-[10px] uppercase font-bold text-teal-700 block">{t("dashboardModule.productAccounts.totalBalance", "Total Balance")}</span>
                   <span className="font-black text-xl text-teal-950">
                     {formatCurrency(Number(selectedAccount.balance || selectedAccount.requested_principal || 0))}
                   </span>
                 </div>
                 <div className="text-right">
-                  <span className="text-[10px] uppercase font-bold text-teal-700 block">Status</span>
+                  <span className="text-[10px] uppercase font-bold text-teal-700 block">{t("common.status", "Status")}</span>
                   <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
-                    <span className="capitalize">{selectedAccount.status || 'Active'}</span>
+                    <span className="capitalize">
+                      {!selectedAccount.status || selectedAccount.status.toLowerCase() === 'active'
+                        ? t("common.active", "Active")
+                        : selectedAccount.status.toLowerCase() === 'inactive'
+                        ? t("common.inactive", "Inactive")
+                        : selectedAccount.status}
+                    </span>
                   </span>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-200">
                 <div>
-                  <span className="text-slate-400 block text-[10px] uppercase font-bold">Scheme Name</span>
+                  <span className="text-slate-400 block text-[10px] uppercase font-bold">{t("dashboardModule.productAccounts.schemeName", "Scheme Name")}</span>
                   <span className="font-bold text-slate-900 text-xs block">{selectedAccount.scheme_name}</span>
                   <span className="text-[10px] text-teal-700 font-mono font-semibold">{selectedAccount.scheme_code}</span>
                 </div>
                 <div>
-                  <span className="text-slate-400 block text-[10px] uppercase font-bold">Serving Branch</span>
-                  <span className="font-bold text-slate-900 block">{selectedAccount.branch_name || 'Society Branch'}</span>
-                  <span className="text-[10px] text-slate-500 font-mono">Branch ID: #{selectedAccount.branch_id}</span>
+                  <span className="text-slate-400 block text-[10px] uppercase font-bold">{t("dashboardModule.productAccounts.servingBranch", "Serving Branch")}</span>
+                  <span className="font-bold text-slate-900 block">{selectedAccount.branch_name || t("dashboardModule.productAccounts.societyBranch", "Society Branch")}</span>
+                  <span className="text-[10px] text-slate-500 font-mono">{t("dashboardModule.productAccounts.branchId", "Branch ID: #{id}", { id: selectedAccount.branch_id })}</span>
                 </div>
                 <div>
-                  <span className="text-slate-400 block text-[10px] uppercase font-bold">Debit Savings A/C</span>
+                  <span className="text-slate-400 block text-[10px] uppercase font-bold">{t("dashboardModule.productAccounts.debitSavingsAc", "Debit Savings A/C")}</span>
                   <span className="font-mono font-bold text-slate-900">
-                    Account #{selectedAccount.savings_account_id}
+                    {t("dashboardModule.productAccounts.accountNumberWithId", "Account #{id}", { id: selectedAccount.savings_account_id })}
                   </span>
                 </div>
                 <div>
-                  <span className="text-slate-400 block text-[10px] uppercase font-bold">Opened Date</span>
+                  <span className="text-slate-400 block text-[10px] uppercase font-bold">{t("dashboardModule.productAccounts.openedDate", "Opened Date")}</span>
                   <span className="font-medium text-slate-800">
-                    {formatDateTime(selectedAccount.opened_at)}
+                    {formatDateTime(selectedAccount.opened_at, t("dashboardModule.productAccounts.na", "N/A"))}
                   </span>
                 </div>
               </div>
@@ -944,7 +990,7 @@ export function MemberProductAccountsTab({
                 onClick={() => setSelectedAccount(null)}
                 className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-colors cursor-pointer"
               >
-                Close
+                {t("common.close", "Close")}
               </button>
             </div>
           </div>

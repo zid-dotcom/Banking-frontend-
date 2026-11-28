@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, Link } from 'react-router-dom';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import {
@@ -42,6 +43,7 @@ import { getCurrentCashDayStatus, getStaffCashDays } from '../../services/cashRe
 import ReconciliationReceiptsModal from '../../components/dashboard/ReconciliationReceiptsModal';
 
 export default function StaffCashOperations() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [staffData, setStaffData] = useState(() => {
     try {
@@ -464,19 +466,19 @@ export default function StaffCashOperations() {
             <div className="flex flex-wrap items-center gap-2 mb-3.5">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur-xs text-xs font-semibold border border-teal-200/80 shadow-2xs text-[#0f766e]">
                 <Briefcase className="w-3.5 h-3.5 text-[#00b4a7]" />
-                <span>Role: {formatStaffRole(staffData?.staff_role?.name) || 'Cashier'}</span>
+                <span>{t("dashboardModule.monthlyTargets.roleLabel", "Role:")} {formatStaffRole(staffData?.staff_role?.name) || 'Cashier'}</span>
               </div>
 
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur-xs text-xs font-semibold border border-teal-200/80 shadow-2xs text-slate-700">
                 <Building2 className="w-3.5 h-3.5 text-teal-600" />
                 <span>
-                  Branch Code: <span className="font-mono text-teal-800 font-bold">{staffData?.branch?.branch_code ? `#${staffData.branch.branch_code}` : '#Central'}</span>
+                  {t("branchManagerCashTransactions.branchCode", "Branch Code:")} <span className="font-mono text-teal-800 font-bold">{staffData?.branch?.branch_code ? `#${staffData.branch.branch_code}` : t("staffCashOperations.central", "#Central")}</span>
                 </span>
               </div>
 
               <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50/95 backdrop-blur-xs text-xs font-semibold border border-emerald-200 shadow-2xs text-emerald-700">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span>{staffData?.is_active !== false ? 'Active' : 'Inactive'}</span>
+                <span>{staffData?.is_active !== false ? t("common.active", "Active") : t("common.inactive", "Inactive")}</span>
               </div>
             </div>
 
@@ -484,7 +486,7 @@ export default function StaffCashOperations() {
             <div className="flex items-center gap-3">
               <span className="w-1.5 h-8 sm:h-9 bg-[#00b4a7] rounded-full flex-shrink-0" />
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
-                <span>Cashier Counter &amp; Cash Operations</span>
+                <span>{t("staffCashOperations.cashierCounterCashOperations", "Cashier Counter & Cash Operations")}</span>
                 <span className="inline-block text-2xl sm:text-3xl">💵</span>
               </h1>
             </div>
@@ -493,27 +495,27 @@ export default function StaffCashOperations() {
             <div className="mt-3.5 flex flex-wrap items-center gap-2 sm:gap-2.5">
               <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/90 border border-teal-200/70 shadow-2xs text-xs text-slate-700 backdrop-blur-xs">
                 <User className="w-3.5 h-3.5 text-teal-600" />
-                <span className="text-slate-500 font-medium">Logged in as:</span>
+                <span className="text-slate-500 font-medium">{t("branchManagerCashTransactions.loggedInAs", "Logged in as:")}</span>
                 <span className="text-slate-900 font-bold capitalize">{staffData?.full_name || 'Staff Member'}</span>
               </div>
 
               <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/90 border border-teal-200/70 shadow-2xs text-xs text-slate-700 backdrop-blur-xs">
-                <span className="text-slate-500 font-medium">Staff ID:</span>
+                <span className="text-slate-500 font-medium">{t("staffCashOperations.staffId", "Staff ID:")}</span>
                 <span className="font-mono font-bold text-teal-800 bg-teal-50 px-1.5 py-0.5 rounded border border-teal-200/60">
-                  {staffData?.staff_code || (staffData?.staff_id ? `STF-${staffData.staff_id}` : 'STF-01')}
+                  {staffData?.staff_code || (staffData?.staff_id ? `STF-${staffData.staff_id}` : t("staffCashOperations.stf01", "STF-01"))}
                 </span>
               </div>
 
               {staffData?.email && (
                 <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/90 border border-teal-200/70 shadow-2xs text-xs text-slate-700 backdrop-blur-xs">
-                  <span className="text-slate-500 font-medium">Email:</span>
+                  <span className="text-slate-500 font-medium">{t("memberDashboard.email", "Email:")}</span>
                   <span className="text-slate-900 font-bold">{staffData.email}</span>
                 </div>
               )}
 
               <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/90 border border-teal-200/70 shadow-2xs text-xs text-slate-700 backdrop-blur-xs">
                 <Building2 className="w-3.5 h-3.5 text-teal-600" />
-                <span className="text-slate-500 font-medium">Branch Name:</span>
+                <span className="text-slate-500 font-medium">{t("branchManagerDashboard.branchName", "Branch Name:")}</span>
                 <span className="text-slate-900 font-bold">{staffData?.branch?.name || 'Society Branch'}</span>
               </div>
             </div>
@@ -523,7 +525,7 @@ export default function StaffCashOperations() {
               {(staffData?.branch?.city || staffData?.branch?.state) && (
                 <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/90 border border-teal-200/70 shadow-2xs text-xs text-slate-700 backdrop-blur-xs">
                   <MapPin className="w-3.5 h-3.5 text-emerald-600" />
-                  <span className="text-slate-500 font-medium">Location:</span>
+                  <span className="text-slate-500 font-medium">{t("branchManagerCashTransactions.location", "Location:")}</span>
                   <span className="text-slate-800 font-semibold capitalize">
                     {[staffData.branch.city, staffData.branch.state].filter(Boolean).join(', ')}
                   </span>
@@ -533,7 +535,7 @@ export default function StaffCashOperations() {
               {staffData?.branch?.ifsc_code && (
                 <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/90 border border-teal-200/70 shadow-2xs text-xs text-slate-700 backdrop-blur-xs">
                   <Landmark className="w-3.5 h-3.5 text-teal-600" />
-                  <span className="text-slate-500 font-medium">IFSC:</span>
+                  <span className="text-slate-500 font-medium">{t("staffCashOperations.ifsc", "IFSC:")}</span>
                   <span className="font-mono font-bold text-teal-800">{staffData.branch.ifsc_code}</span>
                 </div>
               )}
@@ -545,10 +547,10 @@ export default function StaffCashOperations() {
                 }}
                 disabled={refreshing}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 shadow-2xs text-xs font-semibold text-slate-700 transition-colors cursor-pointer active:scale-95 disabled:opacity-50"
-                title="Refresh Counter Profile & Transactions"
+                title={t("staffCashOperations.refreshCounterProfileTransactions", "Refresh Counter Profile & Transactions")}
               >
                 <RefreshCw className={`w-3.5 h-3.5 text-[#00b4a7] ${refreshing ? 'animate-spin' : ''}`} />
-                <span>{refreshing ? 'Refreshing...' : 'Refresh'}</span>
+                <span>{refreshing ? t("dashboardModule.branchOverview.refreshing", "Refreshing...") : t("common.refresh", "Refresh")}</span>
               </button>
             </div>
           </div>
@@ -556,7 +558,7 @@ export default function StaffCashOperations() {
           <div className="relative z-10 flex justify-center md:justify-end pointer-events-none -my-2 sm:-my-5 lg:-my-6 flex-shrink-0 w-full md:w-auto">
             <img
               src={modernTealBankIllustration}
-              alt="Cash Operations Desk"
+              alt={t("branchManagerCashTransactions.cashOperationsDesk", "Cash Operations Desk")}
               className="h-32 sm:h-44 lg:h-52 max-w-full w-auto object-contain drop-shadow-md select-none pointer-events-none mx-auto md:mx-0"
             />
           </div>
@@ -567,25 +569,25 @@ export default function StaffCashOperations() {
           <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/80 shadow-xs hover:border-teal-300 transition-all">
             <div className="flex items-center justify-between mb-3">
               <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                Counter Desk Status
+                {t("staffCashOperations.counterDeskStatus", "Counter Desk Status")}
               </span>
               <div className="w-10 h-10 rounded-2xl bg-teal-50 text-[#00b4a7] flex items-center justify-center">
                 <Wallet className="w-5 h-5" />
               </div>
             </div>
             <h3 className="text-lg sm:text-xl font-black text-slate-900 truncate">
-              Operational
+              {t("staffCashOperations.operational", "Operational")}
             </h3>
             <p className="text-xs text-emerald-600 mt-1 font-semibold flex items-center gap-1">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Ready for Counter Cash</span>
+              <span>{t("staffCashOperations.readyForCounterCash", "Ready for Counter Cash")}</span>
             </p>
           </div>
 
           <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/80 shadow-xs hover:border-teal-300 transition-all">
             <div className="flex items-center justify-between mb-3">
               <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                Cash Transactions
+                {t("dashboardModule.branchOverview.tabCashTransactions", "Cash Transactions")}
               </span>
               <div className="w-10 h-10 rounded-2xl bg-teal-50 text-[#00b4a7] flex items-center justify-center">
                 <Receipt className="w-5 h-5" />
@@ -595,14 +597,14 @@ export default function StaffCashOperations() {
               {cardTxCount}
             </h3>
             <p className="text-xs text-slate-500 mt-1 font-medium">
-              {hasDateFilter ? 'Filtered counter operations' : "Today's counter operations"}
+              {hasDateFilter ? t("staffCashOperations.filteredCounterOperations", "Filtered counter operations") : t("staffCashOperations.todaySCounterOperations", "Today's counter operations")}
             </p>
           </div>
 
           <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/80 shadow-xs hover:border-teal-300 transition-all">
             <div className="flex items-center justify-between mb-3">
               <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                Total Cash Deposits
+                {t("dashboardModule.accountTransactions.totalCashDeposits", "Total Cash Deposits")}
               </span>
               <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
                 <ArrowDownLeft className="w-5 h-5" />
@@ -612,14 +614,14 @@ export default function StaffCashOperations() {
               {formatCurrency(totalDeposits)}
             </h3>
             <p className="text-xs text-slate-500 mt-1 font-medium">
-              {hasDateFilter ? 'Filtered deposits accepted' : "Today's deposits accepted"}
+              {hasDateFilter ? t("staffCashOperations.filteredDepositsAccepted", "Filtered deposits accepted") : t("staffCashOperations.todaySDepositsAccepted", "Today's deposits accepted")}
             </p>
           </div>
 
           <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/80 shadow-xs hover:border-teal-300 transition-all">
             <div className="flex items-center justify-between mb-3">
               <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                Total Cash Withdrawals
+                {t("dashboardModule.accountTransactions.totalCashWithdrawals", "Total Cash Withdrawals")}
               </span>
               <div className="w-10 h-10 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center">
                 <ArrowUpRight className="w-5 h-5" />
@@ -629,7 +631,7 @@ export default function StaffCashOperations() {
               {formatCurrency(totalWithdrawals)}
             </h3>
             <p className="text-xs text-slate-500 mt-1 font-medium">
-              {hasDateFilter ? 'Filtered withdrawals disbursed' : "Today's withdrawals disbursed"}
+              {hasDateFilter ? t("staffCashOperations.filteredWithdrawalsDisbursed", "Filtered withdrawals disbursed") : t("staffCashOperations.todaySWithdrawalsDisbursed", "Today's withdrawals disbursed")}
             </p>
           </div>
         </div>
@@ -640,17 +642,17 @@ export default function StaffCashOperations() {
               <Headset className="w-7 h-7" />
             </div>
             <h3 className="text-xl font-serif font-bold text-slate-900">
-              Customer Service Officer Portal
+              {t("staffCashOperations.customerServiceOfficerPortal", "Customer Service Officer Portal")}
             </h3>
             <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
-              You are signed in as a <strong>Customer Service Officer</strong>. Counter cash deposits and withdrawals are restricted to Cashiers. You have access to review and respond to member service requests.
+              {t("staffCashOperations.youAreSignedInAs", "You are signed in as a")} <strong>{t("dashboardModule.serviceRequests.customerServiceOfficer", "Customer Service Officer")}</strong>{t("staffCashOperations.counterCashDepositsAndWithdrawals", ". Counter cash deposits and withdrawals are restricted to Cashiers. You have access to review and respond to member service requests.")}
             </p>
             <div className="pt-2">
               <Link
                 to="/staff/service-requests"
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#14b8a6] to-[#0f766e] text-white font-bold text-xs shadow-xs hover:shadow-md transition-all cursor-pointer"
               >
-                Go to Service Requests Desk
+                {t("staffCashOperations.goToServiceRequestsDesk", "Go to Service Requests Desk")}
               </Link>
             </div>
           </div>
@@ -660,10 +662,10 @@ export default function StaffCashOperations() {
               <Calculator className="w-7 h-7" />
             </div>
             <h3 className="text-xl font-serif font-bold text-slate-900">
-              Accountant Cash Audit Portal
+              {t("staffCashOperations.accountantCashAuditPortal", "Accountant Cash Audit Portal")}
             </h3>
             <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
-              You are signed in as an <strong>Accountant</strong>. Counter cash deposits and teller withdrawals are restricted to Cashiers. You have access to review branch daily reconciliations and inspect transaction receipts.
+              {t("staffCashOperations.youAreSignedInAs2", "You are signed in as an")} <strong>{t("accountantProductAccounts.accountant", "Accountant")}</strong>{t("staffCashOperations.counterCashDepositsAndTeller", ". Counter cash deposits and teller withdrawals are restricted to Cashiers. You have access to review branch daily reconciliations and inspect transaction receipts.")}
             </p>
             <div className="pt-2">
               <Link
@@ -671,7 +673,7 @@ export default function StaffCashOperations() {
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#14b8a6] to-[#0f766e] text-white font-bold text-xs shadow-xs hover:shadow-md transition-all cursor-pointer"
               >
                 <Calculator className="w-4 h-4" />
-                <span>Go to Cash Reconciliations Review</span>
+                <span>{t("staffCashOperations.goToCashReconciliationsReview", "Go to Cash Reconciliations Review")}</span>
               </Link>
             </div>
           </div>
@@ -689,10 +691,10 @@ export default function StaffCashOperations() {
               </div>
               <div>
                 <h3 className="font-serif font-black text-slate-900 text-lg sm:text-xl">
-                  Cash Operations Counter
+                  {t("staffCashOperations.cashOperationsCounter", "Cash Operations Counter")}
                 </h3>
                 <p className="text-xs text-slate-500 font-medium">
-                  Verify member savings account to record counter cash deposits &amp; withdrawals
+                  {t("staffCashOperations.verifyMemberSavingsAccountTo", "Verify member savings account to record counter cash deposits & withdrawals")}
                 </p>
               </div>
             </div>
@@ -700,7 +702,7 @@ export default function StaffCashOperations() {
             <div className="flex items-center gap-2">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-50 text-[#0f766e] font-semibold text-xs border border-teal-200/80 shadow-2xs">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span>Cash Counter Online</span>
+                <span>{t("staffCashOperations.cashCounterOnline", "Cash Counter Online")}</span>
               </span>
             </div>
           </div>
@@ -726,12 +728,12 @@ export default function StaffCashOperations() {
                     )}
                     <div>
                       <p className={`font-extrabold ${isTodayClosed ? 'text-rose-950' : 'text-amber-950'}`}>
-                        {isTodayClosed ? "Today's Cash Shift Closed & Locked" : "Cash Day Not Open"}
+                        {isTodayClosed ? t("staffCashOperations.todaySCashShiftClosed", "Today's Cash Shift Closed & Locked") : t("staffCashOperations.cashDayNotOpen", "Cash Day Not Open")}
                       </p>
                       <p className={`text-[11px] font-medium mt-0.5 ${isTodayClosed ? 'text-rose-800' : 'text-amber-800'}`}>
                         {isTodayClosed
-                          ? "Your drawer for today has been closed and submitted for reconciliation. Opening a new shift is locked until after 12:00 AM (tomorrow)."
-                          : "Your cash drawer is currently closed or not opened for today. Open your cash day first to record deposits and withdrawals."}
+                          ? t("staffCashOperations.yourDrawerForTodayHas", "Your drawer for today has been closed and submitted for reconciliation. Opening a new shift is locked until after 12:00 AM (tomorrow).")
+                          : t("staffCashOperations.yourCashDrawerIsCurrently", "Your cash drawer is currently closed or not opened for today. Open your cash day first to record deposits and withdrawals.")}
                       </p>
                     </div>
                   </div>
@@ -742,7 +744,7 @@ export default function StaffCashOperations() {
                     }`}
                   >
                     {isTodayClosed ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
-                    <span>{isTodayClosed ? "View Shift Status" : "Open Cash Day"}</span>
+                    <span>{isTodayClosed ? t("staffCashOperations.viewShiftStatus", "View Shift Status") : t("staffCashOperations.openCashDay", "Open Cash Day")}</span>
                   </Link>
                 </div>
               )}
@@ -752,14 +754,14 @@ export default function StaffCashOperations() {
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                     <span>
-                      Day Open ({drawerStatus.currentDay.business_date}) • Starting Float: <strong>{formatCurrency(drawerStatus.currentDay.opening_cash)}</strong>
+                      {t("staffCashOperations.dayOpen", "Day Open (")}{drawerStatus.currentDay.business_date}{t("staffCashOperations.startingFloat", ") • Starting Float:")} <strong>{formatCurrency(drawerStatus.currentDay.opening_cash)}</strong>
                     </span>
                   </div>
                   <Link
                     to="/staff/cash-reconciliation"
                     className="text-xs font-bold text-[#0f766e] hover:underline flex items-center gap-1"
                   >
-                    <span>Reconciliation</span>
+                    <span>{t("staffCashOperations.reconciliation", "Reconciliation")}</span>
                     <span>→</span>
                   </Link>
                 </div>
@@ -768,7 +770,7 @@ export default function StaffCashOperations() {
               {/* Verify Member Account */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                  Verify Member Account
+                  {t("staffCashOperations.verifyMemberAccount", "Verify Member Account")}
                 </label>
                 <form onSubmit={handleLookupAccount} className="flex gap-2">
                   <div className="relative flex-1">
@@ -782,7 +784,7 @@ export default function StaffCashOperations() {
                         setAccountLookupNumber(e.target.value);
                         setLookupError(null);
                       }}
-                      placeholder="Enter 16-digit Account Number (e.g. 9021178522884104)..."
+                      placeholder={t("staffCashOperations.enter16DigitAccountNumber", "Enter 16-digit Account Number (e.g. 9021178522884104)...")}
                       className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-mono text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#00b4a7] focus:bg-white transition-all shadow-2xs"
                     />
                   </div>
@@ -794,12 +796,12 @@ export default function StaffCashOperations() {
                     {lookupLoading ? (
                       <>
                         <Loader2 className="w-4 h-4 animate-spin" />
-                        <span>Verifying...</span>
+                        <span>{t("staffCashOperations.verifying", "Verifying...")}</span>
                       </>
                     ) : (
                       <>
                         <ShieldCheck className="w-4 h-4" />
-                        <span>Verify Account</span>
+                        <span>{t("staffCashOperations.verifyAccount", "Verify Account")}</span>
                       </>
                     )}
                   </button>
@@ -821,12 +823,12 @@ export default function StaffCashOperations() {
                     <CheckCircle2 className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="font-extrabold text-emerald-900 text-sm leading-tight">
-                        {txSuccess.type} Processed Successfully!
+                        {txSuccess.type} {t("staffCashOperations.processedSuccessfully", "Processed Successfully!")}
                       </p>
                       <p className="mt-1 text-emerald-700">{txSuccess.message}</p>
                       {txSuccess.data?.receipt_number && (
                         <p className="mt-1 font-mono text-[11px] text-emerald-900">
-                          Receipt: <strong>{txSuccess.data.receipt_number}</strong>
+                          {t("staffCashOperations.receipt", "Receipt:")} <strong>{txSuccess.data.receipt_number}</strong>
                         </p>
                       )}
                     </div>
@@ -859,14 +861,14 @@ export default function StaffCashOperations() {
               <div className="p-4 sm:p-5 rounded-2xl bg-slate-50/70 border border-slate-200/80 space-y-4">
                 <div className="flex items-center justify-between">
                   <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                    Step 2: Transaction Details
+                    {t("staffCashOperations.step2TransactionDetails", "Step 2: Transaction Details")}
                   </label>
-                  <span className="text-[11px] text-slate-400 font-medium">Cash Desk Execution</span>
+                  <span className="text-[11px] text-slate-400 font-medium">{t("staffCashOperations.cashDeskExecution", "Cash Desk Execution")}</span>
                 </div>
 
                 <div>
                   <span className="text-slate-600 text-xs font-semibold block mb-1.5">
-                    Transaction Amount (₹) <span className="text-rose-500">*</span>
+                    {t("staffCashOperations.transactionAmount", "Transaction Amount (₹)")} <span className="text-rose-500">*</span>
                   </span>
                   <div className="relative">
                     <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none font-bold text-slate-400 text-sm">
@@ -881,14 +883,14 @@ export default function StaffCashOperations() {
                         setTxAmount(e.target.value);
                         setTxError(null);
                       }}
-                      placeholder="Enter amount (e.g. 500.00)"
+                      placeholder={t("staffCashOperations.enterAmountEG500", "Enter amount (e.g. 500.00)")}
                       className="w-full pl-8 pr-4 py-2.5 bg-white border border-slate-300 rounded-xl text-sm font-bold text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#00b4a7] focus:ring-2 focus:ring-teal-100 transition-all shadow-xs"
                     />
                   </div>
 
                   {/* Quick Amount Buttons */}
                   <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                    <span className="text-[11px] text-slate-400 font-medium mr-1">Quick:</span>
+                    <span className="text-[11px] text-slate-400 font-medium mr-1">{t("staffCashOperations.quick", "Quick:")}</span>
                     {[100, 500, 1000, 2000, 5000].map((amt) => (
                       <button
                         key={amt}
@@ -904,13 +906,13 @@ export default function StaffCashOperations() {
 
                 <div>
                   <span className="text-slate-600 text-xs font-semibold block mb-1.5">
-                    Cashier Notes / Reference (Optional)
+                    {t("staffCashOperations.cashierNotesReferenceOptional", "Cashier Notes / Reference (Optional)")}
                   </span>
                   <input
                     type="text"
                     value={txNotes}
                     onChange={(e) => setTxNotes(e.target.value)}
-                    placeholder="e.g. Counter Cash Deposit / Member Passbook entry"
+                    placeholder={t("staffCashOperations.eGCounterCashDeposit", "e.g. Counter Cash Deposit / Member Passbook entry")}
                     className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#00b4a7] transition-all shadow-xs"
                   />
                 </div>
@@ -926,12 +928,12 @@ export default function StaffCashOperations() {
                     {txLoading === 'deposit' ? (
                       <>
                         <Loader2 className="w-4 h-4 animate-spin" />
-                        <span>Processing Deposit...</span>
+                        <span>{t("staffCashOperations.processingDeposit", "Processing Deposit...")}</span>
                       </>
                     ) : (
                       <>
                         <ArrowDownLeft className="w-4 h-4" />
-                        <span>Record Cash Deposit</span>
+                        <span>{t("staffCashOperations.recordCashDeposit", "Record Cash Deposit")}</span>
                       </>
                     )}
                   </button>
@@ -945,23 +947,23 @@ export default function StaffCashOperations() {
                     {txLoading === 'withdrawal' ? (
                       <>
                         <Loader2 className="w-4 h-4 animate-spin" />
-                        <span>Processing Withdrawal...</span>
+                        <span>{t("staffCashOperations.processingWithdrawal", "Processing Withdrawal...")}</span>
                       </>
                     ) : (
                       <>
                         <ArrowUpRight className="w-4 h-4" />
-                        <span>Record Cash Withdrawal</span>
+                        <span>{t("staffCashOperations.recordCashWithdrawal", "Record Cash Withdrawal")}</span>
                       </>
                     )}
                   </button>
                 </div>
                 {!accountDetails ? (
                   <p className="text-[11px] text-amber-700 text-center font-medium">
-                    ⚠️ Please verify an account first to enable cash deposit / withdrawal buttons.
+                    {t("staffCashOperations.pleaseVerifyAnAccountFirst", "⚠️ Please verify an account first to enable cash deposit / withdrawal buttons.")}
                   </p>
                 ) : !drawerStatus.isOpen ? (
                   <p className="text-[11px] text-rose-700 text-center font-bold">
-                    🔒 Cash counter is closed for today. Shift locked until tomorrow after 12:00 AM.
+                    {t("staffCashOperations.cashCounterIsClosedFor", "🔒 Cash counter is closed for today. Shift locked until tomorrow after 12:00 AM.")}
                   </p>
                 ) : null}
               </div>
@@ -976,38 +978,38 @@ export default function StaffCashOperations() {
                     {/* Top Bar */}
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] font-bold text-[#0f766e] uppercase tracking-wider">
-                        Verified Member Account
+                        {t("staffCashOperations.verifiedMemberAccount", "Verified Member Account")}
                       </span>
                       <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
                         <Check className="w-3 h-3 text-emerald-600" />
-                        <span>Confirmed</span>
+                        <span>{t("staffCashOperations.confirmed", "Confirmed")}</span>
                       </span>
                     </div>
 
                     {/* Big Balance Box */}
                     <div className="p-4 rounded-2xl bg-white border border-teal-200/70 shadow-xs">
                       <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                        Current Available Balance
+                        {t("staffCashOperations.currentAvailableBalance", "Current Available Balance")}
                       </span>
                       <p className="text-2xl sm:text-3xl font-black text-slate-900 mt-0.5 font-sans">
                         {formatCurrency(accountDetails.balance ?? accountDetails.current_balance ?? 0)}
                       </p>
                       <p className="text-xs font-mono font-bold text-teal-800 mt-1">
-                        Account Number: {accountDetails.account_number || accountLookupNumber}
+                        {t("staffCashOperations.accountNumber", "Account Number:")} {accountDetails.account_number || accountLookupNumber}
                       </p>
                     </div>
 
                     {/* Account Meta Grid */}
                     <div className="space-y-2.5 text-xs">
                       <div className="p-3 rounded-xl bg-white border border-slate-100 flex items-center justify-between">
-                        <span className="text-slate-400 font-medium">Account Holder:</span>
+                        <span className="text-slate-400 font-medium">{t("staffCashOperations.accountHolder", "Account Holder:")}</span>
                         <span className="font-extrabold text-slate-900">
                           {accountDetails.account_holder_name || accountDetails.member_name || accountDetails.full_name || 'Member'}
                         </span>
                       </div>
 
                       <div className="p-3 rounded-xl bg-white border border-slate-100 flex items-center justify-between">
-                        <span className="text-slate-400 font-medium">Savings Scheme:</span>
+                        <span className="text-slate-400 font-medium">{t("staffCashOperations.savingsScheme", "Savings Scheme:")}</span>
                         <span className="font-bold text-teal-900">
                           {accountDetails.scheme_name || accountDetails.scheme?.name || 'Regular Savings Deposit'}
                         </span>
@@ -1015,29 +1017,29 @@ export default function StaffCashOperations() {
 
                       {accountDetails.member_code && (
                         <div className="p-3 rounded-xl bg-white border border-slate-100 flex items-center justify-between">
-                          <span className="text-slate-400 font-medium">Member Code:</span>
+                          <span className="text-slate-400 font-medium">{t("modal.nominee.memberCode", "Member Code:")}</span>
                           <span className="font-mono font-bold text-slate-800">{accountDetails.member_code}</span>
                         </div>
                       )}
 
                       {accountDetails.branch_name && (
                         <div className="p-3 rounded-xl bg-white border border-slate-100 flex items-center justify-between">
-                          <span className="text-slate-400 font-medium">Operating Branch:</span>
+                          <span className="text-slate-400 font-medium">{t("staffCashOperations.operatingBranch", "Operating Branch:")}</span>
                           <span className="font-semibold text-slate-800">{accountDetails.branch_name}</span>
                         </div>
                       )}
 
                       <div className="p-3 rounded-xl bg-white border border-slate-100 grid grid-cols-2 gap-2 text-center">
                         <div className="p-2 rounded-lg bg-emerald-50/70 border border-emerald-100">
-                          <span className="text-[10px] text-slate-500 font-medium block">Deposits</span>
+                          <span className="text-[10px] text-slate-500 font-medium block">{t("dashboardModule.accountTransactions.filterDeposits", "Deposits")}</span>
                           <span className="text-xs font-bold text-emerald-700">
-                            {accountDetails.deposits_allowed !== false ? '✓ Allowed' : '✗ Restricted'}
+                            {accountDetails.deposits_allowed !== false ? t("staffCashOperations.allowed", "✓ Allowed") : t("staffCashOperations.restricted", "✗ Restricted")}
                           </span>
                         </div>
                         <div className="p-2 rounded-lg bg-teal-50/70 border border-teal-100">
-                          <span className="text-[10px] text-slate-500 font-medium block">Withdrawals</span>
+                          <span className="text-[10px] text-slate-500 font-medium block">{t("dashboardModule.accountTransactions.filterWithdrawals", "Withdrawals")}</span>
                           <span className="text-xs font-bold text-teal-700">
-                            {accountDetails.withdrawals_allowed !== false ? '✓ Allowed' : '✗ Restricted'}
+                            {accountDetails.withdrawals_allowed !== false ? t("staffCashOperations.allowed", "✓ Allowed") : t("staffCashOperations.restricted", "✗ Restricted")}
                           </span>
                         </div>
                       </div>
@@ -1052,7 +1054,7 @@ export default function StaffCashOperations() {
                         }}
                         className="text-xs text-slate-400 hover:text-slate-600 underline font-medium cursor-pointer"
                       >
-                        Clear &amp; Verify Different Account
+                        {t("staffCashOperations.clearVerifyDifferentAccount", "Clear & Verify Different Account")}
                       </button>
                     </div>
                   </div>
@@ -1062,10 +1064,10 @@ export default function StaffCashOperations() {
                       <Landmark className="w-7 h-7" />
                     </div>
                     <h4 className="text-sm font-bold text-slate-800">
-                      Awaiting Account Verification
+                      {t("staffCashOperations.awaitingAccountVerification", "Awaiting Account Verification")}
                     </h4>
                     <p className="text-xs text-slate-500 max-w-xs mx-auto leading-relaxed">
-                      Enter the member's 16-digit account number on the left and click <strong>Verify Account</strong> to inspect balance, scheme, and status before processing cash.
+                      {t("staffCashOperations.enterTheMemberS16", "Enter the member's 16-digit account number on the left and click")} <strong>{t("staffCashOperations.verifyAccount", "Verify Account")}</strong> {t("staffCashOperations.toInspectBalanceSchemeAnd", "to inspect balance, scheme, and status before processing cash.")}
                     </p>
                   </div>
                 )}
@@ -1083,13 +1085,13 @@ export default function StaffCashOperations() {
           <div className="p-5 sm:p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h3 className="font-serif font-black text-slate-900 text-lg sm:text-xl flex items-center gap-2">
-                <span>My Cash Transactions</span>
+                <span>{t("staffCashOperations.myCashTransactions", "My Cash Transactions")}</span>
                 <span className="text-xs font-bold text-teal-800 bg-teal-50 px-2.5 py-0.5 rounded-full border border-teal-200">
                   {filteredTransactions.length}
                 </span>
               </h3>
               <p className="text-xs text-slate-500 font-medium mt-0.5">
-                Real-time record of all cash deposits and withdrawals handled at your counter.
+                {t("staffCashOperations.realTimeRecordOfAll", "Real-time record of all cash deposits and withdrawals handled at your counter.")}
               </p>
             </div>
 
@@ -1100,10 +1102,10 @@ export default function StaffCashOperations() {
                   type="button"
                   onClick={() => setSelectedReconciliationReport(drawerStatus.currentDay)}
                   className="px-3.5 py-2 rounded-xl bg-teal-50 hover:bg-teal-100 border border-teal-200 shadow-2xs text-xs font-bold text-teal-800 transition-all cursor-pointer flex items-center gap-1.5 active:scale-95"
-                  title="Inspect Today's Cash Reconciliation Receipts Audit"
+                  title={t("staffCashOperations.inspectTodaySCashReconciliation", "Inspect Today's Cash Reconciliation Receipts Audit")}
                 >
                   <Receipt className="w-3.5 h-3.5 text-teal-600" />
-                  <span>Day Receipts Audit</span>
+                  <span>{t("staffCashOperations.dayReceiptsAudit", "Day Receipts Audit")}</span>
                 </button>
               )}
               <button
@@ -1111,10 +1113,10 @@ export default function StaffCashOperations() {
                 onClick={loadTransactions}
                 disabled={loadingTransactions}
                 className="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 shadow-2xs text-xs font-bold text-slate-700 hover:text-slate-900 transition-all cursor-pointer disabled:opacity-50 flex items-center gap-2 active:scale-95"
-                title="Refresh Cashier Transactions Ledger"
+                title={t("staffCashOperations.refreshCashierTransactionsLedger", "Refresh Cashier Transactions Ledger")}
               >
                 <RefreshCw className={`w-3.5 h-3.5 text-[#00b4a7] ${loadingTransactions ? 'animate-spin' : ''}`} />
-                <span>{loadingTransactions ? 'Refreshing...' : 'Refresh'}</span>
+                <span>{loadingTransactions ? t("dashboardModule.branchOverview.refreshing", "Refreshing...") : t("common.refresh", "Refresh")}</span>
               </button>
             </div>
           </div>
@@ -1132,7 +1134,7 @@ export default function StaffCashOperations() {
                     : 'text-slate-500 hover:text-slate-800'
                 }`}
               >
-                All
+                {t("dashboardModule.accountTransactions.filterAll", "All")}
               </button>
               <button
                 type="button"
@@ -1143,7 +1145,7 @@ export default function StaffCashOperations() {
                     : 'text-slate-500 hover:text-slate-800'
                 }`}
               >
-                Deposits
+                {t("dashboardModule.accountTransactions.filterDeposits", "Deposits")}
               </button>
               <button
                 type="button"
@@ -1154,7 +1156,7 @@ export default function StaffCashOperations() {
                     : 'text-slate-500 hover:text-slate-800'
                 }`}
               >
-                Withdrawals
+                {t("dashboardModule.accountTransactions.filterWithdrawals", "Withdrawals")}
               </button>
             </div>
 
@@ -1165,28 +1167,28 @@ export default function StaffCashOperations() {
                 {/* FROM Box */}
                 <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-slate-200 shadow-2xs hover:border-teal-400 focus-within:border-teal-500 focus-within:ring-2 focus-within:ring-teal-100 transition-all">
                   <span className="text-[10px] font-black uppercase tracking-wider text-teal-800 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-200 select-none">
-                    From
+                    {t("dashboardModule.accountTransactions.from", "From")}
                   </span>
                   <input
                     type="date"
                     value={fromDate}
                     onChange={(e) => setFromDate(e.target.value)}
                     className="text-xs text-slate-800 font-bold focus:outline-none bg-transparent cursor-pointer"
-                    title="Filter transactions starting from this date"
+                    title={t("dashboardModule.accountTransactions.fromDateTitle", "Filter transactions starting from this date")}
                   />
                 </div>
 
                 {/* TO Box */}
                 <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-slate-200 shadow-2xs hover:border-teal-400 focus-within:border-teal-500 focus-within:ring-2 focus-within:ring-teal-100 transition-all">
                   <span className="text-[10px] font-black uppercase tracking-wider text-teal-800 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-200 select-none">
-                    To
+                    {t("dashboardModule.accountTransactions.to", "To")}
                   </span>
                   <input
                     type="date"
                     value={toDate}
                     onChange={(e) => setToDate(e.target.value)}
                     className="text-xs text-slate-800 font-bold focus:outline-none bg-transparent cursor-pointer"
-                    title="Filter transactions up to this date"
+                    title={t("dashboardModule.accountTransactions.toDateTitle", "Filter transactions up to this date")}
                   />
                 </div>
 
@@ -1199,10 +1201,10 @@ export default function StaffCashOperations() {
                       setToDate('');
                     }}
                     className="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 text-xs font-bold transition-all cursor-pointer flex items-center gap-1 shadow-2xs border border-slate-200"
-                    title="Clear Date Filter"
+                    title={t("branchManagerCashReconciliation.clearDateFilter", "Clear Date Filter")}
                   >
                     <X className="w-3.5 h-3.5 text-slate-500" />
-                    <span className="text-[11px]">Clear</span>
+                    <span className="text-[11px]">{t("dashboardModule.emergency.clear", "Clear")}</span>
                   </button>
                 )}
               </div>
@@ -1214,7 +1216,7 @@ export default function StaffCashOperations() {
                   type="text"
                   value={txSearch}
                   onChange={(e) => setTxSearch(e.target.value)}
-                  placeholder="Search account, ref..."
+                  placeholder={t("staffCashOperations.searchAccountRef", "Search account, ref...")}
                   className="w-full sm:w-48 pl-8 pr-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#00b4a7] focus:ring-2 focus:ring-teal-100 shadow-2xs transition-all"
                 />
               </div>
@@ -1226,21 +1228,21 @@ export default function StaffCashOperations() {
             <table className="w-full text-left border-collapse text-xs whitespace-nowrap">
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                  <th className="py-3.5 px-4 sm:px-6">Receipt Number</th>
-                  <th className="py-3.5 px-4">Account Number</th>
-                  <th className="py-3.5 px-4">Member Name</th>
-                  <th className="py-3.5 px-4">Transaction Type</th>
-                  <th className="py-3.5 px-4">Amount</th>
-                  <th className="py-3.5 px-4">Balance Before</th>
-                  <th className="py-3.5 px-4">Balance After</th>
-                  <th className="py-3.5 px-4">Branch Name</th>
-                  <th className="py-3.5 px-4">Branch Code</th>
-                  <th className="py-3.5 px-4">IFSC Code</th>
-                  <th className="py-3.5 px-4">Cashier Code</th>
-                  <th className="py-3.5 px-4">Cashier Name</th>
-                  <th className="py-3.5 px-4">Date &amp; Time</th>
-                  <th className="py-3.5 px-4 sm:px-6">Notes</th>
-                  <th className="py-3.5 px-4 text-center">Receipt</th>
+                  <th className="py-3.5 px-4 sm:px-6">{t("dashboardModule.accountTransactions.colReceiptNumber", "Receipt Number")}</th>
+                  <th className="py-3.5 px-4">{t("dashboard.accountNumber", "Account Number")}</th>
+                  <th className="py-3.5 px-4">{t("dashboardModule.productAccounts.memberName", "Member Name")}</th>
+                  <th className="py-3.5 px-4">{t("dashboardModule.accountTransactions.colTransactionType", "Transaction Type")}</th>
+                  <th className="py-3.5 px-4">{t("dashboardModule.accountTransactions.colAmount", "Amount")}</th>
+                  <th className="py-3.5 px-4">{t("dashboardModule.accountTransactions.colBalanceBefore", "Balance Before")}</th>
+                  <th className="py-3.5 px-4">{t("dashboardModule.accountTransactions.colBalanceAfter", "Balance After")}</th>
+                  <th className="py-3.5 px-4">{t("dashboardModule.accountTransactions.colBranchName", "Branch Name")}</th>
+                  <th className="py-3.5 px-4">{t("dashboardModule.accountTransactions.colBranchCode", "Branch Code")}</th>
+                  <th className="py-3.5 px-4">{t("dashboardModule.accountTransactions.colIfscCode", "IFSC Code")}</th>
+                  <th className="py-3.5 px-4">{t("dashboardModule.accountTransactions.colCashierCode", "Cashier Code")}</th>
+                  <th className="py-3.5 px-4">{t("dashboardModule.accountTransactions.colCashierName", "Cashier Name")}</th>
+                  <th className="py-3.5 px-4">{t("dashboardModule.accountTransactions.colDateTime", "Date & Time")}</th>
+                  <th className="py-3.5 px-4 sm:px-6">{t("dashboardModule.accountTransactions.colNotes", "Notes")}</th>
+                  <th className="py-3.5 px-4 text-center">{t("staffCashOperations.receipt2", "Receipt")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -1248,27 +1250,28 @@ export default function StaffCashOperations() {
                   <tr>
                     <td colSpan={15} className="py-12 text-center text-slate-400">
                       <Loader2 className="w-6 h-6 animate-spin text-[#00b4a7] mx-auto mb-2" />
-                      <span>Loading cashier transactions...</span>
+                      <span>{t("staffCashOperations.loadingCashierTransactions", "Loading cashier transactions...")}</span>
                     </td>
                   </tr>
                 ) : cashTransactions.length === 0 ? (
                   <tr>
                     <td colSpan={15} className="py-12 text-center text-slate-400">
                       <Receipt className="w-8 h-8 mx-auto mb-2 text-slate-300" />
-                      <p className="font-semibold text-slate-600">No cash transactions recorded yet</p>
-                      <p className="text-[11px] mt-0.5">Use the Counter Desk above to execute your first cash deposit or withdrawal.</p>
+                      <p className="font-semibold text-slate-600">{t("staffCashOperations.noCashTransactionsRecordedYet", "No cash transactions recorded yet")}</p>
+                      <p className="text-[11px] mt-0.5">{t("staffCashOperations.useTheCounterDeskAbove", "Use the Counter Desk above to execute your first cash deposit or withdrawal.")}</p>
                     </td>
                   </tr>
                 ) : filteredTransactions.length === 0 ? (
                   <tr>
                     <td colSpan={15} className="py-12 text-center text-slate-400">
                       <Receipt className="w-8 h-8 mx-auto mb-2 text-slate-300" />
-                      <p className="font-semibold text-slate-600">No cash transactions match the selected filters</p>
-                      <p className="text-[11px] mt-0.5">Try clearing date ranges or resetting search terms.</p>
+                      <p className="font-semibold text-slate-600">{t("staffCashOperations.noCashTransactionsMatchThe", "No cash transactions match the selected filters")}</p>
+                      <p className="text-[11px] mt-0.5">{t("staffCashOperations.tryClearingDateRangesOr", "Try clearing date ranges or resetting search terms.")}</p>
                     </td>
                   </tr>
                 ) : (
                   filteredTransactions.map((tx, idx) => {
+  const { t } = useTranslation();
                       const isDeposit = String(tx.transaction_type || tx.type || '').toLowerCase().includes('deposit') ||
                                         String(tx.transaction_type || tx.type || '').toLowerCase().includes('credit');
                       return (
@@ -1282,7 +1285,7 @@ export default function StaffCashOperations() {
                           <td className="py-3.5 px-4 font-semibold text-slate-900">
                             <div>{tx.member_name || '—'}</div>
                             {tx.member_code && (
-                              <div className="text-[10px] font-mono text-slate-400 font-normal">Code: {tx.member_code}</div>
+                              <div className="text-[10px] font-mono text-slate-400 font-normal">{t("dashboardModule.productAccounts.codeLabel", "Code:")} {tx.member_code}</div>
                             )}
                           </td>
                           <td className="py-3.5 px-4">
@@ -1298,7 +1301,7 @@ export default function StaffCashOperations() {
                               ) : (
                                 <ArrowUpRight className="w-3 h-3 text-rose-600" />
                               )}
-                              <span>{isDeposit ? 'Deposit' : 'Withdrawal'}</span>
+                              <span>{isDeposit ? t("dashboardModule.accountTransactions.deposit", "Deposit") : t("dashboardModule.accountTransactions.withdrawal", "Withdrawal")}</span>
                             </span>
                           </td>
                           <td className="py-3.5 px-4 font-bold text-slate-900 text-sm">
@@ -1336,10 +1339,10 @@ export default function StaffCashOperations() {
                               type="button"
                               onClick={() => handleViewReceipt(tx)}
                               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200 font-bold text-xs transition-all cursor-pointer shadow-2xs"
-                              title="Inspect Counter Receipts & Reconciliation Audit"
+                              title={t("staffCashOperations.inspectCounterReceiptsReconciliationAudit", "Inspect Counter Receipts & Reconciliation Audit")}
                             >
                               <Receipt className="w-3.5 h-3.5 text-teal-600" />
-                              <span>Receipt</span>
+                              <span>{t("staffCashOperations.receipt2", "Receipt")}</span>
                             </button>
                           </td>
                         </tr>

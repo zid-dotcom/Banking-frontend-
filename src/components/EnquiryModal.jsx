@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { X, CheckCircle2, Send } from 'lucide-react';
 import { SOCIETY_INFO } from '../data/societyData';
 
+
 export default function EnquiryModal({ isOpen, onClose, initialData = null }) {
+  const { t } = useTranslation();
   const [submitted, setSubmitted] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -43,13 +46,14 @@ export default function EnquiryModal({ isOpen, onClose, initialData = null }) {
               </svg>
             </div>
             <div>
-              <h3 className="font-serif font-bold text-base text-white">Member Enquiry Desk</h3>
-              <p className="text-xs text-slate-400">Aurumfx Multi State Agro Co-operative Society Limited</p>
+              <h3 className="font-serif font-bold text-base text-white">{t("contact.enquiryCounter", "Enquiry Counter")}</h3>
+              <p className="text-xs text-slate-400">{SOCIETY_INFO.fullName}</p>
             </div>
           </div>
           <button 
             onClick={handleResetAndClose}
-            className="text-slate-400 hover:text-white transition-colors"
+            className="text-slate-400 hover:text-white transition-colors cursor-pointer"
+            title={t("common.close", "Close")}
           >
             <X className="w-5 h-5" />
           </button>
@@ -63,35 +67,35 @@ export default function EnquiryModal({ isOpen, onClose, initialData = null }) {
                 <CheckCircle2 className="w-8 h-8" />
               </div>
               <h4 className="font-serif text-xl font-bold text-slate-900 mb-2">
-                Enquiry Successfully Registered
+                {t("validation.successMessage", "Operation completed successfully")}
               </h4>
               <p className="text-sm text-slate-600 max-w-sm mx-auto mb-6">
-                Thank you, <span className="font-semibold text-slate-900">{formData.name}</span>. Your enquiry has been received at the society member desk. Our representative will contact you during society office hours.
+                {t("contact.thankYou", "Thank you,")} <span className="font-semibold text-slate-900">{formData.name}</span>{t("enquiryModal.yourEnquiryHasBeenReceived", ". Your enquiry has been received at the society member desk. Our representative will contact you during society office hours.")}
               </p>
               <div className="p-3 bg-slate-50 rounded text-xs text-slate-500 mb-6 border border-slate-200 text-left">
-                <strong>Office Desk:</strong> {SOCIETY_INFO.address.full}
+                <strong>{t("footer.establishmentOffice", "Establishment Office")}:</strong> {SOCIETY_INFO.address.full}
               </div>
               <button
                 onClick={handleResetAndClose}
-                className="bg-[#161c28] hover:bg-slate-800 text-white font-semibold px-6 py-2.5 rounded text-sm transition-colors"
+                className="bg-[#161c28] hover:bg-slate-800 text-white font-semibold px-6 py-2.5 rounded text-sm transition-colors cursor-pointer"
               >
-                Close Window
+                {t("common.close", "Close")}
               </button>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4 text-sm">
               <p className="text-xs text-slate-600 pb-1">
-                Please submit your details below. A society counter officer will assist you with guidelines, membership forms, and scheme verification.
+                {t("enquiryModal.pleaseSubmitYourDetailsBelow", "Please submit your details below. A society counter officer will assist you with guidelines, membership forms, and scheme verification.")}
               </p>
 
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Full Name / Member Name *
+                  {t("contact.fullName", "Full Name")} *
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Ramesh Kumar"
+                  placeholder={t("forms.namePlaceholder", "Enter full name")}
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="w-full px-3.5 py-2.5 rounded border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#ffba00] text-slate-900 text-sm"
@@ -101,12 +105,12 @@ export default function EnquiryModal({ isOpen, onClose, initialData = null }) {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Contact Phone Number *
+                    {t("contact.phoneNumber", "Phone Number")} *
                   </label>
                   <input
                     type="tel"
                     required
-                    placeholder="e.g. 9876543210"
+                    placeholder={t("forms.phonePlaceholder", "Enter 10-digit mobile number")}
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     className="w-full px-3.5 py-2.5 rounded border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#ffba00] text-slate-900 text-sm"
@@ -115,7 +119,7 @@ export default function EnquiryModal({ isOpen, onClose, initialData = null }) {
 
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Enquiry Subject / Scheme
+                    {t("contact.subject", "Subject")}
                   </label>
                   <input
                     type="text"
@@ -129,7 +133,7 @@ export default function EnquiryModal({ isOpen, onClose, initialData = null }) {
               {initialData?.amount && (
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Estimated Borrowing Requirement
+                    {t("loans.borrowing", "Borrowing")}
                   </label>
                   <input
                     type="text"
@@ -142,11 +146,11 @@ export default function EnquiryModal({ isOpen, onClose, initialData = null }) {
 
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Additional Details or Questions (Optional)
+                  {t("contact.message", "Message")}
                 </label>
                 <textarea
                   rows="3"
-                  placeholder="Mention your agricultural crop, business trade, or deposit query..."
+                  placeholder={t("enquiryModal.mentionYourAgriculturalCropBusiness", "Mention your agricultural crop, business trade, or deposit query...")}
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                   className="w-full px-3.5 py-2.5 rounded border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#ffba00] text-slate-900 text-sm"
@@ -159,7 +163,7 @@ export default function EnquiryModal({ isOpen, onClose, initialData = null }) {
                   className="w-full bg-[#ffba00] hover:bg-[#e6a700] text-slate-900 font-bold py-3 rounded shadow transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <Send className="w-4 h-4" />
-                  <span>Submit Enquiry to Society Desk</span>
+                  <span>{t("contact.submitMessage", "Submit Message")}</span>
                 </button>
               </div>
             </form>

@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { i18n } from '../../i18n/index.js';
+import { useTranslation } from 'react-i18next';
 import {
   X,
   Building2,
@@ -38,6 +40,7 @@ export function BranchFormModal({
   onSubmit,
   isSubmitting = false
 }) {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: '',
     ifsc_code: '',
@@ -84,21 +87,21 @@ export function BranchFormModal({
     setError(null);
     if (!formData.name.trim()) {
       setErrorPopup({
-        title: 'Validation Error',
+        title: i18n.t("modal.branchAdmin.validationError", "Validation Error"),
         message: 'Branch name is required.'
       });
       return;
     }
     if (!formData.ifsc_code.trim()) {
       setErrorPopup({
-        title: 'Validation Error',
+        title: i18n.t("modal.branchAdmin.validationError", "Validation Error"),
         message: 'Branch IFSC code is required.'
       });
       return;
     }
     if (!formData.city.trim()) {
       setErrorPopup({
-        title: 'Validation Error',
+        title: i18n.t("modal.branchAdmin.validationError", "Validation Error"),
         message: 'City is required.'
       });
       return;
@@ -130,12 +133,12 @@ export function BranchFormModal({
             </div>
             <div>
               <h3 className="text-lg font-bold text-slate-900">
-                {isEdit ? 'Update Branch' : 'Create Branch'}
+                {isEdit ? t("branchModals.updateBranch", "Update Branch") : t("superAdminBranches.createBranch", "Create Branch")}
               </h3>
               <p className="text-xs text-slate-500 mt-0.5">
                 {isEdit
                   ? `Editing ${initialData?.name || 'Branch'}`
-                  : 'Register operational hub in the multi-state cooperative network'}
+                  : t("branchModals.registerOperationalHubInThe", "Register operational hub in the multi-state cooperative network")}
               </p>
             </div>
           </div>
@@ -161,7 +164,7 @@ export function BranchFormModal({
           {/* 1. Branch Name */}
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">
-              Branch Name <span className="text-rose-500">*</span>
+              {t("dashboardModule.accountTransactions.colBranchName", "Branch Name")} <span className="text-rose-500">*</span>
             </label>
             <input
               type="text"
@@ -169,7 +172,7 @@ export function BranchFormModal({
               required
               value={formData.name}
               onChange={handleChange}
-              placeholder="e.g. Kozhikode North Agro Hub"
+              placeholder={t("branchModals.eGKozhikodeNorthAgro", "e.g. Kozhikode North Agro Hub")}
               className="w-full h-10 px-3.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#2dd4bf] focus:bg-white transition-all"
             />
           </div>
@@ -177,7 +180,7 @@ export function BranchFormModal({
           {/* 2. Branch IFSC Code */}
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">
-              Branch IFSC Code <span className="text-rose-500">*</span>
+              {t("branchModals.branchIfscCode", "Branch IFSC Code")} <span className="text-rose-500">*</span>
             </label>
             <input
               type="text"
@@ -185,18 +188,18 @@ export function BranchFormModal({
               required
               value={formData.ifsc_code}
               onChange={(e) => setFormData(prev => ({ ...prev, ifsc_code: e.target.value.toUpperCase() }))}
-              placeholder="e.g. AURM0001234"
+              placeholder={t("branchModals.eGAurm0001234", "e.g. AURM0001234")}
               maxLength={11}
               className="w-full h-10 px-3.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-mono uppercase text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#2dd4bf] focus:bg-white transition-all"
             />
-            <p className="text-[11px] text-slate-400 mt-1">11-character Indian Financial System Code (e.g. AURM0001234)</p>
+            <p className="text-[11px] text-slate-400 mt-1">{t("branchModals.11CharacterIndianFinancialSystem", "11-character Indian Financial System Code (e.g. AURM0001234)")}</p>
           </div>
 
           {/* 3. City & State Jurisdiction */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">
-                City <span className="text-rose-500">*</span>
+                {t("branchModals.city", "City")} <span className="text-rose-500">*</span>
               </label>
               <input
                 type="text"
@@ -204,14 +207,14 @@ export function BranchFormModal({
                 required
                 value={formData.city}
                 onChange={handleChange}
-                placeholder="e.g. Kozhikode"
+                placeholder={t("branchModals.eGKozhikode", "e.g. Kozhikode")}
                 className="w-full h-10 px-3.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#2dd4bf] focus:bg-white transition-all"
               />
             </div>
 
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">
-                State <span className="text-rose-500">*</span>
+                {t("memberProfile.state", "State")} <span className="text-rose-500">*</span>
               </label>
               <input
                 type="text"
@@ -219,7 +222,7 @@ export function BranchFormModal({
                 required
                 value={formData.state}
                 onChange={handleChange}
-                placeholder="e.g. Kerala"
+                placeholder={t("branchModals.eGKerala", "e.g. Kerala")}
                 className="w-full h-10 px-3.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#2dd4bf] focus:bg-white transition-all"
               />
             </div>
@@ -228,7 +231,7 @@ export function BranchFormModal({
           {/* 3. Physical Street Address */}
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">
-              Physical Street Address <span className="text-rose-500">*</span>
+              {t("staffDashboard.physicalStreetAddress", "Physical Street Address")} <span className="text-rose-500">*</span>
             </label>
             <input
               type="text"
@@ -236,7 +239,7 @@ export function BranchFormModal({
               required
               value={formData.address}
               onChange={handleChange}
-              placeholder="e.g. Main Commercial Junction, Town Center"
+              placeholder={t("branchModals.eGMainCommercialJunction", "e.g. Main Commercial Junction, Town Center")}
               className="w-full h-10 px-3.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#2dd4bf] focus:bg-white transition-all"
             />
           </div>
@@ -244,7 +247,7 @@ export function BranchFormModal({
           {/* 4. Contact Number */}
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">
-              Contact Number <span className="text-rose-500">*</span>
+              {t("modal.branchAdmin.contactNumberLabel", "Contact Number")} <span className="text-rose-500">*</span>
             </label>
             <input
               type="text"
@@ -255,7 +258,7 @@ export function BranchFormModal({
               placeholder="e.g. +919495234500"
               className="w-full h-10 px-3.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#2dd4bf] focus:bg-white transition-all"
             />
-            <p className="text-[11px] text-slate-400 mt-1">10 to 14 digits, optional + at start (without spaces)</p>
+            <p className="text-[11px] text-slate-400 mt-1">{t("modal.branchAdmin.contactNumberHint", "10 to 14 digits, optional + at start (without spaces)")}</p>
           </div>
 
           {/* Actions */}
@@ -266,7 +269,7 @@ export function BranchFormModal({
               disabled={isSubmitting}
               className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm rounded-xl transition-colors cursor-pointer"
             >
-              Cancel
+              {t("common.cancel", "Cancel")}
             </button>
             <button
               type="submit"
@@ -274,7 +277,7 @@ export function BranchFormModal({
               className="px-5 py-2 bg-gradient-to-r from-[#14b8a6] to-[#2dd4bf] hover:from-[#0d9488] hover:to-[#14b8a6] text-white font-bold text-xs sm:text-sm rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
             >
               {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
-              <span>{isEdit ? 'Save Changes' : 'Create Branch'}</span>
+              <span>{isEdit ? t("memberNominee.saveChanges", "Save Changes") : t("superAdminBranches.createBranch", "Create Branch")}</span>
             </button>
           </div>
         </form>
@@ -290,7 +293,7 @@ export function BranchFormModal({
 
             <div>
               <h3 className="text-xl font-black text-slate-900 tracking-tight">
-                {typeof errorPopup === 'object' ? (errorPopup.title || 'Validation Error') : 'Submission Error'}
+                {typeof errorPopup === 'object' ? (errorPopup.title || 'Validation Error') : t("modal.branchAdmin.submissionError", "Submission Error")}
               </h3>
               <p className="text-xs sm:text-sm text-rose-900 mt-2.5 leading-relaxed bg-rose-50/70 p-4 rounded-2xl border border-rose-200/80 font-medium break-words text-left">
                 {typeof errorPopup === 'object' ? (errorPopup.message || JSON.stringify(errorPopup)) : String(errorPopup)}
@@ -303,7 +306,7 @@ export function BranchFormModal({
                 onClick={() => setErrorPopup(null)}
                 className="w-full h-11 px-5 bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 text-white font-bold text-sm rounded-xl shadow-md transition-all cursor-pointer"
               >
-                Okay, Got It
+                {t("modal.branchAdmin.okayGotIt", "Okay, Got It")}
               </button>
             </div>
           </div>
@@ -325,6 +328,7 @@ export function BranchDetailModal({
   onDelete,
   onToggleStatus
 }) {
+  const { t } = useTranslation();
   if (!isOpen || !branch) return null;
 
   return (
@@ -346,15 +350,15 @@ export function BranchDetailModal({
                 <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 ${
                   branch.isActive ? 'text-emerald-700 bg-emerald-50' : 'text-slate-600 bg-slate-100'
                 }`}>
-                  <CheckCircle2 className="w-3 h-3" /> {branch.isActive ? 'Active' : 'Inactive'}
+                  <CheckCircle2 className="w-3 h-3" /> {branch.isActive ? t("common.active", "Active") : t("common.inactive", "Inactive")}
                 </span>
               </div>
               <h3 className="text-lg font-bold text-slate-900 mt-1">{branch.name}</h3>
               <div className="flex items-center gap-2 mt-0.5">
-                <p className="text-xs text-slate-500 font-mono">Branch Code: #{branch.branch_code || branch.id}</p>
+                <p className="text-xs text-slate-500 font-mono">{t("branchModals.branchCode", "Branch Code: #")}{branch.branch_code || branch.id}</p>
                 {branch.ifsc_code && (
                   <span className="text-xs font-mono font-bold text-[#0f766e] bg-teal-50 px-2 py-0.5 rounded border border-teal-200/60">
-                    IFSC: {branch.ifsc_code}
+                    {t("staffCashOperations.ifsc", "IFSC:")} {branch.ifsc_code}
                   </span>
                 )}
               </div>
@@ -371,7 +375,7 @@ export function BranchDetailModal({
         {isLoading ? (
           <div className="py-12 text-center text-slate-400 flex flex-col items-center gap-2">
             <Loader2 className="w-6 h-6 animate-spin text-[#00b4a7]" />
-            <p className="text-xs font-medium">Fetching live branch details...</p>
+            <p className="text-xs font-medium">{t("branchModals.fetchingLiveBranchDetails", "Fetching live branch details...")}</p>
           </div>
         ) : (
           <div className="py-4 space-y-4">
@@ -386,7 +390,7 @@ export function BranchDetailModal({
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-slate-200/60">
                 <div className="flex items-center gap-2 text-slate-700">
-                  <span className="text-slate-400 font-medium">State:</span>
+                  <span className="text-slate-400 font-medium">{t("modal.member.state", "State:")}</span>
                   <span className="font-bold text-slate-900">{branch.state || 'N/A'}</span>
                 </div>
                 <div className="flex items-center gap-2 text-slate-700 font-mono">
@@ -399,31 +403,31 @@ export function BranchDetailModal({
             {/* Real API Ledger Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <div className="bg-white rounded-2xl p-3.5 border border-slate-200/80 shadow-2xs">
-                <span className="text-[10px] font-bold text-slate-400 uppercase">Branch Code</span>
+                <span className="text-[10px] font-bold text-slate-400 uppercase">{t("dashboardModule.accountTransactions.colBranchCode", "Branch Code")}</span>
                 <p className="text-sm font-mono font-extrabold text-slate-900 mt-1">#{branch.branch_code || branch.id}</p>
               </div>
 
               <div className="bg-white rounded-2xl p-3.5 border border-slate-200/80 shadow-2xs">
-                <span className="text-[10px] font-bold text-slate-400 uppercase">IFSC Code</span>
+                <span className="text-[10px] font-bold text-slate-400 uppercase">{t("dashboardModule.accountTransactions.colIfscCode", "IFSC Code")}</span>
                 <p className="text-sm font-mono font-extrabold text-[#0f766e] mt-1">{branch.ifsc_code || 'N/A'}</p>
               </div>
 
               <div className="bg-white rounded-2xl p-3.5 border border-slate-200/80 shadow-2xs">
-                <span className="text-[10px] font-bold text-slate-400 uppercase">Opening Date</span>
+                <span className="text-[10px] font-bold text-slate-400 uppercase">{t("branchModals.openingDate", "Opening Date")}</span>
                 <p className="text-sm font-extrabold text-[#0d9488] mt-1">{branch.opening_date || 'N/A'}</p>
               </div>
 
               <div className="bg-white rounded-2xl p-3.5 border border-slate-200/80 shadow-2xs">
-                <span className="text-[10px] font-bold text-slate-400 uppercase">Operational Status</span>
+                <span className="text-[10px] font-bold text-slate-400 uppercase">{t("branchModals.operationalStatus", "Operational Status")}</span>
                 <p className={`text-sm font-extrabold mt-1 ${branch.isActive ? 'text-emerald-700' : 'text-amber-700'}`}>
-                  {branch.isActive ? 'Online' : 'Offline'}
+                  {branch.isActive ? t("branchModals.online", "Online") : t("branchModals.offline", "Offline")}
                 </p>
               </div>
             </div>
 
             {branch.created_at && (
               <div className="p-3 bg-slate-50/70 rounded-xl border border-slate-100 flex items-center justify-between text-xs text-slate-600">
-                <span className="text-slate-400 font-medium">Database Registration:</span>
+                <span className="text-slate-400 font-medium">{t("branchModals.databaseRegistration", "Database Registration:")}</span>
                 <span className="font-mono text-slate-700">{new Date(branch.created_at).toLocaleString()}</span>
               </div>
             )}
@@ -444,7 +448,7 @@ export function BranchDetailModal({
             }`}
           >
             <Power className="w-3.5 h-3.5" />
-            <span>{branch.isActive ? 'Deactivate Branch' : 'Activate Branch'}</span>
+            <span>{branch.isActive ? t("branchModals.deactivateBranch", "Deactivate Branch") : t("branchModals.activateBranch", "Activate Branch")}</span>
           </button>
 
           <div className="flex items-center gap-2">
@@ -456,7 +460,7 @@ export function BranchDetailModal({
               className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer"
             >
               <Pencil className="w-3.5 h-3.5" />
-              <span>Edit</span>
+              <span>{t("memberNominee.edit", "Edit")}</span>
             </button>
             <button
               onClick={() => {
@@ -466,7 +470,7 @@ export function BranchDetailModal({
               className="px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer"
             >
               <Trash2 className="w-3.5 h-3.5" />
-              <span>Delete</span>
+              <span>{t("branchModals.delete", "Delete")}</span>
             </button>
           </div>
         </div>

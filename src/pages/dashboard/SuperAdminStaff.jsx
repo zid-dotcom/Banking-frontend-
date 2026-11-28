@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { i18n } from '../../i18n/index.js';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import {
@@ -51,6 +53,7 @@ function formatDateTime(isoString) {
 }
 
 export default function SuperAdminStaff({ embedded = false, branchId = null }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const [staffList, setStaffList] = useState([]);
@@ -239,7 +242,7 @@ export default function SuperAdminStaff({ embedded = false, branchId = null }) {
     } catch (err) {
       console.error('Failed to toggle staff status:', err);
       setErrorPopup({
-        title: 'Status Update Failed',
+        title: i18n.t("branchManagerMembers.statusUpdateFailed", "Status Update Failed"),
         message: err.message || 'Could not update staff operational status.',
       });
     } finally {
@@ -258,7 +261,7 @@ export default function SuperAdminStaff({ embedded = false, branchId = null }) {
         setFormModal({ isOpen: false, mode: 'create', data: null, isSubmitting: false });
 
         setSuccessPopup({
-          title: 'Staff Member Created Successfully',
+          title: i18n.t("superAdminStaff.staffMemberCreatedSuccessfully", "Staff Member Created Successfully"),
           message: `${created.full_name || formData.full_name} has been registered with staff code ${
             created.staff_code || 'STF'
           }.`,
@@ -273,7 +276,7 @@ export default function SuperAdminStaff({ embedded = false, branchId = null }) {
         setFormModal({ isOpen: false, mode: 'create', data: null, isSubmitting: false });
 
         setSuccessPopup({
-          title: 'Staff Profile Updated',
+          title: i18n.t("branchManagerStaff.staffProfileUpdated", "Staff Profile Updated"),
           message: `${updated.full_name || formModal.data?.full_name} details have been updated.`,
         });
       }
@@ -301,13 +304,13 @@ export default function SuperAdminStaff({ embedded = false, branchId = null }) {
 
       setDeleteModal({ isOpen: false, staff: null, isDeleting: false });
       setSuccessPopup({
-        title: 'Staff Member Removed',
+        title: i18n.t("branchManagerStaff.staffMemberRemoved", "Staff Member Removed"),
         message: `${deletedName} has been deleted from the staff registry.`,
       });
     } catch (err) {
       console.error('Failed to delete staff:', err);
       setErrorPopup({
-        title: 'Delete Staff Failed',
+        title: i18n.t("superAdminStaff.deleteStaffFailed", "Delete Staff Failed"),
         message: err.message || 'Could not delete staff member.',
       });
       setDeleteModal((prev) => ({ ...prev, isDeleting: false }));
@@ -360,21 +363,21 @@ export default function SuperAdminStaff({ embedded = false, branchId = null }) {
             {/* Role Badge */}
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/90 backdrop-blur-xs text-xs font-semibold mb-3 border border-teal-200/60 shadow-2xs text-[#0f766e]">
               <ShieldCheck className="w-3.5 h-3.5 text-[#00b4a7]" />
-              <span>Role: Super Admin &bull; Society-wide Staff Governance &amp; Operations Desk</span>
+              <span>{t("superAdminStaff.roleSuperAdminSocietyWide", "Role: Super Admin • Society-wide Staff Governance & Operations Desk")}</span>
             </div>
 
             {/* Headline with Vertical Teal Accent Bar */}
             <div className="flex items-center gap-3 mt-1">
               <span className="w-1.5 h-8 sm:h-9 bg-[#00b4a7] rounded-full flex-shrink-0" />
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
-                <span>Cooperative Society Staff Registry</span>
+                <span>{t("superAdminStaff.cooperativeSocietyStaffRegistry", "Cooperative Society Staff Registry")}</span>
                 <Users className="w-6 h-6 sm:w-7 sm:h-7 text-[#0f766e] stroke-[2.2]" />
               </h1>
             </div>
 
             {/* Subtitle */}
             <p className="text-slate-600 text-xs sm:text-sm mt-2 font-medium leading-relaxed max-w-xl">
-              Apex administration of cashier drawers, branch accountants, and service desks across all cooperative society branches.
+              {t("superAdminStaff.apexAdministrationOfCashierDrawers", "Apex administration of cashier drawers, branch accountants, and service desks across all cooperative society branches.")}
             </p>
 
             {/* Navigation Tabs Pill (Staff Members vs Staff Roles) */}
@@ -383,14 +386,14 @@ export default function SuperAdminStaff({ embedded = false, branchId = null }) {
                 type="button"
                 className="px-4 py-1.5 rounded-xl text-xs font-bold bg-[#00b4a7] text-white shadow-xs transition-all"
               >
-                Staff Members ({totalCount})
+                {t("superAdminStaff.staffMembers", "Staff Members (")}{totalCount})
               </button>
               <button
                 type="button"
                 onClick={() => navigate('/super-admin/staff-roles')}
                 className="px-4 py-1.5 rounded-xl text-xs font-bold text-slate-600 hover:text-teal-800 hover:bg-teal-50/70 transition-all cursor-pointer"
               >
-                Staff Roles ({roles.length})
+                {t("superAdminStaff.staffRoles", "Staff Roles (")}{roles.length})
               </button>
             </div>
           </div>
@@ -399,7 +402,7 @@ export default function SuperAdminStaff({ embedded = false, branchId = null }) {
           <div className="relative z-10 flex-shrink-0 flex items-center justify-center">
             <img
               src={hrIllustration}
-              alt="Staff Registry Management"
+              alt={t("superAdminStaff.staffRegistryManagement", "Staff Registry Management")}
               className="h-40 sm:h-48 md:h-52 lg:h-56 w-auto object-contain drop-shadow-md select-none pointer-events-none transform hover:scale-102 transition-transform duration-300"
             />
           </div>
@@ -411,7 +414,7 @@ export default function SuperAdminStaff({ embedded = false, branchId = null }) {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Staff</span>
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t("superAdminStaff.totalStaff", "Total Staff")}</span>
               <div className="w-9 h-9 rounded-xl bg-teal-50 text-[#00b4a7] flex items-center justify-center">
                 <Users className="w-4 h-4" />
               </div>
@@ -419,12 +422,12 @@ export default function SuperAdminStaff({ embedded = false, branchId = null }) {
             <h3 className="text-2xl sm:text-3xl font-black text-slate-900 mt-2">
               {loading ? '...' : totalCount}
             </h3>
-            <p className="text-xs text-slate-500 mt-1">Across all operating branches</p>
+            <p className="text-xs text-slate-500 mt-1">{t("superAdminStaff.acrossAllOperatingBranches", "Across all operating branches")}</p>
           </div>
 
           <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-emerald-600 uppercase tracking-wider">Active Staff</span>
+              <span className="text-xs font-bold text-emerald-600 uppercase tracking-wider">{t("superAdminStaff.activeStaff", "Active Staff")}</span>
               <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
                 <CheckCircle2 className="w-4 h-4" />
               </div>
@@ -432,12 +435,12 @@ export default function SuperAdminStaff({ embedded = false, branchId = null }) {
             <h3 className="text-2xl sm:text-3xl font-black text-emerald-700 mt-2">
               {loading ? '...' : activeCount}
             </h3>
-            <p className="text-xs text-slate-500 mt-1">Operational drawer credentials</p>
+            <p className="text-xs text-slate-500 mt-1">{t("superAdminStaff.operationalDrawerCredentials", "Operational drawer credentials")}</p>
           </div>
 
           <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-rose-600 uppercase tracking-wider">Inactive Staff</span>
+              <span className="text-xs font-bold text-rose-600 uppercase tracking-wider">{t("superAdminStaff.inactiveStaff", "Inactive Staff")}</span>
               <div className="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
                 <ShieldCheck className="w-4 h-4" />
               </div>
@@ -445,12 +448,12 @@ export default function SuperAdminStaff({ embedded = false, branchId = null }) {
             <h3 className="text-2xl sm:text-3xl font-black text-rose-700 mt-2">
               {loading ? '...' : inactiveCount}
             </h3>
-            <p className="text-xs text-slate-500 mt-1">Access suspended / off-duty</p>
+            <p className="text-xs text-slate-500 mt-1">{t("superAdminStaff.accessSuspendedOffDuty", "Access suspended / off-duty")}</p>
           </div>
 
           <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-teal-600 uppercase tracking-wider">Assigned Branches</span>
+              <span className="text-xs font-bold text-teal-600 uppercase tracking-wider">{t("superAdminStaff.assignedBranches", "Assigned Branches")}</span>
               <div className="w-9 h-9 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center">
                 <Building2 className="w-4 h-4" />
               </div>
@@ -458,7 +461,7 @@ export default function SuperAdminStaff({ embedded = false, branchId = null }) {
             <h3 className="text-2xl sm:text-3xl font-black text-teal-800 mt-2">
               {loading ? '...' : uniqueBranchesCount}
             </h3>
-            <p className="text-xs text-slate-500 mt-1">Branches staffed</p>
+            <p className="text-xs text-slate-500 mt-1">{t("superAdminStaff.branchesStaffed", "Branches staffed")}</p>
           </div>
         </div>
 
@@ -468,9 +471,9 @@ export default function SuperAdminStaff({ embedded = false, branchId = null }) {
           {/* Header Controls */}
           <div className="p-4 sm:p-5 border-b border-slate-100 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
             <div>
-              <h3 className="text-base font-bold text-slate-900">Branch Staff Directory</h3>
+              <h3 className="text-base font-bold text-slate-900">{t("branchManagerStaff.branchStaffDirectory", "Branch Staff Directory")}</h3>
               <p className="text-xs text-slate-500 mt-0.5">
-                Multi-branch staff credentials, operational role designations, and drawer status
+                {t("superAdminStaff.multiBranchStaffCredentialsOperational", "Multi-branch staff credentials, operational role designations, and drawer status")}
               </p>
             </div>
 
@@ -478,13 +481,13 @@ export default function SuperAdminStaff({ embedded = false, branchId = null }) {
               {/* Branch Filter */}
               <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 shadow-2xs flex-1 sm:flex-initial min-w-0">
                 <Building2 className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
-                <span className="text-xs font-bold text-slate-500 flex-shrink-0">Branch:</span>
+                <span className="text-xs font-bold text-slate-500 flex-shrink-0">{t("branchManagerCashReconciliation.branch", "Branch:")}</span>
                 <select
                   value={branchFilter}
                   onChange={(e) => handleFilterChange('branch', e.target.value)}
                   className="bg-transparent text-xs font-bold text-slate-800 focus:outline-none cursor-pointer w-full truncate max-w-full sm:max-w-[190px]"
                 >
-                  <option value="all">All Branches ({branches.length})</option>
+                  <option value="all">{t("superAdminMonthlyTargets.allBranches", "All Branches (")}{branches.length})</option>
                   {branches.map((b) => (
                     <option key={b.id} value={b.id}>
                       {b.name || `Branch #${b.branch_code || b.id}`}
@@ -501,7 +504,7 @@ export default function SuperAdminStaff({ embedded = false, branchId = null }) {
                   onChange={(e) => handleFilterChange('role', e.target.value)}
                   className="bg-transparent text-xs font-bold text-slate-800 focus:outline-none cursor-pointer w-full max-w-full sm:max-w-[160px] truncate"
                 >
-                  <option value="all">All Staff Roles</option>
+                  <option value="all">{t("superAdminStaff.allStaffRoles", "All Staff Roles")}</option>
                   {roles.map((r) => (
                     <option key={r.id} value={r.id}>
                       {r.name || `Role #${r.id}`}
@@ -518,9 +521,9 @@ export default function SuperAdminStaff({ embedded = false, branchId = null }) {
                   onChange={(e) => handleFilterChange('status', e.target.value)}
                   className="bg-transparent text-xs font-bold text-slate-800 focus:outline-none cursor-pointer w-full"
                 >
-                  <option value="all">All Status</option>
-                  <option value="active">Active Only</option>
-                  <option value="inactive">Inactive Only</option>
+                  <option value="all">{t("branchManagerLoanSchemes.allStatus", "All Status")}</option>
+                  <option value="active">{t("branchManagerFdMisSchemes.activeOnly", "Active Only")}</option>
+                  <option value="inactive">{t("branchManagerFdMisSchemes.inactiveOnly", "Inactive Only")}</option>
                 </select>
               </div>
 
@@ -529,7 +532,7 @@ export default function SuperAdminStaff({ embedded = false, branchId = null }) {
                 <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
-                  placeholder="Search staff, code..."
+                  placeholder={t("superAdminStaff.searchStaffCode", "Search staff, code...")}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-8 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-[#00b4a7] shadow-2xs"
@@ -542,7 +545,7 @@ export default function SuperAdminStaff({ embedded = false, branchId = null }) {
                 onClick={handleRefresh}
                 disabled={loading || refreshing}
                 className="p-2.5 border border-slate-200 hover:border-teal-400 text-slate-600 hover:text-[#0f766e] bg-white hover:bg-teal-50/50 rounded-xl transition-all cursor-pointer shadow-2xs flex-shrink-0"
-                title="Refresh Staff List"
+                title={t("superAdminStaff.refreshStaffList", "Refresh Staff List")}
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin text-[#00b4a7]' : ''}`} />
               </button>
@@ -563,7 +566,7 @@ export default function SuperAdminStaff({ embedded = false, branchId = null }) {
                 className="px-4 py-2 bg-gradient-to-r from-[#00b4a7] to-[#0f766e] hover:from-[#0f766e] hover:to-[#115e59] text-white font-bold text-xs rounded-xl shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-1.5 cursor-pointer flex-shrink-0"
               >
                 <PlusCircle className="w-3.5 h-3.5" />
-                <span>Register Staff</span>
+                <span>{t("branchManagerStaff.registerStaff", "Register Staff")}</span>
               </button>
             </div>
           </div>
@@ -580,7 +583,7 @@ export default function SuperAdminStaff({ embedded = false, branchId = null }) {
                 onClick={handleRefresh}
                 className="px-3 py-1 bg-rose-600 text-white rounded-lg font-bold hover:bg-rose-700 transition-colors"
               >
-                Retry
+                {t("common.retry", "Retry")}
               </button>
             </div>
           )}
@@ -590,14 +593,14 @@ export default function SuperAdminStaff({ embedded = false, branchId = null }) {
             <table className="w-full text-left text-xs whitespace-nowrap">
               <thead className="bg-slate-50 text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">
                 <tr>
-                  <th className="py-3.5 px-5">Staff Code</th>
-                  <th className="py-3.5 px-5">Staff Name</th>
-                  <th className="py-3.5 px-5">Role Designation</th>
-                  <th className="py-3.5 px-5">Branch Office</th>
-                  <th className="py-3.5 px-5">Contact Details</th>
-                  <th className="py-3.5 px-5">Status</th>
-                  <th className="py-3.5 px-5">Joined At</th>
-                  <th className="py-3.5 px-5 text-right">Actions</th>
+                  <th className="py-3.5 px-5">{t("branchManagerStaff.staffCode", "Staff Code")}</th>
+                  <th className="py-3.5 px-5">{t("branchManagerStaff.staffName", "Staff Name")}</th>
+                  <th className="py-3.5 px-5">{t("superAdminStaff.roleDesignation", "Role Designation")}</th>
+                  <th className="py-3.5 px-5">{t("modal.member.branchOffice", "Branch Office")}</th>
+                  <th className="py-3.5 px-5">{t("branchManagerMembers.contactDetails", "Contact Details")}</th>
+                  <th className="py-3.5 px-5">{t("common.status", "Status")}</th>
+                  <th className="py-3.5 px-5">{t("superAdminStaff.joinedAt", "Joined At")}</th>
+                  <th className="py-3.5 px-5 text-right">{t("common.actions", "Actions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-slate-700">
@@ -605,7 +608,7 @@ export default function SuperAdminStaff({ embedded = false, branchId = null }) {
                   <tr>
                     <td colSpan={8} className="py-14 text-center text-slate-400">
                       <RefreshCw className="w-5 h-5 mx-auto animate-spin text-[#00b4a7] mb-2" />
-                      <span className="font-semibold text-xs">Loading society staff records...</span>
+                      <span className="font-semibold text-xs">{t("superAdminStaff.loadingSocietyStaffRecords", "Loading society staff records...")}</span>
                     </td>
                   </tr>
                 ) : filteredStaff.length === 0 ? (
@@ -614,29 +617,30 @@ export default function SuperAdminStaff({ embedded = false, branchId = null }) {
                       <div className="w-12 h-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center mx-auto mb-2">
                         <Users className="w-6 h-6 stroke-[1.8]" />
                       </div>
-                      <h4 className="font-bold text-slate-800 text-sm">No Staff Members Found</h4>
+                      <h4 className="font-bold text-slate-800 text-sm">{t("branchManagerStaff.noStaffMembersFound", "No Staff Members Found")}</h4>
                       <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
                         {searchQuery || branchFilter !== 'all' || roleFilter !== 'all' || statusFilter !== 'all'
-                          ? 'No staff records matched the active search or filter criteria. Try clearing filters.'
-                          : 'No staff members have been registered yet under the society system.'}
+                          ? t("superAdminStaff.noStaffRecordsMatchedThe", "No staff records matched the active search or filter criteria. Try clearing filters.")
+                          : t("superAdminStaff.noStaffMembersHaveBeen", "No staff members have been registered yet under the society system.")}
                       </p>
                     </td>
                   </tr>
                 ) : (
                   paginatedStaff.map((staff) => {
+  const { t } = useTranslation();
                     const isActive = staff.is_active !== false;
                     const roleName =
                       staff.staff_role_name ||
                       staff.staff_role?.name ||
                       roles.find((r) => Number(r.id) === Number(staff.staff_role_id))?.name ||
-                      (staff.staff_role_id ? `Role #${staff.staff_role_id}` : 'Staff');
+                      (staff.staff_role_id ? `Role #${staff.staff_role_id}` : t("dashboardModule.branchOverview.tabStaff", "Staff"));
 
                     const branchObj = branches.find((b) => Number(b.id) === Number(staff.branch_id));
                     const branchName =
                       staff.branch_name ||
                       staff.branch?.name ||
                       branchObj?.name ||
-                      (staff.branch_id ? `Branch #${staff.branch_id}` : 'Society Branch');
+                      (staff.branch_id ? `Branch #${staff.branch_id}` : t("dashboardModule.announcements.societyBranch", "Society Branch"));
                     const branchCode =
                       staff.branch_code ||
                       staff.branch?.branch_code ||
@@ -705,12 +709,12 @@ export default function SuperAdminStaff({ embedded = false, branchId = null }) {
                               aria-checked={isActive}
                               onClick={() => handleToggleStatus(staff)}
                               disabled={actionLoadingId === staff.id}
-                              title={`Click to ${isActive ? 'deactivate' : 'activate'} this staff member`}
+                              title={`Click to ${isActive ? t("branchManagerMembers.deactivate", "deactivate") : t("branchManagerMembers.activate", "activate")} this staff member`}
                               className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 ${
                                 isActive ? 'bg-emerald-500' : 'bg-slate-300'
                               } ${actionLoadingId === staff.id ? 'opacity-50 cursor-wait' : ''}`}
                             >
-                              <span className="sr-only">Toggle Staff Status</span>
+                              <span className="sr-only">{t("superAdminStaff.toggleStaffStatus", "Toggle Staff Status")}</span>
                               <span
                                 aria-hidden="true"
                                 className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
@@ -723,7 +727,7 @@ export default function SuperAdminStaff({ embedded = false, branchId = null }) {
                                 isActive ? 'text-emerald-700' : 'text-slate-400'
                               }`}
                             >
-                              {isActive ? 'Active' : 'Inactive'}
+                              {isActive ? t("common.active", "Active") : t("common.inactive", "Inactive")}
                             </span>
                           </div>
                         </td>
@@ -741,7 +745,7 @@ export default function SuperAdminStaff({ embedded = false, branchId = null }) {
                               type="button"
                               onClick={() => setDetailModal({ isOpen: true, staff })}
                               className="p-1.5 rounded-lg border border-slate-200 hover:border-teal-300 text-slate-600 hover:text-teal-900 bg-white hover:bg-teal-50/40 transition-colors cursor-pointer shadow-2xs"
-                              title="View Staff Profile"
+                              title={t("superAdminStaff.viewStaffProfile", "View Staff Profile")}
                             >
                               <Eye className="w-3.5 h-3.5" />
                             </button>
@@ -758,7 +762,7 @@ export default function SuperAdminStaff({ embedded = false, branchId = null }) {
                                 })
                               }
                               className="p-1.5 rounded-lg border border-slate-200 hover:border-teal-300 text-slate-600 hover:text-teal-900 bg-white hover:bg-teal-50/40 transition-colors cursor-pointer shadow-2xs"
-                              title="Edit Staff Member"
+                              title={t("branchManagerStaff.editStaffMember", "Edit Staff Member")}
                             >
                               <Pencil className="w-3.5 h-3.5" />
                             </button>
@@ -768,7 +772,7 @@ export default function SuperAdminStaff({ embedded = false, branchId = null }) {
                               type="button"
                               onClick={() => setDeleteModal({ isOpen: true, staff, isDeleting: false })}
                               className="p-1.5 rounded-lg border border-rose-200 hover:border-rose-400 text-rose-600 hover:text-rose-800 bg-white hover:bg-rose-50 transition-colors cursor-pointer shadow-2xs"
-                              title="Delete Staff Member"
+                              title={t("branchManagerStaff.deleteStaffMember", "Delete Staff Member")}
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
@@ -785,7 +789,7 @@ export default function SuperAdminStaff({ embedded = false, branchId = null }) {
           {/* Table Footer with Pagination */}
           <div className="p-4 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
             <span>
-              Showing {paginatedStaff.length} of {filteredStaff.length} staff members across {branches.length} branches
+              {t("common.showing", "Showing")} {paginatedStaff.length} {t("common.of", "of")} {filteredStaff.length} {t("superAdminStaff.staffMembersAcross", "staff members across")} {branches.length} {t("superAdminStaff.branches", "branches")}
             </span>
 
             {filteredStaff.length > itemsPerPage && (
@@ -796,7 +800,7 @@ export default function SuperAdminStaff({ embedded = false, branchId = null }) {
                   onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
                   className="px-2.5 py-1 rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer font-bold"
                 >
-                  Prev
+                  {t("superAdminStaff.prev", "Prev")}
                 </button>
                 <span className="font-bold font-mono px-1">
                   {currentPage} / {totalPages}
@@ -807,7 +811,7 @@ export default function SuperAdminStaff({ embedded = false, branchId = null }) {
                   onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
                   className="px-2.5 py-1 rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer font-bold"
                 >
-                  Next
+                  {t("branchManagerFdMisSchemes.next", "Next")}
                 </button>
               </div>
             )}
@@ -870,7 +874,7 @@ export default function SuperAdminStaff({ embedded = false, branchId = null }) {
               onClick={() => setSuccessPopup(null)}
               className="w-full py-2.5 px-4 rounded-xl bg-[#00b4a7] hover:bg-[#0f766e] text-white font-bold text-xs transition-colors cursor-pointer shadow-sm"
             >
-              Okay, Understood
+              {t("superAdminStaff.okayUnderstood", "Okay, Understood")}
             </button>
           </div>
         </div>
@@ -892,7 +896,7 @@ export default function SuperAdminStaff({ embedded = false, branchId = null }) {
               onClick={() => setErrorPopup(null)}
               className="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs transition-colors cursor-pointer shadow-sm"
             >
-              Dismiss
+              {t("branchManagerMemberPasswordUpdate.dismiss", "Dismiss")}
             </button>
           </div>
         </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   X,
   PiggyBank,
@@ -62,6 +63,7 @@ export function ApplySavingsAccountModal({
   onSubmit,
   isSubmitting = false
 }) {
+  const { t } = useTranslation();
   if (!isOpen || !scheme) return null;
 
   return (
@@ -75,10 +77,10 @@ export function ApplySavingsAccountModal({
             </div>
             <div>
               <h3 className="text-base sm:text-lg font-bold text-slate-900 leading-tight">
-                Open Savings Deposit Account
+                {t("savingsAccountModals.openSavingsDepositAccount", "Open Savings Deposit Account")}
               </h3>
               <p className="text-xs text-slate-500 mt-0.5">
-                Submit an account opening request to your branch
+                {t("savingsAccountModals.submitAnAccountOpeningRequest", "Submit an account opening request to your branch")}
               </p>
             </div>
           </div>
@@ -98,7 +100,7 @@ export function ApplySavingsAccountModal({
             <div className="flex items-start justify-between">
               <div>
                 <span className="text-[10px] font-bold text-[#0f766e] uppercase tracking-wider block">
-                  Target Savings Product
+                  {t("savingsAccountModals.targetSavingsProduct", "Target Savings Product")}
                 </span>
                 <h4 className="text-base font-extrabold text-slate-900 mt-0.5">
                   {scheme.scheme_name || scheme.name}
@@ -111,13 +113,13 @@ export function ApplySavingsAccountModal({
 
             <div className="grid grid-cols-2 gap-3 pt-2 text-xs border-t border-teal-200/60">
               <div>
-                <span className="text-slate-500 font-medium">Annual Yield:</span>
+                <span className="text-slate-500 font-medium">{t("savingsAccountModals.annualYield", "Annual Yield:")}</span>
                 <p className="font-extrabold text-emerald-700 mt-0.5">
                   {scheme.annual_interest_rate ?? scheme.interest_rate ?? 0}% p.a.
                 </p>
               </div>
               <div>
-                <span className="text-slate-500 font-medium">Min Opening Deposit:</span>
+                <span className="text-slate-500 font-medium">{t("savingsAccountModals.minOpeningDeposit", "Min Opening Deposit:")}</span>
                 <p className="font-extrabold text-slate-900 mt-0.5">
                   {formatCurrency(scheme.min_opening_balance ?? scheme.min_balance ?? 0)}
                 </p>
@@ -128,19 +130,19 @@ export function ApplySavingsAccountModal({
           {/* Member & Branch Dispatch Summary */}
           <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 text-xs space-y-2">
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-              Applicant Society Context
+              {t("savingsAccountModals.applicantSocietyContext", "Applicant Society Context")}
             </span>
             <div className="grid grid-cols-2 gap-2 text-slate-700 font-medium">
               <div>
-                <span className="text-slate-400 block text-[11px]">Member Name</span>
+                <span className="text-slate-400 block text-[11px]">{t("dashboardModule.productAccounts.memberName", "Member Name")}</span>
                 <span className="font-bold text-slate-900">{memberUser?.name || 'Current Member'}</span>
               </div>
               <div>
-                <span className="text-slate-400 block text-[11px]">Member Code</span>
+                <span className="text-slate-400 block text-[11px]">{t("modal.member.memberCode", "Member Code")}</span>
                 <span className="font-mono font-bold text-slate-900">{memberUser?.member_code || memberUser?.id || '—'}</span>
               </div>
               <div className="col-span-2 pt-1 border-t border-slate-200/60 flex items-center justify-between">
-                <span className="text-slate-500">Servicing Branch:</span>
+                <span className="text-slate-500">{t("savingsAccountModals.servicingBranch", "Servicing Branch:")}</span>
                 <span className="font-bold text-[#0f766e]">
                   {memberUser?.branch_name || memberUser?.branch || 'Assigned Society Branch'}
                 </span>
@@ -151,7 +153,7 @@ export function ApplySavingsAccountModal({
           <div className="p-3 bg-amber-50 rounded-2xl border border-amber-200/70 text-xs text-amber-900 flex items-start gap-2 leading-relaxed font-medium">
             <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
             <span>
-              Once submitted, your branch manager will review and approve the request. Upon approval, your official savings deposit folio will be activated automatically.
+              {t("savingsAccountModals.onceSubmittedYourBranchManager", "Once submitted, your branch manager will review and approve the request. Upon approval, your official savings deposit folio will be activated automatically.")}
             </span>
           </div>
 
@@ -163,7 +165,7 @@ export function ApplySavingsAccountModal({
               disabled={isSubmitting}
               className="flex-1 py-2.5 px-4 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer disabled:opacity-50"
             >
-              Cancel
+              {t("common.cancel", "Cancel")}
             </button>
             <button
               type="button"
@@ -174,12 +176,12 @@ export function ApplySavingsAccountModal({
               {isSubmitting ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Submitting...</span>
+                  <span>{t("memberNominee.submitting", "Submitting...")}</span>
                 </>
               ) : (
                 <>
                   <Send className="w-4 h-4" />
-                  <span>Confirm &amp; Apply</span>
+                  <span>{t("savingsAccountModals.confirmApply", "Confirm & Apply")}</span>
                 </>
               )}
             </button>
@@ -200,6 +202,7 @@ export function RejectSavingsAccountRequestModal({
   onConfirm,
   isSubmitting = false
 }) {
+  const { t } = useTranslation();
   const [reason, setReason] = useState('');
   const [err, setErr] = useState('');
 
@@ -224,10 +227,10 @@ export function RejectSavingsAccountRequestModal({
 
           <div className="text-center">
             <h3 className="text-lg font-black text-slate-900">
-              Reject Savings Account Request?
+              {t("savingsAccountModals.rejectSavingsAccountRequest", "Reject Savings Account Request?")}
             </h3>
             <p className="text-xs text-slate-500 mt-1">
-              Request #{request.id} for{' '}
+              {t("branchManagerNominees.request", "Request #")}{request.id} {t("savingsAccountModals.for", "for")}{' '}
               <strong className="text-slate-800">{request.member_name || request.user_name || 'Member'}</strong>
             </p>
           </div>
@@ -235,7 +238,7 @@ export function RejectSavingsAccountRequestModal({
           <form onSubmit={handleSubmit} className="space-y-3">
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                Reason for Rejection <span className="text-rose-500">*</span>
+                {t("savingsAccountModals.reasonForRejection", "Reason for Rejection")} <span className="text-rose-500">*</span>
               </label>
               <textarea
                 value={reason}
@@ -244,7 +247,7 @@ export function RejectSavingsAccountRequestModal({
                   setErr('');
                 }}
                 rows={3}
-                placeholder="e.g. Incomplete KYC documentation or duplicate active savings account"
+                placeholder={t("savingsAccountModals.eGIncompleteKycDocumentation", "e.g. Incomplete KYC documentation or duplicate active savings account")}
                 className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-rose-400 focus:bg-white transition-all"
               />
               {err && <p className="text-xs text-rose-600 mt-1 font-semibold">{err}</p>}
@@ -257,7 +260,7 @@ export function RejectSavingsAccountRequestModal({
                 disabled={isSubmitting}
                 className="flex-1 py-2 px-4 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer"
               >
-                Cancel
+                {t("common.cancel", "Cancel")}
               </button>
               <button
                 type="submit"
@@ -267,10 +270,10 @@ export function RejectSavingsAccountRequestModal({
                 {isSubmitting ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Rejecting...</span>
+                    <span>{t("modal.member.rejecting", "Rejecting...")}</span>
                   </>
                 ) : (
-                  <span>Confirm Rejection</span>
+                  <span>{t("modal.nominee.confirmRejection", "Confirm Rejection")}</span>
                 )}
               </button>
             </div>
@@ -291,6 +294,7 @@ export function SavingsAccountDetailModal({
   onClose,
   role = null
 }) {
+  const { t } = useTranslation();
   const [accountTransactions, setAccountTransactions] = useState([]);
   const [loadingTx, setLoadingTx] = useState(false);
 
@@ -344,11 +348,11 @@ export function SavingsAccountDetailModal({
                   }`}
                 >
                   <span className={`w-1.5 h-1.5 rounded-full ${isActive || account.status === 'awaiting_initial_deposit' ? 'bg-emerald-500' : 'bg-amber-500'}`} />
-                  <span>{account.status === 'awaiting_initial_deposit' || isActive ? 'Account Opened' : String(account.status || 'Active').replace(/_/g, ' ')}</span>
+                  <span>{account.status === 'awaiting_initial_deposit' || isActive ? t("branchManagerSavingsSchemes.accountOpened", "Account Opened") : String(account.status || 'Active').replace(/_/g, ' ')}</span>
                 </span>
               </div>
               <h3 className="text-base sm:text-lg font-black text-slate-900 mt-1 truncate">
-                Savings Account Details
+                {t("savingsAccountModals.savingsAccountDetails", "Savings Account Details")}
               </h3>
             </div>
           </div>
@@ -366,7 +370,7 @@ export function SavingsAccountDetailModal({
         {isLoading ? (
           <div className="p-16 text-center space-y-2">
             <Loader2 className="w-8 h-8 animate-spin text-[#00b4a7] mx-auto" />
-            <p className="text-xs text-slate-500 font-medium">Fetching account details from ledger...</p>
+            <p className="text-xs text-slate-500 font-medium">{t("savingsAccountModals.fetchingAccountDetailsFromLedger", "Fetching account details from ledger...")}</p>
           </div>
         ) : (
           <div className="p-4 sm:p-6 overflow-y-auto space-y-4 text-xs">
@@ -374,7 +378,7 @@ export function SavingsAccountDetailModal({
             <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-teal-500/10 via-emerald-500/5 to-teal-500/10 border border-teal-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <span className="text-[10px] font-bold text-[#0f766e] uppercase tracking-wider block">
-                  Current Deposit Balance
+                  {t("savingsAccountModals.currentDepositBalance", "Current Deposit Balance")}
                 </span>
                 <p className="text-2xl sm:text-3xl font-black text-slate-900 mt-0.5 font-sans">
                   {formatCurrency(account.balance ?? account.current_balance ?? 0)}
@@ -382,7 +386,7 @@ export function SavingsAccountDetailModal({
               </div>
               <div className="sm:text-right">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                  Deposit Account Number
+                  {t("savingsAccountModals.depositAccountNumber", "Deposit Account Number")}
                 </span>
                 <p className="text-base sm:text-lg font-mono font-extrabold text-[#0f766e] mt-0.5 break-all sm:break-normal">
                   {account.account_number || `#SB-${account.id}`}
@@ -394,35 +398,35 @@ export function SavingsAccountDetailModal({
             <div className="rounded-2xl border border-slate-100 overflow-hidden">
               <div className="px-4 py-2.5 bg-slate-50 border-b border-slate-100 flex items-center gap-2">
                 <User className="w-4 h-4 text-[#00b4a7]" />
-                <h4 className="text-xs font-black uppercase tracking-wider text-slate-700">Member Identification</h4>
+                <h4 className="text-xs font-black uppercase tracking-wider text-slate-700">{t("savingsAccountModals.memberIdentification", "Member Identification")}</h4>
               </div>
               <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 <div>
-                  <span className="text-slate-400 font-medium">Member Name:</span>
+                  <span className="text-slate-400 font-medium">{t("savingsAccountModals.memberName", "Member Name:")}</span>
                   <p className="font-extrabold text-slate-900 mt-0.5">
                     {account.member_name || account.user_name || account.member?.full_name || '—'}
                   </p>
                 </div>
                 <div>
-                  <span className="text-slate-400 font-medium">Member Code:</span>
+                  <span className="text-slate-400 font-medium">{t("modal.nominee.memberCode", "Member Code:")}</span>
                   <p className="font-mono font-bold text-slate-800 mt-0.5">
                     {account.member_code || account.member?.member_code || account.user_code || '—'}
                   </p>
                 </div>
                 <div>
-                  <span className="text-slate-400 font-medium">Contact Mobile:</span>
+                  <span className="text-slate-400 font-medium">{t("savingsAccountModals.contactMobile", "Contact Mobile:")}</span>
                   <p className="font-mono font-bold text-slate-800 mt-0.5">
                     {account.member_mobile || account.mobile || account.member?.mobile || account.contact_number || '—'}
                   </p>
                 </div>
                 <div>
-                  <span className="text-slate-400 font-medium">Email Address:</span>
+                  <span className="text-slate-400 font-medium">{t("savingsAccountModals.emailAddress", "Email Address:")}</span>
                   <p className="font-medium text-slate-700 mt-0.5 truncate" title={account.member_email || account.email}>
                     {account.member_email || account.email || account.member?.email || '—'}
                   </p>
                 </div>
                 <div>
-                  <span className="text-slate-400 font-medium">KYC Status:</span>
+                  <span className="text-slate-400 font-medium">{t("savingsAccountModals.kycStatus", "KYC Status:")}</span>
                   <p className="font-bold text-slate-800 mt-0.5 capitalize">
                     {account.member_kyc_status ? (
                       <span className="inline-flex items-center gap-1 text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
@@ -432,7 +436,7 @@ export function SavingsAccountDetailModal({
                   </p>
                 </div>
                 <div>
-                  <span className="text-slate-400 font-medium">Nominee Status:</span>
+                  <span className="text-slate-400 font-medium">{t("savingsAccountModals.nomineeStatus", "Nominee Status:")}</span>
                   <p className="font-bold text-slate-800 mt-0.5 capitalize">
                     {account.nominee_status ? (
                       <span className="inline-flex items-center gap-1 text-teal-700 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-200">
@@ -448,35 +452,35 @@ export function SavingsAccountDetailModal({
             <div className="rounded-2xl border border-slate-100 overflow-hidden">
               <div className="px-4 py-2.5 bg-slate-50 border-b border-slate-100 flex items-center gap-2">
                 <Building2 className="w-4 h-4 text-[#00b4a7]" />
-                <h4 className="text-xs font-black uppercase tracking-wider text-slate-700">Scheme &amp; Operating Branch</h4>
+                <h4 className="text-xs font-black uppercase tracking-wider text-slate-700">{t("savingsAccountModals.schemeOperatingBranch", "Scheme & Operating Branch")}</h4>
               </div>
               <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 <div>
-                  <span className="text-slate-400 font-medium">Savings Scheme:</span>
+                  <span className="text-slate-400 font-medium">{t("staffCashOperations.savingsScheme", "Savings Scheme:")}</span>
                   <p className="font-extrabold text-[#0f766e] mt-0.5 capitalize">
                     {account.scheme_name || account.scheme?.scheme_name || 'Savings Product'}
                   </p>
                 </div>
                 <div>
-                  <span className="text-slate-400 font-medium">Scheme Code:</span>
+                  <span className="text-slate-400 font-medium">{t("applyProductAccountModal.schemeCode", "Scheme Code:")}</span>
                   <p className="font-mono font-bold text-slate-800 mt-0.5">
                     {account.scheme_code || account.scheme?.scheme_code || '—'}
                   </p>
                 </div>
                 <div>
-                  <span className="text-slate-400 font-medium">Operating Branch:</span>
+                  <span className="text-slate-400 font-medium">{t("staffCashOperations.operatingBranch", "Operating Branch:")}</span>
                   <p className="font-bold text-slate-800 mt-0.5">
                     {account.branch_name || account.branch?.name || 'Society Branch'}
                   </p>
                 </div>
                 <div>
-                  <span className="text-slate-400 font-medium">Branch Code:</span>
+                  <span className="text-slate-400 font-medium">{t("branchManagerCashTransactions.branchCode", "Branch Code:")}</span>
                   <p className="font-mono font-bold text-slate-800 mt-0.5">
                     {account.branch_code || '—'}
                   </p>
                 </div>
                 <div>
-                  <span className="text-slate-400 font-medium">Branch IFSC:</span>
+                  <span className="text-slate-400 font-medium">{t("savingsAccountModals.branchIfsc", "Branch IFSC:")}</span>
                   <p className="font-mono font-bold text-teal-800 mt-0.5">
                     {account.ifsc_code ? (
                       <span className="bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
@@ -486,27 +490,27 @@ export function SavingsAccountDetailModal({
                   </p>
                 </div>
                 <div>
-                  <span className="text-slate-400 font-medium">Branch Location:</span>
+                  <span className="text-slate-400 font-medium">{t("savingsAccountModals.branchLocation", "Branch Location:")}</span>
                   <p className="font-medium text-slate-700 mt-0.5 capitalize">
                     {[account.branch_city, account.branch_state].filter(Boolean).join(', ') || '—'}
                   </p>
                 </div>
                 <div>
-                  <span className="text-slate-400 font-medium">Branch Contact:</span>
+                  <span className="text-slate-400 font-medium">{t("savingsAccountModals.branchContact", "Branch Contact:")}</span>
                   <p className="font-mono font-bold text-slate-800 mt-0.5">
                     {account.branch_contact_number || '—'}
                   </p>
                 </div>
                 {account.branch_address && (
                   <div className="sm:col-span-2 lg:col-span-3">
-                    <span className="text-slate-400 font-medium">Branch Address:</span>
+                    <span className="text-slate-400 font-medium">{t("savingsAccountModals.branchAddress", "Branch Address:")}</span>
                     <p className="font-medium text-slate-700 mt-0.5 capitalize">
                       {account.branch_address}
                     </p>
                   </div>
                 )}
                 <div>
-                  <span className="text-slate-400 font-medium">Opened On:</span>
+                  <span className="text-slate-400 font-medium">{t("savingsAccountModals.openedOn", "Opened On:")}</span>
                   <p className="font-medium text-slate-700 mt-0.5">
                     {formatDateTime(account.opened_at || account.created_at)}
                   </p>
@@ -519,23 +523,23 @@ export function SavingsAccountDetailModal({
               <div className="rounded-2xl border border-slate-100 overflow-hidden">
                 <div className="px-4 py-2.5 bg-slate-50 border-b border-slate-100 flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                  <h4 className="text-xs font-black uppercase tracking-wider text-slate-700">Approval Audit Trail</h4>
+                  <h4 className="text-xs font-black uppercase tracking-wider text-slate-700">{t("savingsAccountModals.approvalAuditTrail", "Approval Audit Trail")}</h4>
                 </div>
                 <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   <div>
-                    <span className="text-slate-400 font-medium">Opening Request:</span>
+                    <span className="text-slate-400 font-medium">{t("savingsAccountModals.openingRequest", "Opening Request:")}</span>
                     <p className="font-mono font-bold text-slate-800 mt-0.5">
-                      Request #{account.opening_request_id || account.id}
+                      {t("branchManagerNominees.request", "Request #")}{account.opening_request_id || account.id}
                     </p>
                   </div>
                   <div>
-                    <span className="text-slate-400 font-medium">Reviewed By (Manager):</span>
+                    <span className="text-slate-400 font-medium">{t("savingsAccountModals.reviewedByManager", "Reviewed By (Manager):")}</span>
                     <p className="font-bold text-slate-900 mt-0.5 capitalize">
                       {account.reviewed_by_name || 'Branch Manager'}
                     </p>
                   </div>
                   <div>
-                    <span className="text-slate-400 font-medium">Reviewed At:</span>
+                    <span className="text-slate-400 font-medium">{t("savingsAccountModals.reviewedAt", "Reviewed At:")}</span>
                     <p className="font-medium text-slate-700 mt-0.5">
                       {formatDateTime(account.reviewed_at)}
                     </p>
@@ -550,42 +554,43 @@ export function SavingsAccountDetailModal({
                 <div className="flex items-center gap-2">
                   <Receipt className="w-4 h-4 text-[#00b4a7]" />
                   <h4 className="text-xs font-black uppercase tracking-wider text-slate-700">
-                    Account Passbook &amp; Transaction History
+                    {t("savingsAccountModals.accountPassbookTransactionHistory", "Account Passbook & Transaction History")}
                   </h4>
                 </div>
                 <span className="text-[10px] font-bold text-teal-800 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200">
-                  {accountTransactions.length} recorded
+                  {accountTransactions.length} {t("savingsAccountModals.recorded", "recorded")}
                 </span>
               </div>
 
               {loadingTx ? (
                 <div className="p-8 text-center text-slate-400">
                   <Loader2 className="w-5 h-5 animate-spin text-[#00b4a7] mx-auto mb-1.5" />
-                  <span className="text-xs">Loading account transactions ledger...</span>
+                  <span className="text-xs">{t("savingsAccountModals.loadingAccountTransactionsLedger", "Loading account transactions ledger...")}</span>
                 </div>
               ) : accountTransactions.length === 0 ? (
                 <div className="p-8 text-center text-slate-400">
                   <Coins className="w-6 h-6 mx-auto mb-1.5 text-slate-300" />
-                  <p className="text-xs font-semibold text-slate-600">No transactions recorded for this account yet</p>
+                  <p className="text-xs font-semibold text-slate-600">{t("savingsAccountModals.noTransactionsRecordedForThis", "No transactions recorded for this account yet")}</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse text-xs min-w-[760px]">
                     <thead>
                       <tr className="bg-slate-50/50 border-b border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                        <th className="py-2.5 px-4">Receipt Number</th>
-                        <th className="py-2.5 px-4">Transaction Type</th>
-                        <th className="py-2.5 px-4">Amount</th>
-                        <th className="py-2.5 px-4">Balance Before</th>
-                        <th className="py-2.5 px-4">Balance After</th>
-                        <th className="py-2.5 px-4">Branch / IFSC</th>
-                        <th className="py-2.5 px-4">Cashier</th>
-                        <th className="py-2.5 px-4">Date &amp; Time</th>
-                        <th className="py-2.5 px-4">Notes</th>
+                        <th className="py-2.5 px-4">{t("dashboardModule.accountTransactions.colReceiptNumber", "Receipt Number")}</th>
+                        <th className="py-2.5 px-4">{t("dashboardModule.accountTransactions.colTransactionType", "Transaction Type")}</th>
+                        <th className="py-2.5 px-4">{t("dashboardModule.accountTransactions.colAmount", "Amount")}</th>
+                        <th className="py-2.5 px-4">{t("dashboardModule.accountTransactions.colBalanceBefore", "Balance Before")}</th>
+                        <th className="py-2.5 px-4">{t("dashboardModule.accountTransactions.colBalanceAfter", "Balance After")}</th>
+                        <th className="py-2.5 px-4">{t("savingsAccountModals.branchIfsc2", "Branch / IFSC")}</th>
+                        <th className="py-2.5 px-4">{t("branchManagerCashReconciliation.cashier", "Cashier")}</th>
+                        <th className="py-2.5 px-4">{t("dashboardModule.accountTransactions.colDateTime", "Date & Time")}</th>
+                        <th className="py-2.5 px-4">{t("dashboardModule.accountTransactions.colNotes", "Notes")}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
                       {accountTransactions.map((tx, idx) => {
+  const { t } = useTranslation();
                         const isDeposit =
                           String(tx.transaction_type || tx.type || '').toLowerCase().includes('deposit') ||
                           String(tx.transaction_type || tx.type || '').toLowerCase().includes('credit');
@@ -607,7 +612,7 @@ export function SavingsAccountDetailModal({
                                 ) : (
                                   <ArrowUpRight className="w-3 h-3 text-rose-600" />
                                 )}
-                                <span>{isDeposit ? 'Deposit' : 'Withdrawal'}</span>
+                                <span>{isDeposit ? t("dashboardModule.accountTransactions.deposit", "Deposit") : t("dashboardModule.accountTransactions.withdrawal", "Withdrawal")}</span>
                               </span>
                             </td>
                             <td className="py-2.5 px-4 font-extrabold whitespace-nowrap">
@@ -659,7 +664,7 @@ export function SavingsAccountDetailModal({
             onClick={onClose}
             className="px-5 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs transition-colors cursor-pointer"
           >
-            Close Details
+            {t("savingsAccountModals.closeDetails", "Close Details")}
           </button>
         </div>
       </div>

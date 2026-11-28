@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { i18n } from '../../i18n/index.js';
+import { useTranslation } from 'react-i18next';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import StatCard from '../../components/dashboard/StatCard';
 import { SavingsSchemeDetailModal } from '../../components/dashboard/SavingsSchemeModals';
@@ -103,7 +105,7 @@ function renderAccountStatusBadge(status) {
     return (
       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-        <span>Account Opened</span>
+        <span>{i18n.t("branchManagerSavingsSchemes.accountOpened", "Account Opened")}</span>
       </span>
     );
   }
@@ -134,6 +136,7 @@ function renderAccountStatusBadge(status) {
 }
 
 export default function BranchManagerSavingsSchemes() {
+  const { t } = useTranslation();
   // 1. Schemes Catalogue state (GET /branch-admin/savings-schemes)
   const [schemes, setSchemes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -267,7 +270,7 @@ export default function BranchManagerSavingsSchemes() {
             <div className="inline-flex flex-wrap items-center gap-x-2 gap-y-1 px-3 sm:px-3.5 py-1.5 rounded-2xl sm:rounded-full bg-white/95 backdrop-blur-xs text-[11px] sm:text-xs font-semibold border border-teal-200/80 shadow-2xs text-[#0f766e] mb-3 max-w-full">
               <span className="inline-flex items-center gap-1.5 flex-shrink-0">
                 <PiggyBank className="w-3.5 h-3.5 text-[#00b4a7]" />
-                <span>Role: <strong className="font-bold text-teal-950">Branch Manager</strong></span>
+                <span>{t("dashboardModule.monthlyTargets.roleLabel", "Role:")} <strong className="font-bold text-teal-950">{t("nav.branchManager", "Branch Manager")}</strong></span>
               </span>
               <span className="text-teal-300 hidden sm:inline">•</span>
               <span className="text-slate-600 sm:text-[#0f766e]">
@@ -276,26 +279,26 @@ export default function BranchManagerSavingsSchemes() {
               <span className="text-teal-300 hidden sm:inline">•</span>
               <span className="inline-flex items-center gap-1.5 font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full text-[10px] sm:text-xs flex-shrink-0">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                Active Schemes
+                {t("branchManagerFdMisSchemes.activeSchemes", "Active Schemes")}
               </span>
             </div>
 
             <div className="flex items-center gap-2.5 sm:gap-3">
               <span className="w-1.5 h-7 sm:h-9 bg-[#00b4a7] rounded-full flex-shrink-0" />
               <h1 className="text-xl sm:text-3xl lg:text-4xl font-serif font-bold text-slate-900 tracking-tight">
-                Available Savings Schemes
+                {t("branchManagerSavingsSchemes.availableSavingsSchemes", "Available Savings Schemes")}
               </h1>
             </div>
 
             <p className="text-slate-600 text-xs sm:text-sm mt-2 sm:mt-2.5 font-medium leading-relaxed max-w-xl">
-              Catalogue of member savings deposit schemes approved by Apex Administration. Review annual yields, minimum average balances, service levies, and payout cycles.
+              {t("branchManagerSavingsSchemes.catalogueOfMemberSavingsDeposit", "Catalogue of member savings deposit schemes approved by Apex Administration. Review annual yields, minimum average balances, service levies, and payout cycles.")}
             </p>
           </div>
 
           <div className="relative z-10 flex justify-center md:justify-end pointer-events-none -my-2 sm:-my-5 lg:-my-6 flex-shrink-0 w-full md:w-auto">
             <img
               src={savingsGrowthIllustration}
-              alt="Available Savings Schemes Illustration"
+              alt={t("branchManagerSavingsSchemes.availableSavingsSchemesIllustration", "Available Savings Schemes Illustration")}
               className="h-32 sm:h-44 lg:h-52 max-w-full w-auto object-contain drop-shadow-md select-none pointer-events-none transform hover:scale-102 transition-transform duration-300 mx-auto md:mx-0"
             />
           </div>
@@ -329,31 +332,31 @@ export default function BranchManagerSavingsSchemes() {
         {/* 4 Summary Metric Cards (Identical to Super Admin) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <StatCard
-            title="Total Savings Schemes"
+            title={t("branchManagerSavingsSchemes.totalSavingsSchemes", "Total Savings Schemes")}
             value={totalCount.toString()}
-            subtitle="Registered Products"
+            subtitle={t("branchManagerLoanSchemes.registeredProducts", "Registered Products")}
             icon={PiggyBank}
             trend={`${activeCount} active`}
             trendType="up"
           />
           <StatCard
-            title="Active Deposit Schemes"
+            title={t("branchManagerFdMisSchemes.activeDepositSchemes", "Active Deposit Schemes")}
             value={activeCount.toString()}
-            subtitle="Ready for Members"
+            subtitle={t("branchManagerFdMisSchemes.readyForMembers", "Ready for Members")}
             icon={CheckCircle2}
             trend={totalCount > 0 ? `${Math.round((activeCount / totalCount) * 100)}% active` : '100%'}
             trendType="up"
           />
           <StatCard
-            title="Max Annual Yield"
+            title={t("branchManagerFdMisSchemes.maxAnnualYield", "Max Annual Yield")}
             value={`${maxInterest}%`}
-            subtitle="Top Annual Rate"
+            subtitle={t("branchManagerSavingsSchemes.topAnnualRate", "Top Annual Rate")}
             icon={Percent}
           />
           <StatCard
-            title="Min Opening Deposit"
+            title={t("branchManagerSavingsSchemes.minOpeningDeposit", "Min Opening Deposit")}
             value={formatCurrency(lowestOpeningBal)}
-            subtitle="Starting Requirement"
+            subtitle={t("branchManagerSavingsSchemes.startingRequirement", "Starting Requirement")}
             icon={Coins}
           />
         </div>
@@ -369,11 +372,11 @@ export default function BranchManagerSavingsSchemes() {
                   <PiggyBank className="w-4 h-4 text-[#00b4a7]" />
                 </div>
                 <h3 className="font-serif font-bold text-slate-900 text-lg">
-                  Society Savings Schemes Catalogue
+                  {t("branchManagerSavingsSchemes.societySavingsSchemesCatalogue", "Society Savings Schemes Catalogue")}
                 </h3>
               </div>
               <p className="text-xs text-slate-500 mt-1 font-medium">
-                Official deposit products available for members at this branch
+                {t("branchManagerSavingsSchemes.officialDepositProductsAvailableFor", "Official deposit products available for members at this branch")}
               </p>
             </div>
 
@@ -383,7 +386,7 @@ export default function BranchManagerSavingsSchemes() {
                 <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
                   type="text"
-                  placeholder="Search savings scheme by name or code..."
+                  placeholder={t("branchManagerSavingsSchemes.searchSavingsSchemeByName", "Search savings scheme by name or code...")}
                   value={searchQuery}
                   onChange={(e) => {
                     setSearchQuery(e.target.value);
@@ -414,9 +417,9 @@ export default function BranchManagerSavingsSchemes() {
                   }}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-sm text-slate-700 font-semibold focus:outline-none focus:ring-2 focus:ring-teal-100 focus:border-teal-500 transition-all cursor-pointer"
                 >
-                  <option value="all">All Statuses</option>
-                  <option value="active">Active Only</option>
-                  <option value="inactive">Inactive Only</option>
+                  <option value="all">{t("branchManagerFdMisSchemes.allStatuses", "All Statuses")}</option>
+                  <option value="active">{t("branchManagerFdMisSchemes.activeOnly", "Active Only")}</option>
+                  <option value="inactive">{t("branchManagerFdMisSchemes.inactiveOnly", "Inactive Only")}</option>
                 </select>
               </div>
 
@@ -424,7 +427,7 @@ export default function BranchManagerSavingsSchemes() {
               <button
                 onClick={() => fetchSavingsSchemes(true)}
                 disabled={refreshing}
-                title="Refresh savings schemes"
+                title={t("branchManagerSavingsSchemes.refreshSavingsSchemes", "Refresh savings schemes")}
                 className="p-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-800 transition-colors cursor-pointer disabled:opacity-50 flex-shrink-0"
               >
                 <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin text-teal-600' : ''}`} />
@@ -438,7 +441,7 @@ export default function BranchManagerSavingsSchemes() {
               <div className="flex items-start gap-2.5">
                 <AlertCircle className="w-5 h-5 flex-shrink-0 text-red-600 mt-0.5" />
                 <div>
-                  <p className="text-sm font-bold text-red-900">Failed to load savings schemes</p>
+                  <p className="text-sm font-bold text-red-900">{t("branchManagerSavingsSchemes.failedToLoadSavingsSchemes", "Failed to load savings schemes")}</p>
                   <p className="text-xs text-red-700 mt-0.5">{error}</p>
                 </div>
               </div>
@@ -446,7 +449,7 @@ export default function BranchManagerSavingsSchemes() {
                 onClick={() => fetchSavingsSchemes()}
                 className="text-xs font-bold text-red-700 hover:text-red-900 underline cursor-pointer flex-shrink-0"
               >
-                Retry
+                {t("common.retry", "Retry")}
               </button>
             </div>
           )}
@@ -456,7 +459,7 @@ export default function BranchManagerSavingsSchemes() {
             {loading ? (
               <div className="py-20 text-center space-y-3">
                 <div className="w-10 h-10 border-3 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto" />
-                <p className="text-sm text-slate-500 font-medium">Loading savings schemes from registry...</p>
+                <p className="text-sm text-slate-500 font-medium">{t("branchManagerSavingsSchemes.loadingSavingsSchemesFromRegistry", "Loading savings schemes from registry...")}</p>
               </div>
             ) : filteredSchemes.length === 0 ? (
               <div className="py-20 text-center space-y-4 max-w-sm mx-auto p-4">
@@ -465,12 +468,12 @@ export default function BranchManagerSavingsSchemes() {
                 </div>
                 <div>
                   <p className="text-base font-bold text-slate-800">
-                    {searchQuery ? 'No matching schemes found' : 'No savings schemes available'}
+                    {searchQuery ? t("branchManagerFdMisSchemes.noMatchingSchemesFound", "No matching schemes found") : t("branchManagerSavingsSchemes.noSavingsSchemesAvailable", "No savings schemes available")}
                   </p>
                   <p className="text-xs text-slate-500 mt-1 font-medium leading-relaxed">
                     {searchQuery
-                      ? 'Try adjusting your search query or clear the filter.'
-                      : 'No savings products currently provisioned by apex administration.'}
+                      ? t("branchManagerFdMisSchemes.tryAdjustingYourSearchQuery", "Try adjusting your search query or clear the filter.")
+                      : t("branchManagerSavingsSchemes.noSavingsProductsCurrentlyProvisioned", "No savings products currently provisioned by apex administration.")}
                   </p>
                 </div>
               </div>
@@ -478,21 +481,22 @@ export default function BranchManagerSavingsSchemes() {
               <table className="w-full text-left border-collapse min-w-[1150px]">
                 <thead>
                   <tr className="border-b border-slate-100 bg-slate-50/75 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                    <th className="py-3.5 px-6">Scheme Name</th>
-                    <th className="py-3.5 px-6">Scheme Code</th>
-                    <th className="py-3.5 px-6">Annual Yield</th>
-                    <th className="py-3.5 px-6">Min Opening</th>
-                    <th className="py-3.5 px-6">Monthly MAB</th>
-                    <th className="py-3.5 px-6">Payout</th>
-                    <th className="py-3.5 px-6">Service Charges</th>
-                    <th className="py-3.5 px-6">SMS Charges</th>
-                    <th className="py-3.5 px-6">Created At</th>
-                    <th className="py-3.5 px-6 text-center">Status</th>
-                    <th className="py-3.5 px-6 text-right">Actions</th>
+                    <th className="py-3.5 px-6">{t("dashboardModule.productAccounts.schemeName", "Scheme Name")}</th>
+                    <th className="py-3.5 px-6">{t("dashboardModule.productAccounts.schemeCode", "Scheme Code")}</th>
+                    <th className="py-3.5 px-6">{t("branchManagerFdMisSchemes.annualYield", "Annual Yield")}</th>
+                    <th className="py-3.5 px-6">{t("branchManagerSavingsSchemes.minOpening", "Min Opening")}</th>
+                    <th className="py-3.5 px-6">{t("branchManagerSavingsSchemes.monthlyMab", "Monthly MAB")}</th>
+                    <th className="py-3.5 px-6">{t("branchManagerSavingsSchemes.payout", "Payout")}</th>
+                    <th className="py-3.5 px-6">{t("branchManagerSavingsSchemes.serviceCharges", "Service Charges")}</th>
+                    <th className="py-3.5 px-6">{t("branchManagerSavingsSchemes.smsCharges", "SMS Charges")}</th>
+                    <th className="py-3.5 px-6">{t("dashboardModule.emergency.table.createdAt", "Created At")}</th>
+                    <th className="py-3.5 px-6 text-center">{t("common.status", "Status")}</th>
+                    <th className="py-3.5 px-6 text-right">{t("common.actions", "Actions")}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-sm">
                   {paginatedSchemes.map((scheme) => {
+  const { t } = useTranslation();
                     const isActive = scheme.is_active !== false;
 
                     return (
@@ -588,7 +592,7 @@ export default function BranchManagerSavingsSchemes() {
                                 isActive ? 'bg-emerald-500' : 'bg-slate-400'
                               }`}
                             />
-                            {isActive ? 'Active' : 'Inactive'}
+                            {isActive ? t("common.active", "Active") : t("common.inactive", "Inactive")}
                           </span>
                         </td>
 
@@ -596,11 +600,11 @@ export default function BranchManagerSavingsSchemes() {
                         <td className="py-4 px-6 text-right whitespace-nowrap">
                           <button
                             onClick={() => setDetailModal({ isOpen: true, scheme })}
-                            title="View Scheme Details"
+                            title={t("branchManagerFdMisSchemes.viewSchemeDetails", "View Scheme Details")}
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-800 font-bold text-xs rounded-xl border border-teal-200/80 transition-all cursor-pointer active:scale-95"
                           >
                             <Eye className="w-3.5 h-3.5" />
-                            <span>View Details</span>
+                            <span>{t("branchManagerFdMisSchemes.viewDetails", "View Details")}</span>
                           </button>
                         </td>
                       </tr>
@@ -614,8 +618,8 @@ export default function BranchManagerSavingsSchemes() {
             {!loading && filteredSchemes.length > itemsPerPage && (
               <div className="px-6 py-4 border-t border-slate-100 flex items-center justify-between">
                 <span className="text-xs text-slate-500 font-medium">
-                  Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
-                  {Math.min(currentPage * itemsPerPage, filteredSchemes.length)} of {filteredSchemes.length} schemes
+                  {t("common.showing", "Showing")} {(currentPage - 1) * itemsPerPage + 1} {t("common.to", "to")}{' '}
+                  {Math.min(currentPage * itemsPerPage, filteredSchemes.length)} {t("common.of", "of")} {filteredSchemes.length} {t("branchManagerFdMisSchemes.schemes", "schemes")}
                 </span>
                 <div className="flex items-center gap-2">
                   <button
@@ -623,7 +627,7 @@ export default function BranchManagerSavingsSchemes() {
                     disabled={currentPage === 1}
                     className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed font-semibold text-xs text-slate-700 transition-colors cursor-pointer"
                   >
-                    Previous
+                    {t("branchManagerFdMisSchemes.previous", "Previous")}
                   </button>
                   <span className="text-xs font-bold text-slate-700 px-2">
                     {currentPage} / {totalPages}
@@ -633,7 +637,7 @@ export default function BranchManagerSavingsSchemes() {
                     disabled={currentPage === totalPages}
                     className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed font-semibold text-xs text-slate-700 transition-colors cursor-pointer"
                   >
-                    Next
+                    {t("branchManagerFdMisSchemes.next", "Next")}
                   </button>
                 </div>
               </div>

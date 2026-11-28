@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import StatCard from '../../components/dashboard/StatCard';
 import { SavingsSchemeDetailModal } from '../../components/dashboard/SavingsSchemeModals';
@@ -52,6 +53,7 @@ function formatDate(isoString) {
 }
 
 export default function MemberSavingsSchemes() {
+  const { t } = useTranslation();
   // 1. Schemes state (GET /member/savings-schemes)
   const [schemes, setSchemes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -216,7 +218,7 @@ export default function MemberSavingsSchemes() {
             <div className="inline-flex flex-wrap items-center gap-x-2 gap-y-1 px-3 sm:px-3.5 py-1.5 rounded-2xl sm:rounded-full bg-white/95 backdrop-blur-xs text-[11px] sm:text-xs font-semibold border border-teal-200/80 shadow-2xs text-[#0f766e] mb-3 max-w-full">
               <span className="inline-flex items-center gap-1.5 flex-shrink-0">
                 <Landmark className="w-3.5 h-3.5 text-[#00b4a7]" />
-                <span>Role: <strong className="font-bold text-teal-950">Member</strong></span>
+                <span>{t("dashboardModule.monthlyTargets.roleLabel", "Role:")} <strong className="font-bold text-teal-950">{t("dashboardModule.accountTransactions.roleMember", "Member")}</strong></span>
               </span>
               <span className="text-teal-300 hidden sm:inline">•</span>
               <span className="text-slate-600 sm:text-[#0f766e]">
@@ -225,26 +227,26 @@ export default function MemberSavingsSchemes() {
               <span className="text-teal-300 hidden sm:inline">•</span>
               <span className="inline-flex items-center gap-1.5 font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full text-[10px] sm:text-xs flex-shrink-0">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                Active Schemes
+                {t("branchManagerFdMisSchemes.activeSchemes", "Active Schemes")}
               </span>
             </div>
 
             <div className="flex items-center gap-2.5 sm:gap-3">
               <span className="w-1.5 h-7 sm:h-9 bg-[#00b4a7] rounded-full flex-shrink-0" />
               <h1 className="text-xl sm:text-3xl lg:text-4xl font-serif font-bold text-slate-900 tracking-tight">
-                Cooperative Savings Schemes
+                {t("memberSavingsSchemes.cooperativeSavingsSchemes", "Cooperative Savings Schemes")}
               </h1>
             </div>
 
             <p className="text-slate-600 text-xs sm:text-sm mt-2 sm:mt-2.5 font-medium leading-relaxed max-w-xl">
-              Explore member savings deposit schemes, annual interest yields, senior citizen add-on benefits, and minimum average balance requirements.
+              {t("memberSavingsSchemes.exploreMemberSavingsDepositSchemes", "Explore member savings deposit schemes, annual interest yields, senior citizen add-on benefits, and minimum average balance requirements.")}
             </p>
           </div>
 
           <div className="relative z-10 flex justify-center md:justify-end pointer-events-none -my-2 sm:-my-5 lg:-my-6 flex-shrink-0 w-full md:w-auto">
             <img
               src={savingsGrowthIllustration}
-              alt="Cooperative Savings Schemes Illustration"
+              alt={t("memberSavingsSchemes.cooperativeSavingsSchemesIllustration", "Cooperative Savings Schemes Illustration")}
               className="h-32 sm:h-44 lg:h-52 max-w-full w-auto object-contain drop-shadow-md select-none pointer-events-none transform hover:scale-102 transition-transform duration-300 mx-auto md:mx-0"
             />
           </div>
@@ -260,33 +262,33 @@ export default function MemberSavingsSchemes() {
         {/* 4 Summary Metric Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <StatCard
-            title="Available Schemes"
+            title={t("memberSavingsSchemes.availableSchemes", "Available Schemes")}
             value={totalCount.toString()}
-            subtitle="Deposit Products"
+            subtitle={t("memberSavingsSchemes.depositProducts", "Deposit Products")}
             icon={PiggyBank}
             trend={`${activeCount} active`}
             trendType="up"
           />
           <StatCard
-            title="Active Deposit Schemes"
+            title={t("branchManagerFdMisSchemes.activeDepositSchemes", "Active Deposit Schemes")}
             value={activeCount.toString()}
-            subtitle="Current Live Offers"
+            subtitle={t("memberSavingsSchemes.currentLiveOffers", "Current Live Offers")}
             icon={CheckCircle2}
             trend={totalCount > 0 ? `${Math.round((activeCount / totalCount) * 100)}% available` : '100%'}
             trendType="up"
           />
           <StatCard
-            title="Min Opening Deposit"
+            title={t("branchManagerSavingsSchemes.minOpeningDeposit", "Min Opening Deposit")}
             value={lowestOpeningBal > 0 ? formatCurrency(lowestOpeningBal) : '₹500'}
-            subtitle="Lowest Entry Point"
+            subtitle={t("memberSavingsSchemes.lowestEntryPoint", "Lowest Entry Point")}
             icon={Wallet}
             trend="Base Entry"
             trendType="neutral"
           />
           <StatCard
-            title="Top Annual Yield"
+            title={t("memberSavingsSchemes.topAnnualYield", "Top Annual Yield")}
             value={`${maxInterest}%`}
-            subtitle="Maximum Return"
+            subtitle={t("memberSavingsSchemes.maximumReturn", "Maximum Return")}
             icon={Percent}
             trend="Per Annum"
             trendType="neutral"
@@ -303,11 +305,11 @@ export default function MemberSavingsSchemes() {
                     <PiggyBank className="w-4 h-4 text-[#00b4a7]" />
                   </div>
                   <h3 className="font-serif font-bold text-slate-900 text-lg">
-                    Society Savings Schemes Catalogue
+                    {t("branchManagerSavingsSchemes.societySavingsSchemesCatalogue", "Society Savings Schemes Catalogue")}
                   </h3>
                 </div>
                 <p className="text-xs text-slate-500 mt-1 font-medium">
-                  Official deposit products available for cooperative society members
+                  {t("memberSavingsSchemes.officialDepositProductsAvailableFor", "Official deposit products available for cooperative society members")}
                 </p>
               </div>
 
@@ -317,7 +319,7 @@ export default function MemberSavingsSchemes() {
                   <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
                     type="text"
-                    placeholder="Search savings scheme by name or code..."
+                    placeholder={t("branchManagerSavingsSchemes.searchSavingsSchemeByName", "Search savings scheme by name or code...")}
                     value={searchQuery}
                     onChange={(e) => {
                       setSearchQuery(e.target.value);
@@ -348,9 +350,9 @@ export default function MemberSavingsSchemes() {
                     }}
                     className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-sm text-slate-700 font-semibold focus:outline-none focus:ring-2 focus:ring-teal-100 focus:border-teal-500 transition-all cursor-pointer"
                   >
-                    <option value="all">All Statuses</option>
-                    <option value="active">Active Only</option>
-                    <option value="inactive">Inactive Only</option>
+                    <option value="all">{t("branchManagerFdMisSchemes.allStatuses", "All Statuses")}</option>
+                    <option value="active">{t("branchManagerFdMisSchemes.activeOnly", "Active Only")}</option>
+                    <option value="inactive">{t("branchManagerFdMisSchemes.inactiveOnly", "Inactive Only")}</option>
                   </select>
                 </div>
    
@@ -358,7 +360,7 @@ export default function MemberSavingsSchemes() {
                   onClick={() => fetchSavingsSchemes(true)}
                   disabled={refreshing}
                   className="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 transition-colors cursor-pointer"
-                  title="Refresh schemes"
+                  title={t("memberSavingsSchemes.refreshSchemes", "Refresh schemes")}
                 >
                   <RefreshCw className={`w-4 h-4 text-[#00b4a7] ${refreshing ? 'animate-spin' : ''}`} />
                 </button>
@@ -371,7 +373,7 @@ export default function MemberSavingsSchemes() {
                 <div className="flex items-start gap-2.5">
                   <AlertCircle className="w-5 h-5 flex-shrink-0 text-red-600 mt-0.5" />
                   <div>
-                    <p className="text-sm font-bold text-red-900">Failed to load savings schemes</p>
+                    <p className="text-sm font-bold text-red-900">{t("branchManagerSavingsSchemes.failedToLoadSavingsSchemes", "Failed to load savings schemes")}</p>
                     <p className="text-xs text-red-700 mt-0.5">{error}</p>
                   </div>
                 </div>
@@ -379,7 +381,7 @@ export default function MemberSavingsSchemes() {
                   onClick={() => fetchSavingsSchemes()}
                   className="text-xs font-bold text-red-700 hover:text-red-900 underline cursor-pointer flex-shrink-0"
                 >
-                  Retry
+                  {t("common.retry", "Retry")}
                 </button>
               </div>
             )}
@@ -389,7 +391,7 @@ export default function MemberSavingsSchemes() {
               {loading ? (
                 <div className="py-20 text-center space-y-3">
                   <div className="w-10 h-10 border-3 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto" />
-                  <p className="text-sm text-slate-500 font-medium">Loading savings schemes from registry...</p>
+                  <p className="text-sm text-slate-500 font-medium">{t("branchManagerSavingsSchemes.loadingSavingsSchemesFromRegistry", "Loading savings schemes from registry...")}</p>
                 </div>
               ) : filteredSchemes.length === 0 ? (
                 <div className="py-20 text-center space-y-4 max-w-sm mx-auto p-4">
@@ -398,12 +400,12 @@ export default function MemberSavingsSchemes() {
                   </div>
                   <div>
                     <p className="text-base font-bold text-slate-800">
-                      {searchQuery ? 'No matching schemes found' : 'No savings schemes available'}
+                      {searchQuery ? t("branchManagerFdMisSchemes.noMatchingSchemesFound", "No matching schemes found") : t("branchManagerSavingsSchemes.noSavingsSchemesAvailable", "No savings schemes available")}
                     </p>
                     <p className="text-xs text-slate-500 mt-1 font-medium leading-relaxed">
                       {searchQuery
-                        ? 'Try adjusting your search query or clear the filter.'
-                        : 'No savings products currently provisioned by apex administration.'}
+                        ? t("branchManagerFdMisSchemes.tryAdjustingYourSearchQuery", "Try adjusting your search query or clear the filter.")
+                        : t("branchManagerSavingsSchemes.noSavingsProductsCurrentlyProvisioned", "No savings products currently provisioned by apex administration.")}
                     </p>
                   </div>
                 </div>
@@ -411,20 +413,21 @@ export default function MemberSavingsSchemes() {
                 <table className="w-full text-left border-collapse min-w-[1150px]">
                   <thead>
                     <tr className="border-b border-slate-100 bg-slate-50/75 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                      <th className="py-3.5 px-6">Scheme Name</th>
-                      <th className="py-3.5 px-6">Scheme Code</th>
-                      <th className="py-3.5 px-6">Annual Yield</th>
-                      <th className="py-3.5 px-6">Min Opening</th>
-                      <th className="py-3.5 px-6">Monthly MAB</th>
-                      <th className="py-3.5 px-6">Payout</th>
-                      <th className="py-3.5 px-6">Service Charges</th>
-                      <th className="py-3.5 px-6">SMS Charges</th>
-                      <th className="py-3.5 px-6 text-center">Status</th>
-                      <th className="py-3.5 px-6 text-right">Actions</th>
+                      <th className="py-3.5 px-6">{t("dashboardModule.productAccounts.schemeName", "Scheme Name")}</th>
+                      <th className="py-3.5 px-6">{t("dashboardModule.productAccounts.schemeCode", "Scheme Code")}</th>
+                      <th className="py-3.5 px-6">{t("branchManagerFdMisSchemes.annualYield", "Annual Yield")}</th>
+                      <th className="py-3.5 px-6">{t("branchManagerSavingsSchemes.minOpening", "Min Opening")}</th>
+                      <th className="py-3.5 px-6">{t("branchManagerSavingsSchemes.monthlyMab", "Monthly MAB")}</th>
+                      <th className="py-3.5 px-6">{t("branchManagerSavingsSchemes.payout", "Payout")}</th>
+                      <th className="py-3.5 px-6">{t("branchManagerSavingsSchemes.serviceCharges", "Service Charges")}</th>
+                      <th className="py-3.5 px-6">{t("branchManagerSavingsSchemes.smsCharges", "SMS Charges")}</th>
+                      <th className="py-3.5 px-6 text-center">{t("common.status", "Status")}</th>
+                      <th className="py-3.5 px-6 text-right">{t("common.actions", "Actions")}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 text-sm">
                     {paginatedSchemes.map((scheme) => {
+  const { t } = useTranslation();
                       const isActive = scheme.is_active !== false;
                       const annualYield = scheme.annual_interest_rate ?? scheme.interest_rate ?? 0;
                       const minOpening = scheme.min_opening_balance ?? scheme.min_balance ?? 0;
@@ -469,7 +472,7 @@ export default function MemberSavingsSchemes() {
                             </div>
                             {scheme.senior_citizen_rate_add_on > 0 && (
                               <span className="text-[10px] text-amber-700 font-semibold block">
-                                +{scheme.senior_citizen_rate_add_on}% Senior
+                                +{scheme.senior_citizen_rate_add_on}{t("memberFdMisSchemes.senior", "% Senior")}
                               </span>
                             )}
                           </td>
@@ -529,7 +532,7 @@ export default function MemberSavingsSchemes() {
                                   isActive ? 'bg-emerald-500' : 'bg-slate-400'
                                 }`}
                               />
-                              {isActive ? 'Active' : 'Inactive'}
+                              {isActive ? t("common.active", "Active") : t("common.inactive", "Inactive")}
                             </span>
                           </td>
 
@@ -539,10 +542,10 @@ export default function MemberSavingsSchemes() {
                               <button
                                 onClick={() => setDetailModal({ isOpen: true, scheme })}
                                 className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-800 font-bold text-xs rounded-xl transition-colors cursor-pointer border border-teal-200/60 shadow-2xs"
-                                title="View scheme details"
+                                title={t("memberFdMisSchemes.viewSchemeDetails", "View scheme details")}
                               >
                                 <Eye className="w-3.5 h-3.5 text-[#00b4a7]" />
-                                <span>View</span>
+                                <span>{t("common.view", "View")}</span>
                               </button>
                             </div>
                           </td>
@@ -558,15 +561,15 @@ export default function MemberSavingsSchemes() {
             {filteredSchemes.length > itemsPerPage && (
               <div className="p-4 sm:p-5 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-medium">
                 <div>
-                  Showing{' '}
+                  {t("common.showing", "Showing")}{' '}
                   <span className="font-bold text-slate-800">
                     {(currentPage - 1) * itemsPerPage + 1}
                   </span>{' '}
-                  to{' '}
+                  {t("common.to", "to")}{' '}
                   <span className="font-bold text-slate-800">
                     {Math.min(currentPage * itemsPerPage, filteredSchemes.length)}
                   </span>{' '}
-                  of <span className="font-bold text-slate-800">{filteredSchemes.length}</span> schemes
+                  {t("common.of", "of")} <span className="font-bold text-slate-800">{filteredSchemes.length}</span> {t("branchManagerFdMisSchemes.schemes", "schemes")}
                 </div>
 
                 <div className="flex items-center gap-1">

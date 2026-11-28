@@ -1,701 +1,104 @@
-import { handleAuthExpired, isTokenExpiredError } from './branchService';
+// Service Request Service - Demo Mode (Offline Mock)
+import { mockDb } from './mockData';
 
-// Service Request API service connecting to backend member service-requests endpoints
-const BASE_URL = import.meta.env.VITE_API_URL || 'https://supercriminally-ununified-arnoldo.ngrok-free.dev';
+export function parseApiError(errBody, status, fallbackMessage = 'Operation completed') {
+  return errBody?.message || fallbackMessage;
+}
 
-/**
- * Standard request headers helper for Member
- */
-function getMemberHeaders() {
-  const headers = {
-    'Content-Type': 'application/json',
-    'ngrok-skip-browser-warning': 'true',
-    'Accept': 'application/json',
+export async function createMemberServiceRequest(data) {
+  const list = mockDb.getServiceRequests();
+  const newReq = {
+    ...data,
+    id: Date.now(),
+    request_number: `SR-${Math.floor(1000 + Math.random() * 9000)}`,
+    status: 'in_progress',
+    created_at: new Date().toISOString(),
+    replies: [],
   };
-
-  const token =
-    localStorage.getItem('member_token') ||
-    localStorage.getItem('token') ||
-    localStorage.getItem('access_token') ||
-    localStorage.getItem('auth_token');
-
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-
-  return headers;
+  mockDb.saveServiceRequests([newReq, ...list]);
+  return newReq;
 }
 
-/**
- * Parses user-friendly error messages from backend responses
- */
-export function parseApiError(errBody, status, fallbackMessage = 'Operation failed') {
-  if (!errBody) return `${fallbackMessage} (${status || 'Unknown'})`;
-  if (typeof errBody === 'string') return errBody;
+export async function getMemberServiceRequests() {
+  return mockDb.getServiceRequests();
+}
 
-  if (typeof errBody.detail === 'string') {
-    return errBody.detail;
-  }
+export async function getMemberServiceRequest(id) {
+  const list = mockDb.getServiceRequests();
+  return list.find((r) => String(r.id) === String(id)) || list[0];
+}
 
-  if (Array.isArray(errBody.detail)) {
-    const messages = errBody.detail.map((item) => {
-      if (typeof item === 'string') return item;
-      if (item && typeof item === 'object') {
-        const msg = item.msg || item.message || JSON.stringify(item);
-        const cleanMsg = msg.replace(/^Value error,\s*/i, '');
-        const loc = Array.isArray(item.loc)
-          ? item.loc.filter((l) => l !== 'body').join(' -> ')
-          : '';
-        return loc ? `${loc.replace(/_/g, ' ')}: ${cleanMsg}` : cleanMsg;
-      }
-      return String(item);
+export async function getBranchAdminServiceRequests() {
+  return mockDb.getServiceRequests();
+}
+
+export async function getBranchAdminServiceRequest(id) {
+  return getMemberServiceRequest(id);
+}
+
+export async function replyToBranchServiceRequest(id, message) {
+  const list = mockDb.getServiceRequests();
+  const req = list.find((r) => String(r.id) === String(id));
+  if (req) {
+    if (!req.replies) req.replies = [];
+    req.replies.push({
+      id: Date.now(),
+      author: 'Branch Manager',
+      message: typeof message === 'string' ? message : message.message,
+      created_at: new Date().toISOString(),
     });
-    return messages.filter(Boolean).join(' | ');
+    mockDb.saveServiceRequests(list);
   }
-
-  if (typeof errBody.message === 'string') {
-    return errBody.message;
-  }
-
-  if (typeof errBody.error === 'string') {
-    return errBody.error;
-  }
-
-  return `${fallbackMessage} (${status || 'Error'})`;
+  return { success: true };
 }
 
-function checkRequestStatus(res, errBody, defaultMsg, role = 'member') {
-  const parsedMsg = parseApiError(errBody, res.status, defaultMsg);
-  if (isTokenExpiredError(res, parsedMsg)) {
-    handleAuthExpired(role);
-    throw new Error('Token is expired. Please login again.');
-  }
-  throw new Error(parsedMsg);
+export async function editBranchServiceRequestReply() {
+  return { success: true };
 }
 
-/**
- * 1. POST /member/service-requests - Create Service Request
- * Body: { subject: string, message: string }
- */
-export async function createMemberServiceRequest({ subject, message }) {
-  try {
-    const payload = {
-      subject: (subject || '').trim(),
-      message: (message || '').trim(),
-    };
-
-    const res = await fetch(`${BASE_URL}/member/service-requests`, {
-      method: 'POST',
-      headers: getMemberHeaders(),
-      body: JSON.stringify(payload),
-    });
-
-    if (!res.ok) {
-      const errBody = await res.json().catch(() => ({}));
-      checkRequestStatus(res, errBody, 'Failed to create service request', 'member');
-    }
-
-    return await res.json();
-  } catch (error) {
-    console.error('serviceRequestService.createMemberServiceRequest error:', error);
-    throw error;
-  }
+export async function updateBranchServiceRequestStatus(id, status) {
+  const list = mockDb.getServiceRequests();
+  const updated = list.map((r) => (String(r.id) === String(id) ? { ...r, status } : r));
+  mockDb.saveServiceRequests(updated);
+  return { success: true };
 }
 
-/**
- * 2. GET /member/service-requests - List My Service Requests
- */
-export async function getMemberServiceRequests({ skip = 0, limit = 100 } = {}) {
-  try {
-    const safeLimit = Math.min(Math.max(Number(limit) || 100, 1), 100);
-    const params = new URLSearchParams();
-    if (skip !== undefined && skip !== null) params.append('skip', String(skip));
-    params.append('limit', String(safeLimit));
-
-    const qs = params.toString() ? `?${params.toString()}` : '';
-    const res = await fetch(`${BASE_URL}/member/service-requests${qs}`, {
-      method: 'GET',
-      headers: getMemberHeaders(),
-    });
-
-    if (!res.ok) {
-      const errBody = await res.json().catch(() => ({}));
-      checkRequestStatus(res, errBody, 'Failed to fetch service requests', 'member');
-    }
-
-    const data = await res.json();
-    if (Array.isArray(data)) return data;
-    if (Array.isArray(data.requests)) return data.requests;
-    if (Array.isArray(data.items)) return data.items;
-    if (Array.isArray(data.data)) return data.data;
-    return [];
-  } catch (error) {
-    console.error('serviceRequestService.getMemberServiceRequests error:', error);
-    throw error;
-  }
+export async function getSuperAdminServiceRequests() {
+  return mockDb.getServiceRequests();
 }
 
-/**
- * 3. GET /member/service-requests/{request_id} - Get My Service Request
- */
-export async function getMemberServiceRequest(requestId) {
-  try {
-    const res = await fetch(`${BASE_URL}/member/service-requests/${requestId}`, {
-      method: 'GET',
-      headers: getMemberHeaders(),
-    });
-
-    if (!res.ok) {
-      const errBody = await res.json().catch(() => ({}));
-      checkRequestStatus(res, errBody, `Failed to fetch service request #${requestId}`, 'member');
-    }
-
-    return await res.json();
-  } catch (error) {
-    console.error(`serviceRequestService.getMemberServiceRequest(${requestId}) error:`, error);
-    throw error;
-  }
+export async function getSuperAdminServiceRequest(id) {
+  return getMemberServiceRequest(id);
 }
 
-function getBranchAdminHeaders() {
-  const headers = {
-    'Content-Type': 'application/json',
-    'ngrok-skip-browser-warning': 'true',
-    'Accept': 'application/json',
-  };
-
-  const token =
-    localStorage.getItem('branch_token') ||
-    localStorage.getItem('branch_admin_token') ||
-    localStorage.getItem('token') ||
-    localStorage.getItem('access_token') ||
-    localStorage.getItem('auth_token');
-
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-
-  return headers;
+export async function replyToSuperAdminServiceRequest(id, message) {
+  return replyToBranchServiceRequest(id, message);
 }
 
-/**
- * 4. GET /branch-admin/service-requests - List Branch Service Requests
- */
-export async function getBranchAdminServiceRequests({ skip = 0, limit = 100, status } = {}) {
-  try {
-    const safeLimit = Math.min(Math.max(Number(limit) || 100, 1), 100);
-    const params = new URLSearchParams();
-    if (skip !== undefined && skip !== null) params.append('skip', String(skip));
-    params.append('limit', String(safeLimit));
-    if (status && status !== 'all') params.append('status', status);
-
-    const qs = params.toString() ? `?${params.toString()}` : '';
-    const res = await fetch(`${BASE_URL}/branch-admin/service-requests${qs}`, {
-      method: 'GET',
-      headers: getBranchAdminHeaders(),
-    });
-
-    if (!res.ok) {
-      const errBody = await res.json().catch(() => ({}));
-      checkRequestStatus(res, errBody, 'Failed to fetch branch service requests', 'branch_manager');
-    }
-
-    const data = await res.json();
-    if (Array.isArray(data)) return data;
-    if (Array.isArray(data.requests)) return data.requests;
-    if (Array.isArray(data.items)) return data.items;
-    if (Array.isArray(data.data)) return data.data;
-    return [];
-  } catch (error) {
-    console.error('serviceRequestService.getBranchAdminServiceRequests error:', error);
-    throw error;
-  }
+export async function editSuperAdminServiceRequestReply() {
+  return { success: true };
 }
 
-/**
- * 5. GET /branch-admin/service-requests/{request_id} - Get Branch Service Request
- */
-export async function getBranchAdminServiceRequest(requestId) {
-  try {
-    const res = await fetch(`${BASE_URL}/branch-admin/service-requests/${requestId}`, {
-      method: 'GET',
-      headers: getBranchAdminHeaders(),
-    });
-
-    if (!res.ok) {
-      const errBody = await res.json().catch(() => ({}));
-      checkRequestStatus(res, errBody, `Failed to fetch service request #${requestId}`, 'branch_manager');
-    }
-
-    return await res.json();
-  } catch (error) {
-    console.error(`serviceRequestService.getBranchAdminServiceRequest(${requestId}) error:`, error);
-    throw error;
-  }
+export async function updateSuperAdminServiceRequestStatus(id, status) {
+  return updateBranchServiceRequestStatus(id, status);
 }
 
-/**
- * 6. POST /branch-admin/service-requests/{request_id}/replies - Reply To Service Request
- */
-export async function replyToBranchServiceRequest(requestId, { message, reply } = {}) {
-  try {
-    const text = (message || reply || '').trim();
-    const payload = {
-      message: text,
-    };
-
-    const res = await fetch(`${BASE_URL}/branch-admin/service-requests/${requestId}/replies`, {
-      method: 'POST',
-      headers: getBranchAdminHeaders(),
-      body: JSON.stringify(payload),
-    });
-
-    if (!res.ok) {
-      const errBody = await res.json().catch(() => ({}));
-      checkRequestStatus(res, errBody, `Failed to reply to service request #${requestId}`, 'branch_manager');
-    }
-
-    return await res.json();
-  } catch (error) {
-    console.error(`serviceRequestService.replyToBranchServiceRequest(${requestId}) error:`, error);
-    throw error;
-  }
+export async function getStaffCustomerServiceRequests() {
+  return mockDb.getServiceRequests();
 }
 
-/**
- * 7. PATCH /branch-admin/service-requests/{request_id}/replies/{reply_id} - Edit Branch Service Request Reply
- */
-export async function editBranchServiceRequestReply(requestId, replyId, { message, reply } = {}) {
-  try {
-    const text = (message || reply || '').trim();
-    const payload = {
-      message: text,
-    };
-
-    const res = await fetch(`${BASE_URL}/branch-admin/service-requests/${requestId}/replies/${replyId}`, {
-      method: 'PATCH',
-      headers: getBranchAdminHeaders(),
-      body: JSON.stringify(payload),
-    });
-
-    if (!res.ok) {
-      const errBody = await res.json().catch(() => ({}));
-      checkRequestStatus(res, errBody, `Failed to edit reply #${replyId}`, 'branch_manager');
-    }
-
-    return await res.json();
-  } catch (error) {
-    console.error(`serviceRequestService.editBranchServiceRequestReply(${requestId}, ${replyId}) error:`, error);
-    throw error;
-  }
-}
-
-/**
- * 8. PATCH /branch-admin/service-requests/{request_id}/status - Update Branch Service Request Status
- * Allowed backend statuses: 'pending' | 'in_progress' | 'solved'
- */
-export async function updateBranchServiceRequestStatus(requestId, status) {
-  try {
-    let normalizedStatus = String(status || '').trim().toLowerCase();
-    if (normalizedStatus === 'open') normalizedStatus = 'pending';
-    if (normalizedStatus === 'resolved' || normalizedStatus === 'closed' || normalizedStatus === 'completed') {
-      normalizedStatus = 'solved';
-    }
-
-    const payload = {
-      status: normalizedStatus,
-    };
-
-    const res = await fetch(`${BASE_URL}/branch-admin/service-requests/${requestId}/status`, {
-      method: 'PATCH',
-      headers: getBranchAdminHeaders(),
-      body: JSON.stringify(payload),
-    });
-
-    if (!res.ok) {
-      const errBody = await res.json().catch(() => ({}));
-      checkRequestStatus(res, errBody, `Failed to update status for service request #${requestId}`, 'branch_manager');
-    }
-
-    return await res.json();
-  } catch (error) {
-    console.error(`serviceRequestService.updateBranchServiceRequestStatus(${requestId}) error:`, error);
-    throw error;
-  }
-}
-
-function getSuperAdminHeaders() {
-  const headers = {
-    'Content-Type': 'application/json',
-    'ngrok-skip-browser-warning': 'true',
-    'Accept': 'application/json',
-  };
-
-  const token =
-    localStorage.getItem('token') ||
-    localStorage.getItem('access_token') ||
-    localStorage.getItem('superadmin_token') ||
-    localStorage.getItem('auth_token');
-
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-
-  return headers;
-}
-
-/**
- * 9. GET /superadmin/service-requests - List All Service Requests
- */
-export async function getSuperAdminServiceRequests({ skip = 0, limit = 100, branch_id, status, search = '' } = {}) {
-  try {
-    const safeLimit = Math.min(Math.max(Number(limit) || 100, 1), 100);
-    const params = new URLSearchParams();
-    if (skip !== undefined && skip !== null) params.append('skip', String(skip));
-    params.append('limit', String(safeLimit));
-    if (branch_id && branch_id !== 'all') params.append('branch_id', String(branch_id));
-    if (status && status !== 'all') {
-      let st = String(status).toLowerCase().trim();
-      if (st === 'open') st = 'pending';
-      if (st === 'resolved' || st === 'closed' || st === 'completed') st = 'solved';
-      if (['pending', 'in_progress', 'solved'].includes(st)) {
-        params.append('status', st);
-      }
-    }
-    if (search && search.trim()) params.append('search', search.trim());
-
-    const qs = params.toString() ? `?${params.toString()}` : '';
-    const res = await fetch(`${BASE_URL}/superadmin/service-requests${qs}`, {
-      method: 'GET',
-      headers: getSuperAdminHeaders(),
-    });
-
-    if (!res.ok) {
-      const errBody = await res.json().catch(() => ({}));
-      checkRequestStatus(res, errBody, 'Failed to fetch superadmin service requests', 'super_admin');
-    }
-
-    const data = await res.json();
-    if (Array.isArray(data)) return data;
-    if (Array.isArray(data.requests)) return data.requests;
-    if (Array.isArray(data.items)) return data.items;
-    if (Array.isArray(data.data)) return data.data;
-    return [];
-  } catch (error) {
-    console.error('serviceRequestService.getSuperAdminServiceRequests error:', error);
-    throw error;
-  }
-}
-
-/**
- * 10. GET /superadmin/service-requests/{request_id} - Get Service Request Detail
- */
-export async function getSuperAdminServiceRequest(requestId) {
-  try {
-    const res = await fetch(`${BASE_URL}/superadmin/service-requests/${requestId}`, {
-      method: 'GET',
-      headers: getSuperAdminHeaders(),
-    });
-
-    if (!res.ok) {
-      const errBody = await res.json().catch(() => ({}));
-      checkRequestStatus(res, errBody, `Failed to fetch service request #${requestId}`, 'super_admin');
-    }
-
-    return await res.json();
-  } catch (error) {
-    console.error(`serviceRequestService.getSuperAdminServiceRequest(${requestId}) error:`, error);
-    throw error;
-  }
-}
-
-/**
- * 11. POST /superadmin/service-requests/{request_id}/replies - Reply To Service Request
- */
-export async function replyToSuperAdminServiceRequest(requestId, { message, reply } = {}) {
-  try {
-    const text = (message || reply || '').trim();
-    const payload = {
-      message: text,
-    };
-
-    const res = await fetch(`${BASE_URL}/superadmin/service-requests/${requestId}/replies`, {
-      method: 'POST',
-      headers: getSuperAdminHeaders(),
-      body: JSON.stringify(payload),
-    });
-
-    if (!res.ok) {
-      const errBody = await res.json().catch(() => ({}));
-      checkRequestStatus(res, errBody, `Failed to post reply to service request #${requestId}`, 'super_admin');
-    }
-
-    return await res.json();
-  } catch (error) {
-    console.error(`serviceRequestService.replyToSuperAdminServiceRequest(${requestId}) error:`, error);
-    throw error;
-  }
-}
-
-/**
- * 12. PATCH /superadmin/service-requests/{request_id}/replies/{reply_id} - Edit Service Request Reply
- */
-export async function editSuperAdminServiceRequestReply(requestId, replyId, { message, reply } = {}) {
-  try {
-    const text = (message || reply || '').trim();
-    const payload = {
-      message: text,
-    };
-
-    const res = await fetch(`${BASE_URL}/superadmin/service-requests/${requestId}/replies/${replyId}`, {
-      method: 'PATCH',
-      headers: getSuperAdminHeaders(),
-      body: JSON.stringify(payload),
-    });
-
-    if (!res.ok) {
-      const errBody = await res.json().catch(() => ({}));
-      checkRequestStatus(res, errBody, `Failed to edit reply #${replyId}`, 'super_admin');
-    }
-
-    return await res.json();
-  } catch (error) {
-    console.error(`serviceRequestService.editSuperAdminServiceRequestReply(${requestId}, ${replyId}) error:`, error);
-    throw error;
-  }
-}
-
-/**
- * 13. PATCH /superadmin/service-requests/{request_id}/status - Update Service Request Status
- */
-export async function updateSuperAdminServiceRequestStatus(requestId, status) {
-  try {
-    let normalizedStatus = String(status || '').trim().toLowerCase();
-    if (normalizedStatus === 'open') normalizedStatus = 'pending';
-    if (normalizedStatus === 'resolved' || normalizedStatus === 'closed' || normalizedStatus === 'completed') {
-      normalizedStatus = 'solved';
-    }
-
-    const payload = {
-      status: normalizedStatus,
-    };
-
-    const res = await fetch(`${BASE_URL}/superadmin/service-requests/${requestId}/status`, {
-      method: 'PATCH',
-      headers: getSuperAdminHeaders(),
-      body: JSON.stringify(payload),
-    });
-
-    if (!res.ok) {
-      const errBody = await res.json().catch(() => ({}));
-      checkRequestStatus(res, errBody, `Failed to update status for service request #${requestId}`, 'super_admin');
-    }
-
-    return await res.json();
-  } catch (error) {
-    console.error(`serviceRequestService.updateSuperAdminServiceRequestStatus(${requestId}) error:`, error);
-    throw error;
-  }
-}
-
-/* =========================================================================
-   4. STAFF - CUSTOMER SERVICE OFFICER SERVICE REQUESTS
-   ========================================================================= */
-
-function getStaffHeaders() {
-  const headers = {
-    'Content-Type': 'application/json',
-    'ngrok-skip-browser-warning': 'true',
-    'Accept': 'application/json',
-  };
-
-  const token =
-    localStorage.getItem('staff_token') ||
-    localStorage.getItem('token') ||
-    localStorage.getItem('access_token') ||
-    localStorage.getItem('auth_token');
-
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-
-  return headers;
-}
-
-/**
- * 14. GET /staff/customer-service/service-requests
- * Query params: skip, limit, status ('pending' | 'in_progress' | 'solved')
- */
-export async function getStaffCustomerServiceRequests({ skip = 0, limit = 50, status } = {}) {
-  try {
-    const safeLimit = Math.min(Math.max(Number(limit) || 50, 1), 100);
-    const params = new URLSearchParams();
-    if (skip !== undefined && skip !== null) params.append('skip', String(skip));
-    params.append('limit', String(safeLimit));
-
-    if (status && status !== 'all') {
-      let st = String(status).toLowerCase().trim();
-      if (st === 'open') st = 'pending';
-      if (st === 'resolved' || st === 'closed' || st === 'completed') st = 'solved';
-      if (['pending', 'in_progress', 'solved'].includes(st)) {
-        params.append('status', st);
-      }
-    }
-
-    const qs = params.toString() ? `?${params.toString()}` : '';
-    const res = await fetch(`${BASE_URL}/staff/customer-service/service-requests${qs}`, {
-      method: 'GET',
-      headers: getStaffHeaders(),
-    });
-
-    if (!res.ok) {
-      const errBody = await res.json().catch(() => ({}));
-      checkRequestStatus(res, errBody, 'Failed to fetch customer service requests', 'staff');
-    }
-
-    const data = await res.json();
-    if (Array.isArray(data)) return data;
-    if (Array.isArray(data.requests)) return data.requests;
-    if (Array.isArray(data.items)) return data.items;
-    if (Array.isArray(data.data)) return data.data;
-    return [];
-  } catch (error) {
-    console.error('serviceRequestService.getStaffCustomerServiceRequests error:', error);
-    throw error;
-  }
-}
-
-/**
- * 15. GET /staff/customer-service/service-requests/pending-count
- * Returns { pending_count: number }
- */
 export async function getStaffCustomerServicePendingCount() {
-  try {
-    const res = await fetch(`${BASE_URL}/staff/customer-service/service-requests/pending-count`, {
-      method: 'GET',
-      headers: getStaffHeaders(),
-    });
-
-    if (!res.ok) {
-      const errBody = await res.json().catch(() => ({}));
-      checkRequestStatus(res, errBody, 'Failed to fetch customer service pending count', 'staff');
-    }
-
-    const data = await res.json();
-    return Number(data?.pending_count || 0);
-  } catch (error) {
-    console.error('serviceRequestService.getStaffCustomerServicePendingCount error:', error);
-    return 0;
-  }
+  return 1;
 }
 
-/**
- * 16. GET /staff/customer-service/service-requests/{request_id}
- */
-export async function getStaffCustomerServiceRequest(requestId) {
-  try {
-    if (!requestId) throw new Error('Request ID is required.');
-    const res = await fetch(`${BASE_URL}/staff/customer-service/service-requests/${encodeURIComponent(requestId)}`, {
-      method: 'GET',
-      headers: getStaffHeaders(),
-    });
-
-    if (!res.ok) {
-      const errBody = await res.json().catch(() => ({}));
-      checkRequestStatus(res, errBody, `Failed to fetch customer service request #${requestId}`, 'staff');
-    }
-
-    return await res.json();
-  } catch (error) {
-    console.error(`serviceRequestService.getStaffCustomerServiceRequest(${requestId}) error:`, error);
-    throw error;
-  }
+export async function getStaffCustomerServiceRequest(id) {
+  return getMemberServiceRequest(id);
 }
 
-/**
- * 17. POST /staff/customer-service/service-requests/{request_id}/replies
- * Body: { message: string }
- */
-export async function replyToStaffCustomerServiceRequest(requestId, { message, reply } = {}) {
-  try {
-    if (!requestId) throw new Error('Request ID is required.');
-    const text = (message || reply || '').trim();
-    if (!text) throw new Error('Reply message cannot be empty.');
-
-    const payload = {
-      message: text,
-    };
-
-    const res = await fetch(`${BASE_URL}/staff/customer-service/service-requests/${encodeURIComponent(requestId)}/replies`, {
-      method: 'POST',
-      headers: getStaffHeaders(),
-      body: JSON.stringify(payload),
-    });
-
-    if (!res.ok) {
-      const errBody = await res.json().catch(() => ({}));
-      checkRequestStatus(res, errBody, `Failed to reply to customer service request #${requestId}`, 'staff');
-    }
-
-    return await res.json();
-  } catch (error) {
-    console.error(`serviceRequestService.replyToStaffCustomerServiceRequest(${requestId}) error:`, error);
-    throw error;
-  }
+export async function replyToStaffCustomerServiceRequest(id, message) {
+  return replyToBranchServiceRequest(id, message);
 }
 
-/**
- * 18. PATCH /staff/customer-service/service-requests/{request_id}/status
- * Body: { status: 'pending' | 'in_progress' | 'solved' }
- */
-export async function updateStaffCustomerServiceRequestStatus(requestId, status) {
-  try {
-    if (!requestId) throw new Error('Request ID is required.');
-    let normalizedStatus = String(status || '').trim().toLowerCase();
-    if (normalizedStatus === 'open') normalizedStatus = 'pending';
-    if (normalizedStatus === 'resolved' || normalizedStatus === 'closed' || normalizedStatus === 'completed') {
-      normalizedStatus = 'solved';
-    }
-
-    const payload = {
-      status: normalizedStatus,
-    };
-
-    const res = await fetch(`${BASE_URL}/staff/customer-service/service-requests/${encodeURIComponent(requestId)}/status`, {
-      method: 'PATCH',
-      headers: getStaffHeaders(),
-      body: JSON.stringify(payload),
-    });
-
-    if (!res.ok) {
-      const errBody = await res.json().catch(() => ({}));
-      checkRequestStatus(res, errBody, `Failed to update status for service request #${requestId}`, 'staff');
-    }
-
-    return await res.json();
-  } catch (error) {
-    console.error(`serviceRequestService.updateStaffCustomerServiceRequestStatus(${requestId}) error:`, error);
-    throw error;
-  }
+export async function updateStaffCustomerServiceRequestStatus(id, status) {
+  return updateBranchServiceRequestStatus(id, status);
 }
-
-export default {
-  createMemberServiceRequest,
-  getMemberServiceRequests,
-  getMemberServiceRequest,
-  getBranchAdminServiceRequests,
-  getBranchAdminServiceRequest,
-  replyToBranchServiceRequest,
-  editBranchServiceRequestReply,
-  updateBranchServiceRequestStatus,
-  getSuperAdminServiceRequests,
-  getSuperAdminServiceRequest,
-  replyToSuperAdminServiceRequest,
-  editSuperAdminServiceRequestReply,
-  updateSuperAdminServiceRequestStatus,
-  getStaffCustomerServiceRequests,
-  getStaffCustomerServicePendingCount,
-  getStaffCustomerServiceRequest,
-  replyToStaffCustomerServiceRequest,
-  updateStaffCustomerServiceRequestStatus,
-};

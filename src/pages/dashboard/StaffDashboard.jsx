@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import {
@@ -37,7 +38,9 @@ import {
 import AccountantCashReconciliationView from '../../components/dashboard/AccountantCashReconciliationView';
 import StaffCustomerServiceView from '../../components/dashboard/StaffCustomerServiceView';
 
+
 export default function StaffDashboard() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [staffData, setStaffData] = useState(() => {
     try {
@@ -387,19 +390,19 @@ export default function StaffDashboard() {
             <div className="flex flex-wrap items-center gap-2 mb-3.5">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur-xs text-xs font-semibold border border-teal-200/80 shadow-2xs text-[#0f766e]">
                 <Briefcase className="w-3.5 h-3.5 text-[#00b4a7]" />
-                <span>Role: {formatStaffRole(staffData?.staff_role?.name) || (isCustomerService ? 'Customer Service Officer' : isAccountant ? 'Accountant' : 'Cashier')}</span>
+                <span>{t("dashboardModule.monthlyTargets.roleLabel", "Role:")} {formatStaffRole(staffData?.staff_role?.name) || (isCustomerService ? t("dashboardModule.serviceRequests.customerServiceOfficer", "Customer Service Officer") : isAccountant ? t("accountantProductAccounts.accountant", "Accountant") : t("branchManagerCashReconciliation.cashier", "Cashier"))}</span>
               </div>
 
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur-xs text-xs font-semibold border border-teal-200/80 shadow-2xs text-slate-700">
                 <Building2 className="w-3.5 h-3.5 text-teal-600" />
                 <span>
-                  Branch Code: <span className="font-mono text-teal-800 font-bold">{staffData?.branch?.branch_code ? `#${staffData.branch.branch_code}` : '#Central'}</span>
+                  {t("branchManagerCashTransactions.branchCode", "Branch Code:")} <span className="font-mono text-teal-800 font-bold">{staffData?.branch?.branch_code ? `#${staffData.branch.branch_code}` : t("staffCashOperations.central", "#Central")}</span>
                 </span>
               </div>
 
               <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50/95 backdrop-blur-xs text-xs font-semibold border border-emerald-200 shadow-2xs text-emerald-700">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span>{staffData?.is_active !== false ? 'Active' : 'Inactive'}</span>
+                <span>{staffData?.is_active !== false ? t("common.active", "Active") : t("common.inactive", "Inactive")}</span>
               </div>
             </div>
 
@@ -407,7 +410,7 @@ export default function StaffDashboard() {
             <div className="flex items-center gap-3">
               <span className="w-1.5 h-8 sm:h-9 bg-[#00b4a7] rounded-full flex-shrink-0" />
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
-                <span>Welcome, {formatStaffRole(staffData?.staff_role?.name) || (isCustomerService ? 'Customer Service Officer' : isAccountant ? 'Accountant' : 'Cashier')}</span>
+                <span>{t("common.welcomeBack", "Welcome back")}, {formatStaffRole(staffData?.staff_role?.name) || (isCustomerService ? t("dashboardModule.serviceRequests.customerServiceOfficer", "Customer Service Officer") : isAccountant ? t("accountantProductAccounts.accountant", "Accountant") : t("branchManagerCashReconciliation.cashier", "Cashier"))}</span>
                 <span className="inline-block text-2xl sm:text-3xl">👋</span>
               </h1>
             </div>
@@ -417,15 +420,15 @@ export default function StaffDashboard() {
               {/* Logged in as */}
               <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/90 border border-teal-200/70 shadow-2xs text-xs text-slate-700 backdrop-blur-xs">
                 <User className="w-3.5 h-3.5 text-teal-600" />
-                <span className="text-slate-500 font-medium">Logged in as:</span>
+                <span className="text-slate-500 font-medium">{t("branchManagerCashTransactions.loggedInAs", "Logged in as:")}</span>
                 <span className="text-slate-900 font-bold capitalize">{staffData?.full_name || 'Staff Member'}</span>
               </div>
 
               {/* Staff ID */}
               <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/90 border border-teal-200/70 shadow-2xs text-xs text-slate-700 backdrop-blur-xs">
-                <span className="text-slate-500 font-medium">Staff ID:</span>
+                <span className="text-slate-500 font-medium">{t("staffCashOperations.staffId", "Staff ID:")}</span>
                 <span className="font-mono font-bold text-teal-800 bg-teal-50 px-1.5 py-0.5 rounded border border-teal-200/60">
-                  {staffData?.staff_code || (staffData?.staff_id ? `STF-${staffData.staff_id}` : 'STF-01')}
+                  {staffData?.staff_code || (staffData?.staff_id ? `STF-${staffData.staff_id}` : t("staffCashOperations.stf01", "STF-01"))}
                 </span>
               </div>
 
@@ -433,7 +436,7 @@ export default function StaffDashboard() {
               {staffData?.email && (
                 <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/90 border border-teal-200/70 shadow-2xs text-xs text-slate-700 backdrop-blur-xs">
                   <Mail className="w-3.5 h-3.5 text-teal-600" />
-                  <span className="text-slate-500 font-medium">Email:</span>
+                  <span className="text-slate-500 font-medium">{t("memberDashboard.email", "Email:")}</span>
                   <span className="text-slate-900 font-bold">{staffData.email}</span>
                 </div>
               )}
@@ -441,7 +444,7 @@ export default function StaffDashboard() {
               {/* Branch Name */}
               <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/90 border border-teal-200/70 shadow-2xs text-xs text-slate-700 backdrop-blur-xs">
                 <Building2 className="w-3.5 h-3.5 text-teal-600" />
-                <span className="text-slate-500 font-medium">Branch Name:</span>
+                <span className="text-slate-500 font-medium">{t("branchManagerDashboard.branchName", "Branch Name:")}</span>
                 <span className="text-slate-900 font-bold">{staffData?.branch?.name || 'Society Branch'}</span>
               </div>
 
@@ -449,7 +452,7 @@ export default function StaffDashboard() {
               {(staffData?.branch?.city || staffData?.branch?.state) && (
                 <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/90 border border-teal-200/70 shadow-2xs text-xs text-slate-700 backdrop-blur-xs">
                   <MapPin className="w-3.5 h-3.5 text-emerald-600" />
-                  <span className="text-slate-500 font-medium">Location:</span>
+                  <span className="text-slate-500 font-medium">{t("branchManagerCashTransactions.location", "Location:")}</span>
                   <span className="text-slate-800 font-semibold capitalize">
                     {[staffData.branch.city, staffData.branch.state].filter(Boolean).join(', ')}
                   </span>
@@ -460,7 +463,7 @@ export default function StaffDashboard() {
               {staffData?.branch?.ifsc_code && (
                 <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/90 border border-teal-200/70 shadow-2xs text-xs text-slate-700 backdrop-blur-xs">
                   <Landmark className="w-3.5 h-3.5 text-teal-600" />
-                  <span className="text-slate-500 font-medium">IFSC:</span>
+                  <span className="text-slate-500 font-medium">{t("staffCashOperations.ifsc", "IFSC:")}</span>
                   <span className="font-mono font-bold text-teal-800">{staffData.branch.ifsc_code}</span>
                 </div>
               )}
@@ -471,7 +474,7 @@ export default function StaffDashboard() {
           <div className="relative z-10 my-[-10px] sm:my-[-20px] lg:my-[-30px] flex justify-end pointer-events-none">
             <img
               src={friendlyCashierIllustration}
-              alt="Friendly Cashier Counter Setup"
+              alt={t("staffDashboard.friendlyCashierCounterSetup", "Friendly Cashier Counter Setup")}
               className="h-44 sm:h-52 lg:h-64 w-auto object-contain drop-shadow-md select-none"
             />
           </div>
@@ -485,7 +488,7 @@ export default function StaffDashboard() {
         {loading && (
           <div className="p-16 text-center space-y-3 bg-white rounded-3xl border border-slate-100 shadow-xs">
             <Loader2 className="w-8 h-8 text-[#00b4a7] animate-spin mx-auto" />
-            <p className="text-xs text-slate-500 font-medium">Loading your staff profile and operational hub...</p>
+            <p className="text-xs text-slate-500 font-medium">{t("staffDashboard.loadingYourStaffProfileAnd", "Loading your staff profile and operational hub...")}</p>
           </div>
         )}
 
@@ -500,7 +503,7 @@ export default function StaffDashboard() {
               onClick={() => fetchStaffProfile()}
               className="font-bold underline text-amber-900 hover:text-amber-700 cursor-pointer"
             >
-              Retry
+              {t("common.retry", "Retry")}
             </button>
           </div>
         )}
@@ -512,17 +515,17 @@ export default function StaffDashboard() {
             <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/80 shadow-xs hover:border-teal-300 transition-all">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                  Assigned Designation
+                  {t("staffDashboard.assignedDesignation", "Assigned Designation")}
                 </span>
                 <div className="w-10 h-10 rounded-2xl bg-teal-50 text-[#00b4a7] flex items-center justify-center">
                   <Briefcase className="w-5 h-5" />
                 </div>
               </div>
               <h3 className="text-lg sm:text-xl font-black text-slate-900 truncate">
-                {formatStaffRole(staffData.staff_role?.name) || (isCustomerService ? 'Customer Service Officer' : isAccountant ? 'Accountant' : 'Cashier')}
+                {formatStaffRole(staffData.staff_role?.name) || (isCustomerService ? t("dashboardModule.serviceRequests.customerServiceOfficer", "Customer Service Officer") : isAccountant ? t("accountantProductAccounts.accountant", "Accountant") : t("branchManagerCashReconciliation.cashier", "Cashier"))}
               </h3>
               <p className="text-xs text-slate-500 mt-1 font-mono">
-                Staff ID: {staffData.staff_code || `STF-${staffData.staff_id}`}
+                {t("staffCashOperations.staffId", "Staff ID:")} {staffData.staff_code || `STF-${staffData.staff_id}`}
               </p>
             </div>
 
@@ -530,7 +533,7 @@ export default function StaffDashboard() {
             <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/80 shadow-xs hover:border-teal-300 transition-all">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                  Branch Hub
+                  {t("dashboardModule.serviceRequests.defaultBranchName", "Branch Hub")}
                 </span>
                 <div className="w-10 h-10 rounded-2xl bg-teal-50 text-[#00b4a7] flex items-center justify-center">
                   <Building2 className="w-5 h-5" />
@@ -540,7 +543,7 @@ export default function StaffDashboard() {
                 {staffData.branch?.name || 'Main Branch'}
               </h3>
               <p className="text-xs text-slate-500 mt-1 font-mono">
-                Branch Code: {staffData.branch?.branch_code || '—'}
+                {t("branchManagerCashTransactions.branchCode", "Branch Code:")} {staffData.branch?.branch_code || '—'}
               </p>
             </div>
 
@@ -548,7 +551,7 @@ export default function StaffDashboard() {
             <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/80 shadow-xs hover:border-teal-300 transition-all">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                  Branch IFSC
+                  {t("modal.member.branchIfsc", "Branch IFSC")}
                 </span>
                 <div className="w-10 h-10 rounded-2xl bg-teal-50 text-[#00b4a7] flex items-center justify-center">
                   <Landmark className="w-5 h-5" />
@@ -558,7 +561,7 @@ export default function StaffDashboard() {
                 {staffData.branch?.ifsc_code || '—'}
               </h3>
               <p className="text-xs text-slate-500 mt-1">
-                {staffData.branch?.city ? `${staffData.branch.city}, ${staffData.branch.state}` : 'Society Clearing'}
+                {staffData.branch?.city ? `${staffData.branch.city}, ${staffData.branch.state}` : t("staffDashboard.societyClearing", "Society Clearing")}
               </p>
             </div>
 
@@ -566,7 +569,7 @@ export default function StaffDashboard() {
             <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/80 shadow-xs hover:border-teal-300 transition-all">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                  Portal Status
+                  {t("staffDashboard.portalStatus", "Portal Status")}
                 </span>
                 <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
                   <ShieldCheck className="w-5 h-5" />
@@ -574,10 +577,10 @@ export default function StaffDashboard() {
               </div>
               <h3 className="text-lg sm:text-xl font-black text-emerald-700 capitalize flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                <span>{staffData.is_active !== false ? 'Active' : 'Inactive'}</span>
+                <span>{staffData.is_active !== false ? t("common.active", "Active") : t("common.inactive", "Inactive")}</span>
               </h3>
               <p className="text-xs text-slate-500 mt-1">
-                Role: {staffData.account_role || 'Staff User'}
+                {t("dashboardModule.monthlyTargets.roleLabel", "Role:")} {staffData.account_role || 'Staff User'}
               </p>
             </div>
           </div>
@@ -610,10 +613,10 @@ export default function StaffDashboard() {
                 </div>
                 <div>
                   <h3 className="font-serif font-black text-slate-900 text-lg sm:text-xl">
-                    Cashier Counter &amp; Cash Operations
+                    {t("staffCashOperations.cashierCounterCashOperations", "Cashier Counter & Cash Operations")}
                   </h3>
                   <p className="text-xs text-slate-500 font-medium">
-                    Look up member savings account to record counter cash deposits &amp; withdrawals
+                    {t("staffDashboard.lookUpMemberSavingsAccount", "Look up member savings account to record counter cash deposits & withdrawals")}
                   </p>
                 </div>
               </div>
@@ -621,7 +624,7 @@ export default function StaffDashboard() {
               <div className="flex items-center gap-2">
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-50 text-[#0f766e] font-semibold text-xs border border-teal-200/80 shadow-2xs">
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span>Counter Desk Ready</span>
+                  <span>{t("staffDashboard.counterDeskReady", "Counter Desk Ready")}</span>
                 </span>
               </div>
             </div>
@@ -635,7 +638,7 @@ export default function StaffDashboard() {
                 {/* Verify Member Account */}
                 <div>
                   <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                    Verify Member Account
+                    {t("staffCashOperations.verifyMemberAccount", "Verify Member Account")}
                   </label>
                   <form onSubmit={handleLookupAccount} className="flex gap-2">
                     <div className="relative flex-1">
@@ -649,7 +652,7 @@ export default function StaffDashboard() {
                           setAccountLookupNumber(e.target.value);
                           setLookupError(null);
                         }}
-                        placeholder="Enter 16-digit Account Number (e.g. 9021178522884104)..."
+                        placeholder={t("staffCashOperations.enter16DigitAccountNumber", "Enter 16-digit Account Number (e.g. 9021178522884104)...")}
                         className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-mono text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#00b4a7] focus:bg-white transition-all shadow-2xs"
                       />
                     </div>
@@ -661,12 +664,12 @@ export default function StaffDashboard() {
                       {lookupLoading ? (
                         <>
                           <Loader2 className="w-4 h-4 animate-spin" />
-                          <span>Verifying...</span>
+                          <span>{t("staffCashOperations.verifying", "Verifying...")}</span>
                         </>
                       ) : (
                         <>
                           <ShieldCheck className="w-4 h-4" />
-                          <span>Verify Account</span>
+                          <span>{t("staffCashOperations.verifyAccount", "Verify Account")}</span>
                         </>
                       )}
                     </button>
@@ -688,12 +691,12 @@ export default function StaffDashboard() {
                       <CheckCircle2 className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
                       <div>
                         <p className="font-extrabold text-emerald-900 text-sm leading-tight">
-                          {txSuccess.type} Processed Successfully!
+                          {txSuccess.type} {t("staffCashOperations.processedSuccessfully", "Processed Successfully!")}
                         </p>
                         <p className="mt-1 text-emerald-700">{txSuccess.message}</p>
                         {txSuccess.data?.receipt_number && (
                           <p className="mt-1 font-mono text-[11px] text-emerald-900">
-                            Receipt: <strong>{txSuccess.data.receipt_number}</strong>
+                            {t("staffCashOperations.receipt", "Receipt:")} <strong>{txSuccess.data.receipt_number}</strong>
                           </p>
                         )}
                       </div>
@@ -726,14 +729,14 @@ export default function StaffDashboard() {
                 <div className="p-4 sm:p-5 rounded-2xl bg-slate-50/70 border border-slate-200/80 space-y-4">
                   <div className="flex items-center justify-between">
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                      Step 2: Transaction Details
+                      {t("staffCashOperations.step2TransactionDetails", "Step 2: Transaction Details")}
                     </label>
-                    <span className="text-[11px] text-slate-400 font-medium">Cash Desk Execution</span>
+                    <span className="text-[11px] text-slate-400 font-medium">{t("staffCashOperations.cashDeskExecution", "Cash Desk Execution")}</span>
                   </div>
 
                   <div>
                     <span className="text-slate-600 text-xs font-semibold block mb-1.5">
-                      Transaction Amount (₹) <span className="text-rose-500">*</span>
+                      {t("staffCashOperations.transactionAmount", "Transaction Amount (₹)")} <span className="text-rose-500">*</span>
                     </span>
                     <div className="relative">
                       <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none font-bold text-slate-400 text-sm">
@@ -748,14 +751,14 @@ export default function StaffDashboard() {
                           setTxAmount(e.target.value);
                           setTxError(null);
                         }}
-                        placeholder="Enter amount (e.g. 500.00)"
+                        placeholder={t("staffCashOperations.enterAmountEG500", "Enter amount (e.g. 500.00)")}
                         className="w-full pl-8 pr-4 py-2.5 bg-white border border-slate-300 rounded-xl text-sm font-bold text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#00b4a7] focus:ring-2 focus:ring-teal-100 transition-all shadow-xs"
                       />
                     </div>
 
                     {/* Quick Amount Buttons */}
                     <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                      <span className="text-[11px] text-slate-400 font-medium mr-1">Quick:</span>
+                      <span className="text-[11px] text-slate-400 font-medium mr-1">{t("staffCashOperations.quick", "Quick:")}</span>
                       {[100, 500, 1000, 2000, 5000].map((amt) => (
                         <button
                           key={amt}
@@ -771,13 +774,13 @@ export default function StaffDashboard() {
 
                   <div>
                     <span className="text-slate-600 text-xs font-semibold block mb-1.5">
-                      Cashier Notes / Reference (Optional)
+                      {t("staffCashOperations.cashierNotesReferenceOptional", "Cashier Notes / Reference (Optional)")}
                     </span>
                     <input
                       type="text"
                       value={txNotes}
                       onChange={(e) => setTxNotes(e.target.value)}
-                      placeholder="e.g. Counter Cash Deposit / Member Passbook entry"
+                      placeholder={t("staffCashOperations.eGCounterCashDeposit", "e.g. Counter Cash Deposit / Member Passbook entry")}
                       className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#00b4a7] transition-all shadow-xs"
                     />
                   </div>
@@ -793,12 +796,12 @@ export default function StaffDashboard() {
                       {txLoading === 'deposit' ? (
                         <>
                           <Loader2 className="w-4 h-4 animate-spin" />
-                          <span>Processing Deposit...</span>
+                          <span>{t("staffCashOperations.processingDeposit", "Processing Deposit...")}</span>
                         </>
                       ) : (
                         <>
                           <ArrowDownLeft className="w-4 h-4" />
-                          <span>Record Cash Deposit</span>
+                          <span>{t("staffCashOperations.recordCashDeposit", "Record Cash Deposit")}</span>
                         </>
                       )}
                     </button>
@@ -812,19 +815,19 @@ export default function StaffDashboard() {
                       {txLoading === 'withdrawal' ? (
                         <>
                           <Loader2 className="w-4 h-4 animate-spin" />
-                          <span>Processing Withdrawal...</span>
+                          <span>{t("staffCashOperations.processingWithdrawal", "Processing Withdrawal...")}</span>
                         </>
                       ) : (
                         <>
                           <ArrowUpRight className="w-4 h-4" />
-                          <span>Record Cash Withdrawal</span>
+                          <span>{t("staffCashOperations.recordCashWithdrawal", "Record Cash Withdrawal")}</span>
                         </>
                       )}
                     </button>
                   </div>
                   {!accountDetails && (
                     <p className="text-[11px] text-amber-700 text-center font-medium">
-                      ⚠️ Please verify an account first to enable cash deposit / withdrawal buttons.
+                      {t("staffCashOperations.pleaseVerifyAnAccountFirst", "⚠️ Please verify an account first to enable cash deposit / withdrawal buttons.")}
                     </p>
                   )}
                 </div>
@@ -839,38 +842,38 @@ export default function StaffDashboard() {
                       {/* Top Bar */}
                       <div className="flex items-center justify-between">
                         <span className="text-[10px] font-bold text-[#0f766e] uppercase tracking-wider">
-                          Verified Member Account
+                          {t("staffCashOperations.verifiedMemberAccount", "Verified Member Account")}
                         </span>
                         <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
                           <Check className="w-3 h-3 text-emerald-600" />
-                          <span>Confirmed</span>
+                          <span>{t("staffCashOperations.confirmed", "Confirmed")}</span>
                         </span>
                       </div>
 
                       {/* Big Balance Box */}
                       <div className="p-4 rounded-2xl bg-white border border-teal-200/70 shadow-xs">
                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                          Current Available Balance
+                          {t("staffCashOperations.currentAvailableBalance", "Current Available Balance")}
                         </span>
                         <p className="text-2xl sm:text-3xl font-black text-slate-900 mt-0.5 font-sans">
                           {formatCurrency(accountDetails.balance ?? accountDetails.current_balance ?? 0)}
                         </p>
                         <p className="text-xs font-mono font-bold text-teal-800 mt-1">
-                          Account Number: {accountDetails.account_number || accountLookupNumber}
+                          {t("staffCashOperations.accountNumber", "Account Number:")} {accountDetails.account_number || accountLookupNumber}
                         </p>
                       </div>
 
                       {/* Account Meta Grid */}
                       <div className="space-y-2.5 text-xs">
                         <div className="p-3 rounded-xl bg-white border border-slate-100 flex items-center justify-between">
-                          <span className="text-slate-400 font-medium">Account Holder:</span>
+                          <span className="text-slate-400 font-medium">{t("staffCashOperations.accountHolder", "Account Holder:")}</span>
                           <span className="font-extrabold text-slate-900">
                             {accountDetails.account_holder_name || accountDetails.member_name || accountDetails.full_name || 'Member'}
                           </span>
                         </div>
 
                         <div className="p-3 rounded-xl bg-white border border-slate-100 flex items-center justify-between">
-                          <span className="text-slate-400 font-medium">Savings Scheme:</span>
+                          <span className="text-slate-400 font-medium">{t("staffCashOperations.savingsScheme", "Savings Scheme:")}</span>
                           <span className="font-bold text-teal-900">
                             {accountDetails.scheme_name || accountDetails.scheme?.name || 'Regular Savings Deposit'}
                           </span>
@@ -878,29 +881,29 @@ export default function StaffDashboard() {
 
                         {accountDetails.member_code && (
                           <div className="p-3 rounded-xl bg-white border border-slate-100 flex items-center justify-between">
-                            <span className="text-slate-400 font-medium">Member Code:</span>
+                            <span className="text-slate-400 font-medium">{t("modal.nominee.memberCode", "Member Code:")}</span>
                             <span className="font-mono font-bold text-slate-800">{accountDetails.member_code}</span>
                           </div>
                         )}
 
                         {accountDetails.branch_name && (
                           <div className="p-3 rounded-xl bg-white border border-slate-100 flex items-center justify-between">
-                            <span className="text-slate-400 font-medium">Operating Branch:</span>
+                            <span className="text-slate-400 font-medium">{t("staffCashOperations.operatingBranch", "Operating Branch:")}</span>
                             <span className="font-semibold text-slate-800">{accountDetails.branch_name}</span>
                           </div>
                         )}
 
                         <div className="p-3 rounded-xl bg-white border border-slate-100 grid grid-cols-2 gap-2 text-center">
                           <div className="p-2 rounded-lg bg-emerald-50/70 border border-emerald-100">
-                            <span className="text-[10px] text-slate-500 font-medium block">Deposits</span>
+                            <span className="text-[10px] text-slate-500 font-medium block">{t("dashboardModule.accountTransactions.filterDeposits", "Deposits")}</span>
                             <span className="text-xs font-bold text-emerald-700">
-                              {accountDetails.deposits_allowed !== false ? '✓ Allowed' : '✗ Restricted'}
+                              {accountDetails.deposits_allowed !== false ? t("staffCashOperations.allowed", "✓ Allowed") : t("staffCashOperations.restricted", "✗ Restricted")}
                             </span>
                           </div>
                           <div className="p-2 rounded-lg bg-teal-50/70 border border-teal-100">
-                            <span className="text-[10px] text-slate-500 font-medium block">Withdrawals</span>
+                            <span className="text-[10px] text-slate-500 font-medium block">{t("dashboardModule.accountTransactions.filterWithdrawals", "Withdrawals")}</span>
                             <span className="text-xs font-bold text-teal-700">
-                              {accountDetails.withdrawals_allowed !== false ? '✓ Allowed' : '✗ Restricted'}
+                              {accountDetails.withdrawals_allowed !== false ? t("staffCashOperations.allowed", "✓ Allowed") : t("staffCashOperations.restricted", "✗ Restricted")}
                             </span>
                           </div>
                         </div>
@@ -915,7 +918,7 @@ export default function StaffDashboard() {
                           }}
                           className="text-xs text-slate-400 hover:text-slate-600 underline font-medium cursor-pointer"
                         >
-                          Clear &amp; Verify Different Account
+                          {t("staffCashOperations.clearVerifyDifferentAccount", "Clear & Verify Different Account")}
                         </button>
                       </div>
                     </div>
@@ -925,10 +928,10 @@ export default function StaffDashboard() {
                         <Landmark className="w-7 h-7" />
                       </div>
                       <h4 className="text-sm font-bold text-slate-800">
-                        Awaiting Account Verification
+                        {t("staffCashOperations.awaitingAccountVerification", "Awaiting Account Verification")}
                       </h4>
                       <p className="text-xs text-slate-500 max-w-xs mx-auto leading-relaxed">
-                        Enter the member's 16-digit account number on the left and click <strong>Verify Account</strong> to inspect balance, scheme, and status before processing cash.
+                        {t("staffCashOperations.enterTheMemberS16", "Enter the member's 16-digit account number on the left and click")} <strong>{t("staffCashOperations.verifyAccount", "Verify Account")}</strong> {t("staffCashOperations.toInspectBalanceSchemeAnd", "to inspect balance, scheme, and status before processing cash.")}
                       </p>
                     </div>
                   )}
@@ -948,13 +951,13 @@ export default function StaffDashboard() {
             <div className="p-5 sm:p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <h3 className="font-serif font-black text-slate-900 text-lg sm:text-xl flex items-center gap-2">
-                  <span>My Cash Transactions</span>
+                  <span>{t("staffCashOperations.myCashTransactions", "My Cash Transactions")}</span>
                   <span className="text-xs font-bold text-teal-800 bg-teal-50 px-2.5 py-0.5 rounded-full border border-teal-200">
                     {filteredTransactions.length}
                   </span>
                 </h3>
                 <p className="text-xs text-slate-500 font-medium mt-0.5">
-                  Real-time record of all cash deposits and withdrawals handled at your counter.
+                  {t("staffCashOperations.realTimeRecordOfAll", "Real-time record of all cash deposits and withdrawals handled at your counter.")}
                 </p>
               </div>
 
@@ -965,10 +968,10 @@ export default function StaffDashboard() {
                   onClick={loadTransactions}
                   disabled={loadingTransactions}
                   className="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 shadow-2xs text-xs font-bold text-slate-700 hover:text-slate-900 transition-all cursor-pointer disabled:opacity-50 flex items-center gap-2 active:scale-95"
-                  title="Refresh Cashier Transactions Ledger"
+                  title={t("staffCashOperations.refreshCashierTransactionsLedger", "Refresh Cashier Transactions Ledger")}
                 >
                   <RefreshCw className={`w-3.5 h-3.5 text-[#00b4a7] ${loadingTransactions ? 'animate-spin' : ''}`} />
-                  <span>{loadingTransactions ? 'Refreshing...' : 'Refresh'}</span>
+                  <span>{loadingTransactions ? t("dashboardModule.branchOverview.refreshing", "Refreshing...") : t("common.refresh", "Refresh")}</span>
                 </button>
               </div>
             </div>
@@ -986,7 +989,7 @@ export default function StaffDashboard() {
                       : 'text-slate-500 hover:text-slate-800'
                   }`}
                 >
-                  All
+                  {t("dashboardModule.accountTransactions.filterAll", "All")}
                 </button>
                 <button
                   type="button"
@@ -997,7 +1000,7 @@ export default function StaffDashboard() {
                       : 'text-slate-500 hover:text-slate-800'
                   }`}
                 >
-                  Deposits
+                  {t("dashboardModule.accountTransactions.filterDeposits", "Deposits")}
                 </button>
                 <button
                   type="button"
@@ -1008,7 +1011,7 @@ export default function StaffDashboard() {
                       : 'text-slate-500 hover:text-slate-800'
                   }`}
                 >
-                  Withdrawals
+                  {t("dashboardModule.accountTransactions.filterWithdrawals", "Withdrawals")}
                 </button>
               </div>
 
@@ -1019,28 +1022,28 @@ export default function StaffDashboard() {
                   {/* FROM Box */}
                   <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-slate-200 shadow-2xs hover:border-teal-400 focus-within:border-teal-500 focus-within:ring-2 focus-within:ring-teal-100 transition-all">
                     <span className="text-[10px] font-black uppercase tracking-wider text-teal-800 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-200 select-none">
-                      From
+                      {t("dashboardModule.accountTransactions.from", "From")}
                     </span>
                     <input
                       type="date"
                       value={fromDate}
                       onChange={(e) => setFromDate(e.target.value)}
                       className="text-xs text-slate-800 font-bold focus:outline-none bg-transparent cursor-pointer"
-                      title="Filter transactions starting from this date"
+                      title={t("dashboardModule.accountTransactions.fromDateTitle", "Filter transactions starting from this date")}
                     />
                   </div>
 
                   {/* TO Box */}
                   <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-slate-200 shadow-2xs hover:border-teal-400 focus-within:border-teal-500 focus-within:ring-2 focus-within:ring-teal-100 transition-all">
                     <span className="text-[10px] font-black uppercase tracking-wider text-teal-800 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-200 select-none">
-                      To
+                      {t("dashboardModule.accountTransactions.to", "To")}
                     </span>
                     <input
                       type="date"
                       value={toDate}
                       onChange={(e) => setToDate(e.target.value)}
                       className="text-xs text-slate-800 font-bold focus:outline-none bg-transparent cursor-pointer"
-                      title="Filter transactions up to this date"
+                      title={t("dashboardModule.accountTransactions.toDateTitle", "Filter transactions up to this date")}
                     />
                   </div>
 
@@ -1053,10 +1056,10 @@ export default function StaffDashboard() {
                         setToDate('');
                       }}
                       className="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 text-xs font-bold transition-all cursor-pointer flex items-center gap-1 shadow-2xs border border-slate-200"
-                      title="Clear Date Filter"
+                      title={t("branchManagerCashReconciliation.clearDateFilter", "Clear Date Filter")}
                     >
                       <X className="w-3.5 h-3.5 text-slate-500" />
-                      <span className="text-[11px]">Clear</span>
+                      <span className="text-[11px]">{t("dashboardModule.emergency.clear", "Clear")}</span>
                     </button>
                   )}
                 </div>
@@ -1068,7 +1071,7 @@ export default function StaffDashboard() {
                     type="text"
                     value={txSearch}
                     onChange={(e) => setTxSearch(e.target.value)}
-                    placeholder="Search account, ref..."
+                    placeholder={t("staffCashOperations.searchAccountRef", "Search account, ref...")}
                     className="w-full sm:w-48 pl-8 pr-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#00b4a7] focus:ring-2 focus:ring-teal-100 shadow-2xs transition-all"
                   />
                 </div>
@@ -1080,20 +1083,20 @@ export default function StaffDashboard() {
               <table className="w-full text-left border-collapse text-xs whitespace-nowrap">
                 <thead>
                   <tr className="bg-slate-50 border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                    <th className="py-3.5 px-4 sm:px-6">Receipt Number</th>
-                    <th className="py-3.5 px-4">Account Number</th>
-                    <th className="py-3.5 px-4">Member Name</th>
-                    <th className="py-3.5 px-4">Transaction Type</th>
-                    <th className="py-3.5 px-4">Amount</th>
-                    <th className="py-3.5 px-4">Balance Before</th>
-                    <th className="py-3.5 px-4">Balance After</th>
-                    <th className="py-3.5 px-4">Branch Name</th>
-                    <th className="py-3.5 px-4">Branch Code</th>
-                    <th className="py-3.5 px-4">IFSC Code</th>
-                    <th className="py-3.5 px-4">Cashier Code</th>
-                    <th className="py-3.5 px-4">Cashier Name</th>
-                    <th className="py-3.5 px-4">Date &amp; Time</th>
-                    <th className="py-3.5 px-4 sm:px-6">Notes</th>
+                    <th className="py-3.5 px-4 sm:px-6">{t("dashboardModule.accountTransactions.colReceiptNumber", "Receipt Number")}</th>
+                    <th className="py-3.5 px-4">{t("dashboard.accountNumber", "Account Number")}</th>
+                    <th className="py-3.5 px-4">{t("dashboardModule.productAccounts.memberName", "Member Name")}</th>
+                    <th className="py-3.5 px-4">{t("dashboardModule.accountTransactions.colTransactionType", "Transaction Type")}</th>
+                    <th className="py-3.5 px-4">{t("dashboardModule.accountTransactions.colAmount", "Amount")}</th>
+                    <th className="py-3.5 px-4">{t("dashboardModule.accountTransactions.colBalanceBefore", "Balance Before")}</th>
+                    <th className="py-3.5 px-4">{t("dashboardModule.accountTransactions.colBalanceAfter", "Balance After")}</th>
+                    <th className="py-3.5 px-4">{t("dashboardModule.accountTransactions.colBranchName", "Branch Name")}</th>
+                    <th className="py-3.5 px-4">{t("dashboardModule.accountTransactions.colBranchCode", "Branch Code")}</th>
+                    <th className="py-3.5 px-4">{t("dashboardModule.accountTransactions.colIfscCode", "IFSC Code")}</th>
+                    <th className="py-3.5 px-4">{t("dashboardModule.accountTransactions.colCashierCode", "Cashier Code")}</th>
+                    <th className="py-3.5 px-4">{t("dashboardModule.accountTransactions.colCashierName", "Cashier Name")}</th>
+                    <th className="py-3.5 px-4">{t("dashboardModule.accountTransactions.colDateTime", "Date & Time")}</th>
+                    <th className="py-3.5 px-4 sm:px-6">{t("dashboardModule.accountTransactions.colNotes", "Notes")}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -1101,27 +1104,28 @@ export default function StaffDashboard() {
                     <tr>
                       <td colSpan={14} className="py-12 text-center text-slate-400">
                         <Loader2 className="w-6 h-6 animate-spin text-[#00b4a7] mx-auto mb-2" />
-                        <span>Loading cashier transactions...</span>
+                        <span>{t("staffCashOperations.loadingCashierTransactions", "Loading cashier transactions...")}</span>
                       </td>
                     </tr>
                   ) : cashTransactions.length === 0 ? (
                     <tr>
                       <td colSpan={14} className="py-12 text-center text-slate-400">
                         <Receipt className="w-8 h-8 mx-auto mb-2 text-slate-300" />
-                        <p className="font-semibold text-slate-600">No cash transactions recorded yet</p>
-                        <p className="text-[11px] mt-0.5">Use the Counter Desk above to execute your first cash deposit or withdrawal.</p>
+                        <p className="font-semibold text-slate-600">{t("staffCashOperations.noCashTransactionsRecordedYet", "No cash transactions recorded yet")}</p>
+                        <p className="text-[11px] mt-0.5">{t("staffCashOperations.useTheCounterDeskAbove", "Use the Counter Desk above to execute your first cash deposit or withdrawal.")}</p>
                       </td>
                     </tr>
                   ) : filteredTransactions.length === 0 ? (
                     <tr>
                       <td colSpan={14} className="py-12 text-center text-slate-400">
                         <Receipt className="w-8 h-8 mx-auto mb-2 text-slate-300" />
-                        <p className="font-semibold text-slate-600">No cash transactions match the selected filters</p>
-                        <p className="text-[11px] mt-0.5">Try clearing date ranges or resetting search terms.</p>
+                        <p className="font-semibold text-slate-600">{t("staffCashOperations.noCashTransactionsMatchThe", "No cash transactions match the selected filters")}</p>
+                        <p className="text-[11px] mt-0.5">{t("staffCashOperations.tryClearingDateRangesOr", "Try clearing date ranges or resetting search terms.")}</p>
                       </td>
                     </tr>
                   ) : (
                     filteredTransactions.map((tx, idx) => {
+  const { t } = useTranslation();
                         const isDeposit = String(tx.transaction_type || tx.type || '').toLowerCase().includes('deposit') ||
                                           String(tx.transaction_type || tx.type || '').toLowerCase().includes('credit');
                         return (
@@ -1135,7 +1139,7 @@ export default function StaffDashboard() {
                             <td className="py-3.5 px-4 font-semibold text-slate-900">
                               <div>{tx.member_name || '—'}</div>
                               {tx.member_code && (
-                                <div className="text-[10px] font-mono text-slate-400 font-normal">Code: {tx.member_code}</div>
+                                <div className="text-[10px] font-mono text-slate-400 font-normal">{t("dashboardModule.productAccounts.codeLabel", "Code:")} {tx.member_code}</div>
                               )}
                             </td>
                             <td className="py-3.5 px-4">
@@ -1151,7 +1155,7 @@ export default function StaffDashboard() {
                                 ) : (
                                   <ArrowUpRight className="w-3 h-3 text-rose-600" />
                                 )}
-                                <span>{isDeposit ? 'Deposit' : 'Withdrawal'}</span>
+                                <span>{isDeposit ? t("dashboardModule.accountTransactions.deposit", "Deposit") : t("dashboardModule.accountTransactions.withdrawal", "Withdrawal")}</span>
                               </span>
                             </td>
                             <td className="py-3.5 px-4 font-bold text-slate-900 text-sm">
@@ -1206,10 +1210,10 @@ export default function StaffDashboard() {
                 </div>
                 <div>
                   <h3 className="font-serif font-bold text-slate-900 text-base sm:text-lg">
-                    Staff Identification &amp; Credentials
+                    {t("staffDashboard.staffIdentificationCredentials", "Staff Identification & Credentials")}
                   </h3>
                   <p className="text-xs text-slate-500 font-medium">
-                    Verified personnel profile details.
+                    {t("staffDashboard.verifiedPersonnelProfileDetails", "Verified personnel profile details.")}
                   </p>
                 </div>
               </div>
@@ -1218,7 +1222,7 @@ export default function StaffDashboard() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="p-3.5 rounded-2xl bg-slate-50/70 border border-slate-100">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                      Full Legal Name
+                      {t("memberProfile.fullLegalName", "Full Legal Name")}
                     </span>
                     <p className="text-sm font-extrabold text-slate-900 mt-0.5">
                       {staffData.full_name || '—'}
@@ -1227,7 +1231,7 @@ export default function StaffDashboard() {
 
                   <div className="p-3.5 rounded-2xl bg-slate-50/70 border border-slate-100">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                      Staff ID / Code
+                      {t("staffDashboard.staffIdCode", "Staff ID / Code")}
                     </span>
                     <p className="text-sm font-mono font-bold text-teal-800 mt-0.5">
                       {staffData.staff_code || `STF-${staffData.staff_id}`}
@@ -1236,7 +1240,7 @@ export default function StaffDashboard() {
 
                   <div className="p-3.5 rounded-2xl bg-slate-50/70 border border-slate-100">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                      Email Address
+                      {t("modal.member.emailAddress", "Email Address")}
                     </span>
                     <p className="text-sm font-medium text-slate-800 mt-0.5 truncate" title={staffData.email}>
                       {staffData.email || '—'}
@@ -1245,7 +1249,7 @@ export default function StaffDashboard() {
 
                   <div className="p-3.5 rounded-2xl bg-slate-50/70 border border-slate-100">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                      Contact Mobile
+                      {t("staffDashboard.contactMobile", "Contact Mobile")}
                     </span>
                     <p className="text-sm font-mono font-bold text-slate-800 mt-0.5">
                       {staffData.contact_number || '—'}
@@ -1254,7 +1258,7 @@ export default function StaffDashboard() {
 
                   <div className="p-3.5 rounded-2xl bg-slate-50/70 border border-slate-100">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                      Operational Designation
+                      {t("staffDashboard.operationalDesignation", "Operational Designation")}
                     </span>
                     <p className="text-sm font-bold text-teal-900 mt-0.5">
                       {staffData.staff_role?.name || 'Branch Staff'}
@@ -1263,7 +1267,7 @@ export default function StaffDashboard() {
 
                   <div className="p-3.5 rounded-2xl bg-slate-50/70 border border-slate-100">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                      Authorization Role
+                      {t("staffDashboard.authorizationRole", "Authorization Role")}
                     </span>
                     <p className="text-sm font-bold text-slate-800 mt-0.5 capitalize">
                       {staffData.account_role || 'Staff'}
@@ -1274,7 +1278,7 @@ export default function StaffDashboard() {
                 {staffData.staff_role?.description && (
                   <div className="p-3.5 rounded-2xl bg-teal-50/50 border border-teal-100">
                     <span className="text-[10px] font-bold text-teal-800 uppercase tracking-wider block">
-                      Role Responsibilities
+                      {t("staffDashboard.roleResponsibilities", "Role Responsibilities")}
                     </span>
                     <p className="text-xs text-slate-600 mt-1 leading-relaxed">
                       {staffData.staff_role.description}
@@ -1292,10 +1296,10 @@ export default function StaffDashboard() {
                 </div>
                 <div>
                   <h3 className="font-serif font-bold text-slate-900 text-base sm:text-lg">
-                    Assigned Operating Branch
+                    {t("staffDashboard.assignedOperatingBranch", "Assigned Operating Branch")}
                   </h3>
                   <p className="text-xs text-slate-500 font-medium">
-                    Branch hub location and clearing details
+                    {t("staffDashboard.branchHubLocationAndClearing", "Branch hub location and clearing details")}
                   </p>
                 </div>
               </div>
@@ -1304,7 +1308,7 @@ export default function StaffDashboard() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="p-3.5 rounded-2xl bg-slate-50/70 border border-slate-100">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                      Branch Name
+                      {t("dashboardModule.accountTransactions.colBranchName", "Branch Name")}
                     </span>
                     <p className="text-sm font-extrabold text-slate-900 mt-0.5">
                       {staffData.branch?.name || 'Society Branch'}
@@ -1313,7 +1317,7 @@ export default function StaffDashboard() {
 
                   <div className="p-3.5 rounded-2xl bg-slate-50/70 border border-slate-100">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                      Branch Code
+                      {t("dashboardModule.accountTransactions.colBranchCode", "Branch Code")}
                     </span>
                     <p className="text-sm font-mono font-bold text-teal-800 mt-0.5">
                       {staffData.branch?.branch_code || '—'}
@@ -1322,7 +1326,7 @@ export default function StaffDashboard() {
 
                   <div className="p-3.5 rounded-2xl bg-slate-50/70 border border-slate-100">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                      IFSC Routing Code
+                      {t("staffDashboard.ifscRoutingCode", "IFSC Routing Code")}
                     </span>
                     <p className="text-sm font-mono font-bold text-teal-800 mt-0.5">
                       {staffData.branch?.ifsc_code || '—'}
@@ -1331,7 +1335,7 @@ export default function StaffDashboard() {
 
                   <div className="p-3.5 rounded-2xl bg-slate-50/70 border border-slate-100">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                      Branch Contact
+                      {t("staffDashboard.branchContact", "Branch Contact")}
                     </span>
                     <p className="text-sm font-mono font-bold text-slate-800 mt-0.5">
                       {staffData.branch?.contact_number || '—'}
@@ -1340,7 +1344,7 @@ export default function StaffDashboard() {
 
                   <div className="p-3.5 rounded-2xl bg-slate-50/70 border border-slate-100">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                      City / District
+                      {t("staffDashboard.cityDistrict", "City / District")}
                     </span>
                     <p className="text-sm font-semibold text-slate-800 mt-0.5 capitalize">
                       {staffData.branch?.city || '—'}
@@ -1349,7 +1353,7 @@ export default function StaffDashboard() {
 
                   <div className="p-3.5 rounded-2xl bg-slate-50/70 border border-slate-100">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                      State / Region
+                      {t("staffDashboard.stateRegion", "State / Region")}
                     </span>
                     <p className="text-sm font-semibold text-slate-800 mt-0.5 capitalize">
                       {staffData.branch?.state || 'Kerala'}
@@ -1360,7 +1364,7 @@ export default function StaffDashboard() {
                 {staffData.branch?.address && (
                   <div className="p-3.5 rounded-2xl bg-slate-50/70 border border-slate-100">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                      Physical Street Address
+                      {t("staffDashboard.physicalStreetAddress", "Physical Street Address")}
                     </span>
                     <p className="text-xs font-medium text-slate-700 mt-1 capitalize leading-relaxed">
                       {staffData.branch.address}
@@ -1371,7 +1375,7 @@ export default function StaffDashboard() {
                 <div className="p-3.5 rounded-2xl bg-slate-50/70 border border-slate-100 flex items-center justify-between">
                   <div>
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                      Branch Established / Opening Date
+                      {t("staffDashboard.branchEstablishedOpeningDate", "Branch Established / Opening Date")}
                     </span>
                     <p className="text-xs font-semibold text-slate-800 mt-0.5">
                       {formatDate(staffData.branch?.opening_date || staffData.branch?.created_at)}
@@ -1379,7 +1383,7 @@ export default function StaffDashboard() {
                   </div>
                   <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                    <span>Operational Hub</span>
+                    <span>{t("staffDashboard.operationalHub", "Operational Hub")}</span>
                   </span>
                 </div>
               </div>

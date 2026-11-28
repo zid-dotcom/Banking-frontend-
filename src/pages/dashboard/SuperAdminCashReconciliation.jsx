@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { i18n } from '../../i18n/index.js';
+import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import {
@@ -93,6 +95,7 @@ export default function SuperAdminCashReconciliation({
   fromDate: propFromDate = '',
   toDate: propToDate = ''
 }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const [currentUser, setCurrentUser] = useState(() => {
@@ -189,7 +192,7 @@ export default function SuperAdminCashReconciliation({
   // Fetch reports based on date & branch filter (defaults to today when dates are empty)
   const fetchReconciliations = async () => {
     if (fromDate && toDate && fromDate > toDate) {
-      setError('"From" date cannot be after "To" date.');
+      setError(i18n.t("dashboardModule.accountTransactions.invalidDateRange", "\"From\" date cannot be after \"To\" date."));
       return;
     }
 
@@ -417,36 +420,36 @@ export default function SuperAdminCashReconciliation({
             <div className="flex flex-wrap items-center gap-2 mb-3.5">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur-xs text-xs font-semibold border border-teal-200/80 shadow-2xs text-[#0f766e]">
                 <Scale className="w-3.5 h-3.5 text-[#00b4a7]" />
-                <span>Role: Super Admin</span>
+                <span>{t("superAdminCashReconciliation.roleSuperAdmin", "Role: Super Admin")}</span>
               </div>
 
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur-xs text-xs font-semibold border border-teal-200/80 shadow-2xs text-slate-700">
                 <Building2 className="w-3.5 h-3.5 text-teal-600" />
-                <span>Apex Central Administration</span>
+                <span>{t("superAdminCashReconciliation.apexCentralAdministration", "Apex Central Administration")}</span>
               </div>
 
               <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50/95 backdrop-blur-xs text-xs font-semibold border border-emerald-200 shadow-2xs text-emerald-700">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span>Society Oversight</span>
+                <span>{t("superAdminCashReconciliation.societyOversight", "Society Oversight")}</span>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
               <span className="w-1.5 h-8 sm:h-9 bg-[#00b4a7] rounded-full flex-shrink-0" />
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold text-slate-900 tracking-tight flex items-center gap-2.5">
-                <span>Central Cash Reconciliation</span>
+                <span>{t("superAdminCashReconciliation.centralCashReconciliation", "Central Cash Reconciliation")}</span>
               </h1>
             </div>
 
             <p className="text-slate-600 text-xs sm:text-sm mt-2 sm:mt-2.5 font-medium leading-relaxed max-w-xl">
-              Society-wide cashier day drawer balancing, branch daily liquidity reports, discrepancy audits, and final apex decision governance.
+              {t("superAdminCashReconciliation.societyWideCashierDayDrawer", "Society-wide cashier day drawer balancing, branch daily liquidity reports, discrepancy audits, and final apex decision governance.")}
             </p>
           </div>
 
           <div className="relative z-10 flex justify-center md:justify-end pointer-events-none -my-2 sm:-my-5 lg:-my-6 flex-shrink-0 w-full md:w-auto">
             <img
               src={bankTechScene}
-              alt="Central Cash Reconciliation"
+              alt={t("superAdminCashReconciliation.centralCashReconciliation", "Central Cash Reconciliation")}
               className="h-32 sm:h-44 lg:h-52 max-w-full w-auto object-contain drop-shadow-md select-none pointer-events-none mx-auto md:mx-0"
             />
           </div>
@@ -463,71 +466,71 @@ export default function SuperAdminCashReconciliation({
             className="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all flex items-center gap-2"
           >
             <Coins className="w-4 h-4 text-slate-400" />
-            <span>Central Cash Transactions</span>
+            <span>{t("superAdminCashReconciliation.centralCashTransactions", "Central Cash Transactions")}</span>
           </Link>
           <button
             type="button"
             className="px-4 py-2 rounded-xl text-xs font-bold bg-[#00b4a7] text-white shadow-sm flex items-center gap-2"
           >
             <Scale className="w-4 h-4" />
-            <span>Cash Reconciliation Audit Desk</span>
+            <span>{t("branchManagerCashReconciliation.cashReconciliationAuditDesk", "Cash Reconciliation Audit Desk")}</span>
           </button>
         </div>
 
         {/* 7 Summary Stat Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 sm:gap-4">
           <StatCard
-            title="Pending Decisions"
+            title={t("branchManagerCashReconciliation.pendingDecisions", "Pending Decisions")}
             value={pendingApexCount.toString()}
-            subtitle="Awaiting decision"
+            subtitle={t("superAdminCashReconciliation.awaitingDecision", "Awaiting decision")}
             icon={AlertCircle}
             trend={pendingApexCount > 0 ? 'Requires Action' : 'All Clear'}
             trendType={pendingApexCount > 0 ? 'down' : 'up'}
           />
           <StatCard
-            title="Total Opening Cash"
+            title={t("branchManagerCashReconciliation.totalOpeningCash", "Total Opening Cash")}
             value={formatCurrency(totalOpening)}
-            subtitle={isDateFiltered ? 'Filtered opening float' : "Today's opening float"}
+            subtitle={isDateFiltered ? t("branchManagerCashReconciliation.filteredOpeningFloat", "Filtered opening float") : t("branchManagerCashReconciliation.todaySOpeningFloat", "Today's opening float")}
             icon={Wallet}
             trend="Opening Float"
             trendType="neutral"
           />
           <StatCard
-            title="Counter Cash Deposits"
+            title={t("dashboardModule.branchOverview.counterCashDeposits", "Counter Cash Deposits")}
             value={formatCurrency(totalDeposits)}
-            subtitle={isDateFiltered ? 'Filtered deposits' : "Today's deposits"}
+            subtitle={isDateFiltered ? t("branchManagerCashReconciliation.filteredDeposits", "Filtered deposits") : t("branchManagerCashReconciliation.todaySDeposits", "Today's deposits")}
             icon={ArrowDownLeft}
             trend="Cash Inflows"
             trendType="up"
           />
           <StatCard
-            title="Counter Cash Withdrawals"
+            title={t("dashboardModule.branchOverview.counterCashWithdrawals", "Counter Cash Withdrawals")}
             value={formatCurrency(totalWithdrawals)}
-            subtitle={isDateFiltered ? 'Filtered withdrawals' : "Today's withdrawals"}
+            subtitle={isDateFiltered ? t("branchManagerCashReconciliation.filteredWithdrawals", "Filtered withdrawals") : t("branchManagerCashReconciliation.todaySWithdrawals", "Today's withdrawals")}
             icon={ArrowUpRight}
             trend="Cash Outflows"
             trendType="down"
           />
           <StatCard
-            title="Expected Closing Cash"
+            title={t("branchManagerCashReconciliation.expectedClosingCash", "Expected Closing Cash")}
             value={formatCurrency(totalExpected)}
-            subtitle="System expected float"
+            subtitle={t("branchManagerCashReconciliation.systemExpectedFloat", "System expected float")}
             icon={Calculator}
             trend="Expected"
             trendType="neutral"
           />
           <StatCard
-            title="Counted Closing Cash"
+            title={t("branchManagerCashReconciliation.countedClosingCash", "Counted Closing Cash")}
             value={formatCurrency(totalCounted)}
-            subtitle="Physical verified cash"
+            subtitle={t("branchManagerCashReconciliation.physicalVerifiedCash", "Physical verified cash")}
             icon={Coins}
             trend="Counted Cash"
             trendType="neutral"
           />
           <StatCard
-            title="Net Variance"
+            title={t("branchManagerCashReconciliation.netVariance", "Net Variance")}
             value={formatCurrency(totalDifference)}
-            subtitle={totalDifference === 0 ? 'Zero Variance' : 'Cash Mismatch'}
+            subtitle={totalDifference === 0 ? t("branchManagerCashReconciliation.zeroVariance", "Zero Variance") : t("branchManagerCashReconciliation.cashMismatch", "Cash Mismatch")}
             icon={Scale}
             trend={totalDifference === 0 ? 'Balanced' : 'Review Needed'}
             trendType={totalDifference === 0 ? 'up' : 'down'}
@@ -544,11 +547,11 @@ export default function SuperAdminCashReconciliation({
                   <Scale className="w-4 h-4 text-[#00b4a7]" />
                 </div>
                 <h3 className="font-serif font-bold text-slate-900 text-lg sm:text-xl">
-                  Central Cash Reconciliations Audit Desk
+                  {t("superAdminCashReconciliation.centralCashReconciliationsAuditDesk", "Central Cash Reconciliations Audit Desk")}
                 </h3>
               </div>
               <p className="text-xs text-slate-500 font-medium mt-1">
-                Multi-branch daily reconciliation reports, branch escalation reviews, and apex resolution decisions.
+                {t("superAdminCashReconciliation.multiBranchDailyReconciliationReports", "Multi-branch daily reconciliation reports, branch escalation reviews, and apex resolution decisions.")}
               </p>
             </div>
 
@@ -558,10 +561,10 @@ export default function SuperAdminCashReconciliation({
                 onClick={fetchReconciliations}
                 disabled={loading}
                 className="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 shadow-2xs text-xs font-bold text-slate-700 hover:text-slate-900 transition-all cursor-pointer disabled:opacity-50 flex items-center gap-2 active:scale-95"
-                title="Refresh Central Reconciliations"
+                title={t("superAdminCashReconciliation.refreshCentralReconciliations", "Refresh Central Reconciliations")}
               >
                 <RefreshCw className={`w-3.5 h-3.5 text-[#00b4a7] ${loading ? 'animate-spin' : ''}`} />
-                <span>{loading ? 'Refreshing...' : 'Refresh'}</span>
+                <span>{loading ? t("dashboardModule.branchOverview.refreshing", "Refreshing...") : t("common.refresh", "Refresh")}</span>
               </button>
             </div>
           </div>
@@ -578,7 +581,7 @@ export default function SuperAdminCashReconciliation({
                   onChange={(e) => setSelectedBranchId(e.target.value)}
                   className="text-xs font-bold text-slate-800 bg-transparent focus:outline-none cursor-pointer"
                 >
-                  <option value="all">All Branches (Apex Network)</option>
+                  <option value="all">{t("dashboardModule.branchOverview.allBranchesApex", "All Branches (Apex Network)")}</option>
                   {branches.map((b) => {
                     const bName = b.branch_name || b.name || b.title || `Branch #${b.id}`;
                     const bCode = b.branch_code || b.code || '';
@@ -600,7 +603,7 @@ export default function SuperAdminCashReconciliation({
                     statusFilter === 'all' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-500 hover:text-slate-800'
                   }`}
                 >
-                  All ({reports.length})
+                  {t("branchManagerCashReconciliation.all", "All (")}{reports.length})
                 </button>
                 <button
                   type="button"
@@ -609,7 +612,7 @@ export default function SuperAdminCashReconciliation({
                     statusFilter === 'pending' ? 'bg-amber-50 text-amber-800 shadow-2xs font-extrabold' : 'text-slate-500 hover:text-slate-800'
                   }`}
                 >
-                  Pending ({pendingApexCount})
+                  {t("superAdminCashReconciliation.pending", "Pending (")}{pendingApexCount})
                 </button>
                 <button
                   type="button"
@@ -618,7 +621,7 @@ export default function SuperAdminCashReconciliation({
                     statusFilter === 'mismatch' ? 'bg-rose-50 text-rose-800 shadow-2xs font-extrabold' : 'text-slate-500 hover:text-slate-800'
                   }`}
                 >
-                  Cash Mismatch ({mismatchCount})
+                  {t("branchManagerCashReconciliation.cashMismatch2", "Cash Mismatch (")}{mismatchCount})
                 </button>
                 <button
                   type="button"
@@ -627,7 +630,7 @@ export default function SuperAdminCashReconciliation({
                     statusFilter === 'resolved' ? 'bg-emerald-50 text-emerald-800 shadow-2xs font-extrabold' : 'text-slate-500 hover:text-slate-800'
                   }`}
                 >
-                  Resolved ({reports.filter((r) => r.superadmin_decision === 'resolved').length})
+                  {t("branchManagerCashReconciliation.resolved", "Resolved (")}{reports.filter((r) => r.superadmin_decision === 'resolved').length})
                 </button>
                 <button
                   type="button"
@@ -636,7 +639,7 @@ export default function SuperAdminCashReconciliation({
                     statusFilter === 'returned' ? 'bg-indigo-50 text-indigo-800 shadow-2xs font-extrabold' : 'text-slate-500 hover:text-slate-800'
                   }`}
                 >
-                  Returned to Branch ({reports.filter((r) => r.superadmin_decision === 'returned_to_branch').length})
+                  {t("superAdminCashReconciliation.returnedToBranch", "Returned to Branch (")}{reports.filter((r) => r.superadmin_decision === 'returned_to_branch').length})
                 </button>
               </div>
             </div>
@@ -646,27 +649,27 @@ export default function SuperAdminCashReconciliation({
               <div className="flex flex-wrap items-center gap-2">
                 <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-slate-200 shadow-2xs hover:border-teal-400 focus-within:border-teal-500 focus-within:ring-2 focus-within:ring-teal-100 transition-all">
                   <span className="text-[10px] font-black uppercase tracking-wider text-teal-800 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-200 select-none">
-                    From
+                    {t("dashboardModule.accountTransactions.from", "From")}
                   </span>
                   <input
                     type="date"
                     value={fromDate}
                     onChange={(e) => setFromDate(e.target.value)}
                     className="text-xs text-slate-800 font-bold focus:outline-none bg-transparent cursor-pointer"
-                    title="Filter from business date"
+                    title={t("branchManagerCashReconciliation.filterFromBusinessDate", "Filter from business date")}
                   />
                 </div>
 
                 <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-slate-200 shadow-2xs hover:border-teal-400 focus-within:border-teal-500 focus-within:ring-2 focus-within:ring-teal-100 transition-all">
                   <span className="text-[10px] font-black uppercase tracking-wider text-teal-800 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-200 select-none">
-                    To
+                    {t("dashboardModule.accountTransactions.to", "To")}
                   </span>
                   <input
                     type="date"
                     value={toDate}
                     onChange={(e) => setToDate(e.target.value)}
                     className="text-xs text-slate-800 font-bold focus:outline-none bg-transparent cursor-pointer"
-                    title="Filter to business date"
+                    title={t("branchManagerCashReconciliation.filterToBusinessDate", "Filter to business date")}
                   />
                 </div>
 
@@ -678,10 +681,10 @@ export default function SuperAdminCashReconciliation({
                       setToDate('');
                     }}
                     className="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 text-xs font-bold transition-all cursor-pointer flex items-center gap-1 shadow-2xs border border-slate-200"
-                    title="Clear Date Filter"
+                    title={t("branchManagerCashReconciliation.clearDateFilter", "Clear Date Filter")}
                   >
                     <X className="w-3.5 h-3.5 text-slate-500" />
-                    <span className="text-[11px]">Clear</span>
+                    <span className="text-[11px]">{t("dashboardModule.emergency.clear", "Clear")}</span>
                   </button>
                 )}
               </div>
@@ -692,7 +695,7 @@ export default function SuperAdminCashReconciliation({
                   type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search branch, cashier..."
+                  placeholder={t("superAdminCashReconciliation.searchBranchCashier", "Search branch, cashier...")}
                   className="w-full sm:w-44 pl-8 pr-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#00b4a7] focus:ring-2 focus:ring-teal-100 shadow-2xs transition-all"
                 />
               </div>
@@ -707,7 +710,7 @@ export default function SuperAdminCashReconciliation({
                 <span>{error}</span>
               </div>
               <button onClick={fetchReconciliations} className="font-bold underline text-amber-900 cursor-pointer">
-                Retry
+                {t("common.retry", "Retry")}
               </button>
             </div>
           )}
@@ -717,23 +720,23 @@ export default function SuperAdminCashReconciliation({
             <table className="w-full text-left border-collapse min-w-[1350px]">
               <thead>
                 <tr className="border-b border-slate-200 bg-slate-50/80 text-[11px] font-bold uppercase tracking-wider text-slate-500 select-none">
-                  <th className="py-3.5 px-4 whitespace-nowrap">Report</th>
-                  <th className="py-3.5 px-4 whitespace-nowrap">Business Date</th>
-                  <th className="py-3.5 px-4 whitespace-nowrap">Branch</th>
-                  <th className="py-3.5 px-4 whitespace-nowrap">Cashier</th>
-                  <th className="py-3.5 px-4 text-right whitespace-nowrap">Opening Float</th>
-                  <th className="py-3.5 px-4 text-right whitespace-nowrap">Deposits</th>
-                  <th className="py-3.5 px-4 text-right whitespace-nowrap">Withdrawals</th>
-                  <th className="py-3.5 px-4 text-right whitespace-nowrap">Expected Cash</th>
-                  <th className="py-3.5 px-4 text-right whitespace-nowrap">Counted Cash</th>
-                  <th className="py-3.5 px-4 text-right whitespace-nowrap">Difference</th>
+                  <th className="py-3.5 px-4 whitespace-nowrap">{t("branchManagerCashReconciliation.report", "Report")}</th>
+                  <th className="py-3.5 px-4 whitespace-nowrap">{t("branchManagerCashReconciliation.businessDate", "Business Date")}</th>
+                  <th className="py-3.5 px-4 whitespace-nowrap">{t("dashboard.branch", "Branch")}</th>
+                  <th className="py-3.5 px-4 whitespace-nowrap">{t("branchManagerCashReconciliation.cashier", "Cashier")}</th>
+                  <th className="py-3.5 px-4 text-right whitespace-nowrap">{t("branchManagerCashReconciliation.openingFloat", "Opening Float")}</th>
+                  <th className="py-3.5 px-4 text-right whitespace-nowrap">{t("dashboardModule.accountTransactions.filterDeposits", "Deposits")}</th>
+                  <th className="py-3.5 px-4 text-right whitespace-nowrap">{t("dashboardModule.accountTransactions.filterWithdrawals", "Withdrawals")}</th>
+                  <th className="py-3.5 px-4 text-right whitespace-nowrap">{t("branchManagerCashReconciliation.expectedCash", "Expected Cash")}</th>
+                  <th className="py-3.5 px-4 text-right whitespace-nowrap">{t("branchManagerCashReconciliation.countedCash", "Counted Cash")}</th>
+                  <th className="py-3.5 px-4 text-right whitespace-nowrap">{t("branchManagerCashReconciliation.difference", "Difference")}</th>
                   {showDecisionColumns && (
                     <>
-                      <th className="py-3.5 px-4 text-center whitespace-nowrap">Branch Decision</th>
-                      <th className="py-3.5 px-4 text-center whitespace-nowrap">Super Admin Decisions</th>
+                      <th className="py-3.5 px-4 text-center whitespace-nowrap">{t("branchManagerCashReconciliation.branchDecision", "Branch Decision")}</th>
+                      <th className="py-3.5 px-4 text-center whitespace-nowrap">{t("superAdminCashReconciliation.superAdminDecisions", "Super Admin Decisions")}</th>
                     </>
                   )}
-                  <th className="py-3.5 px-4 text-center whitespace-nowrap">Actions</th>
+                  <th className="py-3.5 px-4 text-center whitespace-nowrap">{t("common.actions", "Actions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-xs font-medium text-slate-700">
@@ -742,7 +745,7 @@ export default function SuperAdminCashReconciliation({
                     <td colSpan={showDecisionColumns ? 13 : 11} className="py-12 text-center text-slate-400">
                       <div className="flex flex-col items-center justify-center gap-2">
                         <Loader2 className="w-6 h-6 animate-spin text-[#00b4a7]" />
-                        <span>Loading central cash reconciliations...</span>
+                        <span>{t("superAdminCashReconciliation.loadingCentralCashReconciliations", "Loading central cash reconciliations...")}</span>
                       </div>
                     </td>
                   </tr>
@@ -751,17 +754,18 @@ export default function SuperAdminCashReconciliation({
                     <td colSpan={showDecisionColumns ? 13 : 11} className="py-12 text-center text-slate-400">
                       <div className="max-w-xs mx-auto space-y-2">
                         <Scale className="w-8 h-8 text-slate-300 mx-auto" />
-                        <p className="font-bold text-slate-700 text-sm">No cash reconciliations found</p>
+                        <p className="font-bold text-slate-700 text-sm">{t("branchManagerCashReconciliation.noCashReconciliationsFound", "No cash reconciliations found")}</p>
                         <p className="text-[11px] text-slate-400">
                           {fromDate || toDate
                             ? `No reports found for the selected date filter.`
-                            : 'No cashier day reports found for today across branches.'}
+                            : t("superAdminCashReconciliation.noCashierDayReportsFound", "No cashier day reports found for today across branches.")}
                         </p>
                       </div>
                     </td>
                   </tr>
                 ) : (
                   filteredReports.map((report) => {
+  const { t } = useTranslation();
                     const diffNum = Number(report.difference || 0);
                     const hasMismatch = isReportMismatch(report) || Math.abs(diffNum) > 0.001;
                     const bDecision = report.branch_admin_decision;
@@ -770,7 +774,7 @@ export default function SuperAdminCashReconciliation({
                     return (
                       <tr key={report.id} className="hover:bg-slate-50/70 transition-colors">
                         <td className="py-3.5 px-4 font-mono font-bold text-teal-800 whitespace-nowrap">
-                          #REC-{report.id}
+                          {t("branchManagerCashReconciliation.rec", "#REC-")}{report.id}
                         </td>
                         <td className="py-3.5 px-4 font-semibold text-slate-900 whitespace-nowrap">
                           {formatDate(report.business_date)}
@@ -805,9 +809,9 @@ export default function SuperAdminCashReconciliation({
                           ) : Math.abs(diffNum) <= 0.001 ? (
                             <span className="text-emerald-700">₹0.00</span>
                           ) : diffNum > 0 ? (
-                            <span className="text-emerald-600">+{formatCurrency(diffNum)} (Surplus)</span>
+                            <span className="text-emerald-600">+{formatCurrency(diffNum)} {t("branchManagerCashReconciliation.surplus", "(Surplus)")}</span>
                           ) : (
-                            <span className="text-rose-600">{formatCurrency(diffNum)} (Shortage)</span>
+                            <span className="text-rose-600">{formatCurrency(diffNum)} {t("branchManagerCashReconciliation.shortage", "(Shortage)")}</span>
                           )}
                         </td>
                         {showDecisionColumns && (
@@ -817,16 +821,16 @@ export default function SuperAdminCashReconciliation({
                                 bDecision === 'resolved' ? (
                                   <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 whitespace-nowrap">
                                     <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                                    <span>Resolved</span>
+                                    <span>{t("branchManagerCashReconciliation.resolved2", "Resolved")}</span>
                                   </span>
                                 ) : bDecision === 'escalated' ? (
                                   <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-800 border border-rose-200 whitespace-nowrap">
                                     <AlertTriangle className="w-3 h-3 text-rose-600" />
-                                    <span>Escalated</span>
+                                    <span>{t("branchManagerCashReconciliation.escalated2", "Escalated")}</span>
                                   </span>
                                 ) : (
                                   <span className="inline-block text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-500 whitespace-nowrap">
-                                    Pending
+                                    {t("common.pending", "Pending")}
                                   </span>
                                 )
                               ) : (
@@ -838,16 +842,16 @@ export default function SuperAdminCashReconciliation({
                                 sDecision === 'resolved' ? (
                                   <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 whitespace-nowrap">
                                     <CheckCircle2 className="w-3 h-3 text-emerald-700" />
-                                    <span>Approved</span>
+                                    <span>{t("common.approved", "Approved")}</span>
                                   </span>
                                 ) : sDecision === 'returned_to_branch' ? (
                                   <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 whitespace-nowrap">
                                     <RotateCcw className="w-3 h-3 text-amber-600" />
-                                    <span>Returned</span>
+                                    <span>{t("superAdminCashReconciliation.returned", "Returned")}</span>
                                   </span>
                                 ) : (
                                   <span className="inline-block text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 whitespace-nowrap">
-                                    Decision Pending
+                                    {t("branchManagerCashReconciliation.decisionPending", "Decision Pending")}
                                   </span>
                                 )
                               ) : (
@@ -862,20 +866,20 @@ export default function SuperAdminCashReconciliation({
                               type="button"
                               onClick={() => handleOpenDetails(report.id)}
                               className="px-2.5 py-1 rounded-lg bg-teal-50 hover:bg-teal-100 text-teal-800 text-xs font-bold transition-all cursor-pointer flex items-center gap-1 border border-teal-200"
-                              title="Inspect receipts and decision history"
+                              title={t("branchManagerCashReconciliation.inspectReceiptsAndDecisionHistory", "Inspect receipts and decision history")}
                             >
                               <Receipt className="w-3 h-3 text-teal-600" />
-                              <span>Details</span>
+                              <span>{t("dashboardModule.monthlyTargets.details", "Details")}</span>
                             </button>
                             {hasMismatch && (
                               <button
                                 type="button"
                                 onClick={() => handleOpenDecision(report)}
                                 className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1 shadow-2xs"
-                                title="Record superadmin decision"
+                                title={t("superAdminCashReconciliation.recordSuperadminDecision", "Record superadmin decision")}
                               >
                                 <ShieldCheck className="w-3 h-3" />
-                                <span>Decide</span>
+                                <span>{t("branchManagerCashReconciliation.decide", "Decide")}</span>
                               </button>
                             )}
                           </div>
@@ -904,10 +908,10 @@ export default function SuperAdminCashReconciliation({
                 </div>
                 <div>
                   <h3 className="font-serif font-black text-slate-900 text-lg sm:text-xl">
-                    Central Reconciliation Audit: #REC-{selectedReportId}
+                    {t("superAdminCashReconciliation.centralReconciliationAuditRec", "Central Reconciliation Audit: #REC-")}{selectedReportId}
                   </h3>
                   <p className="text-xs text-slate-500 font-medium mt-0.5">
-                    Branch cashier shift balancing, counter vouchers, and verified member balance logs.
+                    {t("superAdminCashReconciliation.branchCashierShiftBalancingCounter", "Branch cashier shift balancing, counter vouchers, and verified member balance logs.")}
                   </p>
                 </div>
               </div>
@@ -925,7 +929,7 @@ export default function SuperAdminCashReconciliation({
               {loadingDetails ? (
                 <div className="py-16 text-center text-slate-400 flex flex-col items-center justify-center gap-2">
                   <Loader2 className="w-8 h-8 animate-spin text-[#00b4a7]" />
-                  <span>Loading full reconciliation audit trail...</span>
+                  <span>{t("branchManagerCashReconciliation.loadingFullReconciliationAuditTrail", "Loading full reconciliation audit trail...")}</span>
                 </div>
               ) : detailsError ? (
                 <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold flex items-center gap-2">
@@ -937,43 +941,43 @@ export default function SuperAdminCashReconciliation({
                   {/* Top Stats Overview in Modal - 7 Cards with Separated Deposits and Withdrawals */}
                   <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5">
                     <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100 text-center">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase block">Business Date</span>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase block">{t("branchManagerCashReconciliation.businessDate", "Business Date")}</span>
                       <span className="text-xs font-black text-slate-900 mt-1 block">
                         {formatDate(reportDetails.business_date)}
                       </span>
                     </div>
                     <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100 text-center">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase block">Cashier</span>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase block">{t("branchManagerCashReconciliation.cashier", "Cashier")}</span>
                       <span className="text-xs font-black text-slate-900 mt-1 block capitalize truncate">
                         {reportDetails.cashier_name || 'Cashier'}
                       </span>
                     </div>
                     <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100 text-center">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase block">Opening Float</span>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase block">{t("branchManagerCashReconciliation.openingFloat", "Opening Float")}</span>
                       <span className="text-xs font-black text-slate-900 mt-1 block font-mono">
                         {formatCurrency(reportDetails.opening_cash)}
                       </span>
                     </div>
                     <div className="p-3 rounded-2xl bg-emerald-50/70 border border-emerald-100 text-center">
-                      <span className="text-[10px] font-bold text-emerald-800 uppercase block">Deposits</span>
+                      <span className="text-[10px] font-bold text-emerald-800 uppercase block">{t("dashboardModule.accountTransactions.filterDeposits", "Deposits")}</span>
                       <span className="text-xs font-black text-emerald-700 mt-1 block font-mono">
                         +{formatCurrency(reportDetails.deposit_total)}
                       </span>
                     </div>
                     <div className="p-3 rounded-2xl bg-rose-50/70 border border-rose-100 text-center">
-                      <span className="text-[10px] font-bold text-rose-800 uppercase block">Withdrawals</span>
+                      <span className="text-[10px] font-bold text-rose-800 uppercase block">{t("dashboardModule.accountTransactions.filterWithdrawals", "Withdrawals")}</span>
                       <span className="text-xs font-black text-rose-700 mt-1 block font-mono">
                         -{formatCurrency(reportDetails.withdrawal_total)}
                       </span>
                     </div>
                     <div className="p-3 rounded-2xl bg-teal-50/60 border border-teal-100 text-center">
-                      <span className="text-[10px] font-bold text-teal-800 uppercase block">Expected Closing</span>
+                      <span className="text-[10px] font-bold text-teal-800 uppercase block">{t("branchManagerCashReconciliation.expectedClosing", "Expected Closing")}</span>
                       <span className="text-xs font-black text-teal-900 mt-1 block font-mono">
                         {formatCurrency(reportDetails.expected_closing_cash)}
                       </span>
                     </div>
                     <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100 text-center">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase block">Physical Count</span>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase block">{t("branchManagerCashReconciliation.physicalCount", "Physical Count")}</span>
                       <span className="text-xs font-black text-slate-900 mt-1 block font-mono">
                         {reportDetails.closing_cash !== null ? formatCurrency(reportDetails.closing_cash) : '—'}
                       </span>
@@ -985,7 +989,7 @@ export default function SuperAdminCashReconciliation({
                     <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center justify-between">
                       <span className="flex items-center gap-2">
                         <Receipt className="w-4 h-4 text-[#00b4a7]" />
-                        <span>Counter Transactions &amp; Receipts ({reportDetails.transactions?.length || 0})</span>
+                        <span>{t("branchManagerCashReconciliation.counterTransactionsReceipts", "Counter Transactions & Receipts (")}{reportDetails.transactions?.length || 0})</span>
                       </span>
                     </h4>
 
@@ -993,24 +997,25 @@ export default function SuperAdminCashReconciliation({
                       <table className="w-full text-left border-collapse min-w-[760px] text-xs">
                         <thead>
                           <tr className="border-b border-slate-200 bg-slate-50 text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                            <th className="py-2.5 px-3">Receipt Number</th>
-                            <th className="py-2.5 px-3">Type</th>
-                            <th className="py-2.5 px-3 text-right">Amount</th>
-                            <th className="py-2.5 px-3 text-right">Balance Before</th>
-                            <th className="py-2.5 px-3 text-right">Balance After</th>
-                            <th className="py-2.5 px-3">Date &amp; Time</th>
-                            <th className="py-2.5 px-3">Notes</th>
+                            <th className="py-2.5 px-3">{t("dashboardModule.accountTransactions.colReceiptNumber", "Receipt Number")}</th>
+                            <th className="py-2.5 px-3">{t("dashboardModule.productAccounts.type", "Type")}</th>
+                            <th className="py-2.5 px-3 text-right">{t("dashboardModule.accountTransactions.colAmount", "Amount")}</th>
+                            <th className="py-2.5 px-3 text-right">{t("dashboardModule.accountTransactions.colBalanceBefore", "Balance Before")}</th>
+                            <th className="py-2.5 px-3 text-right">{t("dashboardModule.accountTransactions.colBalanceAfter", "Balance After")}</th>
+                            <th className="py-2.5 px-3">{t("dashboardModule.accountTransactions.colDateTime", "Date & Time")}</th>
+                            <th className="py-2.5 px-3">{t("dashboardModule.accountTransactions.colNotes", "Notes")}</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 font-medium">
                           {!reportDetails.transactions || reportDetails.transactions.length === 0 ? (
                             <tr>
                               <td colSpan="7" className="py-8 text-center text-slate-400">
-                                No transactions processed during this cash drawer shift.
+                                {t("branchManagerCashReconciliation.noTransactionsProcessedDuringThis", "No transactions processed during this cash drawer shift.")}
                               </td>
                             </tr>
                           ) : (
                             reportDetails.transactions.map((tx, idx) => {
+  const { t } = useTranslation();
                               const isDep = String(tx.type || tx.transaction_type || '').toLowerCase().includes('deposit');
                               return (
                                 <tr key={tx.id || idx} className="hover:bg-slate-50/50">
@@ -1024,7 +1029,7 @@ export default function SuperAdminCashReconciliation({
                                       }`}
                                     >
                                       {isDep ? <ArrowDownLeft className="w-3 h-3" /> : <ArrowUpRight className="w-3 h-3" />}
-                                      <span>{isDep ? 'Deposit' : 'Withdrawal'}</span>
+                                      <span>{isDep ? t("dashboardModule.accountTransactions.deposit", "Deposit") : t("dashboardModule.accountTransactions.withdrawal", "Withdrawal")}</span>
                                     </span>
                                   </td>
                                   <td className={`py-2.5 px-3 text-right font-mono font-bold ${isDep ? 'text-emerald-700' : 'text-rose-700'}`}>
@@ -1061,7 +1066,7 @@ export default function SuperAdminCashReconciliation({
                 onClick={() => setSelectedReportId(null)}
                 className="px-4 py-2 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-all cursor-pointer shadow-2xs"
               >
-                Close Audit Details
+                {t("branchManagerCashReconciliation.closeAuditDetails", "Close Audit Details")}
               </button>
 
               {reportDetails && (
@@ -1074,7 +1079,7 @@ export default function SuperAdminCashReconciliation({
                   className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-xs font-bold text-white transition-all cursor-pointer flex items-center gap-1.5 shadow-md shadow-emerald-600/20"
                 >
                   <ShieldCheck className="w-3.5 h-3.5" />
-                  <span>Submit Super Admin Decision</span>
+                  <span>{t("superAdminCashReconciliation.submitSuperAdminDecision", "Submit Super Admin Decision")}</span>
                 </button>
               )}
             </div>
@@ -1095,10 +1100,10 @@ export default function SuperAdminCashReconciliation({
                 </div>
                 <div>
                   <h3 className="font-serif font-black text-slate-900 text-lg">
-                    Super Admin Decision: #REC-{decisionModalReport.id}
+                    {t("superAdminCashReconciliation.superAdminDecisionRec", "Super Admin Decision: #REC-")}{decisionModalReport.id}
                   </h3>
                   <p className="text-xs text-slate-500 font-medium">
-                    Branch: <strong>{decisionModalReport.branch_name}</strong> | Cashier:{' '}
+                    {t("branchManagerCashReconciliation.branch", "Branch:")} <strong>{decisionModalReport.branch_name}</strong> {t("superAdminCashReconciliation.cashier", "| Cashier:")}{' '}
                     <strong className="text-slate-800 capitalize">{decisionModalReport.cashier_name}</strong>
                   </p>
                 </div>
@@ -1130,19 +1135,19 @@ export default function SuperAdminCashReconciliation({
               {/* Drawer Variance Summary */}
               <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 grid grid-cols-2 gap-3 text-xs">
                 <div>
-                  <span className="text-[10px] text-slate-400 font-bold block uppercase">Expected Closing</span>
+                  <span className="text-[10px] text-slate-400 font-bold block uppercase">{t("branchManagerCashReconciliation.expectedClosing", "Expected Closing")}</span>
                   <span className="font-mono font-bold text-slate-900">
                     {formatCurrency(decisionModalReport.expected_closing_cash)}
                   </span>
                 </div>
                 <div>
-                  <span className="text-[10px] text-slate-400 font-bold block uppercase">Counted Physical Cash</span>
+                  <span className="text-[10px] text-slate-400 font-bold block uppercase">{t("branchManagerCashReconciliation.countedPhysicalCash", "Counted Physical Cash")}</span>
                   <span className="font-mono font-bold text-slate-900">
                     {decisionModalReport.closing_cash !== null ? formatCurrency(decisionModalReport.closing_cash) : '—'}
                   </span>
                 </div>
                 <div className="col-span-2 pt-2 border-t border-slate-200 flex items-center justify-between">
-                  <span className="text-[11px] font-bold text-slate-600">Drawer Difference / Variance:</span>
+                  <span className="text-[11px] font-bold text-slate-600">{t("branchManagerCashReconciliation.drawerDifferenceVariance", "Drawer Difference / Variance:")}</span>
                   <span
                     className={`font-mono font-black ${
                       Number(decisionModalReport.difference || 0) === 0
@@ -1160,7 +1165,7 @@ export default function SuperAdminCashReconciliation({
               {/* Decision Choice */}
               <div className="space-y-2">
                 <label className="text-xs font-bold text-slate-800 block">
-                  Select Super Admin Decision: <span className="text-rose-500">*</span>
+                  {t("superAdminCashReconciliation.selectSuperAdminDecision", "Select Super Admin Decision:")} <span className="text-rose-500">*</span>
                 </label>
                 <div className="grid grid-cols-2 gap-3">
                   <button
@@ -1175,12 +1180,12 @@ export default function SuperAdminCashReconciliation({
                     <div className="flex items-center justify-between w-full mb-1">
                       <span className="font-bold text-xs text-emerald-800 flex items-center gap-1.5">
                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                        <span>Resolved</span>
+                        <span>{t("branchManagerCashReconciliation.resolved2", "Resolved")}</span>
                       </span>
                       {decisionType === 'resolved' && <Check className="w-4 h-4 text-emerald-600" />}
                     </div>
                     <p className="text-[10px] text-slate-500 leading-tight">
-                      Approve and formally close the reconciliation audit at society level.
+                      {t("superAdminCashReconciliation.approveAndFormallyCloseThe", "Approve and formally close the reconciliation audit at society level.")}
                     </p>
                   </button>
 
@@ -1196,12 +1201,12 @@ export default function SuperAdminCashReconciliation({
                     <div className="flex items-center justify-between w-full mb-1">
                       <span className="font-bold text-xs text-amber-800 flex items-center gap-1.5">
                         <RotateCcw className="w-3.5 h-3.5 text-amber-600" />
-                        <span>Return to Branch</span>
+                        <span>{t("superAdminCashReconciliation.returnToBranch", "Return to Branch")}</span>
                       </span>
                       {decisionType === 'returned_to_branch' && <Check className="w-4 h-4 text-amber-600" />}
                     </div>
                     <p className="text-[10px] text-slate-500 leading-tight">
-                      Reject explanation and return report to branch manager for recount or audit.
+                      {t("superAdminCashReconciliation.rejectExplanationAndReturnReport", "Reject explanation and return report to branch manager for recount or audit.")}
                     </p>
                   </button>
                 </div>
@@ -1210,13 +1215,13 @@ export default function SuperAdminCashReconciliation({
               {/* Decision Explanation */}
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-800 block">
-                  Super Admin Review Remarks &amp; Instructions: <span className="text-rose-500">*</span>
+                  {t("superAdminCashReconciliation.superAdminReviewRemarksInstructions", "Super Admin Review Remarks & Instructions:")} <span className="text-rose-500">*</span>
                 </label>
                 <textarea
                   rows="4"
                   value={decisionExplanation}
                   onChange={(e) => setDecisionExplanation(e.target.value)}
-                  placeholder="Record formal superadmin instructions or resolution remarks..."
+                  placeholder={t("superAdminCashReconciliation.recordFormalSuperadminInstructionsOr", "Record formal superadmin instructions or resolution remarks...")}
                   className="w-full p-3 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#00b4a7] focus:ring-2 focus:ring-teal-100 transition-all font-medium"
                   required
                 />
@@ -1232,7 +1237,7 @@ export default function SuperAdminCashReconciliation({
                   disabled={submittingDecision}
                   className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 transition-all cursor-pointer"
                 >
-                  Cancel
+                  {t("common.cancel", "Cancel")}
                 </button>
                 <button
                   type="submit"
@@ -1246,12 +1251,12 @@ export default function SuperAdminCashReconciliation({
                   {submittingDecision ? (
                     <>
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      <span>Submitting Decision...</span>
+                      <span>{t("branchManagerCashReconciliation.submittingDecision", "Submitting Decision...")}</span>
                     </>
                   ) : (
                     <>
                       <Send className="w-3.5 h-3.5" />
-                      <span>{decisionType === 'resolved' ? 'Record Super Admin Approval' : 'Return to Branch'}</span>
+                      <span>{decisionType === 'resolved' ? t("superAdminCashReconciliation.recordSuperAdminApproval", "Record Super Admin Approval") : t("superAdminCashReconciliation.returnToBranch", "Return to Branch")}</span>
                     </>
                   )}
                 </button>

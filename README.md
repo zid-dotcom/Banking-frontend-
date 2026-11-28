@@ -1,16 +1,26 @@
-# React + Vite
+# AurumFX Banking Application
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+## Internationalization
 
-Currently, two official plugins are available:
+The application uses LinguiJS for English (`en`), Malayalam (`ml`), Kannada (`kn`), Hindi (`hi`), and Tamil (`ta`). English is selected by default. The language selector stores the choice in `aurumfx_language`; catalogs are loaded on demand and remain active across routes.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Lingui catalogs are maintained in `src/i18n/locales/{locale}/messages.po`.
 
-## React Compiler
+```sh
+npm run i18n:extract
+npm run i18n:compile
+npm run check:i18n
+npm run test:i18n:resources
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Use Lingui macros for new interface messages:
 
-## Expanding the Oxlint configuration
+```jsx
+import { Trans } from '@lingui/react/macro';
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+<button><Trans>Save changes</Trans></button>
+```
+
+For messages in JavaScript, use `t` or `msg` from `@lingui/core/macro`. Supply stable IDs and translator-friendly defaults for interpolated or plural messages. Keep the five catalogs synchronized after extraction and translate every new entry before release. Missing messages are reported and shown with an explicit translation-needed marker instead of silently falling back to English.
+
+Use the `useLocaleFormatting` hook from `src/i18n/useLocaleFormatting.js` for locale-aware dates, numbers, and INR amounts. Formatting does not alter stored values or personal data.

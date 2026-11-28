@@ -1,12 +1,16 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { MapPin, Building2, User, Clock, ShieldCheck, ChevronRight, Phone } from 'lucide-react';
 import { SOCIETY_INFO } from '../data/societyData';
 import BrandLogo from './BrandLogo';
 
+
 const CURRENT_YEAR = 2026;
 
 export default function Footer() {
+  const { t } = useTranslation();
+
   return (
     <footer className="bg-[#161c28] text-slate-300 pt-16 pb-8 border-t border-slate-800 w-full select-none">
       {/* Full width container spanning edge-to-edge */}
@@ -24,31 +28,32 @@ export default function Footer() {
             </p>
             
             <p className="text-sm text-slate-400 leading-relaxed">
-              Fostering agrarian sustainability, inclusive credit access, and mutual economic empowerment through cooperative solidarity and member-centric financial services.
+              {t("common.tagline", "Fostering agrarian sustainability, inclusive credit access, and mutual economic empowerment through cooperative solidarity.")}
             </p>
 
             <div className="pt-2 flex items-center gap-2 text-xs text-slate-400">
               <ShieldCheck className="w-4 h-4 text-[#00b4a7]" />
-              <span>Multi-State Jurisdiction Cooperative Framework</span>
+              <span>{t("footer.multiStateJurisdictionCooperativeFramework", "Multi-State Jurisdiction Cooperative Framework")}</span>
             </div>
           </div>
 
           {/* Column 2: Quick Navigation */}
           <div className="lg:col-span-2">
             <h4 className="text-white font-serif text-lg font-bold mb-4 relative inline-block">
-              Quick Links
+              {t("nav.quickLinks", "Quick Links")}
               <span className="absolute -bottom-1.5 left-0 w-8 h-[2px] bg-[#ffba00]"></span>
             </h4>
             <ul className="space-y-2.5 text-sm">
               {[
-                { name: 'Home Page', path: '/' },
-                { name: 'About Our Society', path: '/about' },
-                { name: 'Features & Services', path: '/features' },
-                { name: 'Loan Categories', path: '/loans' },
-                { name: 'Articles & Updates', path: '/blog' },
-                { name: 'Contact & Branch Office', path: '/contact' },
+                { name: t("nav.home", "Home"), path: '/' },
+                { name: t("nav.about", "About"), path: '/about' },
+                { name: t("nav.features", "Features"), path: '/features' },
+                { name: t("nav.projects", "Projects"), path: '/projects' },
+                { name: t("nav.loans", "Loans"), path: '/loans' },
+                { name: t("nav.blog", "Blog"), path: '/blog' },
+                { name: t("nav.contact", "Contacts"), path: '/contact' },
               ].map((item) => (
-                <li key={item.name}>
+                <li key={item.path}>
                   <Link
                     to={item.path}
                     className="flex items-center gap-2 text-slate-400 hover:text-white hover:translate-x-1 transition-all duration-200"
@@ -64,7 +69,7 @@ export default function Footer() {
           {/* Column 3: Cooperative Credit Services */}
           <div className="lg:col-span-3">
             <h4 className="text-white font-serif text-lg font-bold mb-4 relative inline-block">
-              Our Services
+              {t("footer.ourServices", "Our Services")}
               <span className="absolute -bottom-1.5 left-0 w-8 h-[2px] bg-[#ffba00]"></span>
             </h4>
             <ul className="space-y-2.5 text-sm">
@@ -92,7 +97,7 @@ export default function Footer() {
           {/* Column 4: Establishment & Office Info (Right end) */}
           <div className="lg:col-span-3">
             <h4 className="text-white font-serif text-lg font-bold mb-4 relative inline-block">
-              Establishment Office
+              {t("footer.establishmentOffice", "Establishment Office")}
               <span className="absolute -bottom-1.5 left-0 w-8 h-[2px] bg-[#ffba00]"></span>
             </h4>
             
@@ -107,7 +112,7 @@ export default function Footer() {
               <div className="flex items-start gap-2.5">
                 <Building2 className="w-4 h-4 text-[#00b4a7] mt-0.5 flex-shrink-0" />
                 <div>
-                  <span className="text-slate-400 block text-xs">Landmark:</span>
+                  <span className="text-slate-400 block text-xs">{t("contact.landmark", "Landmark:")}</span>
                   <span className="font-medium text-slate-200">{SOCIETY_INFO.address.landmark}</span>
                 </div>
               </div>
@@ -115,7 +120,7 @@ export default function Footer() {
               <div className="flex items-start gap-2.5">
                 <User className="w-4 h-4 text-[#ffba00] mt-0.5 flex-shrink-0" />
                 <div>
-                  <span className="text-slate-400 block text-xs">Employer:</span>
+                  <span className="text-slate-400 block text-xs">{t("footer.employer", "Employer:")}</span>
                   <span className="font-semibold text-white">{SOCIETY_INFO.employer}</span>
                 </div>
               </div>
@@ -123,7 +128,7 @@ export default function Footer() {
               <div className="flex items-start gap-2.5">
                 <Phone className="w-4 h-4 text-[#ffba00] mt-0.5 flex-shrink-0" />
                 <div>
-                  <span className="text-slate-400 block text-xs">Direct Society Phone:</span>
+                  <span className="text-slate-400 block text-xs">{t("footer.directSocietyPhone", "Direct Society Phone:")}</span>
                   <a href={`tel:${SOCIETY_INFO.phoneRaw}`} className="font-bold text-white hover:text-[#ffba00] transition-colors">
                     {SOCIETY_INFO.phone}
                   </a>
@@ -133,7 +138,7 @@ export default function Footer() {
               <div className="flex items-start gap-2.5">
                 <Clock className="w-4 h-4 text-slate-400 mt-0.5 flex-shrink-0" />
                 <div>
-                  <span className="text-slate-400 block text-xs">Working Hours:</span>
+                  <span className="text-slate-400 block text-xs">{t("footer.workingHours", "Working Hours:")}</span>
                   <span className="text-slate-300 text-xs">{SOCIETY_INFO.officeHours}</span>
                 </div>
               </div>
@@ -145,15 +150,15 @@ export default function Footer() {
         {/* Bottom Bar Spanning Full Width */}
         <div className="pt-8 flex flex-col md:flex-row items-center justify-between text-xs text-slate-500 gap-4 w-full">
           <p>
-            &copy; {CURRENT_YEAR} {SOCIETY_INFO.fullName}. All rights reserved.
+            &copy; {CURRENT_YEAR} {SOCIETY_INFO.fullName}. {t("common.copyright", "All Rights Reserved")}.
           </p>
           <div className="flex items-center gap-6">
-            <span className="text-slate-400">Cooperative Society Registration Framework</span>
+            <span className="text-slate-400">{t("footer.cooperativeSocietyRegistrationFramework", "Cooperative Society Registration Framework")}</span>
             <Link to="/contact" className="hover:text-slate-300 transition-colors">
-              Enquiry Counter
+              {t("contact.enquiryCounter", "Enquiry Counter")}
             </Link>
             <Link to="/about" className="hover:text-slate-300 transition-colors">
-              Society Governance
+              {t("footer.societyGovernance", "Society Governance")}
             </Link>
           </div>
         </div>

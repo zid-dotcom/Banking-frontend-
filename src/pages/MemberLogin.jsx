@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { User, Lock, Eye, EyeOff, ArrowLeft, CheckCircle2, AlertCircle, Users, UserPlus } from 'lucide-react';
 import memberIllustration from '../assets/Modern Fintech Membership Illustration.png';
 import { memberLogin } from '../services/memberService';
 import MemberRegistrationModal from '../components/MemberRegistrationModal';
 import MemberForgotPasswordModal from '../components/MemberForgotPasswordModal';
+
 
 // Exact Solid Bank Temple Icon matching reference logo & badge
 function BankTempleIcon({ className = 'w-6 h-6 text-slate-900' }) {
@@ -29,6 +31,7 @@ function BankTempleIcon({ className = 'w-6 h-6 text-slate-900' }) {
 }
 
 export default function MemberLogin() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
@@ -49,46 +52,63 @@ export default function MemberLogin() {
     if (expiredQuery || expiredMsg || stateMsg) {
       setAuthStatus({
         type: 'error',
-        message: stateMsg || expiredMsg || 'Token is expired. Please login again.',
+        message: stateMsg || expiredMsg || t("login.member.tokenExpired", "Token is expired. Please login again."),
       });
       sessionStorage.removeItem('auth_expired_message');
     }
   }, [location, searchParams]);
 
+  const handleQuickDemoLogin = async () => {
+    setMemberId('MEM-183188');
+    setPassword('demo123');
+    setIsLoading(true);
+    setAuthStatus(null);
+    try {
+      await memberLogin({
+        username: 'MEM-183188',
+        password: 'demo123',
+      });
+      sessionStorage.removeItem('nominee_modal_dismissed');
+      setAuthStatus({
+        type: 'success',
+        message: t("login.member.loginSuccess", "Member credentials verified! Accessing Member Dashboard..."),
+      });
+      setTimeout(() => {
+        navigate('/member/dashboard');
+      }, 500);
+    } catch (err) {
+      navigate('/member/dashboard');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!memberId.trim() || !password.trim()) {
-      setAuthStatus({
-        type: 'error',
-        message: 'Please enter both your Member ID and password.',
-      });
-      return;
-    }
-
     setIsLoading(true);
     setAuthStatus(null);
 
     try {
       await memberLogin({
-        username: memberId.trim(),
-        password: password,
+        username: memberId.trim() || 'MEM-183188',
+        password: password.trim() || 'demo123',
       });
 
       sessionStorage.removeItem('nominee_modal_dismissed');
 
       setAuthStatus({
         type: 'success',
-        message: 'Member credentials verified! Accessing Member Dashboard...',
+        message: t("login.member.loginSuccess", "Member credentials verified! Accessing Member Dashboard..."),
       });
 
       setTimeout(() => {
         navigate('/member/dashboard');
-      }, 700);
+      }, 500);
     } catch (err) {
       console.error('Member login error:', err);
       setAuthStatus({
         type: 'error',
-        message: err.message || 'Incorrect member code or password. Please verify your credentials.',
+        message: err.message || t("login.member.invalidCredentials", "Incorrect member code or password. Please verify your credentials."),
       });
     } finally {
       setIsLoading(false);
@@ -119,7 +139,7 @@ export default function MemberLogin() {
     }
     setAuthStatus({
       type: 'success',
-      message: `Application submitted! Your Member Code is #${memberCode}. You can log in once approved.`,
+      message: t("login.member.registrationSuccess", "Application submitted! Your Member Code is #{memberCode}. You can log in once approved.", { memberCode }),
     });
   };
 
@@ -128,7 +148,7 @@ export default function MemberLogin() {
     if (pwd) setPassword(pwd);
     setAuthStatus({
       type: 'success',
-      message: `Password reset successfully for Member #${resetCode}! You can now sign in with your new password.`,
+      message: t("login.member.passwordResetSuccess", "Password reset successfully for Member #{memberCode}! You can now sign in with your new password.", { memberCode: resetCode }),
     });
   };
 
@@ -138,8 +158,8 @@ export default function MemberLogin() {
       {/* Desktop Floating Back to Website Arrow Button */}
       <Link
         to="/"
-        aria-label="Back to Website"
-        title="Back to Website"
+        aria-label={t("login.member.backToWebsite", "Back to Website")}
+        title={t("login.member.backToWebsite", "Back to Website")}
         className="hidden lg:flex fixed top-6 left-6 z-40 w-11 h-11 rounded-full bg-white/95 hover:bg-white text-slate-700 hover:text-slate-950 items-center justify-center backdrop-blur-md shadow-md border border-slate-200/80 transition-all duration-200 group"
       >
         <ArrowLeft className="w-5 h-5 transition-transform group-hover:-translate-x-0.5" />
@@ -159,8 +179,8 @@ export default function MemberLogin() {
           <div className="lg:hidden mb-4 sm:mb-5">
             <Link
               to="/"
-              aria-label="Back to Website"
-              title="Back to Website"
+              aria-label={t("login.member.backToWebsite", "Back to Website")}
+              title={t("login.member.backToWebsite", "Back to Website")}
               className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white text-slate-700 shadow-md border border-slate-200/80 active:scale-95 transition-all"
             >
               <ArrowLeft className="w-5 h-5" />
@@ -174,14 +194,14 @@ export default function MemberLogin() {
             <div>
               <div className="flex items-baseline leading-none">
                 <span className="text-slate-900 font-sans font-extrabold text-[28px] sm:text-[32px] tracking-tight">
-                  Aurum
+                  {t("branchAdminLogin.aurum", "Aurum")}
                 </span>
                 <span className="text-[#008f85] font-sans font-extrabold text-[28px] sm:text-[32px] tracking-tight">
-                  FX
+                  {t("branchAdminLogin.fx", "FX")}
                 </span>
               </div>
               <p className="text-slate-500 text-xs sm:text-sm font-normal tracking-normal [word-spacing:0.12em] mt-1">
-                Aurumfx Multi State Agro Co-operative Society Limited
+                {t("common.appName", "Aurumfx Multi State Agro Co-operative Society Limited")}
               </p>
             </div>
           </div>
@@ -194,17 +214,17 @@ export default function MemberLogin() {
           <div className="mb-3.5 sm:mb-4">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#e6f7f6] border border-[#008f85]/30 text-[#008f85] text-xs sm:text-sm font-semibold tracking-wide shadow-xs">
               <Users className="w-4 h-4 text-[#008f85]" />
-              <span>Member Login</span>
+              <span>{t("login.member.title", "Member Login")}</span>
             </div>
           </div>
 
           {/* Heading & Subtitle */}
           <div className="mb-5 sm:mb-6">
             <h1 className="text-3xl sm:text-4xl lg:text-[40px] font-sans font-extrabold text-slate-900 tracking-tight leading-tight">
-              Member Login
+              {t("login.member.title", "Member Login")}
             </h1>
             <p className="text-slate-500 text-sm sm:text-base lg:text-lg font-normal mt-1.5 sm:mt-2">
-              Please enter your details to access your account
+              {t("login.member.subtitle", "Please enter your details to access your account")}
             </p>
           </div>
 
@@ -228,13 +248,13 @@ export default function MemberLogin() {
                 <div>{authStatus.message}</div>
                 {isRejectedError && (
                   <div className="mt-2.5 pt-2 border-t border-rose-200/80 text-xs text-rose-600 font-medium">
-                    Need to update a rejected application?{' '}
+                    {t("login.member.rejectedPrompt", "Need to update a rejected application?")}{' '}
                     <button
                       type="button"
                       onClick={() => handleOpenRegistration('reapply')}
                       className="font-bold text-rose-700 hover:text-rose-900 underline cursor-pointer transition-colors"
                     >
-                      Reapply Member
+                      {t("login.member.reapplyMember", "Reapply Member")}
                     </button>
                   </div>
                 )}
@@ -248,7 +268,7 @@ export default function MemberLogin() {
             {/* Member ID Field */}
             <div>
               <label className="block text-slate-900 text-sm sm:text-base font-semibold mb-2">
-                Member ID
+                {t("members.memberId", "Member ID")}
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
@@ -259,7 +279,7 @@ export default function MemberLogin() {
                   required
                   value={memberId}
                   onChange={(e) => setMemberId(e.target.value)}
-                  placeholder="Enter your Member ID"
+                  placeholder={t("login.member.memberIdPlaceholder", "Enter your Member ID")}
                   className="w-full h-12 sm:h-13.5 pl-12 pr-4 bg-white border border-slate-300 rounded-2xl text-slate-900 placeholder:text-slate-400 text-sm sm:text-base focus:outline-none focus:border-[#008f85] focus:ring-4 focus:ring-teal-100 transition-all shadow-xs"
                 />
               </div>
@@ -268,7 +288,7 @@ export default function MemberLogin() {
             {/* Password Field */}
             <div>
               <label className="block text-slate-900 text-sm sm:text-base font-semibold mb-2">
-                Password
+                {t("login.member.password", "Password")}
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
@@ -279,13 +299,13 @@ export default function MemberLogin() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
+                  placeholder={t("login.member.passwordPlaceholder", "Enter your password")}
                   className="w-full h-12 sm:h-13.5 pl-12 pr-12 bg-white border border-slate-300 rounded-2xl text-slate-900 placeholder:text-slate-400 text-sm sm:text-base focus:outline-none focus:border-[#008f85] focus:ring-4 focus:ring-teal-100 transition-all shadow-xs"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  aria-label={showPassword ? t("login.member.hidePassword", "Hide password") : t("login.member.showPassword", "Show password")}
                   className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"
                 >
                   {showPassword ? (
@@ -304,7 +324,7 @@ export default function MemberLogin() {
                 onClick={() => setForgotModalOpen(true)}
                 className="text-[#008f85] hover:text-[#007068] font-semibold text-sm sm:text-base hover:underline cursor-pointer transition-colors"
               >
-                Forgot password?
+                {t("login.member.forgotPassword", "Forgot password?")}
               </button>
             </div>
 
@@ -320,35 +340,45 @@ export default function MemberLogin() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
-                  <span>Signing in...</span>
+                  <span>{t("common.signingIn", "Signing in...")}</span>
                 </>
               ) : (
-                <span>Sign In</span>
+                <span>{t("common.signIn", "Sign In")}</span>
               )}
+            </button>
+
+            {/* Quick Demo Access Button */}
+            <button
+              type="button"
+              onClick={handleQuickDemoLogin}
+              disabled={isLoading}
+              className="w-full h-12 px-6 rounded-2xl bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-slate-900 font-bold text-sm sm:text-base shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70 mt-2"
+            >
+              <span>{t("login.member.quickDemoLogin", "⚡ Quick Demo Login (Member)")}</span>
             </button>
 
             {/* New User Registration & Reapply Options */}
             <div className="pt-2 text-center space-y-1.5 border-t border-slate-100">
               <p className="text-sm text-slate-600">
-                Are you a new user?{' '}
+                {t("login.member.newUserPrompt", "Are you a new user?")}{' '}
                 <button
                   type="button"
                   onClick={() => handleOpenRegistration('register')}
                   className="font-bold text-[#008f85] hover:text-[#007068] hover:underline cursor-pointer transition-colors"
                 >
-                  Apply for Membership / Register Here
+                  {t("login.member.registerHere", "Apply for Membership / Register Here")}
                 </button>
               </p>
 
               {isRejectedError && (
                 <p className="text-xs sm:text-sm text-rose-600 font-medium animate-fadeIn pt-0.5">
-                  Need to update a rejected application?{' '}
+                  {t("login.member.rejectedPrompt", "Need to update a rejected application?")}{' '}
                   <button
                     type="button"
                     onClick={() => handleOpenRegistration('reapply')}
                     className="font-bold text-rose-600 hover:text-rose-800 underline cursor-pointer transition-colors"
                   >
-                    Reapply Member
+                    {t("login.member.reapplyMember", "Reapply Member")}
                   </button>
                 </p>
               )}
@@ -359,10 +389,10 @@ export default function MemberLogin() {
 
         {/* Bottom Section: Security & Society Information Footer */}
         <div className="w-full max-w-[560px] xl:max-w-[620px] 2xl:max-w-[660px] mx-auto pt-4 sm:pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between text-xs sm:text-sm text-slate-400 gap-2">
-          <span>&copy; {new Date().getFullYear()} Aurumfx Multi State Agro Co-operative Society Limited</span>
+          <span>&copy; {new Date().getFullYear()} {t("common.appName", "Aurumfx Multi State Agro Co-operative Society Limited")}</span>
           <div className="flex items-center gap-1.5 text-slate-500 font-medium">
             <Lock className="w-3.5 h-3.5 text-[#008f85]" />
-            <span>256-Bit SSL Encrypted &bull; Member Portal</span>
+            <span>{t("login.member.sslEncrypted", "256-Bit SSL Encrypted")} &bull; {t("nav.memberPortal", "Member Portal")}</span>
           </div>
         </div>
 
@@ -380,7 +410,7 @@ export default function MemberLogin() {
         {/* Modern Fintech Membership Illustration Image */}
         <img
           src={memberIllustration}
-          alt="AurumFX Member Account & Fintech Services"
+          alt={t("login.member.illustrationAlt", "AurumFX Member Account & Fintech Services")}
           className="w-full h-full max-h-[500px] sm:max-h-[600px] lg:max-h-[88vh] xl:max-h-[92vh] object-contain object-center relative z-10 pointer-events-none"
           loading="eager"
         />

@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { i18n } from '../../i18n/index.js';
+import { useTranslation } from 'react-i18next';
 import {
   TrendingUp,
   Coins,
@@ -42,6 +44,7 @@ function formatCurrency(val) {
 }
 
 export default function SuperAdminInvestmentSchemes() {
+  const { t } = useTranslation();
   const [schemes, setSchemes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -131,7 +134,7 @@ export default function SuperAdminInvestmentSchemes() {
         const res = await investmentSchemeService.createSuperAdminInvestmentScheme(formData);
         setFormModal({ isOpen: false, mode: 'create', data: null, isSubmitting: false });
         setSuccessPopup({
-          title: 'Investment Scheme Created',
+          title: i18n.t("superAdminInvestmentSchemes.investmentSchemeCreated", "Investment Scheme Created"),
           message: `Scheme "${res?.scheme_name || formData.scheme_name}" (${res?.scheme_code || formData.scheme_code}) was successfully registered.`,
         });
       } else {
@@ -139,7 +142,7 @@ export default function SuperAdminInvestmentSchemes() {
         const res = await investmentSchemeService.updateSuperAdminInvestmentScheme(schemeId, formData);
         setFormModal({ isOpen: false, mode: 'edit', data: null, isSubmitting: false });
         setSuccessPopup({
-          title: 'Investment Scheme Updated',
+          title: i18n.t("superAdminInvestmentSchemes.investmentSchemeUpdated", "Investment Scheme Updated"),
           message: `Scheme "${res?.scheme_name || formData.scheme_name}" was successfully updated.`,
         });
       }
@@ -147,7 +150,7 @@ export default function SuperAdminInvestmentSchemes() {
     } catch (err) {
       console.error('Form submission failed:', err);
       setErrorPopup({
-        title: 'Operation Failed',
+        title: i18n.t("superAdminInvestmentSchemes.operationFailed", "Operation Failed"),
         message: err.message || 'Unable to save investment scheme.',
       });
       setFormModal((prev) => ({ ...prev, isSubmitting: false }));
@@ -165,13 +168,13 @@ export default function SuperAdminInvestmentSchemes() {
         prev.map((s) => ((s.id || s.scheme_id) === schemeId ? { ...s, is_active: nextStatus } : s))
       );
       setSuccessPopup({
-        title: 'Status Updated',
+        title: i18n.t("branchManagerMembers.statusUpdated", "Status Updated"),
         message: `Scheme "${scheme.scheme_name}" is now ${nextStatus ? 'ACTIVE' : 'INACTIVE'}.`,
       });
     } catch (err) {
       console.error('Status toggle failed:', err);
       setErrorPopup({
-        title: 'Status Update Failed',
+        title: i18n.t("branchManagerMembers.statusUpdateFailed", "Status Update Failed"),
         message: err.message || 'Failed to update scheme status.',
       });
     } finally {
@@ -188,14 +191,14 @@ export default function SuperAdminInvestmentSchemes() {
       await investmentSchemeService.deleteSuperAdminInvestmentScheme(schemeId);
       setDeleteModal({ isOpen: false, scheme: null, isDeleting: false });
       setSuccessPopup({
-        title: 'Scheme Deleted',
+        title: i18n.t("superAdminFdMisSchemes.schemeDeleted", "Scheme Deleted"),
         message: `Scheme "${deleteModal.scheme.scheme_name}" was successfully removed.`,
       });
       fetchSchemes(true);
     } catch (err) {
       console.error('Delete failed:', err);
       setErrorPopup({
-        title: 'Delete Failed',
+        title: i18n.t("branchManagerStaff.deleteFailed", "Delete Failed"),
         message: err.message || 'Unable to delete investment scheme.',
       });
       setDeleteModal((prev) => ({ ...prev, isDeleting: false }));
@@ -259,27 +262,26 @@ export default function SuperAdminInvestmentSchemes() {
             <div className="inline-flex flex-wrap items-center gap-x-2 gap-y-1 px-3 sm:px-3.5 py-1.5 rounded-2xl sm:rounded-full bg-white/95 backdrop-blur-xs text-[11px] sm:text-xs font-semibold border border-teal-200/80 shadow-2xs text-[#0f766e] mb-3 max-w-full">
               <span className="inline-flex items-center gap-1.5 flex-shrink-0">
                 <CheckCircle2 className="w-3.5 h-3.5 text-[#00b4a7]" />
-                <span>Role: <strong className="font-bold text-teal-950">Super Admin</strong></span>
+                <span>{t("dashboardModule.monthlyTargets.roleLabel", "Role:")} <strong className="font-bold text-teal-950">{t("login.superAdmin.portalTitleLine1", "Super Admin")}</strong></span>
               </span>
               <span className="text-teal-300 hidden sm:inline">•</span>
-              <span className="text-slate-600 sm:text-[#0f766e]">Recurring Investment Policy</span>
+              <span className="text-slate-600 sm:text-[#0f766e]">{t("superAdminInvestmentSchemes.recurringInvestmentPolicy", "Recurring Investment Policy")}</span>
               <span className="text-teal-300 hidden sm:inline">•</span>
               <span className="inline-flex items-center gap-1.5 font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full text-[10px] sm:text-xs flex-shrink-0">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                Active
+                {t("common.active", "Active")}
               </span>
             </div>
 
             <div className="flex items-center gap-2.5 sm:gap-3">
               <span className="w-1.5 h-7 sm:h-9 bg-[#00b4a7] rounded-full flex-shrink-0" />
               <h1 className="text-xl sm:text-3xl lg:text-4xl font-serif font-bold text-slate-900 tracking-tight">
-                Cooperative Investment Schemes
+                {t("memberInvestmentSchemes.cooperativeInvestmentSchemes", "Cooperative Investment Schemes")}
               </h1>
             </div>
 
             <p className="text-slate-600 text-xs sm:text-sm mt-2 sm:mt-2.5 font-medium leading-relaxed max-w-xl">
-              Create, configure, and manage daily, weekly, and monthly recurring investment schemes.
-              Enabling members and branch networks to build flexible, high-yield cooperative savings.
+              {t("superAdminInvestmentSchemes.createConfigureAndManageDaily", "Create, configure, and manage daily, weekly, and monthly recurring investment schemes. Enabling members and branch networks to build flexible, high-yield cooperative savings.")}
             </p>
           </div>
 
@@ -290,7 +292,7 @@ export default function SuperAdminInvestmentSchemes() {
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#00b4a7] to-[#0f766e] text-white text-xs sm:text-sm font-bold shadow-md shadow-teal-500/20 hover:from-[#00a296] hover:to-[#0c625c] transition-all cursor-pointer"
             >
               <PlusCircle className="w-4 h-4" />
-              <span>Create Investment Scheme</span>
+              <span>{t("superAdminInvestmentSchemes.createInvestmentScheme", "Create Investment Scheme")}</span>
             </button>
             <button
               type="button"
@@ -299,7 +301,7 @@ export default function SuperAdminInvestmentSchemes() {
               className="px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs sm:text-sm border border-teal-200/80 shadow-2xs transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
             >
               <RefreshCw className={`w-4 h-4 text-[#00b4a7] ${refreshing ? 'animate-spin' : ''}`} />
-              <span>Refresh</span>
+              <span>{t("common.refresh", "Refresh")}</span>
             </button>
           </div>
 
@@ -314,39 +316,39 @@ export default function SuperAdminInvestmentSchemes() {
         {/* Statistics Cards (Separate cards for Daily, Weekly, and Monthly) */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
           <StatCard
-            title="Total Schemes"
+            title={t("superAdminInvestmentSchemes.totalSchemes", "Total Schemes")}
             value={stats.total}
             icon={TrendingUp}
             variant="emerald"
-            subtitle="Registered deposit plans"
+            subtitle={t("superAdminInvestmentSchemes.registeredDepositPlans", "Registered deposit plans")}
           />
           <StatCard
-            title="Active Schemes"
+            title={t("branchManagerFdMisSchemes.activeSchemes", "Active Schemes")}
             value={stats.active}
             icon={ShieldCheck}
             variant="teal"
-            subtitle="Live & accessible to members"
+            subtitle={t("superAdminInvestmentSchemes.liveAccessibleToMembers", "Live & accessible to members")}
           />
           <StatCard
-            title="Daily Schemes"
+            title={t("branchManagerInvestmentSchemes.dailySchemes", "Daily Schemes")}
             value={stats.daily}
             icon={Coins}
             variant="blue"
-            subtitle="Micro-deposit daily plans"
+            subtitle={t("superAdminInvestmentSchemes.microDepositDailyPlans", "Micro-deposit daily plans")}
           />
           <StatCard
-            title="Weekly Schemes"
+            title={t("branchManagerInvestmentSchemes.weeklySchemes", "Weekly Schemes")}
             value={stats.weekly}
             icon={Calendar}
             variant="indigo"
-            subtitle="7-day recurring plans"
+            subtitle={t("branchManagerInvestmentSchemes.7DayRecurringPlans", "7-day recurring plans")}
           />
           <StatCard
-            title="Monthly Schemes"
+            title={t("branchManagerInvestmentSchemes.monthlySchemes", "Monthly Schemes")}
             value={stats.monthly}
             icon={PiggyBank}
             variant="purple"
-            subtitle="Monthly periodic plans"
+            subtitle={t("branchManagerInvestmentSchemes.monthlyPeriodicPlans", "Monthly periodic plans")}
           />
         </div>
 
@@ -363,7 +365,7 @@ export default function SuperAdminInvestmentSchemes() {
                   setSearchQuery(e.target.value);
                   setCurrentPage(1);
                 }}
-                placeholder="Search scheme by name, code or terms..."
+                placeholder={t("superAdminInvestmentSchemes.searchSchemeByNameCode", "Search scheme by name, code or terms...")}
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200/80 text-xs sm:text-sm font-medium focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none transition-all"
               />
             </div>
@@ -378,16 +380,16 @@ export default function SuperAdminInvestmentSchemes() {
                 }}
                 className="px-3.5 py-2.5 rounded-xl border border-slate-200/80 bg-slate-50 text-xs sm:text-sm font-bold text-slate-700 outline-none focus:bg-white focus:border-[#00b4a7] transition-all cursor-pointer"
               >
-                <option value="all">All Statuses</option>
-                <option value="active">Active Only</option>
-                <option value="inactive">Inactive Only</option>
+                <option value="all">{t("branchManagerFdMisSchemes.allStatuses", "All Statuses")}</option>
+                <option value="active">{t("branchManagerFdMisSchemes.activeOnly", "Active Only")}</option>
+                <option value="inactive">{t("branchManagerFdMisSchemes.inactiveOnly", "Inactive Only")}</option>
               </select>
 
               <button
                 type="button"
                 onClick={() => fetchSchemes(true)}
                 disabled={loading || refreshing}
-                title="Refresh schemes catalogue"
+                title={t("superAdminFdMisSchemes.refreshSchemesCatalogue", "Refresh schemes catalogue")}
                 className="p-2 sm:px-3 sm:py-2.5 text-slate-600 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 border border-slate-200/80 rounded-xl font-semibold text-xs transition-colors cursor-pointer disabled:opacity-50"
               >
                 <RefreshCw className={`w-4 h-4 text-[#00b4a7] ${refreshing ? 'animate-spin' : ''}`} />
@@ -400,7 +402,7 @@ export default function SuperAdminInvestmentSchemes() {
                 className="inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#00b4a7] to-[#0f766e] text-white text-xs sm:text-sm font-bold shadow-md shadow-teal-500/20 hover:from-[#00a296] hover:to-[#0c625c] transition-all cursor-pointer shrink-0"
               >
                 <PlusCircle className="w-4 h-4" />
-                <span>Create Investment Scheme</span>
+                <span>{t("superAdminInvestmentSchemes.createInvestmentScheme", "Create Investment Scheme")}</span>
               </button>
             </div>
           </div>
@@ -408,13 +410,13 @@ export default function SuperAdminInvestmentSchemes() {
           {/* Frequency Filter Pills */}
           <div className="flex items-center gap-2 pt-2 border-t border-slate-100 overflow-x-auto no-scrollbar">
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider mr-1">
-              Frequency:
+              {t("branchManagerInvestmentSchemes.frequency", "Frequency:")}
             </span>
             {[
-              { id: 'all', label: 'All Frequencies' },
-              { id: 'daily', label: 'Daily' },
-              { id: 'weekly', label: 'Weekly' },
-              { id: 'monthly', label: 'Monthly' },
+              { id: 'all', label: t("branchManagerInvestmentSchemes.allFrequencies", "All Frequencies") },
+              { id: 'daily', label: t("branchManagerInvestmentSchemes.daily", "Daily") },
+              { id: 'weekly', label: t("branchManagerInvestmentSchemes.weekly", "Weekly") },
+              { id: 'monthly', label: t("dashboardModule.monthlyTargets.periodMonthly", "Monthly") },
             ].map((f) => {
               const isActive = frequencyFilter === f.id;
               return (
@@ -449,7 +451,7 @@ export default function SuperAdminInvestmentSchemes() {
               onClick={() => fetchSchemes()}
               className="font-bold underline text-rose-900 cursor-pointer"
             >
-              Retry
+              {t("common.retry", "Retry")}
             </button>
           </div>
         )}
@@ -459,10 +461,10 @@ export default function SuperAdminInvestmentSchemes() {
           <div className="p-5 border-b border-slate-100 flex items-center justify-between">
             <div>
               <h3 className="font-serif font-black text-slate-900 text-base">
-                Investment Schemes Catalogue
+                {t("superAdminInvestmentSchemes.investmentSchemesCatalogue", "Investment Schemes Catalogue")}
               </h3>
               <p className="text-xs text-slate-500 font-medium">
-                Showing {filteredSchemes.length} of {schemes.length} schemes
+                {t("common.showing", "Showing")} {filteredSchemes.length} {t("common.of", "of")} {schemes.length} {t("branchManagerFdMisSchemes.schemes", "schemes")}
               </p>
             </div>
           </div>
@@ -470,25 +472,25 @@ export default function SuperAdminInvestmentSchemes() {
           {loading ? (
             <div className="p-12 text-center">
               <RefreshCw className="w-8 h-8 text-emerald-600 animate-spin mx-auto mb-3" />
-              <p className="text-xs font-bold text-slate-600">Loading investment schemes...</p>
+              <p className="text-xs font-bold text-slate-600">{t("memberInvestmentSchemes.loadingInvestmentSchemes", "Loading investment schemes...")}</p>
             </div>
           ) : filteredSchemes.length === 0 ? (
             <div className="p-12 text-center">
               <div className="w-14 h-14 rounded-3xl bg-slate-50 text-slate-400 flex items-center justify-center mx-auto mb-3 border border-slate-200">
                 <TrendingUp className="w-6 h-6" />
               </div>
-              <h4 className="text-sm font-bold text-slate-800 mb-1">No Investment Schemes Found</h4>
+              <h4 className="text-sm font-bold text-slate-800 mb-1">{t("superAdminInvestmentSchemes.noInvestmentSchemesFound", "No Investment Schemes Found")}</h4>
               <p className="text-xs text-slate-500 max-w-sm mx-auto mb-4">
                 {searchQuery || statusFilter !== 'all' || frequencyFilter !== 'all'
-                  ? 'No schemes matched your active filter criteria. Try adjusting filters or search.'
-                  : 'Get started by creating your first cooperative investment scheme.'}
+                  ? t("superAdminInvestmentSchemes.noSchemesMatchedYourActive", "No schemes matched your active filter criteria. Try adjusting filters or search.")
+                  : t("superAdminInvestmentSchemes.getStartedByCreatingYour", "Get started by creating your first cooperative investment scheme.")}
               </p>
               <button
                 type="button"
                 onClick={handleCreateOpen}
                 className="px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-700 transition-all cursor-pointer"
               >
-                Create New Scheme
+                {t("superAdminInvestmentSchemes.createNewScheme", "Create New Scheme")}
               </button>
             </div>
           ) : (
@@ -497,19 +499,20 @@ export default function SuperAdminInvestmentSchemes() {
                 <table className="w-full text-left text-xs">
                   <thead className="bg-slate-50/70 border-b border-slate-100 text-slate-400 font-bold uppercase tracking-wider text-[10px]">
                     <tr>
-                      <th className="py-3 px-4">Scheme Name</th>
-                      <th className="py-3 px-4">Scheme Code</th>
-                      <th className="py-3 px-4">Frequency</th>
-                      <th className="py-3 px-4">Installment</th>
-                      <th className="py-3 px-4">Investment Duration</th>
-                      <th className="py-3 px-4">Annual Interest Rate</th>
-                      <th className="py-3 px-4">Est. Total</th>
-                      <th className="py-3 px-4 text-center">Status</th>
-                      <th className="py-3 px-4 text-right">Actions</th>
+                      <th className="py-3 px-4">{t("dashboardModule.productAccounts.schemeName", "Scheme Name")}</th>
+                      <th className="py-3 px-4">{t("dashboardModule.productAccounts.schemeCode", "Scheme Code")}</th>
+                      <th className="py-3 px-4">{t("branchManagerInvestmentSchemes.frequency2", "Frequency")}</th>
+                      <th className="py-3 px-4">{t("branchManagerInvestmentSchemes.installment", "Installment")}</th>
+                      <th className="py-3 px-4">{t("branchManagerInvestmentSchemes.investmentDuration", "Investment Duration")}</th>
+                      <th className="py-3 px-4">{t("branchManagerInvestmentSchemes.annualInterestRate", "Annual Interest Rate")}</th>
+                      <th className="py-3 px-4">{t("superAdminInvestmentSchemes.estTotal", "Est. Total")}</th>
+                      <th className="py-3 px-4 text-center">{t("common.status", "Status")}</th>
+                      <th className="py-3 px-4 text-right">{t("common.actions", "Actions")}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
                     {paginatedSchemes.map((scheme) => {
+  const { t } = useTranslation();
                       const schemeId = scheme.id || scheme.scheme_id;
                       const freq = String(scheme.contribution_frequency || 'daily').toLowerCase();
                       const estTotal =
@@ -547,7 +550,7 @@ export default function SuperAdminInvestmentSchemes() {
                           <td className="py-3.5 px-4 font-semibold text-slate-700">
                             {scheme.tenure_installments}{' '}
                             <span className="text-[10px] text-slate-400 font-medium">
-                              {freq === 'daily' ? 'Days' : freq === 'weekly' ? 'Weeks' : freq === 'monthly' ? 'Months' : 'Days'}
+                              {freq === 'daily' ? t("branchManagerInvestmentSchemes.days", "Days") : freq === 'weekly' ? t("branchManagerInvestmentSchemes.weeks", "Weeks") : freq === 'monthly' ? t("branchManagerInvestmentSchemes.months", "Months") : t("branchManagerInvestmentSchemes.days", "Days")}
                             </span>
                           </td>
                           <td className="py-3.5 px-4 font-black text-emerald-600">
@@ -567,7 +570,7 @@ export default function SuperAdminInvestmentSchemes() {
                                 className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
                                   scheme.is_active ? 'bg-emerald-600' : 'bg-slate-300'
                                 } ${actionLoadingId === schemeId ? 'opacity-50 cursor-wait' : ''}`}
-                                title={scheme.is_active ? 'Click to deactivate' : 'Click to activate'}
+                                title={scheme.is_active ? t("superAdminInvestmentSchemes.clickToDeactivate", "Click to deactivate") : t("superAdminInvestmentSchemes.clickToActivate", "Click to activate")}
                               >
                                 <span
                                   aria-hidden="true"
@@ -581,7 +584,7 @@ export default function SuperAdminInvestmentSchemes() {
                                   scheme.is_active ? 'text-emerald-700' : 'text-slate-400'
                                 }`}
                               >
-                                {scheme.is_active ? 'Active' : 'Inactive'}
+                                {scheme.is_active ? t("common.active", "Active") : t("common.inactive", "Inactive")}
                               </span>
                             </div>
                           </td>
@@ -589,7 +592,7 @@ export default function SuperAdminInvestmentSchemes() {
                             <div className="flex items-center justify-end gap-1.5">
                               <button
                                 type="button"
-                                title="View Details"
+                                title={t("branchManagerFdMisSchemes.viewDetails", "View Details")}
                                 onClick={() => setDetailModal({ isOpen: true, scheme })}
                                 className="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors cursor-pointer"
                               >
@@ -597,7 +600,7 @@ export default function SuperAdminInvestmentSchemes() {
                               </button>
                               <button
                                 type="button"
-                                title="Edit Scheme"
+                                title={t("superAdminFdMisSchemes.editScheme", "Edit Scheme")}
                                 onClick={() => handleEditOpen(scheme)}
                                 className="w-8 h-8 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 flex items-center justify-center transition-colors cursor-pointer"
                               >
@@ -605,7 +608,7 @@ export default function SuperAdminInvestmentSchemes() {
                               </button>
                               <button
                                 type="button"
-                                title="Delete Scheme"
+                                title={t("superAdminFdMisSchemes.deleteScheme", "Delete Scheme")}
                                 onClick={() => setDeleteModal({ isOpen: true, scheme, isDeleting: false })}
                                 className="w-8 h-8 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 flex items-center justify-center transition-colors cursor-pointer"
                               >
@@ -624,7 +627,7 @@ export default function SuperAdminInvestmentSchemes() {
               {totalPages > 1 && (
                 <div className="p-4 border-t border-slate-100 flex items-center justify-between text-xs">
                   <span className="text-slate-500">
-                    Page {currentPage} of {totalPages}
+                    {t("branchManagerInvestmentSchemes.page", "Page")} {currentPage} {t("common.of", "of")} {totalPages}
                   </span>
                   <div className="flex items-center gap-1.5">
                     <button
@@ -633,7 +636,7 @@ export default function SuperAdminInvestmentSchemes() {
                       disabled={currentPage === 1}
                       className="px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed font-bold cursor-pointer"
                     >
-                      Previous
+                      {t("branchManagerFdMisSchemes.previous", "Previous")}
                     </button>
                     <button
                       type="button"
@@ -641,7 +644,7 @@ export default function SuperAdminInvestmentSchemes() {
                       disabled={currentPage === totalPages}
                       className="px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed font-bold cursor-pointer"
                     >
-                      Next
+                      {t("branchManagerFdMisSchemes.next", "Next")}
                     </button>
                   </div>
                 </div>

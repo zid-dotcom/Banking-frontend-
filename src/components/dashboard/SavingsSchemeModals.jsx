@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { i18n } from '../../i18n/index.js';
+import { useTranslation } from 'react-i18next';
 import {
   X,
   PiggyBank,
@@ -20,17 +22,17 @@ import {
 } from 'lucide-react';
 
 const PAYOUT_OPTIONS = [
-  { value: 'monthly', label: 'Monthly Payout' },
-  { value: 'quarterly', label: 'Quarterly Payout' },
-  { value: 'half_yearly', label: 'Half-Yearly Payout' },
-  { value: 'yearly', label: 'Yearly (Annual) Payout' },
+  { value: 'monthly', label: i18n.t("savingsSchemeModals.monthlyPayout", "Monthly Payout") },
+  { value: 'quarterly', label: i18n.t("fdMisSchemeModals.quarterlyPayout", "Quarterly Payout") },
+  { value: 'half_yearly', label: i18n.t("fdMisSchemeModals.halfYearlyPayout", "Half-Yearly Payout") },
+  { value: 'yearly', label: i18n.t("fdMisSchemeModals.yearlyAnnualPayout", "Yearly (Annual) Payout") },
 ];
 
 const FREQUENCY_OPTIONS = [
-  { value: 'monthly', label: 'Monthly' },
-  { value: 'quarterly', label: 'Quarterly' },
-  { value: 'half_yearly', label: 'Half-Yearly' },
-  { value: 'yearly', label: 'Yearly' },
+  { value: 'monthly', label: i18n.t("dashboardModule.monthlyTargets.periodMonthly", "Monthly") },
+  { value: 'quarterly', label: i18n.t("savingsSchemeModals.quarterly", "Quarterly") },
+  { value: 'half_yearly', label: i18n.t("savingsSchemeModals.halfYearly", "Half-Yearly") },
+  { value: 'yearly', label: i18n.t("savingsSchemeModals.yearly", "Yearly") },
 ];
 
 const INITIAL_FORM_STATE = {
@@ -61,6 +63,7 @@ export function SavingsSchemeFormModal({
   onSubmit,
   isSubmitting = false
 }) {
+  const { t } = useTranslation();
   const [activeStep, setActiveStep] = useState(1);
   const [formData, setFormData] = useState(INITIAL_FORM_STATE);
   const [errors, setErrors] = useState({});
@@ -242,10 +245,10 @@ export function SavingsSchemeFormModal({
             </div>
             <div>
               <h2 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight">
-                {mode === 'edit' ? 'Edit Savings Scheme' : 'Create New Savings Scheme'}
+                {mode === 'edit' ? t("superAdminSavingsSchemes.editSavingsScheme", "Edit Savings Scheme") : t("savingsSchemeModals.createNewSavingsScheme", "Create New Savings Scheme")}
               </h2>
               <p className="text-[11px] sm:text-xs text-slate-500 font-medium line-clamp-1 sm:line-clamp-none">
-                Configure member savings deposit caps, interest rates, and service charges
+                {t("savingsSchemeModals.configureMemberSavingsDepositCaps", "Configure member savings deposit caps, interest rates, and service charges")}
               </p>
             </div>
           </div>
@@ -305,21 +308,21 @@ export function SavingsSchemeFormModal({
               <div className="bg-slate-50/80 rounded-2xl p-4 border border-slate-100 space-y-4">
                 <span className="text-[11px] font-bold text-teal-800 uppercase tracking-wider block flex items-center gap-1.5">
                   <Wallet className="w-3.5 h-3.5 text-[#00b4a7]" />
-                  Scheme Identification
+                  {t("fdMisSchemeModals.schemeIdentification", "Scheme Identification")}
                 </span>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Scheme Name */}
                   <div className="sm:col-span-2">
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                      Scheme Name <span className="text-red-500">*</span>
+                      {t("dashboardModule.productAccounts.schemeName", "Scheme Name")} <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
                       name="scheme_name"
                       value={formData.scheme_name}
                       onChange={handleChange}
-                      placeholder="e.g. Regular Member Savings Deposit"
+                      placeholder={t("savingsSchemeModals.eGRegularMemberSavings", "e.g. Regular Member Savings Deposit")}
                       maxLength={100}
                       className={`w-full px-4 py-2.5 rounded-xl border text-sm transition-all focus:outline-none focus:ring-2 font-medium ${
                         errors.scheme_name
@@ -338,14 +341,14 @@ export function SavingsSchemeFormModal({
                   {/* Scheme Code */}
                   <div>
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                      Scheme Code <span className="text-red-500">*</span>
+                      {t("dashboardModule.productAccounts.schemeCode", "Scheme Code")} <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
                       name="scheme_code"
                       value={formData.scheme_code}
                       onChange={(e) => setFormData((prev) => ({ ...prev, scheme_code: e.target.value.toUpperCase() }))}
-                      placeholder="e.g. SAV-REG-01"
+                      placeholder={t("savingsSchemeModals.eGSavReg01", "e.g. SAV-REG-01")}
                       maxLength={20}
                       className={`w-full px-4 py-2.5 rounded-xl border text-sm font-mono transition-all focus:outline-none focus:ring-2 font-medium ${
                         errors.scheme_code
@@ -372,7 +375,7 @@ export function SavingsSchemeFormModal({
                         className="w-4 h-4 rounded text-teal-600 focus:ring-teal-500"
                       />
                       <span className="text-xs font-bold text-slate-800">
-                        Scheme Operational Status (Active)
+                        {t("fdMisSchemeModals.schemeOperationalStatusActive", "Scheme Operational Status (Active)")}
                       </span>
                     </label>
                   </div>
@@ -383,14 +386,14 @@ export function SavingsSchemeFormModal({
               <div className="bg-slate-50/80 rounded-2xl p-4 border border-slate-100 space-y-4">
                 <span className="text-[11px] font-bold text-teal-800 uppercase tracking-wider block flex items-center gap-1.5">
                   <Coins className="w-3.5 h-3.5 text-[#00b4a7]" />
-                  Minimum Balance Requirements
+                  {t("savingsSchemeModals.minimumBalanceRequirements", "Minimum Balance Requirements")}
                 </span>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Min Opening Balance */}
                   <div>
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                      Min Opening Balance (₹) <span className="text-red-500">*</span>
+                      {t("savingsSchemeModals.minOpeningBalance", "Min Opening Balance (₹)")} <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">₹</span>
@@ -420,7 +423,7 @@ export function SavingsSchemeFormModal({
                   {/* Min Monthly Average Balance */}
                   <div>
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                      Min Monthly Avg Balance (₹) <span className="text-red-500">*</span>
+                      {t("savingsSchemeModals.minMonthlyAvgBalance", "Min Monthly Avg Balance (₹)")} <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">₹</span>
@@ -457,14 +460,14 @@ export function SavingsSchemeFormModal({
               <div className="bg-slate-50/80 rounded-2xl p-4 border border-slate-100 space-y-4">
                 <span className="text-[11px] font-bold text-teal-800 uppercase tracking-wider block flex items-center gap-1.5">
                   <Percent className="w-3.5 h-3.5 text-[#00b4a7]" />
-                  Annual Interest Yield Formulas
+                  {t("fdMisSchemeModals.annualInterestYieldFormulas", "Annual Interest Yield Formulas")}
                 </span>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Annual Interest Rate */}
                   <div>
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                      Annual Interest Rate (%) <span className="text-red-500">*</span>
+                      {t("fdMisSchemeModals.annualInterestRate", "Annual Interest Rate (%)")} <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <input
@@ -495,7 +498,7 @@ export function SavingsSchemeFormModal({
                   {/* Senior Citizen Add-on Rate */}
                   <div>
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                      Senior Citizen Add-on Rate (%)
+                      {t("fdMisSchemeModals.seniorCitizenAddOnRate", "Senior Citizen Add-on Rate (%)")}
                     </label>
                     <div className="relative">
                       <input
@@ -511,13 +514,13 @@ export function SavingsSchemeFormModal({
                       />
                       <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">%</span>
                     </div>
-                    <p className="text-[11px] text-slate-400 mt-1">Additional yield credited to senior members</p>
+                    <p className="text-[11px] text-slate-400 mt-1">{t("fdMisSchemeModals.additionalYieldCreditedToSenior", "Additional yield credited to senior members")}</p>
                   </div>
 
                   {/* Interest Payout Type */}
                   <div className="sm:col-span-1">
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                      Interest Payout Frequency <span className="text-red-500">*</span>
+                      {t("fdMisSchemeModals.interestPayoutFrequency", "Interest Payout Frequency")} <span className="text-red-500">*</span>
                     </label>
                     <select
                       name="interest_payout_type"
@@ -529,7 +532,7 @@ export function SavingsSchemeFormModal({
                           : 'border-slate-200 focus:border-teal-500 focus:ring-teal-100 bg-white'
                       }`}
                     >
-                      <option value="">Select Payout Frequency</option>
+                      <option value="">{t("savingsSchemeModals.selectPayoutFrequency", "Select Payout Frequency")}</option>
                       {PAYOUT_OPTIONS.map((opt) => (
                         <option key={opt.value} value={opt.value}>
                           {opt.label}
@@ -554,14 +557,14 @@ export function SavingsSchemeFormModal({
               <div className="bg-slate-50/80 rounded-2xl p-4 border border-slate-100 space-y-4">
                 <span className="text-[11px] font-bold text-teal-800 uppercase tracking-wider block flex items-center gap-1.5">
                   <ShieldCheck className="w-3.5 h-3.5 text-[#00b4a7]" />
-                  Operational Levies &amp; SMS Charges
+                  {t("savingsSchemeModals.operationalLeviesSmsCharges", "Operational Levies & SMS Charges")}
                 </span>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Lock-in Amount */}
                   <div>
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                      Lock-in Amount (₹)
+                      {t("savingsSchemeModals.lockInAmount", "Lock-in Amount (₹)")}
                     </label>
                     <div className="relative">
                       <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">₹</span>
@@ -581,7 +584,7 @@ export function SavingsSchemeFormModal({
                   {/* Min Monthly Avg Balance Non-maintenance Charge */}
                   <div>
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                      MAB Non-Maintenance Fee (₹)
+                      {t("savingsSchemeModals.mabNonMaintenanceFee", "MAB Non-Maintenance Fee (₹)")}
                     </label>
                     <div className="relative">
                       <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">₹</span>
@@ -601,7 +604,7 @@ export function SavingsSchemeFormModal({
                   {/* Service Charges */}
                   <div>
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                      Service / Maintenance Charge (₹)
+                      {t("savingsSchemeModals.serviceMaintenanceCharge", "Service / Maintenance Charge (₹)")}
                     </label>
                     <div className="relative">
                       <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">₹</span>
@@ -621,7 +624,7 @@ export function SavingsSchemeFormModal({
                   {/* Service Charge Frequency */}
                   <div>
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                      Service Charge Frequency
+                      {t("savingsSchemeModals.serviceChargeFrequency", "Service Charge Frequency")}
                     </label>
                     <select
                       name="service_charge_frequency"
@@ -629,7 +632,7 @@ export function SavingsSchemeFormModal({
                       onChange={handleChange}
                       className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-teal-500 focus:ring-teal-100 bg-white text-sm transition-all focus:outline-none focus:ring-2 font-medium"
                     >
-                      <option value="">Select Service Charge Frequency</option>
+                      <option value="">{t("savingsSchemeModals.selectServiceChargeFrequency", "Select Service Charge Frequency")}</option>
                       {FREQUENCY_OPTIONS.map((f) => (
                         <option key={f.value} value={f.value}>
                           {f.label}
@@ -641,7 +644,7 @@ export function SavingsSchemeFormModal({
                   {/* SMS Charges */}
                   <div>
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                      SMS Alert Charges (₹)
+                      {t("savingsSchemeModals.smsAlertCharges", "SMS Alert Charges (₹)")}
                     </label>
                     <div className="relative">
                       <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">₹</span>
@@ -661,7 +664,7 @@ export function SavingsSchemeFormModal({
                   {/* SMS Charge Frequency */}
                   <div>
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                      SMS Charge Frequency
+                      {t("savingsSchemeModals.smsChargeFrequency", "SMS Charge Frequency")}
                     </label>
                     <select
                       name="sms_charge_frequency"
@@ -669,7 +672,7 @@ export function SavingsSchemeFormModal({
                       onChange={handleChange}
                       className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-teal-500 focus:ring-teal-100 bg-white text-sm transition-all focus:outline-none focus:ring-2 font-medium"
                     >
-                      <option value="">Select SMS Charge Frequency</option>
+                      <option value="">{t("savingsSchemeModals.selectSmsChargeFrequency", "Select SMS Charge Frequency")}</option>
                       {FREQUENCY_OPTIONS.map((f) => (
                         <option key={f.value} value={f.value}>
                           {f.label}
@@ -693,7 +696,7 @@ export function SavingsSchemeFormModal({
                   className="inline-flex items-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer whitespace-nowrap"
                 >
                   <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                  <span>Back</span>
+                  <span>{t("fdMisSchemeModals.back", "Back")}</span>
                 </button>
               )}
             </div>
@@ -705,7 +708,7 @@ export function SavingsSchemeFormModal({
                 disabled={isSubmitting}
                 className="px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer whitespace-nowrap"
               >
-                Cancel
+                {t("common.cancel", "Cancel")}
               </button>
 
               {activeStep < 3 && (
@@ -718,7 +721,7 @@ export function SavingsSchemeFormModal({
                       : 'bg-[#00b4a7] hover:bg-[#009d91] text-white shadow-md shadow-teal-500/20'
                   }`}
                 >
-                  <span>Fill Next</span>
+                  <span>{t("fdMisSchemeModals.fillNext", "Fill Next")}</span>
                   <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 </button>
               )}
@@ -733,12 +736,12 @@ export function SavingsSchemeFormModal({
                   {isSubmitting ? (
                     <>
                       <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin" />
-                      <span>Saving...</span>
+                      <span>{t("branchStaffModals.saving", "Saving...")}</span>
                     </>
                   ) : (
                     <>
                       <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                      <span>{mode === 'edit' ? 'Save Changes' : 'Create Scheme'}</span>
+                      <span>{mode === 'edit' ? t("memberNominee.saveChanges", "Save Changes") : t("fdMisSchemeModals.createScheme", "Create Scheme")}</span>
                     </>
                   )}
                 </button>
@@ -761,6 +764,7 @@ export function SavingsSchemeDetailModal({
   onEditClick,
   onDeleteClick
 }) {
+  const { t } = useTranslation();
   if (!isOpen || !scheme) return null;
 
   const formatCurrency = (val) => {
@@ -807,11 +811,11 @@ export function SavingsSchemeDetailModal({
                     ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                     : 'bg-slate-100 text-slate-500 border border-slate-200'
                 }`}>
-                  {scheme.is_active !== false ? '● Active' : '○ Inactive'}
+                  {scheme.is_active !== false ? t("announcementModals.active", "● Active") : t("announcementModals.inactive", "○ Inactive")}
                 </span>
               </div>
               <p className="text-xs text-slate-500 mt-1 font-medium">
-                Savings Deposit Scheme Policy & Governance Terms
+                {t("savingsSchemeModals.savingsDepositSchemePolicyGovernance", "Savings Deposit Scheme Policy & Governance Terms")}
               </p>
             </div>
           </div>
@@ -830,7 +834,7 @@ export function SavingsSchemeDetailModal({
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <div className="bg-teal-50/70 rounded-2xl p-3.5 border border-teal-100">
               <span className="text-[10px] sm:text-[11px] font-bold text-teal-800 uppercase tracking-wider block">
-                Annual Interest Rate
+                {t("branchManagerInvestmentSchemes.annualInterestRate", "Annual Interest Rate")}
               </span>
               <p className="text-base sm:text-lg font-bold font-sans text-teal-950 mt-1">
                 {scheme.annual_interest_rate}% <span className="text-xs font-medium text-teal-700">p.a.</span>
@@ -839,7 +843,7 @@ export function SavingsSchemeDetailModal({
 
             <div className="bg-amber-50/70 rounded-2xl p-3.5 border border-amber-100">
               <span className="text-[10px] sm:text-[11px] font-bold text-amber-800 uppercase tracking-wider block">
-                Senior Citizen Add-on
+                {t("fdMisSchemeModals.seniorCitizenAddOn", "Senior Citizen Add-on")}
               </span>
               <p className="text-base sm:text-lg font-bold font-sans text-amber-950 mt-1">
                 +{scheme.senior_citizen_addon_interest_rate || 0}%
@@ -848,7 +852,7 @@ export function SavingsSchemeDetailModal({
 
             <div className="bg-slate-50 rounded-2xl p-3.5 border border-slate-100">
               <span className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
-                Min Opening Balance
+                {t("savingsSchemeModals.minOpeningBalance2", "Min Opening Balance")}
               </span>
               <p className="text-base sm:text-lg font-bold font-sans text-slate-900 mt-1">
                 {formatCurrency(scheme.min_opening_balance)}
@@ -857,7 +861,7 @@ export function SavingsSchemeDetailModal({
 
             <div className="bg-slate-50 rounded-2xl p-3.5 border border-slate-100">
               <span className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
-                Min Monthly Avg Balance
+                {t("savingsSchemeModals.minMonthlyAvgBalance2", "Min Monthly Avg Balance")}
               </span>
               <p className="text-base sm:text-lg font-bold font-sans text-slate-900 mt-1">
                 {formatCurrency(scheme.min_monthly_avg_balance)}
@@ -869,39 +873,39 @@ export function SavingsSchemeDetailModal({
           <div className="border border-slate-100 rounded-2xl p-4 sm:p-5 bg-white shadow-2xs space-y-3">
             <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
               <Coins className="w-4 h-4 text-[#00b4a7]" />
-              <span>Minimum Balance Requirements & Account Policy</span>
+              <span>{t("savingsSchemeModals.minimumBalanceRequirementsAccountPolicy", "Minimum Balance Requirements & Account Policy")}</span>
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
               <div className="p-3 bg-slate-50/80 rounded-xl border border-slate-100/80">
-                <span className="text-slate-500 block font-medium">Minimum Opening Balance</span>
+                <span className="text-slate-500 block font-medium">{t("savingsSchemeModals.minimumOpeningBalance", "Minimum Opening Balance")}</span>
                 <span className="font-bold text-slate-900 text-sm sm:text-base mt-1 block font-sans">
                   {formatCurrency(scheme.min_opening_balance)}
                 </span>
-                <span className="text-[11px] text-slate-400 mt-0.5 block">Initial required deposit</span>
+                <span className="text-[11px] text-slate-400 mt-0.5 block">{t("savingsSchemeModals.initialRequiredDeposit", "Initial required deposit")}</span>
               </div>
 
               <div className="p-3 bg-slate-50/80 rounded-xl border border-slate-100/80">
-                <span className="text-slate-500 block font-medium">Minimum Monthly Average Balance</span>
+                <span className="text-slate-500 block font-medium">{t("savingsSchemeModals.minimumMonthlyAverageBalance", "Minimum Monthly Average Balance")}</span>
                 <span className="font-bold text-slate-900 text-sm sm:text-base mt-1 block font-sans">
                   {formatCurrency(scheme.min_monthly_avg_balance)}
                 </span>
-                <span className="text-[11px] text-slate-400 mt-0.5 block">Required maintainable MAB</span>
+                <span className="text-[11px] text-slate-400 mt-0.5 block">{t("savingsSchemeModals.requiredMaintainableMab", "Required maintainable MAB")}</span>
               </div>
 
               <div className="p-3 bg-slate-50/80 rounded-xl border border-slate-100/80">
-                <span className="text-slate-500 block font-medium">MAB Non-Maintenance Charge</span>
+                <span className="text-slate-500 block font-medium">{t("savingsSchemeModals.mabNonMaintenanceCharge", "MAB Non-Maintenance Charge")}</span>
                 <span className="font-bold text-rose-700 text-sm sm:text-base mt-1 block font-sans">
                   {formatCurrency(scheme.min_monthly_avg_balance_charge)}
                 </span>
-                <span className="text-[11px] text-slate-400 mt-0.5 block">Fee when balance falls below MAB</span>
+                <span className="text-[11px] text-slate-400 mt-0.5 block">{t("savingsSchemeModals.feeWhenBalanceFallsBelow", "Fee when balance falls below MAB")}</span>
               </div>
 
               <div className="p-3 bg-slate-50/80 rounded-xl border border-slate-100/80">
-                <span className="text-slate-500 block font-medium">Lock-in Amount</span>
+                <span className="text-slate-500 block font-medium">{t("savingsSchemeModals.lockInAmount2", "Lock-in Amount")}</span>
                 <span className="font-bold text-slate-900 text-sm sm:text-base mt-1 block font-sans">
                   {formatCurrency(scheme.lock_in_amount)}
                 </span>
-                <span className="text-[11px] text-slate-400 mt-0.5 block">Mandatory reserve deposit</span>
+                <span className="text-[11px] text-slate-400 mt-0.5 block">{t("savingsSchemeModals.mandatoryReserveDeposit", "Mandatory reserve deposit")}</span>
               </div>
             </div>
           </div>
@@ -910,31 +914,31 @@ export function SavingsSchemeDetailModal({
           <div className="border border-slate-100 rounded-2xl p-4 sm:p-5 bg-white shadow-2xs space-y-3">
             <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
               <Percent className="w-4 h-4 text-[#00b4a7]" />
-              <span>Annual Interest Yield Formulas & Payout Schedule</span>
+              <span>{t("savingsSchemeModals.annualInterestYieldFormulasPayout", "Annual Interest Yield Formulas & Payout Schedule")}</span>
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
               <div className="p-3 bg-teal-50/60 rounded-xl border border-teal-100/80">
-                <span className="text-teal-800 block font-medium">Annual Interest Rate</span>
+                <span className="text-teal-800 block font-medium">{t("branchManagerInvestmentSchemes.annualInterestRate", "Annual Interest Rate")}</span>
                 <span className="font-bold text-teal-950 text-sm sm:text-base mt-1 block font-sans">
                   {scheme.annual_interest_rate}% <span className="text-xs font-medium text-teal-700">p.a.</span>
                 </span>
-                <span className="text-[11px] text-teal-700/80 mt-0.5 block">Base annual percentage yield</span>
+                <span className="text-[11px] text-teal-700/80 mt-0.5 block">{t("savingsSchemeModals.baseAnnualPercentageYield", "Base annual percentage yield")}</span>
               </div>
 
               <div className="p-3 bg-amber-50/60 rounded-xl border border-amber-100/80">
-                <span className="text-amber-800 block font-medium">Senior Citizen Add-on Rate</span>
+                <span className="text-amber-800 block font-medium">{t("savingsSchemeModals.seniorCitizenAddOnRate", "Senior Citizen Add-on Rate")}</span>
                 <span className="font-bold text-amber-950 text-sm sm:text-base mt-1 block font-sans">
                   +{scheme.senior_citizen_addon_interest_rate || 0}%
                 </span>
-                <span className="text-[11px] text-amber-700/80 mt-0.5 block">Special rate credited to senior members</span>
+                <span className="text-[11px] text-amber-700/80 mt-0.5 block">{t("fdMisSchemeModals.specialRateCreditedToSenior", "Special rate credited to senior members")}</span>
               </div>
 
               <div className="p-3 bg-slate-50/80 rounded-xl border border-slate-100/80">
-                <span className="text-slate-500 block font-medium">Interest Payout Frequency</span>
+                <span className="text-slate-500 block font-medium">{t("fdMisSchemeModals.interestPayoutFrequency", "Interest Payout Frequency")}</span>
                 <span className="font-bold text-slate-900 text-sm sm:text-base mt-1 block capitalize">
-                  {scheme.interest_payout_type ? scheme.interest_payout_type.replace('_', ' ') + ' Payout' : 'Monthly Payout'}
+                  {scheme.interest_payout_type ? scheme.interest_payout_type.replace('_', ' ') + ' Payout' : t("savingsSchemeModals.monthlyPayout", "Monthly Payout")}
                 </span>
-                <span className="text-[11px] text-slate-400 mt-0.5 block">Credit distribution interval</span>
+                <span className="text-[11px] text-slate-400 mt-0.5 block">{t("savingsSchemeModals.creditDistributionInterval", "Credit distribution interval")}</span>
               </div>
             </div>
           </div>
@@ -943,11 +947,11 @@ export function SavingsSchemeDetailModal({
           <div className="border border-slate-100 rounded-2xl p-4 sm:p-5 bg-white shadow-2xs space-y-3">
             <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-[#00b4a7]" />
-              <span>Operational Service Levies & SMS Notification Charges</span>
+              <span>{t("savingsSchemeModals.operationalServiceLeviesSmsNotification", "Operational Service Levies & SMS Notification Charges")}</span>
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
               <div className="p-3 bg-slate-50/80 rounded-xl border border-slate-100/80">
-                <span className="text-slate-500 block font-medium">Periodic Service Charges</span>
+                <span className="text-slate-500 block font-medium">{t("savingsSchemeModals.periodicServiceCharges", "Periodic Service Charges")}</span>
                 <div className="flex items-baseline gap-1.5 mt-1">
                   <span className="font-bold text-slate-900 text-sm sm:text-base font-sans">
                     {formatCurrency(scheme.service_charges)}
@@ -956,11 +960,11 @@ export function SavingsSchemeDetailModal({
                     / {scheme.service_charge_frequency || 'monthly'}
                   </span>
                 </div>
-                <span className="text-[11px] text-slate-400 mt-0.5 block">Account maintenance & levy fee</span>
+                <span className="text-[11px] text-slate-400 mt-0.5 block">{t("savingsSchemeModals.accountMaintenanceLevyFee", "Account maintenance & levy fee")}</span>
               </div>
 
               <div className="p-3 bg-slate-50/80 rounded-xl border border-slate-100/80">
-                <span className="text-slate-500 block font-medium">SMS Notification Charges</span>
+                <span className="text-slate-500 block font-medium">{t("savingsSchemeModals.smsNotificationCharges", "SMS Notification Charges")}</span>
                 <div className="flex items-baseline gap-1.5 mt-1">
                   <span className="font-bold text-slate-900 text-sm sm:text-base font-sans">
                     {formatCurrency(scheme.sms_charges)}
@@ -969,15 +973,15 @@ export function SavingsSchemeDetailModal({
                     / {scheme.sms_charge_frequency || 'monthly'}
                   </span>
                 </div>
-                <span className="text-[11px] text-slate-400 mt-0.5 block">Transactional alert subscription fee</span>
+                <span className="text-[11px] text-slate-400 mt-0.5 block">{t("savingsSchemeModals.transactionalAlertSubscriptionFee", "Transactional alert subscription fee")}</span>
               </div>
 
               <div className="p-3 bg-slate-50/80 rounded-xl border border-slate-100/80">
-                <span className="text-slate-500 block font-medium">Created At</span>
+                <span className="text-slate-500 block font-medium">{t("dashboardModule.emergency.table.createdAt", "Created At")}</span>
                 <span className="font-bold text-slate-900 text-xs sm:text-sm mt-1.5 block">
                   {formatDate(scheme.created_at)}
                 </span>
-                <span className="text-[11px] text-slate-400 mt-0.5 block">Scheme creation timestamp</span>
+                <span className="text-[11px] text-slate-400 mt-0.5 block">{t("fdMisSchemeModals.schemeCreationTimestamp", "Scheme creation timestamp")}</span>
               </div>
             </div>
           </div>
@@ -993,7 +997,7 @@ export function SavingsSchemeDetailModal({
                 className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2 text-rose-600 hover:bg-rose-50 rounded-xl text-xs sm:text-sm font-bold transition-colors cursor-pointer"
               >
                 <Trash2 className="w-4 h-4" />
-                <span>Delete Scheme</span>
+                <span>{t("superAdminFdMisSchemes.deleteScheme", "Delete Scheme")}</span>
               </button>
             ) : <div />}
 
@@ -1007,14 +1011,14 @@ export function SavingsSchemeDetailModal({
                   className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2 bg-teal-50 text-teal-800 hover:bg-teal-100 border border-teal-200/80 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer active:scale-95"
                 >
                   <Pencil className="w-3.5 h-3.5" />
-                  <span>Edit Scheme</span>
+                  <span>{t("superAdminFdMisSchemes.editScheme", "Edit Scheme")}</span>
                 </button>
               )}
               <button
                 onClick={onClose}
                 className="px-5 sm:px-6 py-2 bg-gradient-to-r from-[#00b4a7] to-[#0f766e] text-white hover:from-[#00a296] hover:to-[#0c625c] rounded-xl text-xs sm:text-sm font-bold shadow-md shadow-teal-500/20 transition-all cursor-pointer active:scale-95"
               >
-                Done
+                {t("branchManagerMemberPasswordUpdate.done", "Done")}
               </button>
             </div>
           </div>
@@ -1034,6 +1038,7 @@ export function SavingsSchemeDeleteModal({
   onConfirm,
   isDeleting = false
 }) {
+  const { t } = useTranslation();
   if (!isOpen || !scheme) return null;
 
   return (
@@ -1046,10 +1051,10 @@ export function SavingsSchemeDeleteModal({
 
           <div>
             <h3 className="text-lg font-bold text-slate-900">
-              Delete Savings Scheme?
+              {t("savingsSchemeModals.deleteSavingsScheme", "Delete Savings Scheme?")}
             </h3>
             <p className="text-xs sm:text-sm text-slate-500 mt-1.5 leading-relaxed font-medium">
-              Are you sure you want to permanently delete the savings scheme{' '}
+              {t("savingsSchemeModals.areYouSureYouWant", "Are you sure you want to permanently delete the savings scheme")}{' '}
               <strong className="text-slate-800 font-bold">"{scheme.scheme_name}"</strong> ({scheme.scheme_code})?
             </p>
           </div>
@@ -1058,7 +1063,7 @@ export function SavingsSchemeDeleteModal({
             <p className="text-xs text-amber-800 flex items-start gap-2 font-medium">
               <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
               <span>
-                If members have open deposit accounts linked to this scheme, the backend may reject the deletion until accounts are migrated or closed.
+                {t("savingsSchemeModals.ifMembersHaveOpenDeposit", "If members have open deposit accounts linked to this scheme, the backend may reject the deletion until accounts are migrated or closed.")}
               </span>
             </p>
           </div>
@@ -1069,7 +1074,7 @@ export function SavingsSchemeDeleteModal({
               disabled={isDeleting}
               className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
             >
-              Cancel
+              {t("common.cancel", "Cancel")}
             </button>
             <button
               onClick={() => onConfirm(scheme)}
@@ -1079,12 +1084,12 @@ export function SavingsSchemeDeleteModal({
               {isDeleting ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  Deleting...
+                  {t("branchStaffModals.deleting", "Deleting...")}
                 </>
               ) : (
                 <>
                   <Trash2 className="w-4 h-4" />
-                  Yes, Delete
+                  {t("branchStaffModals.yesDelete", "Yes, Delete")}
                 </>
               )}
             </button>

@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { i18n } from '../../i18n/index.js';
+import { useTranslation } from 'react-i18next';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import StatCard from '../../components/dashboard/StatCard';
 import { LoanSchemeFormModal, LoanSchemeDetailModal } from '../../components/dashboard/LoanSchemeModals';
@@ -25,6 +27,7 @@ import {
 import loanIllustration from '../../assets/Modern Cooperative Bank Loan Illustration.webp';
 
 export default function SuperAdminLoanSchemes() {
+  const { t } = useTranslation();
   const [schemes, setSchemes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -135,14 +138,14 @@ export default function SuperAdminLoanSchemes() {
       if (formModal.mode === 'create') {
         const created = await loanSchemeService.createLoanScheme(payload);
         setSuccessPopup({
-          title: 'Loan Scheme Created!',
+          title: i18n.t("superAdminLoanSchemes.loanSchemeCreated", "Loan Scheme Created!"),
           message: `Loan Scheme "${payload.scheme_name}" (${payload.scheme_code}) has been created successfully.`
         });
       } else {
         const schemeId = formModal.data.id || formModal.data.scheme_id;
         await loanSchemeService.updateLoanScheme(schemeId, payload);
         setSuccessPopup({
-          title: 'Loan Scheme Updated!',
+          title: i18n.t("superAdminLoanSchemes.loanSchemeUpdated", "Loan Scheme Updated!"),
           message: `Loan Scheme "${payload.scheme_name}" (${payload.scheme_code}) details have been updated.`
         });
       }
@@ -171,13 +174,13 @@ export default function SuperAdminLoanSchemes() {
       await loanSchemeService.changeLoanSchemeStatus(schemeId, newStatus);
       setSchemes(prev => prev.map(s => (s.id === schemeId || s.scheme_id === schemeId) ? { ...s, is_active: newStatus } : s));
       setSuccessPopup({
-        title: 'Status Updated!',
+        title: i18n.t("superAdminLoanSchemes.statusUpdated", "Status Updated!"),
         message: `Loan Scheme "${name}" is now ${newStatus ? 'Active' : 'Inactive'}.`
       });
     } catch (err) {
       console.error('Status toggle error:', err);
       setErrorPopup({
-        title: 'Status Update Failed',
+        title: i18n.t("branchManagerMembers.statusUpdateFailed", "Status Update Failed"),
         message: err.message || `Failed to update status for "${name}".`
       });
       await fetchSchemes();
@@ -198,14 +201,14 @@ export default function SuperAdminLoanSchemes() {
       await loanSchemeService.deleteLoanScheme(schemeId);
       setDeleteModal({ isOpen: false, scheme: null });
       setSuccessPopup({
-        title: 'Scheme Deleted',
+        title: i18n.t("superAdminFdMisSchemes.schemeDeleted", "Scheme Deleted"),
         message: `Loan scheme "${name}" has been deleted successfully.`
       });
       await fetchSchemes();
     } catch (err) {
       console.error('Delete scheme error:', err);
       setErrorPopup({
-        title: 'Deletion Failed',
+        title: i18n.t("superAdminAnnouncements.deletionFailed", "Deletion Failed"),
         message: err.message || `Failed to delete scheme "${name}".`
       });
     } finally {
@@ -278,33 +281,33 @@ export default function SuperAdminLoanSchemes() {
             <div className="inline-flex flex-wrap items-center gap-x-2 gap-y-1 px-3 sm:px-3.5 py-1.5 rounded-2xl sm:rounded-full bg-white/95 backdrop-blur-xs text-[11px] sm:text-xs font-semibold border border-teal-200/80 shadow-2xs text-[#0f766e] mb-3 max-w-full">
               <span className="inline-flex items-center gap-1.5 flex-shrink-0">
                 <Landmark className="w-3.5 h-3.5 text-[#00b4a7]" />
-                <span>Role: <strong className="font-bold text-teal-950">Super Admin</strong></span>
+                <span>{t("dashboardModule.monthlyTargets.roleLabel", "Role:")} <strong className="font-bold text-teal-950">{t("login.superAdmin.portalTitleLine1", "Super Admin")}</strong></span>
               </span>
               <span className="text-teal-300 hidden sm:inline">•</span>
-              <span className="text-slate-600 sm:text-[#0f766e]">Credit Portfolio &amp; Schemes Policy</span>
+              <span className="text-slate-600 sm:text-[#0f766e]">{t("superAdminLoanSchemes.creditPortfolioSchemesPolicy", "Credit Portfolio & Schemes Policy")}</span>
               <span className="text-teal-300 hidden sm:inline">•</span>
               <span className="inline-flex items-center gap-1.5 font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full text-[10px] sm:text-xs flex-shrink-0">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                Active
+                {t("common.active", "Active")}
               </span>
             </div>
 
             <div className="flex items-center gap-2.5 sm:gap-3">
               <span className="w-1.5 h-7 sm:h-9 bg-[#00b4a7] rounded-full flex-shrink-0" />
               <h1 className="text-xl sm:text-3xl lg:text-4xl font-extrabold text-[#0f2e2e] tracking-tight">
-                Cooperative Loan Schemes
+                {t("memberLoanSchemes.cooperativeLoanSchemes", "Cooperative Loan Schemes")}
               </h1>
             </div>
 
             <p className="text-slate-600 text-xs sm:text-sm mt-2 sm:mt-2.5 font-medium leading-relaxed max-w-xl">
-              Define multi-tier loan products, annual interest formulas, upfront processing charges, and per-EMI operational recovery levies.
+              {t("superAdminLoanSchemes.defineMultiTierLoanProducts", "Define multi-tier loan products, annual interest formulas, upfront processing charges, and per-EMI operational recovery levies.")}
             </p>
           </div>
 
           <div className="relative z-10 flex justify-center md:justify-end pointer-events-none -my-2 sm:-my-5 lg:-my-6 flex-shrink-0 w-full md:w-auto">
             <img
               src={loanIllustration}
-              alt="Cooperative Loan Schemes Illustration"
+              alt={t("memberLoanSchemes.cooperativeLoanSchemesIllustration", "Cooperative Loan Schemes Illustration")}
               className="h-32 sm:h-44 lg:h-52 max-w-full w-auto object-contain drop-shadow-md select-none pointer-events-none transform hover:scale-102 transition-transform duration-300 mx-auto md:mx-0"
             />
           </div>
@@ -320,31 +323,31 @@ export default function SuperAdminLoanSchemes() {
         {/* 4 Summary Metric Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <StatCard
-            title="Total Loan Schemes"
+            title={t("branchManagerLoanSchemes.totalLoanSchemes", "Total Loan Schemes")}
             value={totalCount}
-            subtitle="Registered Products"
+            subtitle={t("branchManagerLoanSchemes.registeredProducts", "Registered Products")}
             icon={Landmark}
             trend={`${activeCount} active`}
             trendType="up"
           />
           <StatCard
-            title="Active Schemes"
+            title={t("branchManagerFdMisSchemes.activeSchemes", "Active Schemes")}
             value={activeCount}
-            subtitle="Ready for Member Loans"
+            subtitle={t("branchManagerLoanSchemes.readyForMemberLoans", "Ready for Member Loans")}
             icon={CheckCircle2}
             trend={totalCount > 0 ? `${Math.round((activeCount / totalCount) * 100)}% ratio` : '100%'}
             trendType="up"
           />
           <StatCard
-            title="Maximum Loan Amount"
+            title={t("branchManagerLoanSchemes.maximumLoanAmount", "Maximum Loan Amount")}
             value={formatCurrency(maxCap)}
-            subtitle="Highest Permissible Limit"
+            subtitle={t("branchManagerLoanSchemes.highestPermissibleLimit", "Highest Permissible Limit")}
             icon={Coins}
           />
           <StatCard
-            title="Avg Annual Rate"
+            title={t("branchManagerLoanSchemes.avgAnnualRate", "Avg Annual Rate")}
             value={`${avgRate}%`}
-            subtitle="Across Active Schemes"
+            subtitle={t("branchManagerLoanSchemes.acrossActiveSchemes", "Across Active Schemes")}
             icon={Percent}
             trend="Reducing EMI"
             trendType="up"
@@ -359,10 +362,10 @@ export default function SuperAdminLoanSchemes() {
             <div>
               <h3 className="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
                 <Coins className="w-5 h-5 text-[#008f85]" />
-                <span>Loan Schemes Directory</span>
+                <span>{t("superAdminLoanSchemes.loanSchemesDirectory", "Loan Schemes Directory")}</span>
               </h3>
               <p className="text-xs text-slate-500 mt-0.5">
-                Manage product parameters, interest structures, and operational fees
+                {t("superAdminLoanSchemes.manageProductParametersInterestStructures", "Manage product parameters, interest structures, and operational fees")}
               </p>
             </div>
 
@@ -373,7 +376,7 @@ export default function SuperAdminLoanSchemes() {
                 <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
-                  placeholder="Search scheme name or code..."
+                  placeholder={t("dashboardModule.productAccounts.searchSchemePlaceholder", "Search scheme name or code...")}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 text-slate-800"
@@ -386,16 +389,16 @@ export default function SuperAdminLoanSchemes() {
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 font-semibold text-slate-700"
               >
-                <option value="all">All Statuses</option>
-                <option value="active">Active Only</option>
-                <option value="inactive">Inactive Only</option>
+                <option value="all">{t("branchManagerFdMisSchemes.allStatuses", "All Statuses")}</option>
+                <option value="active">{t("branchManagerFdMisSchemes.activeOnly", "Active Only")}</option>
+                <option value="inactive">{t("branchManagerFdMisSchemes.inactiveOnly", "Inactive Only")}</option>
               </select>
 
               {/* Refresh Button */}
               <button
                 onClick={() => fetchSchemes(true)}
                 disabled={refreshing || loading}
-                title="Refresh Schemes"
+                title={t("superAdminLoanSchemes.refreshSchemes", "Refresh Schemes")}
                 className="p-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 transition-colors cursor-pointer"
               >
                 <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin text-teal-600' : ''}`} />
@@ -407,7 +410,7 @@ export default function SuperAdminLoanSchemes() {
                 className="px-4 py-2 bg-gradient-to-r from-[#008f85] to-[#00a89c] hover:from-[#00786f] hover:to-[#008f85] text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
               >
                 <PlusCircle className="w-4 h-4" />
-                <span>New Loan Scheme</span>
+                <span>{t("superAdminLoanSchemes.newLoanScheme", "New Loan Scheme")}</span>
               </button>
             </div>
           </div>
@@ -423,7 +426,7 @@ export default function SuperAdminLoanSchemes() {
                 onClick={() => fetchSchemes()}
                 className="underline font-bold hover:text-rose-900 cursor-pointer ml-4"
               >
-                Retry
+                {t("common.retry", "Retry")}
               </button>
             </div>
           )}
@@ -433,27 +436,27 @@ export default function SuperAdminLoanSchemes() {
             <table className="w-full text-left text-sm">
               <thead className="bg-slate-50 text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">
                 <tr>
-                  <th className="py-3.5 px-4 whitespace-nowrap">Scheme Code</th>
-                  <th className="py-3.5 px-5 whitespace-nowrap">Scheme Name</th>
-                  <th className="py-3.5 px-4 whitespace-nowrap">Maximum Loan Amount</th>
-                  <th className="py-3.5 px-3 text-center whitespace-nowrap">Tenure</th>
-                  <th className="py-3.5 px-3 text-center whitespace-nowrap">Annual Rate</th>
-                  <th className="py-3.5 px-3 text-center whitespace-nowrap">Overdue Rate</th>
-                  <th className="py-3.5 px-3 text-center whitespace-nowrap">Grace Period</th>
-                  <th className="py-3.5 px-3 text-center whitespace-nowrap">Processing Fee</th>
-                  <th className="py-3.5 px-3 text-center whitespace-nowrap">Stamp Duty</th>
-                  <th className="py-3.5 px-3 text-center whitespace-nowrap">Insurance Fee</th>
-                  <th className="py-3.5 px-3 text-center whitespace-nowrap">Doc Fee</th>
-                  <th className="py-3.5 px-3 text-center whitespace-nowrap">Foreclosure</th>
-                  <th className="py-3.5 px-3 text-center whitespace-nowrap">Penalty</th>
-                  <th className="py-3.5 px-3 text-center whitespace-nowrap">SMS Fee</th>
-                  <th className="py-3.5 px-3 text-center whitespace-nowrap">Stationery Fee</th>
-                  <th className="py-3.5 px-3 text-center whitespace-nowrap">Field / Travel Fee</th>
-                  <th className="py-3.5 px-3 text-center whitespace-nowrap">Maintenance Fee</th>
-                  <th className="py-3.5 px-3 text-center whitespace-nowrap">Doorstep Collection</th>
-                  <th className="py-3.5 px-4 whitespace-nowrap">Created At</th>
-                  <th className="py-3.5 px-4 whitespace-nowrap">Status</th>
-                  <th className="py-3.5 px-4 text-right whitespace-nowrap sticky right-0 bg-slate-50 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.05)]">Actions</th>
+                  <th className="py-3.5 px-4 whitespace-nowrap">{t("dashboardModule.productAccounts.schemeCode", "Scheme Code")}</th>
+                  <th className="py-3.5 px-5 whitespace-nowrap">{t("dashboardModule.productAccounts.schemeName", "Scheme Name")}</th>
+                  <th className="py-3.5 px-4 whitespace-nowrap">{t("branchManagerLoanSchemes.maximumLoanAmount", "Maximum Loan Amount")}</th>
+                  <th className="py-3.5 px-3 text-center whitespace-nowrap">{t("memberLoanSchemes.tenure", "Tenure")}</th>
+                  <th className="py-3.5 px-3 text-center whitespace-nowrap">{t("branchManagerLoanSchemes.annualRate", "Annual Rate")}</th>
+                  <th className="py-3.5 px-3 text-center whitespace-nowrap">{t("branchManagerLoanSchemes.overdueRate", "Overdue Rate")}</th>
+                  <th className="py-3.5 px-3 text-center whitespace-nowrap">{t("branchManagerLoanSchemes.gracePeriod", "Grace Period")}</th>
+                  <th className="py-3.5 px-3 text-center whitespace-nowrap">{t("branchManagerLoanSchemes.processingFee", "Processing Fee")}</th>
+                  <th className="py-3.5 px-3 text-center whitespace-nowrap">{t("branchManagerLoanSchemes.stampDuty", "Stamp Duty")}</th>
+                  <th className="py-3.5 px-3 text-center whitespace-nowrap">{t("branchManagerLoanSchemes.insuranceFee", "Insurance Fee")}</th>
+                  <th className="py-3.5 px-3 text-center whitespace-nowrap">{t("superAdminLoanSchemes.docFee", "Doc Fee")}</th>
+                  <th className="py-3.5 px-3 text-center whitespace-nowrap">{t("memberLoanSchemes.foreclosure", "Foreclosure")}</th>
+                  <th className="py-3.5 px-3 text-center whitespace-nowrap">{t("memberLoanSchemes.penalty", "Penalty")}</th>
+                  <th className="py-3.5 px-3 text-center whitespace-nowrap">{t("branchManagerLoanSchemes.smsFee", "SMS Fee")}</th>
+                  <th className="py-3.5 px-3 text-center whitespace-nowrap">{t("memberLoanSchemes.stationeryFee", "Stationery Fee")}</th>
+                  <th className="py-3.5 px-3 text-center whitespace-nowrap">{t("memberLoanSchemes.fieldTravelFee", "Field / Travel Fee")}</th>
+                  <th className="py-3.5 px-3 text-center whitespace-nowrap">{t("memberLoanSchemes.maintenanceFee", "Maintenance Fee")}</th>
+                  <th className="py-3.5 px-3 text-center whitespace-nowrap">{t("memberLoanSchemes.doorstepCollection", "Doorstep Collection")}</th>
+                  <th className="py-3.5 px-4 whitespace-nowrap">{t("dashboardModule.emergency.table.createdAt", "Created At")}</th>
+                  <th className="py-3.5 px-4 whitespace-nowrap">{t("common.status", "Status")}</th>
+                  <th className="py-3.5 px-4 text-right whitespace-nowrap sticky right-0 bg-slate-50 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.05)]">{t("common.actions", "Actions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-slate-700 text-xs sm:text-sm">
@@ -462,7 +465,7 @@ export default function SuperAdminLoanSchemes() {
                     <td colSpan={21} className="py-12 text-center text-slate-400">
                       <div className="inline-flex items-center gap-2 font-medium">
                         <RefreshCw className="w-4 h-4 animate-spin text-teal-600" />
-                        <span>Loading loan schemes from registry...</span>
+                        <span>{t("memberLoanSchemes.loadingLoanSchemesFromRegistry", "Loading loan schemes from registry...")}</span>
                       </div>
                     </td>
                   </tr>
@@ -471,17 +474,18 @@ export default function SuperAdminLoanSchemes() {
                     <td colSpan={21} className="py-12 text-center text-slate-400">
                       <div className="max-w-xs mx-auto space-y-1">
                         <Landmark className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-                        <p className="font-bold text-slate-700">No Loan Schemes Found</p>
+                        <p className="font-bold text-slate-700">{t("branchManagerLoanSchemes.noLoanSchemesFound", "No Loan Schemes Found")}</p>
                         <p className="text-xs text-slate-400">
                           {searchQuery || statusFilter !== 'all'
-                            ? 'Try clearing your search or filter options.'
-                            : 'Click "New Loan Scheme" to add your first credit product.'}
+                            ? t("branchManagerLoanSchemes.tryClearingYourSearchOr", "Try clearing your search or filter options.")
+                            : t("superAdminLoanSchemes.clickNewLoanSchemeTo", "Click \"New Loan Scheme\" to add your first credit product.")}
                         </p>
                       </div>
                     </td>
                   </tr>
                 ) : (
                   filteredSchemes.map((scheme) => {
+  const { t } = useTranslation();
                     const schemeId = scheme.id || scheme.scheme_id;
                     const isActive = scheme.is_active !== false;
                     const isLoadingThis = actionLoadingId === schemeId;
@@ -512,7 +516,7 @@ export default function SuperAdminLoanSchemes() {
 
                         {/* Tenure */}
                         <td className="py-4 px-3 text-center whitespace-nowrap text-slate-700 font-semibold">
-                          {scheme.max_tenure_months || 0} mos
+                          {scheme.max_tenure_months || 0} {t("branchManagerLoanSchemes.mos", "mos")}
                         </td>
 
                         {/* Annual Interest Rate */}
@@ -599,12 +603,12 @@ export default function SuperAdminLoanSchemes() {
                               aria-checked={isActive}
                               onClick={() => handleToggleStatus(scheme)}
                               disabled={isLoadingThis}
-                              title={`Click to ${isActive ? 'deactivate' : 'activate'} this scheme`}
+                              title={`Click to ${isActive ? t("branchManagerMembers.deactivate", "deactivate") : t("branchManagerMembers.activate", "activate")} this scheme`}
                               className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-teal-500 ${
                                 isActive ? 'bg-emerald-500' : 'bg-slate-300'
                               } ${isLoadingThis ? 'opacity-50 cursor-wait' : ''}`}
                             >
-                              <span className="sr-only">Toggle Scheme Status</span>
+                              <span className="sr-only">{t("superAdminLoanSchemes.toggleSchemeStatus", "Toggle Scheme Status")}</span>
                               <span
                                 aria-hidden="true"
                                 className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
@@ -617,7 +621,7 @@ export default function SuperAdminLoanSchemes() {
                                 isActive ? 'text-emerald-700' : 'text-slate-400'
                               }`}
                             >
-                              {isActive ? 'Active' : 'Inactive'}
+                              {isActive ? t("common.active", "Active") : t("common.inactive", "Inactive")}
                             </span>
                           </div>
                         </td>
@@ -627,21 +631,21 @@ export default function SuperAdminLoanSchemes() {
                           <div className="flex items-center justify-end gap-1">
                             <button
                               onClick={() => setDetailModal({ isOpen: true, scheme })}
-                              title="View Full Scheme Details"
+                              title={t("memberLoanSchemes.viewFullSchemeDetails", "View Full Scheme Details")}
                               className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-teal-50 text-slate-600 hover:text-teal-700 transition-colors cursor-pointer shadow-2xs"
                             >
                               <Eye className="w-3.5 h-3.5 text-teal-600" />
                             </button>
                             <button
                               onClick={() => handleOpenEdit(scheme)}
-                              title="Edit Scheme Parameters"
+                              title={t("superAdminLoanSchemes.editSchemeParameters", "Edit Scheme Parameters")}
                               className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 transition-colors cursor-pointer shadow-2xs"
                             >
                               <Pencil className="w-3.5 h-3.5 text-slate-600" />
                             </button>
                             <button
                               onClick={() => setDeleteModal({ isOpen: true, scheme })}
-                              title="Delete Scheme"
+                              title={t("superAdminFdMisSchemes.deleteScheme", "Delete Scheme")}
                               className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-700 transition-colors cursor-pointer shadow-2xs"
                             >
                               <Trash2 className="w-3.5 h-3.5 text-rose-600" />
@@ -685,10 +689,10 @@ export default function SuperAdminLoanSchemes() {
             </div>
             <div>
               <h3 className="text-lg font-black text-slate-900">
-                Delete Loan Scheme?
+                {t("superAdminLoanSchemes.deleteLoanScheme", "Delete Loan Scheme?")}
               </h3>
               <p className="text-xs text-slate-500 mt-2 leading-relaxed">
-                Are you sure you want to permanently remove <strong className="text-slate-800">{deleteModal.scheme?.scheme_name}</strong> ({deleteModal.scheme?.scheme_code})? Existing member loans under this scheme might be affected.
+                {t("superAdminLoanSchemes.areYouSureYouWant", "Are you sure you want to permanently remove")} <strong className="text-slate-800">{deleteModal.scheme?.scheme_name}</strong> ({deleteModal.scheme?.scheme_code}{t("superAdminLoanSchemes.existingMemberLoansUnderThis", ")? Existing member loans under this scheme might be affected.")}
               </p>
             </div>
             <div className="pt-2 flex items-center justify-center gap-3">
@@ -697,7 +701,7 @@ export default function SuperAdminLoanSchemes() {
                 onClick={() => setDeleteModal({ isOpen: false, scheme: null })}
                 className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl cursor-pointer"
               >
-                Cancel
+                {t("common.cancel", "Cancel")}
               </button>
               <button
                 type="button"
@@ -705,7 +709,7 @@ export default function SuperAdminLoanSchemes() {
                 disabled={actionLoadingId !== null}
                 className="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-md cursor-pointer disabled:opacity-50"
               >
-                Confirm Delete
+                {t("superAdminLoanSchemes.confirmDelete", "Confirm Delete")}
               </button>
             </div>
           </div>
@@ -722,7 +726,7 @@ export default function SuperAdminLoanSchemes() {
 
             <div>
               <h3 className="text-xl font-black text-slate-900 tracking-tight">
-                {typeof errorPopup === 'object' ? (errorPopup.title || 'Action Error') : 'Notice'}
+                {typeof errorPopup === 'object' ? (errorPopup.title || 'Action Error') : t("modal.member.notice", "Notice")}
               </h3>
               <p className="text-xs sm:text-sm text-rose-900 mt-2.5 leading-relaxed bg-rose-50/70 p-4 rounded-2xl border border-rose-200/80 font-medium break-words text-left">
                 {typeof errorPopup === 'object' ? (errorPopup.message || JSON.stringify(errorPopup)) : String(errorPopup)}
@@ -735,7 +739,7 @@ export default function SuperAdminLoanSchemes() {
                 onClick={() => setErrorPopup(null)}
                 className="w-full h-11 px-5 bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 text-white font-bold text-sm rounded-xl shadow-md transition-all cursor-pointer"
               >
-                Okay, Got It
+                {t("modal.branchAdmin.okayGotIt", "Okay, Got It")}
               </button>
             </div>
           </div>
@@ -752,7 +756,7 @@ export default function SuperAdminLoanSchemes() {
 
             <div>
               <h3 className="text-xl sm:text-2xl font-black text-slate-900">
-                {typeof successPopup === 'object' ? (successPopup.title || 'Action Successful!') : 'Success!'}
+                {typeof successPopup === 'object' ? (successPopup.title || 'Action Successful!') : t("modal.member.success", "Success!")}
               </h3>
               <p className="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
                 {typeof successPopup === 'object' ? successPopup.message : String(successPopup)}
@@ -765,7 +769,7 @@ export default function SuperAdminLoanSchemes() {
                 onClick={() => setSuccessPopup(null)}
                 className="w-full h-11 px-5 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-bold text-sm rounded-xl shadow-md transition-all cursor-pointer"
               >
-                Okay, Got It
+                {t("modal.branchAdmin.okayGotIt", "Okay, Got It")}
               </button>
             </div>
           </div>

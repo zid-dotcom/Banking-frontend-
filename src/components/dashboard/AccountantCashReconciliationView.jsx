@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { i18n } from '../../i18n/index.js';
+import { useTranslation } from 'react-i18next';
 import {
   Calculator,
   FileText,
@@ -74,6 +76,7 @@ function formatDate(dateStr) {
 }
 
 export default function AccountantCashReconciliationView({ staffUser = {}, isStandalone = false }) {
+  const { t } = useTranslation();
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -100,7 +103,7 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
   // Fetch all reports
   const fetchReports = async () => {
     if (fromDate && toDate && fromDate > toDate) {
-      setError('"From" date cannot be after "To" date.');
+      setError(i18n.t("dashboardModule.accountTransactions.invalidDateRange", "\"From\" date cannot be after \"To\" date."));
       return;
     }
 
@@ -295,9 +298,9 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
         {/* 1. Pending Reviews */}
         <StatCard
-          title="Pending Reviews"
+          title={t("accountantCashReconciliationView.pendingReviews", "Pending Reviews")}
           value={pendingReviewsCount.toString()}
-          subtitle="Reports needing audit"
+          subtitle={t("accountantCashReconciliationView.reportsNeedingAudit", "Reports needing audit")}
           icon={AlertCircle}
           trend={pendingReviewsCount > 0 ? 'Requires Action' : 'All Cleared'}
           trendType={pendingReviewsCount > 0 ? 'down' : 'up'}
@@ -305,9 +308,9 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
 
         {/* 2. Opening Cash */}
         <StatCard
-          title="Opening Cash"
+          title={t("accountantCashReconciliationView.openingCash", "Opening Cash")}
           value={formatCurrency(totalOpeningCash)}
-          subtitle={hasDateFilter ? 'Filtered opening float' : "Today's opening float"}
+          subtitle={hasDateFilter ? t("branchManagerCashReconciliation.filteredOpeningFloat", "Filtered opening float") : t("branchManagerCashReconciliation.todaySOpeningFloat", "Today's opening float")}
           icon={Wallet}
           trend={hasDateFilter ? 'Selected Float' : 'Opening Float'}
           trendType="neutral"
@@ -315,9 +318,9 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
 
         {/* 3. Closing Cash */}
         <StatCard
-          title="Closing Cash"
+          title={t("accountantCashReconciliationView.closingCash", "Closing Cash")}
           value={formatCurrency(totalClosingCash)}
-          subtitle={hasDateFilter ? 'Filtered closing cash' : "Today's closing cash"}
+          subtitle={hasDateFilter ? t("accountantCashReconciliationView.filteredClosingCash", "Filtered closing cash") : t("accountantCashReconciliationView.todaySClosingCash", "Today's closing cash")}
           icon={Coins}
           trend={hasDateFilter ? 'Selected Cash' : 'Physical Cash'}
           trendType="neutral"
@@ -325,9 +328,9 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
 
         {/* 4. Total Deposits Today */}
         <StatCard
-          title={hasDateFilter ? "Total Deposits" : "Total Deposits Today"}
+          title={hasDateFilter ? t("dashboard.totalDeposits", "Total Deposits") : t("staffCashReconciliation.totalDepositsToday", "Total Deposits Today")}
           value={formatCurrency(totalDeposit)}
-          subtitle={hasDateFilter ? 'Filtered counter inflows' : "Today's counter inflows"}
+          subtitle={hasDateFilter ? t("branchManagerCashTransactions.filteredCounterInflows", "Filtered counter inflows") : t("branchManagerCashTransactions.todaySCounterInflows", "Today's counter inflows")}
           icon={ArrowDownLeft}
           trend="Cash Inflow"
           trendType="up"
@@ -335,9 +338,9 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
 
         {/* 5. Withdrawal Total Today */}
         <StatCard
-          title={hasDateFilter ? "Withdrawal Total" : "Withdrawal Total Today"}
+          title={hasDateFilter ? t("accountantCashReconciliationView.withdrawalTotal", "Withdrawal Total") : t("staffCashReconciliation.withdrawalTotalToday", "Withdrawal Total Today")}
           value={formatCurrency(totalWithdrawal)}
-          subtitle={hasDateFilter ? 'Filtered counter outflows' : "Today's counter outflows"}
+          subtitle={hasDateFilter ? t("accountantCashReconciliationView.filteredCounterOutflows", "Filtered counter outflows") : t("accountantCashReconciliationView.todaySCounterOutflows", "Today's counter outflows")}
           icon={ArrowUpRight}
           trend="Cash Outflow"
           trendType="down"
@@ -345,9 +348,9 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
 
         {/* 6. Expected Closing Cash */}
         <StatCard
-          title="Expected Closing Cash"
+          title={t("branchManagerCashReconciliation.expectedClosingCash", "Expected Closing Cash")}
           value={formatCurrency(totalExpectedClosingCash)}
-          subtitle={hasDateFilter ? 'Filtered expected balance' : "Today's expected float"}
+          subtitle={hasDateFilter ? t("accountantCashReconciliationView.filteredExpectedBalance", "Filtered expected balance") : t("accountantCashReconciliationView.todaySExpectedFloat", "Today's expected float")}
           icon={Calculator}
           trend={hasDateFilter ? 'Selected Float' : 'Expected Float'}
           trendType="neutral"
@@ -364,14 +367,14 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
                 <Calculator className="w-4 h-4 text-[#00b4a7]" />
               </div>
               <h3 className="font-serif font-bold text-slate-900 text-lg sm:text-xl flex items-center gap-2">
-                <span>Branch Cash Reconciliations Ledger</span>
+                <span>{t("branchManagerCashReconciliation.branchCashReconciliationsLedger", "Branch Cash Reconciliations Ledger")}</span>
                 <span className="text-xs font-bold text-teal-800 bg-teal-50 px-2.5 py-0.5 rounded-full border border-teal-200">
                   {filteredReports.length}
                 </span>
               </h3>
             </div>
             <p className="text-xs text-slate-500 font-medium mt-1">
-              Audit cashier daily cash days, inspect transaction receipts with before/after balances, and record explanation for cash variances.
+              {t("accountantCashReconciliationView.auditCashierDailyCashDays", "Audit cashier daily cash days, inspect transaction receipts with before/after balances, and record explanation for cash variances.")}
             </p>
           </div>
 
@@ -382,10 +385,10 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
               onClick={fetchReports}
               disabled={loading}
               className="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 shadow-2xs text-xs font-bold text-slate-700 hover:text-slate-900 transition-all cursor-pointer disabled:opacity-50 flex items-center gap-2 active:scale-95"
-              title="Refresh Reports"
+              title={t("accountantCashReconciliationView.refreshReports", "Refresh Reports")}
             >
               <RefreshCw className={`w-3.5 h-3.5 text-[#00b4a7] ${loading ? 'animate-spin' : ''}`} />
-              <span>{loading ? 'Refreshing...' : 'Refresh'}</span>
+              <span>{loading ? t("dashboardModule.branchOverview.refreshing", "Refreshing...") : t("common.refresh", "Refresh")}</span>
             </button>
           </div>
         </div>
@@ -403,7 +406,7 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
                   : 'text-slate-500 hover:text-slate-800'
               }`}
             >
-              All ({reports.length})
+              {t("branchManagerCashReconciliation.all", "All (")}{reports.length})
             </button>
             <button
               type="button"
@@ -414,7 +417,7 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
                   : 'text-slate-500 hover:text-slate-800'
               }`}
             >
-              Pending Review ({pendingReviewsCount})
+              {t("accountantCashReconciliationView.pendingReview", "Pending Review (")}{pendingReviewsCount})
             </button>
             <button
               type="button"
@@ -425,7 +428,7 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
                   : 'text-slate-500 hover:text-slate-800'
               }`}
             >
-              Cash Mismatch ({cashMismatchCount})
+              {t("branchManagerCashReconciliation.cashMismatch2", "Cash Mismatch (")}{cashMismatchCount})
             </button>
             <button
               type="button"
@@ -436,7 +439,7 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
                   : 'text-slate-500 hover:text-slate-800'
               }`}
             >
-              Reviewed ({reviewedCount})
+              {t("accountantCashReconciliationView.reviewed", "Reviewed (")}{reviewedCount})
             </button>
           </div>
 
@@ -446,27 +449,27 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
             <div className="flex flex-wrap items-center gap-2">
               <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-slate-200 shadow-2xs hover:border-teal-400 focus-within:border-teal-500 focus-within:ring-2 focus-within:ring-teal-100 transition-all">
                 <span className="text-[10px] font-black uppercase tracking-wider text-teal-800 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-200 select-none">
-                  From
+                  {t("dashboardModule.accountTransactions.from", "From")}
                 </span>
                 <input
                   type="date"
                   value={fromDate}
                   onChange={(e) => setFromDate(e.target.value)}
                   className="text-xs text-slate-800 font-bold focus:outline-none bg-transparent cursor-pointer"
-                  title="Filter from business date"
+                  title={t("branchManagerCashReconciliation.filterFromBusinessDate", "Filter from business date")}
                 />
               </div>
 
               <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-slate-200 shadow-2xs hover:border-teal-400 focus-within:border-teal-500 focus-within:ring-2 focus-within:ring-teal-100 transition-all">
                 <span className="text-[10px] font-black uppercase tracking-wider text-teal-800 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-200 select-none">
-                  To
+                  {t("dashboardModule.accountTransactions.to", "To")}
                 </span>
                 <input
                   type="date"
                   value={toDate}
                   onChange={(e) => setToDate(e.target.value)}
                   className="text-xs text-slate-800 font-bold focus:outline-none bg-transparent cursor-pointer"
-                  title="Filter to business date"
+                  title={t("branchManagerCashReconciliation.filterToBusinessDate", "Filter to business date")}
                 />
               </div>
 
@@ -478,10 +481,10 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
                     setToDate('');
                   }}
                   className="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 text-xs font-bold transition-all cursor-pointer flex items-center gap-1 shadow-2xs border border-slate-200"
-                  title="Clear Date Filter"
+                  title={t("branchManagerCashReconciliation.clearDateFilter", "Clear Date Filter")}
                 >
                   <X className="w-3.5 h-3.5 text-slate-500" />
-                  <span className="text-[11px]">Clear</span>
+                  <span className="text-[11px]">{t("dashboardModule.emergency.clear", "Clear")}</span>
                 </button>
               )}
             </div>
@@ -493,7 +496,7 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search cashier, report ID..."
+                placeholder={t("accountantCashReconciliationView.searchCashierReportId", "Search cashier, report ID...")}
                 className="w-full sm:w-48 pl-8 pr-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#00b4a7] focus:ring-2 focus:ring-teal-100 shadow-2xs transition-all"
               />
             </div>
@@ -511,7 +514,7 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
               onClick={fetchReports}
               className="font-bold underline text-amber-900 hover:text-amber-700 cursor-pointer"
             >
-              Retry
+              {t("common.retry", "Retry")}
             </button>
           </div>
         )}
@@ -521,18 +524,18 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
           <table className="w-full text-left border-collapse text-xs min-w-[1100px]">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-100 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                <th className="py-3 pl-4 sm:pl-5 pr-2">Report ID</th>
-                <th className="py-3 px-2">Date</th>
-                <th className="py-3 px-2">Cashier</th>
-                <th className="py-3 px-2">Opening Float</th>
-                <th className="py-3 px-2">Deposits</th>
-                <th className="py-3 px-2">Withdrawals</th>
-                <th className="py-3 px-2">Expected</th>
-                <th className="py-3 px-2">Physical Closing</th>
-                <th className="py-3 px-2">Difference</th>
-                <th className="py-3 px-2">Status</th>
-                <th className="py-3 px-2">Audit Notes</th>
-                <th className="py-3 pl-2 pr-4 sm:pr-5 text-right">Actions</th>
+                <th className="py-3 pl-4 sm:pl-5 pr-2">{t("accountantCashReconciliationView.reportId", "Report ID")}</th>
+                <th className="py-3 px-2">{t("branchManagerMembershipSettings.date", "Date")}</th>
+                <th className="py-3 px-2">{t("branchManagerCashReconciliation.cashier", "Cashier")}</th>
+                <th className="py-3 px-2">{t("branchManagerCashReconciliation.openingFloat", "Opening Float")}</th>
+                <th className="py-3 px-2">{t("dashboardModule.accountTransactions.filterDeposits", "Deposits")}</th>
+                <th className="py-3 px-2">{t("dashboardModule.accountTransactions.filterWithdrawals", "Withdrawals")}</th>
+                <th className="py-3 px-2">{t("accountantCashReconciliationView.expected", "Expected")}</th>
+                <th className="py-3 px-2">{t("accountantCashReconciliationView.physicalClosing", "Physical Closing")}</th>
+                <th className="py-3 px-2">{t("branchManagerCashReconciliation.difference", "Difference")}</th>
+                <th className="py-3 px-2">{t("common.status", "Status")}</th>
+                <th className="py-3 px-2">{t("accountantCashReconciliationView.auditNotes", "Audit Notes")}</th>
+                <th className="py-3 pl-2 pr-4 sm:pr-5 text-right">{t("common.actions", "Actions")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -540,23 +543,24 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
                 <tr>
                   <td colSpan={12} className="py-16 text-center text-slate-400">
                     <Loader2 className="w-7 h-7 animate-spin text-[#00b4a7] mx-auto mb-2" />
-                    <span>Loading branch cash reconciliations...</span>
+                    <span>{t("branchManagerCashReconciliation.loadingBranchCashReconciliations", "Loading branch cash reconciliations...")}</span>
                   </td>
                 </tr>
               ) : filteredReports.length === 0 ? (
                 <tr>
                   <td colSpan={12} className="py-16 text-center text-slate-400">
                     <Calculator className="w-10 h-10 mx-auto mb-2 text-slate-300" />
-                    <p className="font-semibold text-slate-700 text-sm">No cash reconciliation reports found</p>
+                    <p className="font-semibold text-slate-700 text-sm">{t("accountantCashReconciliationView.noCashReconciliationReportsFound", "No cash reconciliation reports found")}</p>
                     <p className="text-xs text-slate-400 mt-1">
                       {reports.length === 0
-                        ? 'Cashiers at your branch have not submitted any day reconciliations for this period.'
-                        : 'No reports match your active filter criteria.'}
+                        ? t("accountantCashReconciliationView.cashiersAtYourBranchHave", "Cashiers at your branch have not submitted any day reconciliations for this period.")
+                        : t("accountantCashReconciliationView.noReportsMatchYourActive", "No reports match your active filter criteria.")}
                     </p>
                   </td>
                 </tr>
               ) : (
                 filteredReports.map((report) => {
+  const { t } = useTranslation();
                   const diff = Number(report.difference || 0);
                   const isMismatch = isReportMismatch(report);
                   const isBalanced = !isMismatch && (report.difference !== null && report.difference !== undefined);
@@ -568,7 +572,7 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
                     <tr key={report.id} className="hover:bg-slate-50/70 transition-colors">
                       {/* Report ID */}
                       <td className="py-3 pl-4 sm:pl-5 pr-2 font-mono font-bold text-slate-800 whitespace-nowrap">
-                        #REC-{report.id}
+                        {t("branchManagerCashReconciliation.rec", "#REC-")}{report.id}
                       </td>
 
                       {/* Business Date */}
@@ -616,17 +620,17 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
                         ) : isBalanced ? (
                           <span className="inline-flex items-center gap-1 font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
                             <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                            <span>₹0 Balanced</span>
+                            <span>{t("accountantCashReconciliationView.0Balanced", "₹0 Balanced")}</span>
                           </span>
                         ) : diff > 0 ? (
                           <span className="inline-flex items-center gap-1 font-mono font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
                             <AlertTriangle className="w-3 h-3 text-amber-600" />
-                            <span>+{formatCurrency(diff)} Surplus</span>
+                            <span>+{formatCurrency(diff)} {t("accountantCashReconciliationView.surplus", "Surplus")}</span>
                           </span>
                         ) : (
                           <span className="inline-flex items-center gap-1 font-mono font-bold text-rose-800 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-200">
                             <AlertCircle className="w-3 h-3 text-rose-600" />
-                            <span>{formatCurrency(diff)} Shortage</span>
+                            <span>{formatCurrency(diff)} {t("accountantCashReconciliationView.shortage", "Shortage")}</span>
                           </span>
                         )}
                       </td>
@@ -663,17 +667,17 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
                         ) : isMismatch ? (
                           <span className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200 whitespace-nowrap">
                             <AlertCircle className="w-3 h-3" />
-                            <span>Explanation Required</span>
+                            <span>{t("accountantCashReconciliationView.explanationRequired", "Explanation Required")}</span>
                           </span>
                         ) : isReviewed ? (
                           <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 whitespace-nowrap">
                             <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                            <span>Reviewed</span>
+                            <span>{t("accountantCashReconciliationView.reviewed2", "Reviewed")}</span>
                           </span>
                         ) : (
                           <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 whitespace-nowrap">
                             <Clock className="w-3 h-3 text-amber-600" />
-                            <span>Pending Review</span>
+                            <span>{t("branchManagerMembers.pendingReview", "Pending Review")}</span>
                           </span>
                         )}
                       </td>
@@ -686,10 +690,10 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
                             type="button"
                             onClick={() => handleOpenDetails(report.id)}
                             className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-teal-50 text-slate-700 hover:text-teal-800 border border-slate-200 hover:border-teal-300 font-bold text-[11px] transition-all cursor-pointer shadow-2xs"
-                            title="Inspect Transaction Receipts & Balance History"
+                            title={t("accountantCashReconciliationView.inspectTransactionReceiptsBalanceHistory", "Inspect Transaction Receipts & Balance History")}
                           >
                             <Receipt className="w-3.5 h-3.5 text-teal-600" />
-                            <span>Receipts</span>
+                            <span>{t("staffCashReconciliation.receipts", "Receipts")}</span>
                           </button>
 
                           {/* Review & Explain (PATCH /staff/accountant/cash-reconciliations/{report_id}/review) */}
@@ -703,10 +707,10 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
                                 ? 'bg-amber-50 hover:bg-amber-100 text-amber-900 border-amber-300'
                                 : 'bg-teal-50 hover:bg-teal-100 text-[#0f766e] border-teal-200'
                             }`}
-                            title="Record Audit Explanation & Review"
+                            title={t("accountantCashReconciliationView.recordAuditExplanationReview", "Record Audit Explanation & Review")}
                           >
                             <CheckCircle2 className="w-3.5 h-3.5 text-[#00b4a7]" />
-                            <span>{hasExplanation || isReviewed ? 'Edit Review' : 'Review'}</span>
+                            <span>{hasExplanation || isReviewed ? t("accountantCashReconciliationView.editReview", "Edit Review") : t("accountantCashReconciliationView.review", "Review")}</span>
                           </button>
                         </div>
                       </td>
@@ -734,10 +738,10 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
                 </div>
                 <div>
                   <h3 className="font-serif font-black text-slate-900 text-lg">
-                    Reconciliation Receipts Audit: #REC-{selectedReportId}
+                    {t("accountantCashReconciliationView.reconciliationReceiptsAuditRec", "Reconciliation Receipts Audit: #REC-")}{selectedReportId}
                   </h3>
                   <p className="text-xs text-slate-500 font-medium">
-                    Verified counter cash vouchers, receipts, and member balance before/after logs.
+                    {t("branchManagerCashReconciliation.verifiedCounterCashVouchersReceipts", "Verified counter cash vouchers, receipts, and member balance before/after logs.")}
                   </p>
                 </div>
               </div>
@@ -755,7 +759,7 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
               {loadingDetails ? (
                 <div className="py-20 text-center text-slate-400">
                   <Loader2 className="w-8 h-8 animate-spin text-[#00b4a7] mx-auto mb-2" />
-                  <p className="font-medium text-xs">Loading transaction receipts and balance logs...</p>
+                  <p className="font-medium text-xs">{t("accountantCashReconciliationView.loadingTransactionReceiptsAndBalance", "Loading transaction receipts and balance logs...")}</p>
                 </div>
               ) : detailsError ? (
                 <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center justify-between">
@@ -764,7 +768,7 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
                     onClick={() => handleOpenDetails(selectedReportId)}
                     className="font-bold underline text-rose-900 hover:text-rose-700 cursor-pointer"
                   >
-                    Retry
+                    {t("common.retry", "Retry")}
                   </button>
                 </div>
               ) : reportDetails ? (
@@ -772,31 +776,31 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
                   {/* Summary Bar with Separated Deposits and Withdrawals */}
                   <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5">
                     <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200/80">
-                      <div className="text-[10px] uppercase font-bold text-slate-400">Business Date</div>
+                      <div className="text-[10px] uppercase font-bold text-slate-400">{t("branchManagerCashReconciliation.businessDate", "Business Date")}</div>
                       <div className="font-bold text-slate-800 text-sm mt-0.5">{formatDate(reportDetails.business_date)}</div>
                     </div>
                     <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200/80">
-                      <div className="text-[10px] uppercase font-bold text-slate-400">Cashier</div>
+                      <div className="text-[10px] uppercase font-bold text-slate-400">{t("branchManagerCashReconciliation.cashier", "Cashier")}</div>
                       <div className="font-bold text-slate-800 text-sm mt-0.5 truncate">{reportDetails.cashier_name}</div>
                     </div>
                     <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200/80">
-                      <div className="text-[10px] uppercase font-bold text-slate-400">Opening Float</div>
+                      <div className="text-[10px] uppercase font-bold text-slate-400">{t("branchManagerCashReconciliation.openingFloat", "Opening Float")}</div>
                       <div className="font-mono font-bold text-slate-800 text-sm mt-0.5">{formatCurrency(reportDetails.opening_cash)}</div>
                     </div>
                     <div className="bg-emerald-50/70 p-3 rounded-2xl border border-emerald-200/80">
-                      <div className="text-[10px] uppercase font-bold text-emerald-800">Deposits</div>
+                      <div className="text-[10px] uppercase font-bold text-emerald-800">{t("dashboardModule.accountTransactions.filterDeposits", "Deposits")}</div>
                       <div className="font-mono font-bold text-emerald-700 text-sm mt-0.5">+{formatCurrency(reportDetails.deposit_total)}</div>
                     </div>
                     <div className="bg-rose-50/70 p-3 rounded-2xl border border-rose-200/80">
-                      <div className="text-[10px] uppercase font-bold text-rose-800">Withdrawals</div>
+                      <div className="text-[10px] uppercase font-bold text-rose-800">{t("dashboardModule.accountTransactions.filterWithdrawals", "Withdrawals")}</div>
                       <div className="font-mono font-bold text-rose-700 text-sm mt-0.5">-{formatCurrency(reportDetails.withdrawal_total)}</div>
                     </div>
                     <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200/80">
-                      <div className="text-[10px] uppercase font-bold text-slate-400">Expected Closing</div>
+                      <div className="text-[10px] uppercase font-bold text-slate-400">{t("branchManagerCashReconciliation.expectedClosing", "Expected Closing")}</div>
                       <div className="font-mono font-bold text-slate-800 text-sm mt-0.5">{formatCurrency(reportDetails.expected_closing_cash)}</div>
                     </div>
                     <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200/80">
-                      <div className="text-[10px] uppercase font-bold text-slate-400">Physical Closing</div>
+                      <div className="text-[10px] uppercase font-bold text-slate-400">{t("accountantCashReconciliationView.physicalClosing", "Physical Closing")}</div>
                       <div className="font-mono font-bold text-slate-900 text-sm mt-0.5">
                         {reportDetails.closing_cash !== null ? formatCurrency(reportDetails.closing_cash) : '—'}
                       </div>
@@ -809,14 +813,14 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
                       <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
                       <div className="flex-1">
                         <h4 className="font-bold text-amber-900 text-xs">
-                          Cash Variance Notice: Difference of {formatCurrency(reportDetails.difference)}
+                          {t("accountantCashReconciliationView.cashVarianceNoticeDifferenceOf", "Cash Variance Notice: Difference of")} {formatCurrency(reportDetails.difference)}
                         </h4>
                         <p className="text-[11px] text-amber-800 mt-0.5">
-                          Physical drawer cash recorded by the cashier does not match expected counter balance. An accountant explanation must be recorded for audit trails.
+                          {t("accountantCashReconciliationView.physicalDrawerCashRecordedBy", "Physical drawer cash recorded by the cashier does not match expected counter balance. An accountant explanation must be recorded for audit trails.")}
                         </p>
                         {reportDetails.accountant_explanation ? (
                           <div className="mt-2 p-2.5 rounded-xl bg-white/80 border border-amber-200 text-xs text-slate-800">
-                            <strong>Recorded Explanation:</strong> {reportDetails.accountant_explanation}
+                            <strong>{t("accountantCashReconciliationView.recordedExplanation", "Recorded Explanation:")}</strong> {reportDetails.accountant_explanation}
                           </div>
                         ) : (
                           <button
@@ -827,7 +831,7 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
                             }}
                             className="mt-2.5 px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-xs cursor-pointer"
                           >
-                            Record Required Explanation Now
+                            {t("accountantCashReconciliationView.recordRequiredExplanationNow", "Record Required Explanation Now")}
                           </button>
                         )}
                       </div>
@@ -839,7 +843,7 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
                     <div className="flex items-center justify-between mb-2.5">
                       <h4 className="font-serif font-bold text-slate-900 text-sm flex items-center gap-2">
                         <FileText className="w-4 h-4 text-[#00b4a7]" />
-                        <span>Counter Transactions &amp; Receipts ({reportDetails.transactions?.length || 0})</span>
+                        <span>{t("branchManagerCashReconciliation.counterTransactionsReceipts", "Counter Transactions & Receipts (")}{reportDetails.transactions?.length || 0})</span>
                       </h4>
                     </div>
 
@@ -848,20 +852,20 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
                         <table className="w-full text-left border-collapse text-xs min-w-[720px]">
                           <thead>
                             <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                              <th className="py-2.5 pl-4 pr-2">Receipt Number</th>
-                              <th className="py-2.5 px-2">Type</th>
-                              <th className="py-2.5 px-2">Amount</th>
-                              <th className="py-2.5 px-2">Balance Before</th>
-                              <th className="py-2.5 px-2">Balance After</th>
-                              <th className="py-2.5 px-2">Date &amp; Time</th>
-                              <th className="py-2.5 pl-2 pr-4">Notes</th>
+                              <th className="py-2.5 pl-4 pr-2">{t("dashboardModule.accountTransactions.colReceiptNumber", "Receipt Number")}</th>
+                              <th className="py-2.5 px-2">{t("dashboardModule.productAccounts.type", "Type")}</th>
+                              <th className="py-2.5 px-2">{t("dashboardModule.accountTransactions.colAmount", "Amount")}</th>
+                              <th className="py-2.5 px-2">{t("dashboardModule.accountTransactions.colBalanceBefore", "Balance Before")}</th>
+                              <th className="py-2.5 px-2">{t("dashboardModule.accountTransactions.colBalanceAfter", "Balance After")}</th>
+                              <th className="py-2.5 px-2">{t("dashboardModule.accountTransactions.colDateTime", "Date & Time")}</th>
+                              <th className="py-2.5 pl-2 pr-4">{t("dashboardModule.accountTransactions.colNotes", "Notes")}</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-slate-100">
                             {!reportDetails.transactions || reportDetails.transactions.length === 0 ? (
                               <tr>
                                 <td colSpan={7} className="py-10 text-center text-slate-400 text-xs">
-                                  No individual cash transaction receipts recorded during this cash day.
+                                  {t("accountantCashReconciliationView.noIndividualCashTransactionReceipts", "No individual cash transaction receipts recorded during this cash day.")}
                                 </td>
                               </tr>
                             ) : (
@@ -918,7 +922,7 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
                 onClick={() => setSelectedReportId(null)}
                 className="px-4 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 font-bold text-xs cursor-pointer shadow-2xs"
               >
-                Close
+                {t("common.close", "Close")}
               </button>
 
               {reportDetails && (
@@ -932,7 +936,7 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
                   className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#14b8a6] to-[#0f766e] text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-xs hover:shadow-md"
                 >
                   <CheckCircle2 className="w-4 h-4" />
-                  <span>{reportDetails.accountant_explanation ? 'Edit Audit Explanation' : 'Record Audit Review'}</span>
+                  <span>{reportDetails.accountant_explanation ? t("accountantCashReconciliationView.editAuditExplanation", "Edit Audit Explanation") : t("accountantCashReconciliationView.recordAuditReview", "Record Audit Review")}</span>
                 </button>
               )}
             </div>
@@ -955,10 +959,10 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
                 </div>
                 <div>
                   <h3 className="font-serif font-black text-slate-900 text-base sm:text-lg">
-                    Accountant Audit Review: #REC-{reviewModalReport.id}
+                    {t("accountantCashReconciliationView.accountantAuditReviewRec", "Accountant Audit Review: #REC-")}{reviewModalReport.id}
                   </h3>
                   <p className="text-xs text-slate-500 font-medium">
-                    {formatDate(reviewModalReport.business_date)} • Cashier: {reviewModalReport.cashier_name}
+                    {formatDate(reviewModalReport.business_date)} {t("accountantCashReconciliationView.cashier", "• Cashier:")} {reviewModalReport.cashier_name}
                   </p>
                 </div>
               </div>
@@ -976,21 +980,21 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
               {/* Difference highlight */}
               <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between">
                 <div>
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Cash Variance</div>
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{t("accountantCashReconciliationView.cashVariance", "Cash Variance")}</div>
                   <div className="font-mono font-black text-base mt-0.5">
                     {Number(reviewModalReport.difference || 0) === 0 ? (
-                      <span className="text-emerald-700">₹0.00 (Balanced)</span>
+                      <span className="text-emerald-700">{t("accountantCashReconciliationView.000Balanced", "₹0.00 (Balanced)")}</span>
                     ) : (
                       <span className="text-rose-700">
                         {formatCurrency(reviewModalReport.difference)}{' '}
-                        {Number(reviewModalReport.difference) > 0 ? '(Surplus)' : '(Shortage)'}
+                        {Number(reviewModalReport.difference) > 0 ? t("branchManagerCashReconciliation.surplus", "(Surplus)") : t("branchManagerCashReconciliation.shortage", "(Shortage)")}
                       </span>
                     )}
                   </div>
                 </div>
 
                 <div className="text-right">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Physical Recorded</div>
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{t("accountantCashReconciliationView.physicalRecorded", "Physical Recorded")}</div>
                   <div className="font-mono font-bold text-sm text-slate-800 mt-0.5">
                     {formatCurrency(reviewModalReport.closing_cash)}
                   </div>
@@ -1002,7 +1006,7 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
                 <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs font-semibold flex items-start gap-2">
                   <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
                   <span>
-                    Cash count differs by {formatCurrency(Math.abs(Number(reviewModalReport.difference)))}. An explanation is <strong>required</strong> before this reconciliation can be verified.
+                    {t("accountantCashReconciliationView.cashCountDiffersBy", "Cash count differs by")} {formatCurrency(Math.abs(Number(reviewModalReport.difference)))}{t("accountantCashReconciliationView.anExplanationIs", ". An explanation is")} <strong>{t("accountantCashReconciliationView.required", "required")}</strong> {t("accountantCashReconciliationView.beforeThisReconciliationCanBe", "before this reconciliation can be verified.")}
                   </span>
                 </div>
               )}
@@ -1010,18 +1014,18 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
               {/* Textarea for explanation */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                  Accountant Explanation / Audit Notes {Number(reviewModalReport.difference || 0) !== 0 ? <span className="text-rose-600">*</span> : '(Optional)'}
+                  {t("accountantCashReconciliationView.accountantExplanationAuditNotes", "Accountant Explanation / Audit Notes")} {Number(reviewModalReport.difference || 0) !== 0 ? <span className="text-rose-600">*</span> : t("accountantCashReconciliationView.optional", "(Optional)")}
                 </label>
                 <textarea
                   value={explanation}
                   onChange={(e) => setExplanation(e.target.value)}
                   maxLength={1000}
                   rows={4}
-                  placeholder="Record your audit findings, voucher verifications, reasons for cash surplus/shortage, or counter notes..."
+                  placeholder={t("accountantCashReconciliationView.recordYourAuditFindingsVoucher", "Record your audit findings, voucher verifications, reasons for cash surplus/shortage, or counter notes...")}
                   className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#00b4a7] focus:ring-2 focus:ring-teal-100 transition-all resize-none"
                 />
                 <div className="text-right text-[10px] text-slate-400 mt-1">
-                  {explanation.length} / 1000 characters
+                  {explanation.length} {t("accountantCashReconciliationView.1000Characters", "/ 1000 characters")}
                 </div>
               </div>
 
@@ -1048,7 +1052,7 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
                   disabled={reviewSubmitting}
                   className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors cursor-pointer"
                 >
-                  Cancel
+                  {t("common.cancel", "Cancel")}
                 </button>
                 <button
                   type="submit"
@@ -1058,12 +1062,12 @@ export default function AccountantCashReconciliationView({ staffUser = {}, isSta
                   {reviewSubmitting ? (
                     <>
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      <span>Submitting Audit...</span>
+                      <span>{t("accountantCashReconciliationView.submittingAudit", "Submitting Audit...")}</span>
                     </>
                   ) : (
                     <>
                       <Check className="w-3.5 h-3.5" />
-                      <span>Save Audit Review</span>
+                      <span>{t("accountantCashReconciliationView.saveAuditReview", "Save Audit Review")}</span>
                     </>
                   )}
                 </button>

@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { i18n } from '../../i18n/index.js';
+import { useTranslation } from 'react-i18next';
 import {
   X,
   HelpCircle,
@@ -22,19 +24,19 @@ function getRoleBadgeInfo(role) {
   const r = String(role || '').toLowerCase().trim();
   if (r === 'branch_admin' || r === 'branch_manager' || r === 'branch admin') {
     return {
-      label: 'Branch Manager',
+      label: i18n.t("nav.branchManager", "Branch Manager"),
       className: 'bg-teal-100 text-teal-800 border-teal-200'
     };
   }
   if (r === 'super_admin' || r === 'superadmin' || r === 'super admin' || r === 'admin') {
     return {
-      label: 'Main Administration',
+      label: i18n.t("branchServiceRequestModal.mainAdministration", "Main Administration"),
       className: 'bg-purple-100 text-purple-800 border-purple-200'
     };
   }
   if (r === 'member') {
     return {
-      label: 'Member',
+      label: i18n.t("dashboardModule.accountTransactions.roleMember", "Member"),
       className: 'bg-slate-100 text-slate-700 border-slate-200'
     };
   }
@@ -73,6 +75,7 @@ export function CreateServiceRequestModal({
   onSubmit,
   isSubmitting = false
 }) {
+  const { t } = useTranslation();
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
   const [errors, setErrors] = useState({});
@@ -125,8 +128,8 @@ export function CreateServiceRequestModal({
               <LifeBuoy className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h3 className="text-lg font-black tracking-tight">New Service Request</h3>
-              <p className="text-xs text-teal-100 font-medium">Submit an inquiry or assistance ticket to society desk</p>
+              <h3 className="text-lg font-black tracking-tight">{t("memberHelpdesk.newServiceRequest", "New Service Request")}</h3>
+              <p className="text-xs text-teal-100 font-medium">{t("serviceRequestModals.submitAnInquiryOrAssistance", "Submit an inquiry or assistance ticket to society desk")}</p>
             </div>
           </div>
           <button
@@ -144,11 +147,11 @@ export function CreateServiceRequestModal({
           {/* Subject Field */}
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-              Subject / Topic <span className="text-rose-500">*</span>
+              {t("serviceRequestModals.subjectTopic", "Subject / Topic")} <span className="text-rose-500">*</span>
             </label>
             <input
               type="text"
-              placeholder="e.g. Passbook statement update or EMI query"
+              placeholder={t("serviceRequestModals.eGPassbookStatementUpdate", "e.g. Passbook statement update or EMI query")}
               value={subject}
               onChange={(e) => {
                 setSubject(e.target.value);
@@ -172,11 +175,11 @@ export function CreateServiceRequestModal({
           {/* Message Field */}
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-              Detailed Description / Message <span className="text-rose-500">*</span>
+              {t("serviceRequestModals.detailedDescriptionMessage", "Detailed Description / Message")} <span className="text-rose-500">*</span>
             </label>
             <textarea
               rows={5}
-              placeholder="Describe your issue, query, or service request in detail..."
+              placeholder={t("serviceRequestModals.describeYourIssueQueryOr", "Describe your issue, query, or service request in detail...")}
               value={message}
               onChange={(e) => {
                 setMessage(e.target.value);
@@ -189,15 +192,15 @@ export function CreateServiceRequestModal({
               }`}
             />
             <div className="flex items-center justify-between mt-1 text-[11px] text-slate-400">
-              <span>{errors.message ? <span className="text-rose-500 font-semibold">{errors.message}</span> : 'Provide specific account or transaction details if applicable'}</span>
-              <span>{message.length} chars</span>
+              <span>{errors.message ? <span className="text-rose-500 font-semibold">{errors.message}</span> : t("serviceRequestModals.provideSpecificAccountOrTransaction", "Provide specific account or transaction details if applicable")}</span>
+              <span>{message.length} {t("serviceRequestModals.chars", "chars")}</span>
             </div>
           </div>
 
           <div className="bg-teal-50/70 border border-teal-200/60 rounded-xl p-3 flex items-start gap-2.5 text-xs text-teal-900">
             <CheckCircle2 className="w-4 h-4 text-teal-600 flex-shrink-0 mt-0.5" />
             <p className="leading-relaxed">
-              Your service request will be routed directly to your home branch support team and prioritized for resolution.
+              {t("serviceRequestModals.yourServiceRequestWillBe", "Your service request will be routed directly to your home branch support team and prioritized for resolution.")}
             </p>
           </div>
 
@@ -209,7 +212,7 @@ export function CreateServiceRequestModal({
               disabled={isSubmitting}
               className="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-700 font-bold text-xs hover:bg-slate-50 transition-colors disabled:opacity-50 cursor-pointer"
             >
-              Cancel
+              {t("common.cancel", "Cancel")}
             </button>
             <button
               type="submit"
@@ -219,12 +222,12 @@ export function CreateServiceRequestModal({
               {isSubmitting ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Submitting Ticket...</span>
+                  <span>{t("serviceRequestModals.submittingTicket", "Submitting Ticket...")}</span>
                 </>
               ) : (
                 <>
                   <Send className="w-4 h-4" />
-                  <span>Submit Service Request</span>
+                  <span>{t("serviceRequestModals.submitServiceRequest", "Submit Service Request")}</span>
                 </>
               )}
             </button>
@@ -244,6 +247,7 @@ export function ServiceRequestDetailModal({
   request,
   loading = false
 }) {
+  const { t } = useTranslation();
   if (!isOpen) return null;
 
   const reqId = request?.id || request?.request_id || request?.ticket_id;
@@ -312,7 +316,7 @@ export function ServiceRequestDetailModal({
             <div>
               <div className="flex items-center gap-2 flex-wrap">
                 <h3 className="text-base sm:text-lg font-black text-slate-900">
-                  Service Request Details
+                  {t("serviceRequestModals.serviceRequestDetails", "Service Request Details")}
                 </h3>
                 {reqId && (
                   <span className="font-mono text-xs font-bold text-teal-800 bg-teal-50 px-2 py-0.5 rounded border border-teal-200/60">
@@ -321,7 +325,7 @@ export function ServiceRequestDetailModal({
                 )}
               </div>
               <div className="flex items-center gap-2 text-xs text-slate-500 font-medium mt-0.5 flex-wrap">
-                <span>Society Helpdesk Support Ticket</span>
+                <span>{t("serviceRequestModals.societyHelpdeskSupportTicket", "Society Helpdesk Support Ticket")}</span>
                 {branchName && (
                   <>
                     <span className="text-slate-300">•</span>
@@ -348,11 +352,11 @@ export function ServiceRequestDetailModal({
           {loading ? (
             <div className="py-12 text-center space-y-3">
               <Loader2 className="w-8 h-8 animate-spin text-teal-600 mx-auto" />
-              <p className="text-xs text-slate-500 font-medium">Loading ticket details...</p>
+              <p className="text-xs text-slate-500 font-medium">{t("serviceRequestModals.loadingTicketDetails", "Loading ticket details...")}</p>
             </div>
           ) : !request ? (
             <div className="py-8 text-center text-slate-400 text-xs">
-              No request details found.
+              {t("serviceRequestModals.noRequestDetailsFound", "No request details found.")}
             </div>
           ) : (
             <>
@@ -365,14 +369,14 @@ export function ServiceRequestDetailModal({
 
                 <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
                   <Clock className="w-3.5 h-3.5 text-slate-400" />
-                  <span>Submitted on {formatDateTime(request.created_at || request.date)}</span>
+                  <span>{t("branchManagerMembershipSettings.submittedOn", "Submitted on")} {formatDateTime(request.created_at || request.date)}</span>
                 </div>
               </div>
 
               {/* Subject */}
               <div>
                 <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">
-                  Subject
+                  {t("dashboardModule.emergency.table.subject", "Subject")}
                 </p>
                 <h4 className="text-base font-extrabold text-slate-900 leading-snug">
                   {request.subject}
@@ -383,7 +387,7 @@ export function ServiceRequestDetailModal({
               <div>
                 <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 flex items-center gap-1.5">
                   <User className="w-3.5 h-3.5 text-slate-500" />
-                  <span>Your Sent Message</span>
+                  <span>{t("serviceRequestModals.yourSentMessage", "Your Sent Message")}</span>
                 </p>
                 <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 text-xs sm:text-sm text-slate-800 font-medium whitespace-pre-wrap leading-relaxed shadow-2xs">
                   {request.message || request.description || 'No initial message text recorded.'}
@@ -396,24 +400,25 @@ export function ServiceRequestDetailModal({
                   <div className="flex items-center gap-2">
                     <MessageSquare className="w-4 h-4 text-teal-600" />
                     <h5 className="font-bold text-slate-900 text-sm">
-                      Official Desk Responses ({replies.length})
+                      {t("serviceRequestModals.officialDeskResponses", "Official Desk Responses (")}{replies.length})
                     </h5>
                   </div>
                   <span className="text-[11px] text-slate-400 font-medium">
-                    Branch &amp; Society Correspondence
+                    {t("serviceRequestModals.branchSocietyCorrespondence", "Branch & Society Correspondence")}
                   </span>
                 </div>
 
                 {replies.length === 0 ? (
                   <div className="p-5 text-center rounded-2xl bg-teal-50/40 border border-dashed border-teal-200/80 text-teal-800 space-y-1">
-                    <p className="text-xs font-bold text-teal-900">Awaiting Response</p>
+                    <p className="text-xs font-bold text-teal-900">{t("serviceRequestModals.awaitingResponse", "Awaiting Response")}</p>
                     <p className="text-[11px] text-teal-700 leading-relaxed">
-                      Your service request has been logged. A Branch Manager or society officer will post responses here.
+                      {t("serviceRequestModals.yourServiceRequestHasBeen", "Your service request has been logged. A Branch Manager or society officer will post responses here.")}
                     </p>
                   </div>
                 ) : (
                   <div className="space-y-3">
                     {replies.map((rep, idx) => {
+  const { t } = useTranslation();
                       const repId = rep.id || `rep-${idx}`;
                       const rawName =
                         rep.sender?.full_name ||
@@ -470,7 +475,7 @@ export function ServiceRequestDetailModal({
                               <Clock className="w-3 h-3 text-slate-400" />
                               <span>{formatDateTime(rep.created_at || rep.date)}</span>
                               {rep.edited_at && (
-                                <span className="text-[10px] text-slate-400 italic">(edited)</span>
+                                <span className="text-[10px] text-slate-400 italic">{t("branchServiceRequestModal.edited", "(edited)")}</span>
                               )}
                             </div>
                           </div>
@@ -495,7 +500,7 @@ export function ServiceRequestDetailModal({
             onClick={onClose}
             className="px-5 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs transition-colors cursor-pointer"
           >
-            Close
+            {t("common.close", "Close")}
           </button>
         </div>
       </div>

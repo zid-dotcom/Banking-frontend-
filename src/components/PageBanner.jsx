@@ -1,6 +1,8 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
+
 
 export default function PageBanner({ 
   title, 
@@ -8,6 +10,7 @@ export default function PageBanner({
   breadcrumbs = [], 
   image = 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=1920&q=80' 
 }) {
+  const { t } = useTranslation();
   return (
     <section className="relative pt-36 pb-20 md:pt-40 md:pb-24 bg-slate-800 overflow-hidden select-none">
       
@@ -32,7 +35,7 @@ export default function PageBanner({
         {/* Breadcrumbs */}
         <nav className="flex items-center space-x-2 text-sm text-white/90 drop-shadow-sm font-medium">
           <Link to="/" className="hover:text-white transition-colors">
-            Home
+            {t("nav.home", "Home")}
           </Link>
           
           {breadcrumbs.map((crumb, idx) => (

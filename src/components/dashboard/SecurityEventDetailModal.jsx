@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   X,
   ShieldAlert,
@@ -41,6 +42,7 @@ function formatDateTime(isoString) {
 }
 
 export default function SecurityEventDetailModal({ isOpen, event, onClose }) {
+  const { t } = useTranslation();
   if (!isOpen || !event) return null;
 
   const typeBadge = getSecurityEventTypeBadge(event.event_type);
@@ -81,14 +83,14 @@ export default function SecurityEventDetailModal({ isOpen, event, onClose }) {
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-[11px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-teal-100 text-[#0f766e]">
-                  Event #{event.id}
+                  {t("securityEventDetailModal.event", "Event #")}{event.id}
                 </span>
                 <span className={`text-[11px] font-extrabold px-2.5 py-0.5 rounded-full border ${typeBadge.bg}`}>
                   {formatSecurityEventType(event.event_type)}
                 </span>
               </div>
               <h3 className="text-base sm:text-lg font-black text-slate-900 mt-0.5">
-                Security Audit Dossier
+                {t("securityEventDetailModal.securityAuditDossier", "Security Audit Dossier")}
               </h3>
             </div>
           </div>
@@ -110,10 +112,10 @@ export default function SecurityEventDetailModal({ isOpen, event, onClose }) {
               <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-bold text-xs sm:text-sm text-amber-900">
-                  Suspicious Activity Flagged
+                  {t("securityEventDetailModal.suspiciousActivityFlagged", "Suspicious Activity Flagged")}
                 </p>
                 <p className="text-xs text-amber-700 mt-0.5 leading-relaxed font-medium">
-                  This transaction or access attempt triggered automated anomaly detection rules (e.g. unexpected IP, velocity limit, or repeated credential failure).
+                  {t("securityEventDetailModal.thisTransactionOrAccessAttempt", "This transaction or access attempt triggered automated anomaly detection rules (e.g. unexpected IP, velocity limit, or repeated credential failure).")}
                 </p>
               </div>
             </div>
@@ -122,35 +124,35 @@ export default function SecurityEventDetailModal({ isOpen, event, onClose }) {
           {/* Status & Outcome Summary Bar */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Result Status</p>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{t("securityEventDetailModal.resultStatus", "Result Status")}</p>
               <div className="flex items-center gap-1.5 mt-1">
                 {succeeded ? (
                   <>
                     <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-                    <span className="font-extrabold text-emerald-700 text-xs sm:text-sm">Succeeded</span>
+                    <span className="font-extrabold text-emerald-700 text-xs sm:text-sm">{t("branchManagerSecurityEvents.succeeded", "Succeeded")}</span>
                   </>
                 ) : (
                   <>
                     <XCircle className="w-4 h-4 text-rose-600 flex-shrink-0" />
-                    <span className="font-extrabold text-rose-700 text-xs sm:text-sm">Failed / Denied</span>
+                    <span className="font-extrabold text-rose-700 text-xs sm:text-sm">{t("branchManagerSecurityEvents.failedDenied", "Failed / Denied")}</span>
                   </>
                 )}
               </div>
             </div>
 
             <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Risk Assessment</p>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{t("securityEventDetailModal.riskAssessment", "Risk Assessment")}</p>
               <div className="flex items-center gap-1.5 mt-1">
                 {isSuspicious ? (
-                  <span className="font-extrabold text-amber-600 text-xs sm:text-sm">High / Suspicious</span>
+                  <span className="font-extrabold text-amber-600 text-xs sm:text-sm">{t("securityEventDetailModal.highSuspicious", "High / Suspicious")}</span>
                 ) : (
-                  <span className="font-extrabold text-emerald-700 text-xs sm:text-sm">Normal / Verified</span>
+                  <span className="font-extrabold text-emerald-700 text-xs sm:text-sm">{t("securityEventDetailModal.normalVerified", "Normal / Verified")}</span>
                 )}
               </div>
             </div>
 
             <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 col-span-2 sm:col-span-1">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Timestamp</p>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{t("branchManagerSecurityEvents.timestamp", "Timestamp")}</p>
               <p className="font-bold text-slate-800 text-xs mt-1 truncate" title={formatDateTime(event.created_at)}>
                 {formatDateTime(event.created_at)}
               </p>
@@ -161,41 +163,41 @@ export default function SecurityEventDetailModal({ isOpen, event, onClose }) {
           <div className="rounded-2xl border border-slate-100 overflow-hidden">
             <div className="px-4 py-2.5 bg-slate-50 border-b border-slate-100 flex items-center gap-2">
               <User className="w-4 h-4 text-[#00b4a7]" />
-              <h4 className="text-xs font-black uppercase tracking-wider text-slate-700">User &amp; Actor Context</h4>
+              <h4 className="text-xs font-black uppercase tracking-wider text-slate-700">{t("securityEventDetailModal.userActorContext", "User & Actor Context")}</h4>
             </div>
             <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
               <div>
-                <span className="text-slate-400 font-medium">Target User:</span>
+                <span className="text-slate-400 font-medium">{t("securityEventDetailModal.targetUser", "Target User:")}</span>
                 <p className="font-extrabold text-slate-900 mt-0.5">
                   {event.user_name || '—'} {event.user_code ? `(${event.user_code})` : ''}
                 </p>
-                {event.user_id && <span className="text-[11px] text-slate-400">User ID: #{event.user_id}</span>}
+                {event.user_id && <span className="text-[11px] text-slate-400">{t("securityEventDetailModal.userId", "User ID: #")}{event.user_id}</span>}
               </div>
 
               <div>
-                <span className="text-slate-400 font-medium">Account Role:</span>
+                <span className="text-slate-400 font-medium">{t("securityEventDetailModal.accountRole", "Account Role:")}</span>
                 <p className="font-extrabold text-[#0f766e] capitalize mt-0.5">
                   {formatAccountRole(event.account_role)}
                 </p>
               </div>
 
               <div>
-                <span className="text-slate-400 font-medium">Actor / Initiator:</span>
+                <span className="text-slate-400 font-medium">{t("securityEventDetailModal.actorInitiator", "Actor / Initiator:")}</span>
                 <p className="font-bold text-slate-800 mt-0.5">
                   {event.actor_name || event.user_name || 'System / Direct'}
                 </p>
                 {event.actor_user_id && (
-                  <span className="text-[11px] text-slate-400">Actor ID: #{event.actor_user_id}</span>
+                  <span className="text-[11px] text-slate-400">{t("securityEventDetailModal.actorId", "Actor ID: #")}{event.actor_user_id}</span>
                 )}
               </div>
 
               <div>
-                <span className="text-slate-400 font-medium">Branch Affiliation:</span>
+                <span className="text-slate-400 font-medium">{t("securityEventDetailModal.branchAffiliation", "Branch Affiliation:")}</span>
                 <p className="font-bold text-slate-800 mt-0.5">
                   {event.branch_name || 'Central HQ / Global'}
                 </p>
                 {event.branch_id && (
-                  <span className="text-[11px] text-slate-400">Branch ID: #{event.branch_id}</span>
+                  <span className="text-[11px] text-slate-400">{t("securityEventDetailModal.branchId", "Branch ID: #")}{event.branch_id}</span>
                 )}
               </div>
             </div>
@@ -205,18 +207,18 @@ export default function SecurityEventDetailModal({ isOpen, event, onClose }) {
           <div className="rounded-2xl border border-slate-100 overflow-hidden">
             <div className="px-4 py-2.5 bg-slate-50 border-b border-slate-100 flex items-center gap-2">
               <Globe className="w-4 h-4 text-[#00b4a7]" />
-              <h4 className="text-xs font-black uppercase tracking-wider text-slate-700">Network &amp; Device Details</h4>
+              <h4 className="text-xs font-black uppercase tracking-wider text-slate-700">{t("securityEventDetailModal.networkDeviceDetails", "Network & Device Details")}</h4>
             </div>
             <div className="p-4 space-y-2.5 text-xs">
               <div className="flex items-center justify-between flex-wrap gap-2">
-                <span className="text-slate-500 font-medium">Client IP Address:</span>
+                <span className="text-slate-500 font-medium">{t("securityEventDetailModal.clientIpAddress", "Client IP Address:")}</span>
                 <span className="font-mono font-bold text-slate-900 bg-slate-100 px-2.5 py-0.5 rounded-lg border border-slate-200">
                   {event.ip_address || '—'}
                 </span>
               </div>
 
               <div>
-                <span className="text-slate-500 font-medium">User Agent String:</span>
+                <span className="text-slate-500 font-medium">{t("securityEventDetailModal.userAgentString", "User Agent String:")}</span>
                 <p className="font-mono text-[11px] text-slate-700 bg-slate-50 p-2.5 rounded-xl border border-slate-200 mt-1 break-all">
                   {event.user_agent || 'Unknown Client Device'}
                 </p>
@@ -229,7 +231,7 @@ export default function SecurityEventDetailModal({ isOpen, event, onClose }) {
             <div className="rounded-2xl border border-slate-100 overflow-hidden">
               <div className="px-4 py-2.5 bg-slate-50 border-b border-slate-100 flex items-center gap-2">
                 <FileText className="w-4 h-4 text-[#00b4a7]" />
-                <h4 className="text-xs font-black uppercase tracking-wider text-slate-700">Event Details Payload</h4>
+                <h4 className="text-xs font-black uppercase tracking-wider text-slate-700">{t("securityEventDetailModal.eventDetailsPayload", "Event Details Payload")}</h4>
               </div>
               <div className="p-4">
                 <pre className="font-mono text-[11px] text-slate-800 bg-slate-900 text-slate-100 p-3.5 rounded-xl overflow-x-auto leading-relaxed">
@@ -249,7 +251,7 @@ export default function SecurityEventDetailModal({ isOpen, event, onClose }) {
             onClick={onClose}
             className="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs transition-colors cursor-pointer"
           >
-            Close Dossier
+            {t("securityEventDetailModal.closeDossier", "Close Dossier")}
           </button>
         </div>
       </div>

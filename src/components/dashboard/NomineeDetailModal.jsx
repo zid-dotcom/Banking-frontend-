@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   X,
   UserCheck,
@@ -22,8 +23,9 @@ import {
   reviewBranchAdminNominee
 } from '../../services/branchAdminService';
 
-function formatDate(isoString) {
-  if (!isoString) return 'N/A';
+
+function formatDate(isoString, naLabel = 'N/A') {
+  if (!isoString) return naLabel;
   try {
     const d = new Date(isoString);
     if (isNaN(d.getTime())) return isoString;
@@ -37,8 +39,8 @@ function formatDate(isoString) {
   }
 }
 
-function formatDateTime(isoString) {
-  if (!isoString) return 'N/A';
+function formatDateTime(isoString, naLabel = 'N/A') {
+  if (!isoString) return naLabel;
   try {
     const d = new Date(isoString);
     if (isNaN(d.getTime())) return isoString;
@@ -75,6 +77,7 @@ export default function NomineeDetailModal({
   onClose,
   onStatusUpdated
 }) {
+  const { t } = useTranslation();
   const [nominee, setNominee] = useState(initialData);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -115,7 +118,7 @@ export default function NomineeDetailModal({
       if (initialData) {
         setNominee(initialData);
       } else {
-        setError(err.message || 'Failed to load nominee details.');
+        setError(err.message || t("modal.nominee.loadError", "Failed to load nominee details."));
       }
     } finally {
       setLoading(false);
@@ -131,7 +134,10 @@ export default function NomineeDetailModal({
       } else if (typeof docUrl === 'string') {
         setPreviewDoc({
           url: docUrl,
-          title: docType === 'aadhaar_front' ? 'Nominee Aadhaar (Front)' : 'Nominee Aadhaar (Back)'
+          title:
+            docType === 'aadhaar_front'
+              ? t("modal.nominee.aadhaarFrontTitle", "Nominee Aadhaar (Front)")
+              : t("modal.nominee.aadhaarBackTitle", "Nominee Aadhaar (Back)")
         });
       }
     } catch (err) {
@@ -141,7 +147,18 @@ export default function NomineeDetailModal({
       if (directUrl) {
         window.open(directUrl, '_blank', 'noopener,noreferrer');
       } else {
-        setActionError(err.message || `Could not retrieve ${docType.replace('_', ' ')}.`);
+        const docLabel =
+          docType === 'aadhaar_front'
+            ? t("modal.nominee.aadhaarFrontDoc", "aadhaar front")
+            : docType === 'aadhaar_back'
+              ? t("modal.nominee.aadhaarBackDoc", "aadhaar back")
+              : docType.replace('_', ' ');
+        setActionError(
+          err.message ||
+            t("modal.nominee.retrieveDocError", "Could not retrieve {doc}.", {
+              doc: docLabel
+            })
+        );
       }
     } finally {
       setDocLoading((prev) => ({ ...prev, [docType]: false }));
@@ -150,12 +167,20 @@ export default function NomineeDetailModal({
 
   const handleReviewAction = async (status) => {
     if (status === 'rejected' && !rejectionReason.trim()) {
-      setActionError('Please provide a specific rejection reason for the member.');
+      setActionError(
+        t("modal.nominee.rejectionReasonRequired", "Please provide a specific rejection reason for the member.")
+      );
       return;
     }
 
     setActionLoading(true);
     setActionError(null);
+    const statusLabel =
+      status === 'approved'
+        ? t("common.approved", "Approved")
+        : status === 'rejected'
+          ? t("common.rejected", "Rejected")
+          : status;
     try {
       const updated = await reviewBranchAdminNominee(nomineeId, {
         status,
@@ -172,14 +197,23 @@ export default function NomineeDetailModal({
 
       setShowRejectInput(false);
       setRejectionReason('');
-      setActionSuccess(`Nominee has been successfully marked as ${status.toUpperCase()}.`);
+      setActionSuccess(
+        t("modal.nominee.statusUpdateSuccess", "Nominee has been successfully marked as {status}.", {
+          status: statusLabel.toUpperCase()
+        })
+      );
 
       if (onStatusUpdated) {
         onStatusUpdated(nomineeId, status, updated);
       }
     } catch (err) {
       console.error('Review nominee failed:', err);
-      setActionError(err.message || `Failed to update nominee status to ${status}.`);
+      setActionError(
+        err.message ||
+          t("modal.nominee.statusUpdateError", "Failed to update nominee status to {status}.", {
+            status: statusLabel.toLowerCase()
+          })
+      );
     } finally {
       setActionLoading(false);
     }
@@ -189,6 +223,15 @@ export default function NomineeDetailModal({
 
   const currentStatus = (nominee?.status || 'pending').toLowerCase();
   const age = calculateAge(nominee?.date_of_birth);
+  const naLabel = t("modal.nominee.na", "N/A");
+  const statusDisplay =
+    currentStatus === 'approved'
+      ? t("common.approved", "Approved")
+      : currentStatus === 'rejected'
+        ? t("common.rejected", "Rejected")
+        : currentStatus === 'pending'
+          ? t("common.pending", "Pending")
+          : currentStatus;
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 md:p-6 animate-fadeIn">
@@ -203,7 +246,7 @@ export default function NomineeDetailModal({
             <div>
               <div className="flex items-center gap-2 flex-wrap">
                 <h3 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight leading-tight">
-                  {nominee?.nominee_name || 'Nominee Verification'}
+                  {nominee?.nominee_name || t("modal.nominee.title", "Nominee Verification")}
                 </h3>
                 {nominee?.relationship_type && (
                   <span className="font-medium text-xs text-teal-800 bg-teal-50 border border-teal-200 px-2.5 py-0.5 rounded-lg capitalize">
@@ -219,11 +262,11 @@ export default function NomineeDetailModal({
                       : 'bg-amber-50 text-amber-700 border border-amber-200'
                   }`}
                 >
-                  ● {currentStatus}
+                  ● {statusDisplay}
                 </span>
               </div>
               <p className="text-xs text-slate-500 mt-1 font-medium">
-                Nominee Registration Details &amp; KYC Verification
+                {t("modal.nominee.subtitle", "Nominee Registration Details & KYC Verification")}
               </p>
             </div>
           </div>
@@ -254,7 +297,9 @@ export default function NomineeDetailModal({
           {loading ? (
             <div className="py-20 text-center space-y-3">
               <Loader2 className="w-8 h-8 text-teal-600 animate-spin mx-auto" />
-              <p className="text-sm text-slate-500 font-medium">Loading nominee details...</p>
+              <p className="text-sm text-slate-500 font-medium">
+                {t("modal.nominee.loading", "Loading nominee details...")}
+              </p>
             </div>
           ) : error ? (
             <div className="p-6 text-center space-y-3 bg-red-50 rounded-2xl border border-red-200 text-red-700">
@@ -264,7 +309,7 @@ export default function NomineeDetailModal({
                 onClick={fetchNomineeDetail}
                 className="px-4 py-2 bg-red-600 text-white rounded-xl text-xs font-bold hover:bg-red-700 cursor-pointer"
               >
-                Retry
+                {t("modal.nominee.retry", "Retry")}
               </button>
             </div>
           ) : nominee ? (
@@ -277,15 +322,17 @@ export default function NomineeDetailModal({
                   </div>
                   <div>
                     <span className="text-[10px] font-bold text-teal-700 uppercase tracking-wider block">
-                      Member Account Holder
+                      {t("modal.nominee.memberAccountHolder", "Member Account Holder")}
                     </span>
                     <h4 className="text-sm sm:text-base font-bold text-slate-900">
-                      {nominee.member_name || 'Member'}
+                      {nominee.member_name || t("modal.nominee.memberFallback", "Member")}
                     </h4>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-slate-500 font-medium">Member Code:</span>
+                  <span className="text-xs text-slate-500 font-medium">
+                    {t("modal.nominee.memberCode", "Member Code:")}
+                  </span>
                   <span className="font-mono text-xs font-bold text-teal-900 bg-white px-2.5 py-1 rounded-lg border border-teal-200 shadow-2xs">
                     {nominee.member_code || `MEM-${nominee.id}`}
                   </span>
@@ -296,32 +343,38 @@ export default function NomineeDetailModal({
               <div className="border border-slate-100 rounded-2xl p-4 sm:p-5 bg-white shadow-2xs space-y-3">
                 <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
                   <UserCheck className="w-4 h-4 text-[#00b4a7]" />
-                  <span>Nominee Identification &amp; Relationship</span>
+                  <span>{t("modal.nominee.identificationSection", "Nominee Identification & Relationship")}</span>
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
                   <div className="p-3 bg-slate-50/80 rounded-xl border border-slate-100/80">
-                    <span className="text-slate-500 block font-medium">Full Name</span>
+                    <span className="text-slate-500 block font-medium">
+                      {t("modal.nominee.fullName", "Full Name")}
+                    </span>
                     <span className="font-bold text-slate-900 text-sm mt-1 block">
                       {nominee.nominee_name}
                     </span>
                   </div>
 
                   <div className="p-3 bg-slate-50/80 rounded-xl border border-slate-100/80">
-                    <span className="text-slate-500 block font-medium">Relationship</span>
+                    <span className="text-slate-500 block font-medium">
+                      {t("modal.nominee.relationship", "Relationship")}
+                    </span>
                     <span className="font-bold text-slate-900 text-sm mt-1 block capitalize">
-                      {nominee.relationship_type || 'N/A'}
+                      {nominee.relationship_type || naLabel}
                     </span>
                   </div>
 
                   <div className="p-3 bg-slate-50/80 rounded-xl border border-slate-100/80">
-                    <span className="text-slate-500 block font-medium">Date of Birth</span>
+                    <span className="text-slate-500 block font-medium">
+                      {t("modal.nominee.dateOfBirth", "Date of Birth")}
+                    </span>
                     <div className="flex items-baseline gap-1.5 mt-1">
                       <span className="font-bold text-slate-900 text-sm">
-                        {formatDate(nominee.date_of_birth)}
+                        {formatDate(nominee.date_of_birth, naLabel)}
                       </span>
                       {age !== null && (
                         <span className="text-[11px] font-semibold text-teal-700 bg-teal-50 px-1.5 py-0.5 rounded">
-                          ({age} yrs)
+                          {t("modal.nominee.ageYears", "({age} yrs)", { age })}
                         </span>
                       )}
                     </div>
@@ -333,20 +386,24 @@ export default function NomineeDetailModal({
               <div className="border border-slate-100 rounded-2xl p-4 sm:p-5 bg-white shadow-2xs space-y-3">
                 <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
                   <Clock className="w-4 h-4 text-[#00b4a7]" />
-                  <span>Application Audit &amp; Timestamps</span>
+                  <span>{t("modal.nominee.auditSection", "Application Audit & Timestamps")}</span>
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                   <div className="p-3 bg-slate-50/80 rounded-xl border border-slate-100/80">
-                    <span className="text-slate-500 block font-medium">Submitted At</span>
+                    <span className="text-slate-500 block font-medium">
+                      {t("modal.nominee.submittedAt", "Submitted At")}
+                    </span>
                     <span className="font-bold text-slate-900 text-xs sm:text-sm mt-1 block">
-                      {formatDateTime(nominee.submitted_at)}
+                      {formatDateTime(nominee.submitted_at, naLabel)}
                     </span>
                   </div>
 
                   <div className="p-3 bg-slate-50/80 rounded-xl border border-slate-100/80">
-                    <span className="text-slate-500 block font-medium">Reviewed At</span>
+                    <span className="text-slate-500 block font-medium">
+                      {t("modal.nominee.reviewedAt", "Reviewed At")}
+                    </span>
                     <span className="font-bold text-slate-900 text-xs sm:text-sm mt-1 block">
-                      {formatDateTime(nominee.reviewed_at)}
+                      {formatDateTime(nominee.reviewed_at, naLabel)}
                     </span>
                   </div>
                 </div>
@@ -355,7 +412,7 @@ export default function NomineeDetailModal({
                   <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-xl text-xs space-y-1">
                     <span className="font-bold text-rose-900 block flex items-center gap-1.5">
                       <XCircle className="w-4 h-4 text-rose-600 flex-shrink-0" />
-                      Rejection Remarks:
+                      {t("modal.nominee.rejectionRemarks", "Rejection Remarks:")}
                     </span>
                     <p className="text-rose-700 font-medium">{nominee.rejection_reason}</p>
                   </div>
@@ -366,7 +423,7 @@ export default function NomineeDetailModal({
               <div className="border border-slate-100 rounded-2xl p-4 sm:p-5 bg-white shadow-2xs space-y-3">
                 <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
                   <ShieldCheck className="w-4 h-4 text-[#00b4a7]" />
-                  <span>Nominee Aadhaar Identification KYC</span>
+                  <span>{t("modal.nominee.kycSection", "Nominee Aadhaar Identification KYC")}</span>
                 </h4>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
@@ -377,8 +434,12 @@ export default function NomineeDetailModal({
                         <FileText className="w-5 h-5" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-xs font-bold text-slate-800">Aadhaar Card (Front)</p>
-                        <p className="text-[10px] text-slate-400">Photo &amp; Identity side</p>
+                        <p className="text-xs font-bold text-slate-800">
+                          {t("modal.nominee.aadhaarFront", "Aadhaar Card (Front)")}
+                        </p>
+                        <p className="text-[10px] text-slate-400">
+                          {t("modal.nominee.aadhaarFrontDesc", "Photo & Identity side")}
+                        </p>
                       </div>
                     </div>
                     <button
@@ -391,7 +452,7 @@ export default function NomineeDetailModal({
                       ) : (
                         <Eye className="w-3.5 h-3.5" />
                       )}
-                      <span>View</span>
+                      <span>{t("common.view", "View")}</span>
                     </button>
                   </div>
 
@@ -402,8 +463,12 @@ export default function NomineeDetailModal({
                         <FileText className="w-5 h-5" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-xs font-bold text-slate-800">Aadhaar Card (Back)</p>
-                        <p className="text-[10px] text-slate-400">Address side</p>
+                        <p className="text-xs font-bold text-slate-800">
+                          {t("modal.nominee.aadhaarBack", "Aadhaar Card (Back)")}
+                        </p>
+                        <p className="text-[10px] text-slate-400">
+                          {t("modal.nominee.aadhaarBackDesc", "Address side")}
+                        </p>
                       </div>
                     </div>
                     <button
@@ -416,7 +481,7 @@ export default function NomineeDetailModal({
                       ) : (
                         <Eye className="w-3.5 h-3.5" />
                       )}
-                      <span>View</span>
+                      <span>{t("common.view", "View")}</span>
                     </button>
                   </div>
                 </div>
@@ -450,14 +515,14 @@ export default function NomineeDetailModal({
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-rose-900 flex items-center gap-1.5">
                       <AlertCircle className="w-4 h-4 text-rose-600" />
-                      Specify Rejection Reason (Required)
+                      {t("modal.nominee.specifyRejectionReason", "Specify Rejection Reason (Required)")}
                     </span>
                     <button
                       type="button"
                       onClick={() => setShowRejectInput(false)}
                       className="text-slate-400 hover:text-slate-600 cursor-pointer text-xs"
                     >
-                      Cancel
+                      {t("common.cancel", "Cancel")}
                     </button>
                   </div>
                   <textarea
@@ -465,12 +530,14 @@ export default function NomineeDetailModal({
                     maxLength={255}
                     value={rejectionReason}
                     onChange={(e) => setRejectionReason(e.target.value)}
-                    placeholder="e.g. Aadhaar copy is blurry or does not match nominee details..."
+                    placeholder={t("modal.nominee.rejectionPlaceholder", "e.g. Aadhaar copy is blurry or does not match nominee details...")}
                     className="w-full p-3 rounded-xl border border-rose-200 bg-white text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-200"
                   />
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] text-slate-400">
-                      {rejectionReason.length} / 255 characters
+                      {t("modal.nominee.characterCount", "{count} / 255 characters", {
+                        count: rejectionReason.length
+                      })}
                     </span>
                     <button
                       type="button"
@@ -483,7 +550,7 @@ export default function NomineeDetailModal({
                       ) : (
                         <XCircle className="w-3.5 h-3.5" />
                       )}
-                      <span>Confirm Rejection</span>
+                      <span>{t("modal.nominee.confirmRejection", "Confirm Rejection")}</span>
                     </button>
                   </div>
                 </div>
@@ -499,7 +566,7 @@ export default function NomineeDetailModal({
             onClick={onClose}
             className="px-4 py-2 rounded-xl border border-slate-200 text-xs sm:text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
           >
-            Close
+            {t("common.close", "Close")}
           </button>
 
           {/* Action buttons (allow approval/rejection) */}
@@ -512,7 +579,7 @@ export default function NomineeDetailModal({
                 className="px-3.5 sm:px-4 py-2 rounded-xl border border-rose-200 text-rose-700 hover:bg-rose-50 text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-1.5"
               >
                 <XCircle className="w-3.5 h-3.5" />
-                <span>Reject</span>
+                <span>{t("modal.nominee.reject", "Reject")}</span>
               </button>
             )}
 
@@ -528,7 +595,7 @@ export default function NomineeDetailModal({
                 ) : (
                   <CheckCircle2 className="w-3.5 h-3.5" />
                 )}
-                <span>Approve Nominee</span>
+                <span>{t("modal.nominee.approveNominee", "Approve Nominee")}</span>
               </button>
             )}
           </div>
